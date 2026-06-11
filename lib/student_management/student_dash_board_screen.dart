@@ -1,0 +1,880 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:school_pro/student_management/student_fees_screen.dart';
+import 'package:school_pro/student_management/timetable_screen.dart';
+import 'package:school_pro/utils/routes/routes_name.dart';
+import '../admin_management/school_timetable_screen.dart';
+import '../repo/auth_repo/auth_repo.dart';
+import '../res/app_color.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_manager.dart';
+import '../view_model/school_view_model/user_permission_view_model.dart';
+import '../view_model/student_view_model/student_fee_view_model.dart'; // ← ADD karo
+import '../view_model/student_view_model/student_profile_view_model.dart';
+import '../view_model/user_view_model.dart';
+
+class StudentDashboardScreen extends StatefulWidget {
+  const StudentDashboardScreen({super.key});
+
+  @override
+  State<StudentDashboardScreen> createState() => _StudentDashboardScreenState();
+}
+
+class _StudentDashboardScreenState extends State<StudentDashboardScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late List<Animation<double>> _tileAnimations;
+
+  bool _permissionsLoaded = false;
+
+  static const List<_DashTile> _tiles = [
+    _DashTile(
+      'My Profile',
+      Icons.person_rounded,
+      Color(0xFF1976D2),
+      'View & edit',
+      'view_one_student_profile',
+    ),
+
+    _DashTile(
+      'Attendance',
+      Icons.fact_check_rounded,
+      Color(0xFF00897B),
+      'Daily record',
+      'view_one_student_attendance',
+    ),
+
+    _DashTile(
+      'Homework',
+      Icons.auto_stories_rounded,
+      Color(0xFFF57C00),
+      'Assignments',
+      'submit_homework',
+    ),
+
+    _DashTile(
+      'Fees',
+      Icons.receipt_long_rounded,
+      Color(0xFF1565C0),
+      'Payment',
+      'view_fees',
+    ),
+
+    _DashTile(
+      'Notifications',
+      Icons.notifications_active_outlined,
+      Color(0xFFC62828),
+      'new',
+      'notification_view',
+    ),
+
+    _DashTile(
+      'School Timetable',
+      Icons.schedule_rounded,
+      Color(0xFF6D28D9),
+      'Class Schedule',
+      'view_timetable',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    );
+
+    _tileAnimations = List.generate(_tiles.length, (i) {
+      final start = (i * 0.08).clamp(0.0, 0.6);
+      final end = (start + 0.45).clamp(0.0, 1.0);
+
+      return CurvedAnimation(
+        parent: _animController,
+        curve: Interval(start, end, curve: Curves.easeOutBack),
+      );
+    });
+
+    _animController.forward();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        await _restorePermissions();
+
+        if (!mounted) return;
+
+        final userVm = Provider.of<UserViewModel>(context, listen: false);
+
+        final token = await userVm.getToken();
+
+        if (token == null || token.isEmpty) {
+          debugPrint("❌ TOKEN NOT FOUND");
+
+          return;
+        }
+
+        final profileVm = Provider.of<StudentProfileViewModel>(
+          context,
+          listen: false,
+        );
+
+        await profileVm.studentProfileApi(context);
+
+        if (!mounted) return;
+
+        final academicYear =
+            profileVm.studentProfileModel?.data?.academicYear ?? "2026-27";
+
+        // =========================
+        // Fee API
+        // =========================
+        await Provider.of<StudentFeesViewModel>(
+          context,
+          listen: false,
+        ).fetchFees(academicYear: academicYear, token: token);
+
+        debugPrint("✅ STUDENT DASHBOARD READY");
+      } catch (e, s) {
+        debugPrint("❌ STUDENT DASHBOARD ERROR => $e");
+
+        debugPrint(s.toString());
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _restorePermissions() async {
+    final permissions =
+    await UserViewModel().getPermissions();
+
+    PermissionManager.setPermissions(
+      permissions,
+    );
+
+    debugPrint(
+      "RESTORED PERMISSIONS => $permissions",
+    );
+
+    if (mounted) {
+      setState(() {
+        _permissionsLoaded = true;
+      });
+    }
+  }
+
+  String _capitalize(String? name) {
+    if (name == null || name.isEmpty) return 'Student';
+    return name[0].toUpperCase() + name.substring(1);
+  }
+
+  void _onTileTap(int index) {
+    switch (index) {
+      case 0:
+        Navigator.pushNamed(
+          context,
+          RoutesName.studentProfileScreen,
+        );
+        break;
+
+      case 1:
+        Navigator.pushNamed(
+          context,
+          RoutesName.studentAttendanceScreen,
+        );
+        break;
+
+      case 2:
+        Navigator.pushNamed(
+          context,
+          RoutesName.studentHomeworkScreen,
+        );
+        break;
+
+      case 3:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                StudentFeesScreen(),
+          ),
+        );
+        break;
+
+      case 4:
+        Navigator.pushNamed(
+          context,
+          RoutesName.studentNotificationScreen,
+        );
+        break;
+
+      case 5:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+            const SchoolTimetableView(),
+          ),
+        );
+        break;
+    }
+  }
+
+  String _fmt(double v) {
+    if (v >= 1000) return '₹${(v / 1000).toStringAsFixed(1)}k';
+    return '₹${v.toStringAsFixed(0)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final profile = Provider.of<StudentProfileViewModel>(
+      context,
+    ).studentProfileModel;
+    final String studentName = _capitalize(profile?.data?.name);
+    final String studentEmail =
+        profile?.data?.userEmail ?? 'student@school.com';
+    final String studentClass = profile?.data?.classId?.toString() ?? 'Class X';
+    return WillPopScope(
+      onWillPop: () async {
+        SystemNavigator.pop();
+        return false;
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF0F4FF),
+        drawer: _buildDrawer(context, studentName, studentEmail, studentClass),
+        body: Column(
+          children: [
+            _buildHeader(context, studentName, studentClass),
+            Expanded(child: _buildGrid()),
+            // _buildBottomNav(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, String name, String studentClass) {
+    final feesVm = Provider.of<StudentFeesViewModel>(context);
+    final bool loading = feesVm.isLoading;
+    final String totalStr = loading ? '...' : _fmt(feesVm.totalAmount);
+    final String paidStr = loading ? '...' : _fmt(feesVm.paidAmount);
+    final String pendingStr = loading ? '...' : _fmt(feesVm.pendingAmount);
+    final int pendingCount =
+        feesVm.pendingInstallments.length +
+        feesVm.pendingTransportInstallments.length;
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColor.lightBlueColor,
+            AppColor.lightBlueColor.withValues(alpha: 0.85),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(36)),
+      ),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        MediaQuery.of(context).padding.top + 16,
+        20,
+        28,
+      ),
+      child: Column(
+        children: [
+          // ── Top Row ──
+          Row(
+            children: [
+              Builder(
+                builder: (ctx) => GestureDetector(
+                  onTap: () => Scaffold.of(ctx).openDrawer(),
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.35),
+                        width: 1.5,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.person_rounded,
+                      color: Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'STUDENT PORTAL',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white.withValues(alpha: 0.55),
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Hi, $name 👋',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Notification bell — ab real pending count
+              // Stack(
+              //   children: [
+              //     Container(
+              //       width: 44, height: 44,
+              //       decoration: BoxDecoration(
+              //         color: Colors.white.withValues(alpha: 0.13),
+              //         shape: BoxShape.circle,
+              //       ),
+              //       child: const Icon(Icons.notifications_outlined,
+              //           color: Colors.white, size: 22),
+              //     ),
+              //     Positioned(
+              //       top: 6, right: 6,
+              //       child: Container(
+              //         padding: const EdgeInsets.all(2),
+              //         constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+              //         decoration: BoxDecoration(
+              //           color: const Color(0xFFFFD54F),
+              //           shape: BoxShape.circle,
+              //           border: Border.all(
+              //               color: const Color(0xFF1565C0), width: 1.5),
+              //         ),
+              //         child: pendingCount > 0
+              //             ? Text(
+              //           pendingCount > 9 ? '9+' : '$pendingCount',
+              //           style: const TextStyle(
+              //               fontSize: 8,
+              //               fontWeight: FontWeight.bold,
+              //               color: Colors.black87),
+              //           textAlign: TextAlign.center,
+              //         )
+              //             : const SizedBox(width: 5, height: 5),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // ── Info Cards Row — real data ──
+          Row(
+            children: [
+              _infoCard(
+                Icons.account_balance_wallet_rounded,
+                totalStr,
+                'Total Fee',
+              ),
+              const SizedBox(width: 10),
+              _infoCard(
+                Icons.check_circle_outline_rounded,
+                paidStr,
+                'Paid Amount',
+              ),
+              const SizedBox(width: 10),
+              _infoCard(Icons.pending_actions_rounded, pendingStr, 'Pending'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoCard(IconData icon, String value, String label) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.22),
+            width: 1,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: Colors.white, size: 16),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 1),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 9,
+                color: Colors.white.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ─── GRID ────────────────────────────────────────────────────────────────────
+
+  // Widget _buildGrid() {
+  //   return GridView.builder(
+  //     padding: const EdgeInsets.fromLTRB(16, 22, 16, 16),
+  //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+  //       crossAxisCount: 2,
+  //       mainAxisSpacing: 14,
+  //       crossAxisSpacing: 14,
+  //       childAspectRatio: 1.05,
+  //     ),
+  //     itemCount: _tiles.length,
+  //     itemBuilder: (ctx, i) {
+  //       final tile = _tiles[i];
+  //       return AnimatedBuilder(
+  //         animation: _tileAnimations[i],
+  //         builder: (_, child) => Transform.scale(
+  //           scale: _tileAnimations[i].value,
+  //           child: Opacity(
+  //             opacity: _tileAnimations[i].value.clamp(0.0, 1.0),
+  //             child: child,
+  //           ),
+  //         ),
+  //         child: GestureDetector(
+  //           onTap: () => _onTileTap(i),
+  //           child: _buildTile(tile),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+  Widget _buildGrid() {
+    // ✅ Sirf woh tiles jo denied nahi hain
+
+    if (!_permissionsLoaded) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+    final visibleTiles = _tiles
+        .asMap()
+        .entries
+        .where((e) => PermissionExtensions.canAccess(e.value.permKey))
+        .toList();
+
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 22, 16, 16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 1.05,
+      ),
+      itemCount: visibleTiles.length,
+      itemBuilder: (ctx, i) {
+        final entry = visibleTiles[i];
+        final originalIdx = entry.key; // ✅ _onTileTap ke liye original index
+        final tile = entry.value;
+
+        final animIdx = i.clamp(0, _tileAnimations.length - 1);
+
+        return AnimatedBuilder(
+          animation: _tileAnimations[animIdx],
+          builder: (_, child) => Transform.scale(
+            scale: _tileAnimations[animIdx].value,
+            child: Opacity(
+              opacity: _tileAnimations[animIdx].value.clamp(0.0, 1.0),
+              child: child,
+            ),
+          ),
+          child: GestureDetector(
+            onTap: () => _onTileTap(originalIdx), // ✅ original index
+            child: _buildTile(tile),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTile(_DashTile tile) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [tile.color, tile.color.withValues(alpha: 0.78)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: tile.color.withValues(alpha: 0.32),
+            blurRadius: 14,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -16,
+            right: -16,
+            child: Container(
+              width: 68,
+              height: 68,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.11),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -8,
+            left: 10,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.07),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.22),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(tile.icon, color: Colors.white, size: 26),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  tile.label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  tile.sub,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.white.withValues(alpha: 0.65),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDrawer(
+    BuildContext context,
+    String name,
+    String email,
+    String studentClass,
+  ) {
+    return Drawer(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(right: Radius.circular(28)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1A237E), Color(0xFF1565C0)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            padding: EdgeInsets.fromLTRB(
+              20,
+              MediaQuery.of(context).padding.top + 24,
+              20,
+              28,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 68,
+                  height: 68,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.4),
+                      width: 2,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.person_rounded,
+                    color: Colors.white,
+                    size: 36,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  email,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withValues(alpha: 0.65),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Container(
+                //   padding: const EdgeInsets.symmetric(
+                //       horizontal: 12, vertical: 5),
+                //   decoration: BoxDecoration(
+                //     color: Colors.white.withOpacity(0.18),
+                //     borderRadius: BorderRadius.circular(20),
+                //     border: Border.all(
+                //         color: Colors.white.withOpacity(0.3)),
+                //   ),
+                //   child: Text(
+                //     '🎓  $studentClass',
+                //     style: const TextStyle(
+                //       fontSize: 11,
+                //       color: Colors.white,
+                //       fontWeight: FontWeight.w500,
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              children: [
+                _drawerItem(
+                  icon: Icons.settings_outlined,
+                  title: 'Settings',
+                  onTap: () => Navigator.pop(context),
+                ),
+                _drawerItem(
+                  icon: Icons.help_outline_rounded,
+                  title: 'Help & Support',
+                  onTap: () => Navigator.pop(context),
+                ),
+                _drawerItem(
+                  icon: Icons.shield_outlined,
+                  title: 'Privacy Policy',
+                  onTap: () => Navigator.pop(context),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                  child: Divider(),
+                ),
+                _drawerItem(
+                  icon: Icons.logout_rounded,
+                  title: 'Logout',
+                  iconColor: Colors.red.shade700,
+                  titleColor: Colors.red.shade700,
+                  iconBg: Colors.red.shade50,
+                  onTap: () {
+                    // Navigator.pop(context);
+                    _showLogoutDialog(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _drawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    Color? iconColor,
+    Color? titleColor,
+    Color? iconBg,
+  }) {
+    return ListTile(
+      onTap: onTap,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: iconBg ?? const Color(0xFFE3EEFF),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: iconColor ?? const Color(0xFF1565C0),
+        ),
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: titleColor ?? Colors.black87,
+        ),
+      ),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        color: Colors.grey.shade300,
+        size: 22,
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.logout_rounded, color: Colors.red),
+            SizedBox(width: 10),
+            Text(
+              'Logout',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to logout?',
+          style: TextStyle(fontSize: 14, color: Colors.black54),
+        ),
+        actions: [
+          /// CANCEL
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+
+          /// LOGOUT
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+
+            onPressed: () async {
+              // dialog close
+              Navigator.pop(ctx);
+
+              try {
+                final repo = AuthRepository();
+                final userVM = UserViewModel();
+
+                // API logout
+                await repo.logoutApi({"device_type": "android"});
+
+                // delete firebase token
+                await FirebaseMessaging.instance.deleteToken();
+
+                // clear all local data
+                await userVM.clearUser();
+
+                PermissionManager.clear();
+
+                print("✅ USER LOGOUT SUCCESS");
+
+                // go to login screen
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RoutesName.loginScreen,
+                  (route) => false,
+                );
+              } catch (e) {
+                print("Logout Error => $e");
+
+                // error aaye tab bhi clear karo
+                await UserViewModel().clearUser();
+                PermissionManager.clear();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  RoutesName.loginScreen,
+                  (route) => false,
+                );
+              }
+            },
+
+            child: const Text("Logout", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── DATA MODELS ─────────────────────────────────────────────────────────────
+
+class _DashTile {
+  final String label;
+  final IconData icon;
+  final Color color;
+  final String sub;
+  final String permKey; // ✅ new
+
+  const _DashTile(this.label, this.icon, this.color, this.sub, this.permKey);
+}
