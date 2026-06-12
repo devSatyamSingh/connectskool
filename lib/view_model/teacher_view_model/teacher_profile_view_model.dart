@@ -12,6 +12,14 @@ class TeacherProfileViewModel extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
 
+  bool _permissionDenied = false;
+  bool get permissionDenied => _permissionDenied;
+
+  void setPermissionDenied(bool value) {
+    _permissionDenied = value;
+    notifyListeners();
+  }
+
   TeacherProfileModel? _teacherProfileModel;
   TeacherProfileModel? get teacherProfileModel => _teacherProfileModel;
 
@@ -48,7 +56,13 @@ class TeacherProfileViewModel extends ChangeNotifier {
           break;
 
         case 403:
-          Utils.show("Access denied", context);
+          setPermissionDenied(true);
+
+          Utils.show(
+            "Your profile access has been disabled by administrator.",
+            context,
+            type: "warning",
+          );
           break;
 
         case 404:

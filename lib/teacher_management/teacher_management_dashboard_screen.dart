@@ -11,12 +11,15 @@ import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../admin_management/attendance_widget/all_student_admin_attendance_screen.dart';
 import '../repo/auth_repo/auth_repo.dart';
+import '../utils/dashboard_module.dart';
 import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../utils/permission_manager.dart';
 import '../view_model/school_view_model/all_accountant_list_view_model.dart';
 import '../view_model/school_view_model/all_teachers_view_model.dart';
-import '../view_model/school_view_model/user_permission_view_model.dart';
 import '../view_model/user_view_model.dart';
+import '../admin_management/cms_screen.dart';
+import '../admin_management/manage_permission.dart';
 import 'Teacher_school_timetable_screen.dart';
 
 class TeacherManagementDashBoardScreen extends StatefulWidget {
@@ -34,72 +37,72 @@ class _TeacherManagementDashBoardScreenState
   late List<Animation<double>> _tileAnimations;
   int _selectedNavIndex = 0;
 
-  final List<_DashTile> _tiles = [
-    _DashTile(
-      label: 'My Profile',
-      sub: 'View & edit',
-      icon: Icons.person_rounded,
-      color: const Color(0xFF00897B),
-      route: null,
-      permKey: 'view_all_teacher',
-    ),
-
-    _DashTile(
-      label: 'Attendance',
-      sub: 'Mark today',
-      icon: Icons.fact_check_rounded,
-      color: const Color(0xFF1976D2),
-      route: null,
-      permKey: 'mark_student_attendance',
-    ),
-
-    _DashTile(
-      label: 'Marksheet',
-      sub: 'View results',
-      icon: Icons.description_rounded,
-      color: const Color(0xFF3949AB),
-      route: null,
-      permKey: 'view_marks',
-    ),
-
-    _DashTile(
-      label: 'Timetable',
-      sub: 'This week',
-      icon: Icons.schedule_rounded,
-      color: const Color(0xFF7B1FA2),
-      route: null,
-      permKey: 'view_timetable',
-    ),
-
-    _DashTile(
-      label: 'Exams',
-      sub: 'Schedule',
-      icon: Icons.assignment_turned_in_rounded,
-      color: const Color(0xFF2E7D32),
-      route: null,
-      permKey: 'view_exam',
-    ),
-
-    _DashTile(
-      label: 'Homework',
-      sub: 'Assign & view',
-      icon: Icons.menu_book_rounded,
-      color: const Color(0xFFF57C00),
-      route: null,
-      permKey: 'teacher_create_homework',
-    ),
-
-    _DashTile(
-      label: 'Notifications',
-      sub: 'Stay updated',
-      icon: Icons.notifications_active_rounded,
-      color: const Color(0xFFFFA000),
-      route: null,
-      permKey: 'notification_view',
-      isWide: true,
-      badge: '3 new',
-    ),
-  ];
+  // final List<_DashTile> _tiles = [
+  //   _DashTile(
+  //     label: 'My Profile',
+  //     sub: 'View & edit',
+  //     icon: Icons.person_rounded,
+  //     color: const Color(0xFF00897B),
+  //     route: null,
+  //     permKey: 'view_all_teacher',
+  //   ),
+  //
+  //   _DashTile(
+  //     label: 'Attendance',
+  //     sub: 'Mark today',
+  //     icon: Icons.fact_check_rounded,
+  //     color: const Color(0xFF1976D2),
+  //     route: null,
+  //     permKey: 'mark_student_attendance',
+  //   ),
+  //
+  //   _DashTile(
+  //     label: 'Marksheet',
+  //     sub: 'View results',
+  //     icon: Icons.description_rounded,
+  //     color: const Color(0xFF3949AB),
+  //     route: null,
+  //     permKey: 'view_marks',
+  //   ),
+  //
+  //   _DashTile(
+  //     label: 'Timetable',
+  //     sub: 'This week',
+  //     icon: Icons.schedule_rounded,
+  //     color: const Color(0xFF7B1FA2),
+  //     route: null,
+  //     permKey: 'view_timetable',
+  //   ),
+  //
+  //   _DashTile(
+  //     label: 'Exams',
+  //     sub: 'Schedule',
+  //     icon: Icons.assignment_turned_in_rounded,
+  //     color: const Color(0xFF2E7D32),
+  //     route: null,
+  //     permKey: 'view_exam',
+  //   ),
+  //
+  //   _DashTile(
+  //     label: 'Homework',
+  //     sub: 'Assign & view',
+  //     icon: Icons.menu_book_rounded,
+  //     color: const Color(0xFFF57C00),
+  //     route: null,
+  //     permKey: 'teacher_create_homework',
+  //   ),
+  //
+  //   _DashTile(
+  //     label: 'Notifications',
+  //     sub: 'Stay updated',
+  //     icon: Icons.notifications_active_rounded,
+  //     color: const Color(0xFFFFA000),
+  //     route: null,
+  //     permKey: 'notification_view',
+  //     isWide: true,
+  //     badge: '3 new',
+  //   ),
+  // ];
   @override
   void initState() {
     super.initState();
@@ -122,12 +125,16 @@ class _TeacherManagementDashBoardScreenState
       ).allTeachersListApi(context);
     });
 
+
+
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
     );
 
-    _tileAnimations = List.generate(_tiles.length, (i) {
+    _tileAnimations = List.generate(
+        DashboardModules.modules.length + 1,
+            (i) {
       final start = i * 0.07;
       final end = (start + 0.5).clamp(0.0, 1.0);
       return CurvedAnimation(
@@ -187,38 +194,38 @@ class _TeacherManagementDashBoardScreenState
         false;
   }
 
-  void _onTileTap(BuildContext ctx, int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushNamed(ctx, RoutesName.teacherProfileScreen);
-        break;
-
-      case 1:
-        Navigator.push(
-          ctx,
-          MaterialPageRoute(builder: (_) => AllStudentAdminAttendanceScreen()),
-        );
-        break;
-      case 2:
-        Navigator.pushNamed(ctx, RoutesName.marksheetScreen);
-        break;
-      case 3:
-        Navigator.push(
-          ctx,
-          MaterialPageRoute(builder: (_) => TeacherSchoolTimetableScreen()),
-        );
-        break;
-      case 4:
-        Navigator.pushNamed(ctx, RoutesName.examScreen);
-        break;
-      case 5:
-        Navigator.pushNamed(ctx, RoutesName.allHomeWorkScreen);
-        break;
-      case 6:
-        Navigator.pushNamed(ctx, RoutesName.notificationScreen);
-        break;
-    }
-  }
+  // void _onTileTap(BuildContext ctx, int index) {
+  //   switch (index) {
+  //     case 0:
+  //       Navigator.pushNamed(ctx, RoutesName.teacherProfileScreen);
+  //       break;
+  //
+  //     case 1:
+  //       Navigator.push(
+  //         ctx,
+  //         MaterialPageRoute(builder: (_) => AllStudentAdminAttendanceScreen()),
+  //       );
+  //       break;
+  //     case 2:
+  //       Navigator.pushNamed(ctx, RoutesName.marksheetScreen);
+  //       break;
+  //     case 3:
+  //       Navigator.push(
+  //         ctx,
+  //         MaterialPageRoute(builder: (_) => TeacherSchoolTimetableScreen()),
+  //       );
+  //       break;
+  //     case 4:
+  //       Navigator.pushNamed(ctx, RoutesName.examScreen);
+  //       break;
+  //     case 5:
+  //       Navigator.pushNamed(ctx, RoutesName.allHomeWorkScreen);
+  //       break;
+  //     case 6:
+  //       Navigator.pushNamed(ctx, RoutesName.notificationScreen);
+  //       break;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -429,323 +436,326 @@ class _TeacherManagementDashBoardScreenState
     );
   }
 
-  // ─── GRID ────────────────────────────────────────────────────────────────────
-
-  // Widget _buildGrid(BuildContext context) {
-  //   // Separate normal tiles from wide tiles
-  //   final normalTiles = _tiles.where((t) => !t.isWide).toList();
-  //   final wideTiles = _tiles.where((t) => t.isWide).toList();
-  //
-  //   return ListView(
-  //     padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-  //     children: [
-  //       GridView.builder(
-  //         shrinkWrap: true,
-  //         physics: const NeverScrollableScrollPhysics(),
-  //         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-  //           crossAxisCount: 2,
-  //           mainAxisSpacing: 14,
-  //           crossAxisSpacing: 14,
-  //           childAspectRatio: 1.05,
-  //         ),
-  //         itemCount: normalTiles.length,
-  //         itemBuilder: (ctx, i) {
-  //           final tile = normalTiles[i];
-  //           final globalIndex = _tiles.indexOf(tile);
-  //           return AnimatedBuilder(
-  //             animation: _tileAnimations[globalIndex],
-  //             builder: (_, child) => Transform.scale(
-  //               scale: _tileAnimations[globalIndex].value,
-  //               child: Opacity(
-  //                 opacity: _tileAnimations[globalIndex].value.clamp(0.0, 1.0),
-  //                 child: child,
-  //               ),
-  //             ),
-  //             child: _normalCard(ctx, tile, globalIndex),
-  //           );
-  //         },
-  //       ),
-  //       const SizedBox(height: 14),
-  //       ...wideTiles.map((tile) {
-  //         final globalIndex = _tiles.indexOf(tile);
-  //         return Padding(
-  //           padding: const EdgeInsets.only(bottom: 10),
-  //           child: Column(
-  //             children: [
-  //               AnimatedBuilder(
-  //                 animation: _tileAnimations[globalIndex],
-  //                 builder: (_, child) => Transform.scale(
-  //                   scale: _tileAnimations[globalIndex].value,
-  //                   child: Opacity(
-  //                     opacity: _tileAnimations[globalIndex].value.clamp(
-  //                       0.0,
-  //                       1.0,
-  //                     ),
-  //                     child: child,
-  //                   ),
-  //                 ),
-  //                 child: SizedBox(
-  //                   height: 80,
-  //                   child: _wideCard(context, tile, globalIndex),
-  //                 ),
-  //               ),
-  //               SizedBox(height: 40),
-  //             ],
-  //           ),
-  //         );
-  //       }),
-  //     ],
-  //   );
-  // }
   Widget _buildGrid(BuildContext context) {
-    final permVm = Provider.of<GetUserPermissionViewModel>(
-      context,
-      listen: false,
-    );
 
-    final filteredTiles = _tiles.where(
-          (t) => permVm.canAccess(
-        t.permKey,
+    final teacherModules = [
+
+      DashboardModule(
+        title: "My Profile",
+        subTitle: "View & Edit",
+        icon: Icons.person_rounded,
+        color: const Color(0xFF00897B),
+        permission: PermissionKeys.viewOneTeacherProfile,
+        route: RoutesName.teacherProfileScreen,
       ),
-    ).toList();
 
-    final normalTiles = filteredTiles.where((t) => !t.isWide).toList();
-    final wideTiles = filteredTiles.where((t) => t.isWide).toList();
+      // Common Modules
+      ...DashboardModules.modules.where(
+            (e) =>
+        e.permission != PermissionKeys.managePermissions &&
+            PermissionExtensions.canAccess(
+              e.permission,
+            ),
+      ),
+    ];
 
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-      children: [
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 14,
-            crossAxisSpacing: 14,
-            childAspectRatio: 1.05,
-          ),
-          itemCount: normalTiles.length,
-          itemBuilder: (ctx, i) {
-            final tile = normalTiles[i];
-            final globalIndex = _tiles.indexOf(
-              tile,
-            ); // ✅ original index for _onTileTap
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(
+        16,
+        0,
+        16,
+        20,
+      ),
+      itemCount: teacherModules.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 1.05,
+      ),
+      itemBuilder: (context, i) {
 
-            final animIdx = globalIndex.clamp(0, _tileAnimations.length - 1);
+        final module = teacherModules[i];
 
-            return AnimatedBuilder(
-              animation: _tileAnimations[animIdx],
-              builder: (_, child) => Transform.scale(
-                scale: _tileAnimations[animIdx].value,
-                child: Opacity(
-                  opacity: _tileAnimations[animIdx].value.clamp(0.0, 1.0),
-                  child: child,
+        final animIdx = i.clamp(
+          0,
+          _tileAnimations.length - 1,
+        );
+
+        return AnimatedBuilder(
+          animation: _tileAnimations[animIdx],
+          builder: (_, child) {
+            return Transform.scale(
+              scale: _tileAnimations[animIdx].value,
+              child: Opacity(
+                opacity: _tileAnimations[animIdx].value.clamp(
+                  0.0,
+                  1.0,
                 ),
+                child: child,
               ),
-              child: _normalCard(ctx, tile, globalIndex),
             );
           },
-        ),
-        const SizedBox(height: 14),
-        ...wideTiles.map((tile) {
-          final globalIndex = _tiles.indexOf(tile);
-          final animIdx = globalIndex.clamp(0, _tileAnimations.length - 1);
-
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Column(
-              children: [
-                AnimatedBuilder(
-                  animation: _tileAnimations[animIdx],
-                  builder: (_, child) => Transform.scale(
-                    scale: _tileAnimations[animIdx].value,
-                    child: Opacity(
-                      opacity: _tileAnimations[animIdx].value.clamp(0.0, 1.0),
-                      child: child,
-                    ),
-                  ),
-                  child: SizedBox(
-                    height: 80,
-                    child: _wideCard(context, tile, globalIndex),
-                  ),
-                ),
-                const SizedBox(height: 40),
-              ],
-            ),
-          );
-        }),
-      ],
+          child: _buildModuleTile(module),
+        );
+      },
     );
   }
 
-  Widget _normalCard(BuildContext ctx, _DashTile tile, int index) {
+  // Widget _normalCard(BuildContext ctx, _DashTile tile, int index) {
+  //   return GestureDetector(
+  //     onTap: () => _onTileTap(ctx, index),
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         gradient: LinearGradient(
+  //           colors: [tile.color, tile.color.withOpacity(0.82)],
+  //           begin: Alignment.topLeft,
+  //           end: Alignment.bottomRight,
+  //         ),
+  //         borderRadius: BorderRadius.circular(22),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: tile.color.withOpacity(0.38),
+  //             blurRadius: 16,
+  //             offset: const Offset(0, 8),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Stack(
+  //         children: [
+  //           // Decorative circles
+  //           Positioned(
+  //             top: -16,
+  //             right: -16,
+  //             child: Container(
+  //               width: 72,
+  //               height: 72,
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white.withOpacity(0.12),
+  //                 shape: BoxShape.circle,
+  //               ),
+  //             ),
+  //           ),
+  //           Positioned(
+  //             bottom: -12,
+  //             right: 12,
+  //             child: Container(
+  //               width: 44,
+  //               height: 44,
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white.withOpacity(0.08),
+  //                 shape: BoxShape.circle,
+  //               ),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.all(18),
+  //             child: Column(
+  //               crossAxisAlignment: CrossAxisAlignment.start,
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 Container(
+  //                   padding: const EdgeInsets.all(10),
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.white.withOpacity(0.22),
+  //                     borderRadius: BorderRadius.circular(14),
+  //                   ),
+  //                   child: Icon(tile.icon, color: Colors.white, size: 26),
+  //                 ),
+  //                 const SizedBox(height: 14),
+  //                 Text(
+  //                   tile.label,
+  //                   style: const TextStyle(
+  //                     fontSize: 14,
+  //                     fontWeight: FontWeight.bold,
+  //                     color: Colors.white,
+  //                   ),
+  //                 ),
+  //                 const SizedBox(height: 3),
+  //                 Text(
+  //                   tile.sub,
+  //                   style: TextStyle(
+  //                     fontSize: 11,
+  //                     color: Colors.white.withOpacity(0.65),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+  //
+  // Widget _wideCard(BuildContext ctx, _DashTile tile, int index) {
+  //   // Spans 2 columns — wrap in a SizedBox with full width
+  //   return SizedBox(
+  //     // GridView will size this; span is handled below via itemBuilder check
+  //     child: GestureDetector(
+  //       onTap: () => _onTileTap(ctx, index),
+  //       child: Container(
+  //         decoration: BoxDecoration(
+  //           gradient: LinearGradient(
+  //             colors: [tile.color, tile.color.withOpacity(0.82)],
+  //             begin: Alignment.topLeft,
+  //             end: Alignment.bottomRight,
+  //           ),
+  //           borderRadius: BorderRadius.circular(22),
+  //           boxShadow: [
+  //             BoxShadow(
+  //               color: tile.color.withOpacity(0.35),
+  //               blurRadius: 14,
+  //               offset: const Offset(0, 6),
+  //             ),
+  //           ],
+  //         ),
+  //         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+  //         child: Row(
+  //           children: [
+  //             Container(
+  //               padding: const EdgeInsets.all(10),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white.withOpacity(0.22),
+  //                 borderRadius: BorderRadius.circular(14),
+  //               ),
+  //               child: Icon(tile.icon, color: Colors.white, size: 26),
+  //             ),
+  //             const SizedBox(width: 14),
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 mainAxisAlignment: MainAxisAlignment.center,
+  //                 children: [
+  //                   Text(
+  //                     tile.label,
+  //                     style: const TextStyle(
+  //                       fontSize: 15,
+  //                       fontWeight: FontWeight.bold,
+  //                       color: Colors.white,
+  //                     ),
+  //                   ),
+  //                   Text(
+  //                     tile.sub,
+  //                     style: TextStyle(
+  //                       fontSize: 11,
+  //                       color: Colors.white.withOpacity(0.65),
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //             if (tile.badge != null)
+  //               Container(
+  //                 padding: const EdgeInsets.symmetric(
+  //                   horizontal: 10,
+  //                   vertical: 4,
+  //                 ),
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.white.withOpacity(0.2),
+  //                   borderRadius: BorderRadius.circular(20),
+  //                   border: Border.all(
+  //                     color: Colors.white.withOpacity(0.3),
+  //                     width: 1,
+  //                   ),
+  //                 ),
+  //                 child: Text(
+  //                   tile.badge!,
+  //                   style: const TextStyle(
+  //                     fontSize: 11,
+  //                     color: Colors.white,
+  //                     fontWeight: FontWeight.w600,
+  //                   ),
+  //                 ),
+  //               ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+
+  Widget _buildModuleTile(
+      DashboardModule module,
+      ) {
     return GestureDetector(
-      onTap: () => _onTileTap(ctx, index),
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          module.route,
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [tile.color, tile.color.withOpacity(0.82)],
+            colors: [
+              module.color,
+              module.color.withOpacity(0.78),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: tile.color.withOpacity(0.38),
-              blurRadius: 16,
-              offset: const Offset(0, 8),
+              color: module.color.withOpacity(0.32),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
         child: Stack(
           children: [
-            // Decorative circles
             Positioned(
-              top: -16,
-              right: -16,
+              top: -14,
+              right: -14,
               child: Container(
-                width: 72,
-                height: 72,
+                width: 58,
+                height: 58,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.12),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -12,
-              right: 12,
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Colors.white.withOpacity(0.11),
                   shape: BoxShape.circle,
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.symmetric(
+                vertical: 14,
+                horizontal: 10,
+              ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.22),
+                      color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(tile.icon, color: Colors.white, size: 26),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    tile.label,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                    child: Icon(
+                      module.icon,
                       color: Colors.white,
+                      size: 24,
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 10),
                   Text(
-                    tile.sub,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.white.withOpacity(0.65),
+                    module.title,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.3,
                     ),
                   ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _wideCard(BuildContext ctx, _DashTile tile, int index) {
-    // Spans 2 columns — wrap in a SizedBox with full width
-    return SizedBox(
-      // GridView will size this; span is handled below via itemBuilder check
-      child: GestureDetector(
-        onTap: () => _onTileTap(ctx, index),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [tile.color, tile.color.withOpacity(0.82)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: [
-              BoxShadow(
-                color: tile.color.withOpacity(0.35),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.22),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(tile.icon, color: Colors.white, size: 26),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      tile.label,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    Text(
-                      tile.sub,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Colors.white.withOpacity(0.65),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (tile.badge != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    tile.badge!,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-            ],
-          ),
         ),
       ),
     );
@@ -825,31 +835,64 @@ class _TeacherManagementDashBoardScreenState
                 _drawerItem(
                   icon: Icons.shield_outlined,
                   title: 'Privacy Policy',
-                  onTap: () => Navigator.pushNamed(
-                    context,
-                    RoutesName.schoolAdminPrivacyPolicyScreen,
-                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "privacy_policy",
+                          title: "Privacy Policy",
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 _drawerItem(
                   icon: Icons.description_outlined,
                   title: 'Terms & Conditions',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "terms_conditions",
+                          title: "Terms & Conditions",
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 _drawerItem(
                   icon: Icons.info_outline_rounded,
                   title: 'About Us',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "about_us",
+                          title: "About Us",
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 _drawerItem(
                   icon: Icons.help_outline_rounded,
                   title: 'Help & Support',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, RoutesName.helpSupportScreen);
+                  },
                 ),
-                _drawerItem(
-                  icon: Icons.settings_outlined,
-                  title: 'Settings',
-                  onTap: () => Navigator.pop(context),
-                ),
+                // _drawerItem(
+                //   icon: Icons.settings_outlined,
+                //   title: 'Settings',
+                //   onTap: () => Navigator.push(
+                //     context,
+                //     MaterialPageRoute(builder: (context) => ManagePermission()),
+                //   ),
+                // ),
                 const Divider(height: 16, indent: 20, endIndent: 20),
                 _drawerItem(
                   icon: Icons.logout_rounded,
@@ -1132,25 +1175,25 @@ class _TeacherManagementDashBoardScreenState
 }
 
 // ─── DATA MODELS ────────────────────────────────────────────────────────────────
-
-class _DashTile {
-  final String label;
-  final String sub;
-  final IconData icon;
-  final Color color;
-  final String? route;
-  final bool isWide;
-  final String? badge;
-  final String permKey; // ✅ new
-
-  const _DashTile({
-    required this.label,
-    required this.sub,
-    required this.icon,
-    required this.color,
-    required this.route,
-    required this.permKey, // ✅ new
-    this.isWide = false,
-    this.badge,
-  });
-}
+//
+// class _DashTile {
+//   final String label;
+//   final String sub;
+//   final IconData icon;
+//   final Color color;
+//   final String? route;
+//   final bool isWide;
+//   final String? badge;
+//   final String permKey; // ✅ new
+//
+//   const _DashTile({
+//     required this.label,
+//     required this.sub,
+//     required this.icon,
+//     required this.color,
+//     required this.route,
+//     required this.permKey, // ✅ new
+//     this.isWide = false,
+//     this.badge,
+//   });
+// }

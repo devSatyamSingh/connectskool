@@ -10,6 +10,8 @@ import 'package:school_pro/view_model/school_view_model/all_student_list_view_mo
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../repo/auth_repo/auth_repo.dart';
+import '../utils/dashboard_module.dart';
+import '../utils/permission_error_message.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/all_accountant_list_view_model.dart';
@@ -34,236 +36,236 @@ class _SchoolManagementDashboardScreenState
   late List<Animation<double>> _tileAnimations;
   int _selectedNavIndex = 0;
 
-  // ─── Tile Data ───────────────────────────────────────────────────────────────
+  // // ─── Tile Data ───────────────────────────────────────────────────────────────
+  // // static const List<_DashTile> _tiles = [
+  // //   _DashTile(
+  // //     'All Students',
+  // //     Icons.people_alt_rounded,
+  // //     Color(0xFF1976D2),
+  // //     'Manage students',
+  // //   ),
+  // //   _DashTile(
+  // //     'All Teachers',
+  // //     Icons.school_rounded,
+  // //     Color(0xFF00897B),
+  // //     'Staff list',
+  // //   ),
+  // //   _DashTile(
+  // //     'All Accountants',
+  // //     Icons.account_balance_rounded,
+  // //     Color(0xFFF57C00),
+  // //     'Finance team',
+  // //   ),
+  // //   _DashTile(
+  // //     'Classes',
+  // //     Icons.layers_rounded,
+  // //     Color(0xFF7B1FA2),
+  // //     'View classes',
+  // //   ),
+  // //   _DashTile(
+  // //     'Timetable',
+  // //     Icons.schedule_rounded,
+  // //     Color(0xFF2E7D32),
+  // //     'Weekly schedule',
+  // //   ),
+  // //   // _DashTile('Sections',       Icons.view_module_rounded,         Color(0xFF6A1B9A), 'Manage sections'),
+  // //   _DashTile(
+  // //     'Subject',
+  // //     Icons.menu_book_rounded,
+  // //     Color(0xFF00695C),
+  // //     'All subjects',
+  // //   ),
+  // //   // _DashTile('Fine',           Icons.currency_rupee_rounded,      Color(0xFF8E44AD), 'Fine records'),
+  // //   _DashTile(
+  // //     'Fees',
+  // //     Icons.receipt_long_rounded,
+  // //     Color(0xFF27AE60),
+  // //     'Fee collection',
+  // //   ),
+  // //   _DashTile(
+  // //     'Transport Fee',
+  // //     Icons.directions_bus_rounded,
+  // //     Color(0xFF0097A7),
+  // //     'Bus fees',
+  // //   ),
+  // //   _DashTile(
+  // //     'Exams',
+  // //     Icons.assignment_turned_in_rounded,
+  // //     Color(0xFFD4A017),
+  // //     'Exam schedule',
+  // //   ),
+  // //   _DashTile(
+  // //     'Marksheet',
+  // //     Icons.description_rounded,
+  // //     Color(0xFF1565C0),
+  // //     'View marks',
+  // //   ),
+  // //   _DashTile(
+  // //     'Admit Card',
+  // //     Icons.badge_rounded,
+  // //     Color(0xFFC62828),
+  // //     'Generate cards',
+  // //   ),
+  // //   _DashTile(
+  // //     'Attendance',
+  // //     Icons.fact_check_rounded,
+  // //     Color(0xFF0288D1),
+  // //     'Daily attendance',
+  // //   ),
+  // //   _DashTile(
+  // //     'Homework',
+  // //     Icons.auto_stories_rounded,
+  // //     Color(0xFF00796B),
+  // //     'Assignments',
+  // //   ),
+  // //   _DashTile(
+  // //     'Notifications',
+  // //     Icons.notifications_active_rounded,
+  // //     Color(0xFFE65100),
+  // //     'Alerts & updates',
+  // //   ),
+  // //   _DashTile(
+  // //     'Exam Marks',
+  // //     Icons.grading_rounded,
+  // //     Color(0xFF558B2F),
+  // //     'Enter marks',
+  // //   ),
+  // //   _DashTile(
+  // //     'Permission',
+  // //     Icons.admin_panel_settings_rounded,
+  // //     Color(0xFF4527A0),
+  // //     'Access control',
+  // //   ),
+  // // ];
   // static const List<_DashTile> _tiles = [
   //   _DashTile(
   //     'All Students',
   //     Icons.people_alt_rounded,
   //     Color(0xFF1976D2),
   //     'Manage students',
+  //     PermissionKeys.viewAllStudent,
   //   ),
+  //
   //   _DashTile(
   //     'All Teachers',
   //     Icons.school_rounded,
   //     Color(0xFF00897B),
   //     'Staff list',
+  //     PermissionKeys.viewAllTeacher,
   //   ),
+  //
   //   _DashTile(
   //     'All Accountants',
   //     Icons.account_balance_rounded,
   //     Color(0xFFF57C00),
   //     'Finance team',
+  //     PermissionKeys.viewAccountants,
   //   ),
+  //
   //   _DashTile(
   //     'Classes',
   //     Icons.layers_rounded,
   //     Color(0xFF7B1FA2),
   //     'View classes',
+  //     PermissionKeys.viewClasses,
   //   ),
+  //
   //   _DashTile(
   //     'Timetable',
   //     Icons.schedule_rounded,
   //     Color(0xFF2E7D32),
   //     'Weekly schedule',
+  //     PermissionKeys.viewTimetable,
   //   ),
-  //   // _DashTile('Sections',       Icons.view_module_rounded,         Color(0xFF6A1B9A), 'Manage sections'),
+  //
   //   _DashTile(
   //     'Subject',
   //     Icons.menu_book_rounded,
   //     Color(0xFF00695C),
   //     'All subjects',
+  //     PermissionKeys.viewSubjects,
   //   ),
-  //   // _DashTile('Fine',           Icons.currency_rupee_rounded,      Color(0xFF8E44AD), 'Fine records'),
+  //
   //   _DashTile(
   //     'Fees',
   //     Icons.receipt_long_rounded,
   //     Color(0xFF27AE60),
   //     'Fee collection',
+  //     PermissionKeys.viewFees,
   //   ),
+  //
   //   _DashTile(
   //     'Transport Fee',
   //     Icons.directions_bus_rounded,
   //     Color(0xFF0097A7),
   //     'Bus fees',
+  //     PermissionKeys.manageTransport,
   //   ),
+  //
   //   _DashTile(
   //     'Exams',
   //     Icons.assignment_turned_in_rounded,
   //     Color(0xFFD4A017),
   //     'Exam schedule',
+  //     PermissionKeys.viewExam,
   //   ),
+  //
   //   _DashTile(
   //     'Marksheet',
   //     Icons.description_rounded,
   //     Color(0xFF1565C0),
   //     'View marks',
+  //     PermissionKeys.viewMarks,
   //   ),
+  //
   //   _DashTile(
   //     'Admit Card',
   //     Icons.badge_rounded,
   //     Color(0xFFC62828),
   //     'Generate cards',
+  //     PermissionKeys.generateAdmitCard,
   //   ),
+  //
   //   _DashTile(
   //     'Attendance',
   //     Icons.fact_check_rounded,
   //     Color(0xFF0288D1),
   //     'Daily attendance',
+  //     PermissionKeys.markStudentAttendance,
   //   ),
+  //
   //   _DashTile(
   //     'Homework',
   //     Icons.auto_stories_rounded,
   //     Color(0xFF00796B),
   //     'Assignments',
+  //     PermissionKeys.viewHomework,
   //   ),
+  //
   //   _DashTile(
   //     'Notifications',
   //     Icons.notifications_active_rounded,
   //     Color(0xFFE65100),
   //     'Alerts & updates',
+  //     PermissionKeys.notificationView,
   //   ),
+  //
   //   _DashTile(
   //     'Exam Marks',
   //     Icons.grading_rounded,
   //     Color(0xFF558B2F),
   //     'Enter marks',
+  //     PermissionKeys.manageExamMarks,
   //   ),
+  //
   //   _DashTile(
   //     'Permission',
   //     Icons.admin_panel_settings_rounded,
   //     Color(0xFF4527A0),
   //     'Access control',
+  //     PermissionKeys.managePermissions,
   //   ),
   // ];
-  static const List<_DashTile> _tiles = [
-    _DashTile(
-      'All Students',
-      Icons.people_alt_rounded,
-      Color(0xFF1976D2),
-      'Manage students',
-      PermissionKeys.viewAllStudent,
-    ),
-
-    _DashTile(
-      'All Teachers',
-      Icons.school_rounded,
-      Color(0xFF00897B),
-      'Staff list',
-      PermissionKeys.viewAllTeacher,
-    ),
-
-    _DashTile(
-      'All Accountants',
-      Icons.account_balance_rounded,
-      Color(0xFFF57C00),
-      'Finance team',
-      PermissionKeys.viewAccountants,
-    ),
-
-    _DashTile(
-      'Classes',
-      Icons.layers_rounded,
-      Color(0xFF7B1FA2),
-      'View classes',
-      PermissionKeys.viewClasses,
-    ),
-
-    _DashTile(
-      'Timetable',
-      Icons.schedule_rounded,
-      Color(0xFF2E7D32),
-      'Weekly schedule',
-      PermissionKeys.viewTimetable,
-    ),
-
-    _DashTile(
-      'Subject',
-      Icons.menu_book_rounded,
-      Color(0xFF00695C),
-      'All subjects',
-      PermissionKeys.viewSubjects,
-    ),
-
-    _DashTile(
-      'Fees',
-      Icons.receipt_long_rounded,
-      Color(0xFF27AE60),
-      'Fee collection',
-      PermissionKeys.viewFees,
-    ),
-
-    _DashTile(
-      'Transport Fee',
-      Icons.directions_bus_rounded,
-      Color(0xFF0097A7),
-      'Bus fees',
-      PermissionKeys.manageTransport,
-    ),
-
-    _DashTile(
-      'Exams',
-      Icons.assignment_turned_in_rounded,
-      Color(0xFFD4A017),
-      'Exam schedule',
-      PermissionKeys.viewExam,
-    ),
-
-    _DashTile(
-      'Marksheet',
-      Icons.description_rounded,
-      Color(0xFF1565C0),
-      'View marks',
-      PermissionKeys.viewMarks,
-    ),
-
-    _DashTile(
-      'Admit Card',
-      Icons.badge_rounded,
-      Color(0xFFC62828),
-      'Generate cards',
-      PermissionKeys.generateAdmitCard,
-    ),
-
-    _DashTile(
-      'Attendance',
-      Icons.fact_check_rounded,
-      Color(0xFF0288D1),
-      'Daily attendance',
-      PermissionKeys.markStudentAttendance,
-    ),
-
-    _DashTile(
-      'Homework',
-      Icons.auto_stories_rounded,
-      Color(0xFF00796B),
-      'Assignments',
-      PermissionKeys.viewHomework,
-    ),
-
-    _DashTile(
-      'Notifications',
-      Icons.notifications_active_rounded,
-      Color(0xFFE65100),
-      'Alerts & updates',
-      PermissionKeys.notificationView,
-    ),
-
-    _DashTile(
-      'Exam Marks',
-      Icons.grading_rounded,
-      Color(0xFF558B2F),
-      'Enter marks',
-      PermissionKeys.manageExamMarks,
-    ),
-
-    _DashTile(
-      'Permission',
-      Icons.admin_panel_settings_rounded,
-      Color(0xFF4527A0),
-      'Access control',
-      PermissionKeys.managePermissions,
-    ),
-  ];
   @override
   void initState() {
     super.initState();
@@ -292,7 +294,9 @@ class _SchoolManagementDashboardScreenState
       duration: const Duration(milliseconds: 1100),
     );
 
-    _tileAnimations = List.generate(_tiles.length, (i) {
+    _tileAnimations = List.generate(
+        DashboardModules.modules.length,
+            (i) {
       final start = (i * 0.05).clamp(0.0, 0.7);
       final end = (start + 0.4).clamp(0.0, 1.0);
       return CurvedAnimation(
@@ -357,60 +361,60 @@ class _SchoolManagementDashboardScreenState
         false;
   }
 
-  void _onTileTap(int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushNamed(context, RoutesName.allStudentList);
-        break;
-      case 1:
-        Navigator.pushNamed(context, RoutesName.allTeacherListScreen);
-        break;
-      case 2:
-        Navigator.pushNamed(context, RoutesName.allAccountantListScreen);
-        break;
-      case 3:
-        Navigator.pushNamed(context, RoutesName.classesPage);
-        break;
-      case 4:
-        Navigator.pushNamed(context, RoutesName.schoolTimetableScreen);
-        break;
-      // case 5:  Navigator.pushNamed(context, RoutesName.allSectionScreen); break;
-      case 5:
-        Navigator.pushNamed(context, RoutesName.allSubjectsScreen);
-        break;
-      // case 6:  Navigator.pushNamed(context, RoutesName.fineManagementScreen); break;
-      case 6:
-        Navigator.pushNamed(context, RoutesName.feesManagementScreen);
-        break;
-      case 7:
-        Navigator.pushNamed(context, RoutesName.transportFeeManagementScreen);
-        break;
-      case 8:
-        Navigator.pushNamed(context, RoutesName.examScreen);
-        break;
-      case 9:
-        Navigator.pushNamed(context, RoutesName.marksheetScreen);
-        break;
-      case 10:
-        Navigator.pushNamed(context, RoutesName.schoolAdmitCardScreen);
-        break;
-      case 11:
-        Navigator.pushNamed(context, RoutesName.staffAttendanceScreen);
-        break;
-      case 12:
-        Navigator.pushNamed(context, RoutesName.allHomeWorkScreen);
-        break;
-      case 13:
-        Navigator.pushNamed(context, RoutesName.notificationScreen);
-        break;
-      case 14:
-        Navigator.pushNamed(context, RoutesName.schoolExamMarksScreen);
-        break;
-      case 15:
-        Navigator.pushNamed(context, RoutesName.managePermission);
-        break;
-    }
-  }
+  // void _onTileTap(int index) {
+  //   switch (index) {
+  //     case 0:
+  //       Navigator.pushNamed(context, RoutesName.allStudentList);
+  //       break;
+  //     case 1:
+  //       Navigator.pushNamed(context, RoutesName.allTeacherListScreen);
+  //       break;
+  //     case 2:
+  //       Navigator.pushNamed(context, RoutesName.allAccountantListScreen);
+  //       break;
+  //     case 3:
+  //       Navigator.pushNamed(context, RoutesName.classesPage);
+  //       break;
+  //     case 4:
+  //       Navigator.pushNamed(context, RoutesName.schoolTimetableScreen);
+  //       break;
+  //     // case 5:  Navigator.pushNamed(context, RoutesName.allSectionScreen); break;
+  //     case 5:
+  //       Navigator.pushNamed(context, RoutesName.allSubjectsScreen);
+  //       break;
+  //     // case 6:  Navigator.pushNamed(context, RoutesName.fineManagementScreen); break;
+  //     case 6:
+  //       Navigator.pushNamed(context, RoutesName.feesManagementScreen);
+  //       break;
+  //     case 7:
+  //       Navigator.pushNamed(context, RoutesName.transportFeeManagementScreen);
+  //       break;
+  //     case 8:
+  //       Navigator.pushNamed(context, RoutesName.examScreen);
+  //       break;
+  //     case 9:
+  //       Navigator.pushNamed(context, RoutesName.marksheetScreen);
+  //       break;
+  //     case 10:
+  //       Navigator.pushNamed(context, RoutesName.schoolAdmitCardScreen);
+  //       break;
+  //     case 11:
+  //       Navigator.pushNamed(context, RoutesName.staffAttendanceScreen);
+  //       break;
+  //     case 12:
+  //       Navigator.pushNamed(context, RoutesName.allHomeWorkScreen);
+  //       break;
+  //     case 13:
+  //       Navigator.pushNamed(context, RoutesName.notificationScreen);
+  //       break;
+  //     case 14:
+  //       Navigator.pushNamed(context, RoutesName.schoolExamMarksScreen);
+  //       break;
+  //     case 15:
+  //       Navigator.pushNamed(context, RoutesName.managePermission);
+  //       break;
+  //   }
+  // }
 
   // ─── BUILD ───────────────────────────────────────────────────────────────────
 
@@ -422,7 +426,7 @@ class _SchoolManagementDashboardScreenState
     final String adminName = _capitalize(profile?.data?.name);
     final String adminEmail = profile?.data?.userEmail ?? 'admin@schoolpro.com';
 
-    // ✅ Dynamic student total from pagination
+    //  Dynamic student total from pagination
     final studentTotal = Provider.of<AllStudentListVieModel>(
           context,
         ).allStudentListModel?.pagination?.total?.toString() ??
@@ -686,12 +690,10 @@ class _SchoolManagementDashboardScreenState
       listen: false,
     );
 
-    final visibleTiles = _tiles
-        .asMap()
-        .entries
+    final visibleTiles = DashboardModules.modules
         .where(
           (e) => PermissionExtensions.canAccess(
-        e.value.permKey,
+        e.permission,
       ),
     )
         .toList();
@@ -706,9 +708,7 @@ class _SchoolManagementDashboardScreenState
       ),
       itemCount: visibleTiles.length,
       itemBuilder: (ctx, i) {
-        final entry = visibleTiles[i];
-        final originalIndex = entry.key; // original index for _onTileTap
-        final tile = entry.value;
+        final module = visibleTiles[i];
 
         return AnimatedBuilder(
           animation: _tileAnimations[i.clamp(0, _tileAnimations.length - 1)],
@@ -722,26 +722,47 @@ class _SchoolManagementDashboardScreenState
               child: child,
             ),
           ),
-          child: _buildTile(tile, originalIndex), // ✅ original index pass
+          child: _buildModuleTile(module), // ✅ original index pass
         );
       },
     );
   }
 
-  Widget _buildTile(_DashTile tile, int index) {
+  Widget _buildModuleTile(
+      DashboardModule module,
+      ) {
     return GestureDetector(
-      onTap: () => _onTileTap(index),
+      onTap: () {
+
+        if (
+        !PermissionGuard.check(
+          context,
+          module.permission,
+          module.title,
+        )
+        ) {
+          return;
+        }
+
+        Navigator.pushNamed(
+          context,
+          module.route,
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [tile.color, tile.color.withOpacity(0.78)],
+            colors: [
+              module.color,
+              module.color.withOpacity(0.78),
+            ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: tile.color.withOpacity(0.32),
+              color: module.color.withOpacity(0.32),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -761,20 +782,11 @@ class _SchoolManagementDashboardScreenState
                 ),
               ),
             ),
-            Positioned(
-              bottom: -8,
-              left: 8,
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.07),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+              padding: const EdgeInsets.symmetric(
+                vertical: 14,
+                horizontal: 10,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -784,11 +796,15 @@ class _SchoolManagementDashboardScreenState
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(tile.icon, color: Colors.white, size: 24),
+                    child: Icon(
+                      module.icon,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    tile.label,
+                    module.title,
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -807,6 +823,86 @@ class _SchoolManagementDashboardScreenState
       ),
     );
   }
+
+  // Widget _buildTile(_DashTile tile, int index) {
+  //   return GestureDetector(
+  //     onTap: () => _onTileTap(index),
+  //     child: Container(
+  //       decoration: BoxDecoration(
+  //         gradient: LinearGradient(
+  //           colors: [tile.color, tile.color.withOpacity(0.78)],
+  //           begin: Alignment.topLeft,
+  //           end: Alignment.bottomRight,
+  //         ),
+  //         borderRadius: BorderRadius.circular(20),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: tile.color.withOpacity(0.32),
+  //             blurRadius: 12,
+  //             offset: const Offset(0, 6),
+  //           ),
+  //         ],
+  //       ),
+  //       child: Stack(
+  //         children: [
+  //           Positioned(
+  //             top: -14,
+  //             right: -14,
+  //             child: Container(
+  //               width: 58,
+  //               height: 58,
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white.withOpacity(0.11),
+  //                 shape: BoxShape.circle,
+  //               ),
+  //             ),
+  //           ),
+  //           Positioned(
+  //             bottom: -8,
+  //             left: 8,
+  //             child: Container(
+  //               width: 36,
+  //               height: 36,
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white.withOpacity(0.07),
+  //                 shape: BoxShape.circle,
+  //               ),
+  //             ),
+  //           ),
+  //           Padding(
+  //             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+  //             child: Column(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 Container(
+  //                   padding: const EdgeInsets.all(10),
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.white.withOpacity(0.2),
+  //                     borderRadius: BorderRadius.circular(14),
+  //                   ),
+  //                   child: Icon(tile.icon, color: Colors.white, size: 24),
+  //                 ),
+  //                 const SizedBox(height: 10),
+  //                 Text(
+  //                   tile.label,
+  //                   textAlign: TextAlign.center,
+  //                   maxLines: 2,
+  //                   overflow: TextOverflow.ellipsis,
+  //                   style: const TextStyle(
+  //                     fontSize: 11.5,
+  //                     fontWeight: FontWeight.bold,
+  //                     color: Colors.white,
+  //                     height: 1.3,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildDrawer(BuildContext context, String name, String email) {
     return Drawer(

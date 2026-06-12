@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // ✅ Existing model — already has PermissionItem defined
 import '../../model/school_model/user_permission_model.dart';
 import '../../repo/school_repo/user_permission_repo.dart';
+import '../../utils/permission_manager.dart';
 
 class GetUserPermissionViewModel extends ChangeNotifier {
 
@@ -14,14 +15,11 @@ class GetUserPermissionViewModel extends ChangeNotifier {
   GetUserPermissionModel? _model;
   GetUserPermissionModel? get model => _model;
 
-  /// Flat map: permissionId -> "default" | "allowed" | "denied"
   Map<int, String> permissionStateMap = {};
 
-  // ─── Repository ────────────────────────────────────────────────────────────
 
   final _repo = GetUserPermissionRepository();
 
-  // ─── Fetch API ─────────────────────────────────────────────────────────────
 
   Future<void> getUserPermissionApi({
     required BuildContext context,
@@ -35,6 +33,8 @@ class GetUserPermissionViewModel extends ChangeNotifier {
         userId: userId,
       );
 
+      debugPrint(response.toString());
+
       _model = GetUserPermissionModel.fromJson(response);
       _buildStateMap();
 
@@ -45,21 +45,50 @@ class GetUserPermissionViewModel extends ChangeNotifier {
     _setLoading(false);
   }
 
-  // ─── Build State Map ───────────────────────────────────────────────────────
 
   void _buildStateMap() {
+
     permissionStateMap.clear();
 
     final sections = _model?.data?.permissions;
+
     if (sections == null) return;
 
+    final List<String> activePermissions = [];
+
     sections.forEach((section, items) {
+
       for (var item in items) {
+
+        debugPrint(
+          "KEY=${item.key} STATE=${item.state}",
+        );
+
         if (item.permissionId != null) {
-          permissionStateMap[item.permissionId!] = item.state ?? 'default';
+
+          permissionStateMap[item.permissionId!] =
+              item.state ?? 'default';
+        }
+
+        if (
+        item.key != null &&
+            item.state != "denied"
+        ) {
+
+          activePermissions.add(
+            item.key!,
+          );
         }
       }
     });
+
+    PermissionManager.setPermissions(
+      activePermissions,
+    );
+
+    debugPrint(
+      "ACTIVE PERMISSIONS => $activePermissions",
+    );
 
     notifyListeners();
   }

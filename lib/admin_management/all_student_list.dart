@@ -2065,6 +2065,8 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
 import '../repo/school_repo/all_sections_repo.dart';
 import '../res/app_button.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
 import '../view_model/school_view_model/add_student_view_model.dart';
 import 'package:image_picker/image_picker.dart';
@@ -2174,7 +2176,8 @@ class _AllStudentListState extends State<AllStudentList>
 
     return Scaffold(
       backgroundColor: AppColor.pageBgColor,
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: PermissionExtensions.canAccess(PermissionKeys.addStudent)
+      ? FloatingActionButton.extended(
         backgroundColor: AppColor.lightBlueColor,
         onPressed: () => Navigator.push(
           context,
@@ -2185,7 +2188,7 @@ class _AllStudentListState extends State<AllStudentList>
           'Add Student',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
-      ),
+      ): null,
       body: Column(
         children: [
           // ── Header ──

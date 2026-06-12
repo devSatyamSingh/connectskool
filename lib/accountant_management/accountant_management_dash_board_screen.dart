@@ -5,13 +5,16 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import '../../res/app_color.dart';
 import '../repo/auth_repo/auth_repo.dart';
+import '../utils/dashboard_module.dart';
 import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/accountant/accountant_profile_view_model.dart';
 import '../view_model/school_view_model/all_accountant_list_view_model.dart';
 import '../view_model/school_view_model/all_student_list_view_model.dart';
 import '../view_model/school_view_model/all_teachers_view_model.dart';
-import '../view_model/school_view_model/user_permission_view_model.dart';
 import '../view_model/user_view_model.dart';
+import '../admin_management/cms_screen.dart';
+import '../admin_management/manage_permission.dart';
 
 class AccountantManagementDashBoardScreen extends StatefulWidget {
   const AccountantManagementDashBoardScreen({super.key});
@@ -120,120 +123,120 @@ class _AccountantManagementDashBoardScreenState
   //     'Enter marks',
   //   ),
   // ];
-  // ✅ static const nahi chalega kyunki const constructor mein String permKey required hai
-  final List<_DashTile> _tiles = [
-    _DashTile(
-      'All Students',
-      Icons.people_alt_rounded,
-      const Color(0xFF1976D2),
-      'Manage records',
-      'view_all_student',
-    ),
-
-    _DashTile(
-      'All Teachers',
-      Icons.school_rounded,
-      const Color(0xFF00897B),
-      'Staff list',
-      'view_all_teacher',
-    ),
-
-    _DashTile(
-      'Classes',
-      Icons.layers_rounded,
-      const Color(0xFF7B1FA2),
-      'View classes',
-      'view_classes',
-    ),
-
-    _DashTile(
-      'Timetable',
-      Icons.schedule_rounded,
-      const Color(0xFF2E7D32),
-      'Weekly schedule',
-      'view_timetable',
-    ),
-
-    _DashTile(
-      'Sections',
-      Icons.view_module_rounded,
-      const Color(0xFF6A1B9A),
-      'Manage sections',
-      'view_sections',
-    ),
-
-    _DashTile(
-      'Subject',
-      Icons.menu_book_rounded,
-      const Color(0xFF00695C),
-      'All subjects',
-      'view_subjects',
-    ),
-
-    _DashTile(
-      'Fees',
-      Icons.receipt_long_rounded,
-      const Color(0xFF27AE60),
-      'Fee collection',
-      'view_fees',
-    ),
-
-    _DashTile(
-      'Exams',
-      Icons.assignment_turned_in_rounded,
-      const Color(0xFFD4A017),
-      'Exam schedule',
-      'view_exam',
-    ),
-
-    _DashTile(
-      'Marksheet',
-      Icons.description_rounded,
-      const Color(0xFF1565C0),
-      'View marks',
-      'view_marks',
-    ),
-
-    _DashTile(
-      'Admit Card',
-      Icons.badge_rounded,
-      const Color(0xFFC62828),
-      'Generate cards',
-      'generate_admit_card',
-    ),
-
-    _DashTile(
-      'Attendance',
-      Icons.fact_check_rounded,
-      const Color(0xFF0288D1),
-      'Daily record',
-      'mark_student_attendance',
-    ),
-
-    _DashTile(
-      'Homework',
-      Icons.auto_stories_rounded,
-      const Color(0xFF00796B),
-      'Assignments',
-      'view_hw_from_student',
-    ),
-
-    _DashTile(
-      'Notifications',
-      Icons.notifications_active_rounded,
-      const Color(0xFFE65100),
-      'Alerts',
-      'notification_view',
-    ),
-
-    _DashTile(
-      'Exam Marks',
-      Icons.grading_rounded,
-      const Color(0xFF558B2F),
-      'Enter marks',
-      'manage_exam_marks',
-    ),
-  ];
+  // static const nahi chalega kyunki const constructor mein String permKey required hai
+  // final List<_DashTile> _tiles = [
+  //   _DashTile(
+  //     'All Students',
+  //     Icons.people_alt_rounded,
+  //     const Color(0xFF1976D2),
+  //     'Manage records',
+  //     'view_all_student',
+  //   ),
+  //
+  //   _DashTile(
+  //     'All Teachers',
+  //     Icons.school_rounded,
+  //     const Color(0xFF00897B),
+  //     'Staff list',
+  //     'view_all_teacher',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Classes',
+  //     Icons.layers_rounded,
+  //     const Color(0xFF7B1FA2),
+  //     'View classes',
+  //     'view_classes',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Timetable',
+  //     Icons.schedule_rounded,
+  //     const Color(0xFF2E7D32),
+  //     'Weekly schedule',
+  //     'view_timetable',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Sections',
+  //     Icons.view_module_rounded,
+  //     const Color(0xFF6A1B9A),
+  //     'Manage sections',
+  //     'view_sections',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Subject',
+  //     Icons.menu_book_rounded,
+  //     const Color(0xFF00695C),
+  //     'All subjects',
+  //     'view_subjects',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Fees',
+  //     Icons.receipt_long_rounded,
+  //     const Color(0xFF27AE60),
+  //     'Fee collection',
+  //     'view_fees',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Exams',
+  //     Icons.assignment_turned_in_rounded,
+  //     const Color(0xFFD4A017),
+  //     'Exam schedule',
+  //     'view_exam',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Marksheet',
+  //     Icons.description_rounded,
+  //     const Color(0xFF1565C0),
+  //     'View marks',
+  //     'view_marks',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Admit Card',
+  //     Icons.badge_rounded,
+  //     const Color(0xFFC62828),
+  //     'Generate cards',
+  //     'generate_admit_card',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Attendance',
+  //     Icons.fact_check_rounded,
+  //     const Color(0xFF0288D1),
+  //     'Daily record',
+  //     'mark_student_attendance',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Homework',
+  //     Icons.auto_stories_rounded,
+  //     const Color(0xFF00796B),
+  //     'Assignments',
+  //     'view_hw_from_student',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Notifications',
+  //     Icons.notifications_active_rounded,
+  //     const Color(0xFFE65100),
+  //     'Alerts',
+  //     'notification_view',
+  //   ),
+  //
+  //   _DashTile(
+  //     'Exam Marks',
+  //     Icons.grading_rounded,
+  //     const Color(0xFF558B2F),
+  //     'Enter marks',
+  //     'manage_exam_marks',
+  //   ),
+  // ];
   @override
   void initState() {
     super.initState();
@@ -261,7 +264,9 @@ class _AccountantManagementDashBoardScreenState
       duration: const Duration(milliseconds: 1000),
     );
 
-    _tileAnimations = List.generate(_tiles.length, (i) {
+    _tileAnimations = List.generate(
+        DashboardModules.modules.length,
+            (i) {
       final start = (i * 0.05).clamp(0.0, 0.65);
       final end = (start + 0.42).clamp(0.0, 1.0);
       return CurvedAnimation(
@@ -321,55 +326,55 @@ class _AccountantManagementDashBoardScreenState
         false;
   }
 
-  void _onTileTap(int index) {
-    switch (index) {
-      case 0:
-        Navigator.pushNamed(context, RoutesName.allStudentList);
-        break;
-      case 1:
-        Navigator.pushNamed(context, RoutesName.allTeacherListScreen);
-        break;
-      case 2:
-        Navigator.pushNamed(context, RoutesName.classesPage);
-        break;
-      case 3:
-        Navigator.pushNamed(context, RoutesName.schoolTimetableScreen);
-        break;
-      case 4:
-        Navigator.pushNamed(context, RoutesName.allSectionScreen);
-        break;
-      case 5:
-        Navigator.pushNamed(context, RoutesName.allSubjectsScreen);
-        break;
-      case 6:
-        Navigator.pushNamed(context, RoutesName.fineManagementScreen);
-        break;
-      case 7:
-        Navigator.pushNamed(context, RoutesName.feesManagementScreen);
-        break;
-      case 8:
-        Navigator.pushNamed(context, RoutesName.examScreen);
-        break;
-      case 9:
-        Navigator.pushNamed(context, RoutesName.marksheetScreen);
-        break;
-      case 10:
-        Navigator.pushNamed(context, RoutesName.schoolAdmitCardScreen);
-        break;
-      case 11:
-        Navigator.pushNamed(context, RoutesName.schoolAttendanceScreen);
-        break;
-      case 12:
-        Navigator.pushNamed(context, RoutesName.allHomeWorkScreen);
-        break;
-      case 13:
-        Navigator.pushNamed(context, RoutesName.notificationScreen);
-        break;
-      case 14:
-        Navigator.pushNamed(context, RoutesName.schoolExamMarksScreen);
-        break;
-    }
-  }
+  // void _onTileTap(int index) {
+  //   switch (index) {
+  //     case 0:
+  //       Navigator.pushNamed(context, RoutesName.allStudentList);
+  //       break;
+  //     case 1:
+  //       Navigator.pushNamed(context, RoutesName.allTeacherListScreen);
+  //       break;
+  //     case 2:
+  //       Navigator.pushNamed(context, RoutesName.classesPage);
+  //       break;
+  //     case 3:
+  //       Navigator.pushNamed(context, RoutesName.schoolTimetableScreen);
+  //       break;
+  //     case 4:
+  //       Navigator.pushNamed(context, RoutesName.allSectionScreen);
+  //       break;
+  //     case 5:
+  //       Navigator.pushNamed(context, RoutesName.allSubjectsScreen);
+  //       break;
+  //     case 6:
+  //       Navigator.pushNamed(context, RoutesName.fineManagementScreen);
+  //       break;
+  //     case 7:
+  //       Navigator.pushNamed(context, RoutesName.feesManagementScreen);
+  //       break;
+  //     case 8:
+  //       Navigator.pushNamed(context, RoutesName.examScreen);
+  //       break;
+  //     case 9:
+  //       Navigator.pushNamed(context, RoutesName.marksheetScreen);
+  //       break;
+  //     case 10:
+  //       Navigator.pushNamed(context, RoutesName.schoolAdmitCardScreen);
+  //       break;
+  //     case 11:
+  //       Navigator.pushNamed(context, RoutesName.schoolAttendanceScreen);
+  //       break;
+  //     case 12:
+  //       Navigator.pushNamed(context, RoutesName.allHomeWorkScreen);
+  //       break;
+  //     case 13:
+  //       Navigator.pushNamed(context, RoutesName.notificationScreen);
+  //       break;
+  //     case 14:
+  //       Navigator.pushNamed(context, RoutesName.schoolExamMarksScreen);
+  //       break;
+  //   }
+  // }
 
   // ─── BUILD ───────────────────────────────────────────────────────────────────
 
@@ -419,7 +424,6 @@ class _AccountantManagementDashBoardScreenState
     );
   }
 
-  // ─── HEADER ──────────────────────────────────────────────────────────────────
 
   Widget _buildHeader(
     BuildContext context,
@@ -620,19 +624,13 @@ class _AccountantManagementDashBoardScreenState
   // ─── GRID ────────────────────────────────────────────────────────────────────
 
   Widget _buildGrid() {
-    final permVm = Provider.of<GetUserPermissionViewModel>(
-      context,
-      listen: false,
-    );
-
-    // ✅ Denied tiles hide
-    final visibleTiles = _tiles
-        .asMap()
-        .entries
+    // ✅ Denied tiles hide (PermissionManager se driven, login ke effective
+    // permissions list ke hisaab se)
+    final visibleModules = DashboardModules.modules
         .where(
-          (e) => PermissionExtensions.canAccess(
-        e.value.permKey,
-      ),
+          (e) =>
+      e.permission != PermissionKeys.managePermissions &&
+          PermissionExtensions.canAccess(e.permission),
     )
         .toList();
 
@@ -644,14 +642,14 @@ class _AccountantManagementDashBoardScreenState
         crossAxisSpacing: 13,
         childAspectRatio: 1.1,
       ),
-      itemCount: visibleTiles.length,
+      itemCount: visibleModules.length,
       itemBuilder: (ctx, i) {
-        final entry = visibleTiles[i];
-        final originalIdx = entry.key; // ✅ _onTileTap ke liye
-        final tile = entry.value;
+        final module = visibleModules[i];
 
-        final animIdx = originalIdx.clamp(0, _tileAnimations.length - 1);
-
+        final animIdx = i.clamp(
+          0,
+          _tileAnimations.length - 1,
+        );
         return AnimatedBuilder(
           animation: _tileAnimations[animIdx],
           builder: (_, child) => Transform.scale(
@@ -661,88 +659,170 @@ class _AccountantManagementDashBoardScreenState
               child: child,
             ),
           ),
-          child: GestureDetector(
-            onTap: () => _onTileTap(originalIdx), // ✅ original index
-            child: _buildTile(tile),
-          ),
+          child: _buildModuleTile(module),
         );
       },
     );
   }
 
-  Widget _buildTile(_DashTile tile) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [tile.color, tile.color.withValues(alpha: 0.78)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  // Widget _buildTile(_DashTile tile) {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       gradient: LinearGradient(
+  //         colors: [tile.color, tile.color.withValues(alpha: 0.78)],
+  //         begin: Alignment.topLeft,
+  //         end: Alignment.bottomRight,
+  //       ),
+  //       borderRadius: BorderRadius.circular(20),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: tile.color.withValues(alpha: 0.30),
+  //           blurRadius: 12,
+  //           offset: const Offset(0, 5),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Stack(
+  //       children: [
+  //         Positioned(
+  //           top: -14,
+  //           right: -14,
+  //           child: Container(
+  //             width: 56,
+  //             height: 56,
+  //             decoration: BoxDecoration(
+  //               color: Colors.white.withValues(alpha: 0.10),
+  //               shape: BoxShape.circle,
+  //             ),
+  //           ),
+  //         ),
+  //         Positioned(
+  //           bottom: -8,
+  //           left: 6,
+  //           child: Container(
+  //             width: 34,
+  //             height: 34,
+  //             decoration: BoxDecoration(
+  //               color: Colors.white.withValues(alpha: 0.07),
+  //               shape: BoxShape.circle,
+  //             ),
+  //           ),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+  //           child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             children: [
+  //               Container(
+  //                 padding: const EdgeInsets.all(9),
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.white.withValues(alpha: 0.22),
+  //                   borderRadius: BorderRadius.circular(13),
+  //                 ),
+  //                 child: Icon(tile.icon, color: Colors.white, size: 22),
+  //               ),
+  //               const SizedBox(height: 9),
+  //               Text(
+  //                 tile.label,
+  //                 textAlign: TextAlign.center,
+  //                 maxLines: 2,
+  //                 overflow: TextOverflow.ellipsis,
+  //                 style: const TextStyle(
+  //                   fontSize: 11,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Colors.white,
+  //                   height: 1.3,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Widget _buildModuleTile(
+      DashboardModule module,
+      ) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(
+          context,
+          module.route,
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              module.color,
+              module.color.withOpacity(0.78),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: module.color.withOpacity(0.32),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: tile.color.withValues(alpha: 0.30),
-            blurRadius: 12,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            top: -14,
-            right: -14,
-            child: Container(
-              width: 56,
-              height: 56,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.10),
-                shape: BoxShape.circle,
+        child: Stack(
+          children: [
+            Positioned(
+              top: -14,
+              right: -14,
+              child: Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.11),
+                  shape: BoxShape.circle,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: -8,
-            left: 6,
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.07),
-                shape: BoxShape.circle,
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 14,
+                horizontal: 10,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Icon(
+                      module.icon,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    module.title,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(9),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.22),
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: Icon(tile.icon, color: Colors.white, size: 22),
-                ),
-                const SizedBox(height: 9),
-                Text(
-                  tile.label,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -841,31 +921,64 @@ class _AccountantManagementDashBoardScreenState
                 _drawerItem(
                   icon: Icons.shield_outlined,
                   title: 'Privacy Policy',
-                  onTap: () => Navigator.pushNamed(
-                    context,
-                    RoutesName.schoolAdminPrivacyPolicyScreen,
-                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "privacy_policy",
+                          title: "Privacy Policy",
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 _drawerItem(
                   icon: Icons.description_outlined,
                   title: 'Terms & Conditions',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "terms_conditions",
+                          title: "Terms & Conditions",
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 _drawerItem(
                   icon: Icons.info_outline_rounded,
                   title: 'About Us',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "about_us",
+                          title: "About Us",
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 _drawerItem(
                   icon: Icons.help_outline_rounded,
                   title: 'Help & Support',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, RoutesName.helpSupportScreen);
+                  },
                 ),
-                _drawerItem(
-                  icon: Icons.settings_outlined,
-                  title: 'Settings',
-                  onTap: () => Navigator.pop(context),
-                ),
+                // _drawerItem(
+                //   icon: Icons.settings_outlined,
+                //   title: 'Settings',
+                //   onTap: () => Navigator.push(
+                //     context,
+                //     MaterialPageRoute(builder: (context) => ManagePermission()),
+                //   ),
+                // ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                   child: Divider(),
@@ -1008,7 +1121,8 @@ class _AccountantManagementDashBoardScreenState
         ],
       ),
     );
-  } // void _showLogoutDialog(BuildContext context) {
+  }
+  // void _showLogoutDialog(BuildContext context) {
 
   //   showDialog(
   //     context: context,
@@ -1147,14 +1261,14 @@ class _AccountantManagementDashBoardScreenState
   // }
 }
 
-// ─── DATA MODELS ─────────────────────────────────────────────────────────────
-
-class _DashTile {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final String sub;
-  final String permKey; // ✅ new
-
-  const _DashTile(this.label, this.icon, this.color, this.sub, this.permKey);
-}
+// // ─── DATA MODELS ─────────────────────────────────────────────────────────────
+//
+// class _DashTile {
+//   final String label;
+//   final IconData icon;
+//   final Color color;
+//   final String sub;
+//   final String permKey; // new
+//
+//   const _DashTile(this.label, this.icon, this.color, this.sub, this.permKey);
+// }

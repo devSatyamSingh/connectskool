@@ -12,6 +12,9 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
 import '../model/school_model/all_teachers_list_model.dart';
 import '../res/app_button.dart';
+import '../utils/permission_error_message.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/delete_teacher_view_model.dart';
 import '../view_model/school_view_model/edit_teacher_view_model.dart';
 import 'add_teacher_screen.dart';
@@ -1045,15 +1048,35 @@ class _AllTeacherListScreenState extends State
       // ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColor.lightBlueColor,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const AddTeacherScreen()),
+        onPressed: () {
+
+          if (!PermissionGuard.check(
+            context,
+            PermissionKeys.addTeacher,
+            "Add Teacher",
+          )) {
+            return;
+          }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AddTeacherScreen(),
+            ),
+          );
+        },
+        icon: const Icon(
+          Icons.add_rounded,
+          color: Colors.white,
         ),
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text(
-          'Add Student',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),      ),
+          'Add Teacher',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       body: Column(
         children: [
           /// ===== CUSTOM HEADER =====
@@ -1779,7 +1802,20 @@ class _AllTeacherListScreenState extends State
                   //       color: Colors.red),
                   // ),
                   GestureDetector(
-                    onTap: () =>  _openAccountantSheet(existing: t),
+                    onTap: () {
+
+                      if(
+                      !PermissionGuard.check(
+                        context,
+                        PermissionKeys.editTeacher,
+                        "Edit Teacher",
+                      )
+                      ){
+                        return;
+                      }
+
+                      _openAccountantSheet(existing: t);
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -1793,11 +1829,27 @@ class _AllTeacherListScreenState extends State
                   const SizedBox(height: 6),
                   GestureDetector(
                     onTap: () async {
+
+                      if(
+                      !PermissionGuard.check(
+                        context,
+                        PermissionKeys.deleteTeacher,
+                        "Delete Teacher",
+                      )
+                      ){
+                        return;
+                      }
+
                       bool confirmed = await _showDeleteDialog();
+
                       if (confirmed) {
-                        Provider.of<DeleteTeacherViewModel>(context,
-                            listen: false)
-                            .deleteTeacherApi(t.teacherId, context);
+                        Provider.of<DeleteTeacherViewModel>(
+                          context,
+                          listen: false,
+                        ).deleteTeacherApi(
+                          t.teacherId,
+                          context,
+                        );
                       }
                     },
                     child: Container(

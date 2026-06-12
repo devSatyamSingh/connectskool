@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/add_teachers_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
 import '../../repo/school_repo/add_accountant_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 import '../../view_model/school_view_model/all_student_list_view_model.dart';
 
@@ -42,6 +44,18 @@ class AddTeachersViewModel with ChangeNotifier {
   }) async {
     setLoading(true);
 
+    if(
+    !PermissionExtensions.canAccess(
+      PermissionKeys.addTeacher,
+    )
+    ){
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+      return false;
+    }
+
     try {
       /// ✅ fields map
       final Map<String, String> fields = {
@@ -71,6 +85,7 @@ class AddTeachersViewModel with ChangeNotifier {
       final response = await _loginRepo.addTeachersApi(fields, files);
 
       setLoading(false);
+
 
       if (response["status_code"] == 200 ||
           response["status_code"] == 201) {

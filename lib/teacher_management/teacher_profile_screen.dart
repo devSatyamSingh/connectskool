@@ -263,6 +263,9 @@ import 'package:provider/provider.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../view_model/teacher_view_model/teacher_profile_view_model.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
 
 class TeacherProfileScreen extends StatefulWidget {
   const TeacherProfileScreen({super.key});
@@ -276,9 +279,29 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<TeacherProfileViewModel>(context, listen: false)
-          .teacherProfileApi(context);
+
+      if(
+      !PermissionExtensions.canAccess(
+        PermissionKeys.viewOneTeacherProfile,
+      )
+      ){
+
+        Utils.show(
+          "Your profile access has been disabled by administrator.",
+          context,
+          type: "warning",
+        );
+
+        Navigator.pop(context);
+        return;
+      }
+
+      Provider.of<TeacherProfileViewModel>(
+        context,
+        listen: false,
+      ).teacherProfileApi(context);
     });
   }
   String capitalizeWords(String text) {
@@ -322,6 +345,8 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
 
     final dob         = formatDate(data?.dob);
     final joiningDate = formatDate(data?.joiningDate);
+
+
 
     return Scaffold(
       backgroundColor: AppColor.bg,
