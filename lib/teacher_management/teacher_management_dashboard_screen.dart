@@ -503,14 +503,11 @@ class _TeacherManagementDashBoardScreenState
       listen: false,
     );
 
-    // ✅ Pehle permission filter karo
-    final filteredTiles = _tiles
-        .where(
-          (t) => PermissionExtensions.canAccess(
+    final filteredTiles = _tiles.where(
+          (t) => permVm.canAccess(
         t.permKey,
       ),
-    )
-        .toList();
+    ).toList();
 
     final normalTiles = filteredTiles.where((t) => !t.isWide).toList();
     final wideTiles = filteredTiles.where((t) => t.isWide).toList();
@@ -994,7 +991,8 @@ class _TeacherManagementDashBoardScreenState
         ],
       ),
     );
-  } // void _showLogoutDialog(BuildContext context) {
+  }
+  // void _showLogoutDialog(BuildContext context) {
 
   //   showDialog(
   //     context: context,

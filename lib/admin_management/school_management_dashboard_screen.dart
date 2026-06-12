@@ -10,6 +10,8 @@ import 'package:school_pro/view_model/school_view_model/all_student_list_view_mo
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../repo/auth_repo/auth_repo.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/all_accountant_list_view_model.dart';
 import '../view_model/school_view_model/cms_viewmodel.dart';
 import '../view_model/school_view_model/user_permission_view_model.dart';
@@ -139,112 +141,127 @@ class _SchoolManagementDashboardScreenState
       Icons.people_alt_rounded,
       Color(0xFF1976D2),
       'Manage students',
-      'students.view',
+      PermissionKeys.viewAllStudent,
     ),
+
     _DashTile(
       'All Teachers',
       Icons.school_rounded,
       Color(0xFF00897B),
       'Staff list',
-      'teachers.view',
+      PermissionKeys.viewAllTeacher,
     ),
+
     _DashTile(
       'All Accountants',
       Icons.account_balance_rounded,
       Color(0xFFF57C00),
       'Finance team',
-      'accountant.view',
+      PermissionKeys.viewAccountants,
     ),
+
     _DashTile(
       'Classes',
       Icons.layers_rounded,
       Color(0xFF7B1FA2),
       'View classes',
-      'classes.view',
+      PermissionKeys.viewClasses,
     ),
+
     _DashTile(
       'Timetable',
       Icons.schedule_rounded,
       Color(0xFF2E7D32),
       'Weekly schedule',
-      'timetable.view',
+      PermissionKeys.viewTimetable,
     ),
+
     _DashTile(
       'Subject',
       Icons.menu_book_rounded,
       Color(0xFF00695C),
       'All subjects',
-      'subjects.view',
+      PermissionKeys.viewSubjects,
     ),
+
     _DashTile(
       'Fees',
       Icons.receipt_long_rounded,
       Color(0xFF27AE60),
       'Fee collection',
-      'fees.view',
+      PermissionKeys.viewFees,
     ),
+
     _DashTile(
       'Transport Fee',
       Icons.directions_bus_rounded,
       Color(0xFF0097A7),
       'Bus fees',
-      'transport_fee.view',
+      PermissionKeys.manageTransport,
     ),
+
     _DashTile(
       'Exams',
       Icons.assignment_turned_in_rounded,
       Color(0xFFD4A017),
       'Exam schedule',
-      'exams.view',
+      PermissionKeys.viewExam,
     ),
+
     _DashTile(
       'Marksheet',
       Icons.description_rounded,
       Color(0xFF1565C0),
       'View marks',
-      'marksheet.view',
+      PermissionKeys.viewMarks,
     ),
+
     _DashTile(
       'Admit Card',
       Icons.badge_rounded,
       Color(0xFFC62828),
       'Generate cards',
-      'admit_card.view',
+      PermissionKeys.generateAdmitCard,
     ),
+
     _DashTile(
       'Attendance',
       Icons.fact_check_rounded,
       Color(0xFF0288D1),
       'Daily attendance',
-      'attendance.view',
+      PermissionKeys.markStudentAttendance,
     ),
+
     _DashTile(
       'Homework',
       Icons.auto_stories_rounded,
       Color(0xFF00796B),
       'Assignments',
-      'homework.view',
+      PermissionKeys.viewHomework,
     ),
+
     _DashTile(
       'Notifications',
       Icons.notifications_active_rounded,
       Color(0xFFE65100),
       'Alerts & updates',
-      'notification.view',
+      PermissionKeys.notificationView,
     ),
+
     _DashTile(
       'Exam Marks',
       Icons.grading_rounded,
       Color(0xFF558B2F),
       'Enter marks',
-      'exam_marks.view',
+      PermissionKeys.manageExamMarks,
     ),
+
     _DashTile(
       'Permission',
       Icons.admin_panel_settings_rounded,
       Color(0xFF4527A0),
       'Access control',
-      'permission.view',
+      PermissionKeys.managePermissions,
     ),
   ];
   @override
@@ -672,7 +689,11 @@ class _SchoolManagementDashboardScreenState
     final visibleTiles = _tiles
         .asMap()
         .entries
-        .where((e) => permVm.canAccess(e.value.permKey))
+        .where(
+          (e) => PermissionExtensions.canAccess(
+        e.value.permKey,
+      ),
+    )
         .toList();
 
     return GridView.builder(
