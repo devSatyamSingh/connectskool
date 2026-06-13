@@ -5,6 +5,9 @@ import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 
 import '../../teacher_management/teacher_attendance_screen.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 import 'all_student_admin_attendance_screen.dart';
 import 'school_accountant_attendance_screen.dart';
 
@@ -111,6 +114,18 @@ class StaffAttendanceScreen extends StatelessWidget {
                       );
                     }
                     else if (role == "Teacher") {
+
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.viewAllTeacherAttendance)) {
+
+                        Utils.show(
+                          "You don't have permission to view teacher attendance",
+                          context,
+                        );
+
+                        return;
+                      }
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(

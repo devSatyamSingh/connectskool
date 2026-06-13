@@ -14,15 +14,21 @@ class AllClassesViewModel extends ChangeNotifier {
 
   void _setLoading(bool value) {
     _loading = value;
+    notifyListeners();
   }
 
   // ✅ ONLY API updates model
   Future<void> allClassesApi(BuildContext context) async {
+
+    print("API CALL START");
+
     _setLoading(true);
-    notifyListeners(); // 🔔 start loading
 
     try {
       final response = await _allStudentListRepo.allClassesApi();
+
+      print("API RESPONSE => $response");
+
       final int statusCode = response['status_code'];
 
       if (statusCode == 200) {
@@ -30,15 +36,19 @@ class AllClassesViewModel extends ChangeNotifier {
         body.remove('status_code');
 
         _allClassesModel = AllClassesModel.fromJson(body);
+
+        print(
+          "TOTAL CLASSES => ${_allClassesModel?.data?.length}",
+        );
       } else {
         _handleError(statusCode, response, context);
       }
     } catch (e) {
+      print("ERROR => $e");
       Utils.show("Failed to load classes", context);
     }
 
     _setLoading(false);
-    notifyListeners(); // 🔔 ONE FINAL rebuild
   }
 
   void _handleError(

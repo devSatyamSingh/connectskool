@@ -5,6 +5,8 @@ import 'package:school_pro/repo/school_repo/delete_accountant_repo.dart';
 import 'package:school_pro/repo/school_repo/delete_teacher_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class DeleteAccountantViewModel with ChangeNotifier {
@@ -22,6 +24,16 @@ class DeleteAccountantViewModel with ChangeNotifier {
       dynamic accountantId,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.deleteAccountant)) {
+
+      Utils.show(
+        "You don't have permission to delete accountant",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map<String, dynamic> data = {

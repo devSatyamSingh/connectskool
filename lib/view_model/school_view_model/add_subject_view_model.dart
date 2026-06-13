@@ -7,6 +7,8 @@ import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class AddSubjectViewModel with ChangeNotifier {
@@ -22,6 +24,16 @@ class AddSubjectViewModel with ChangeNotifier {
       dynamic assessmentModel,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.addSubject)) {
+
+      Utils.show(
+        "You don't have permission to add subject",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

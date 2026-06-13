@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/edit_subject_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class EditSubjectsViewModel with ChangeNotifier {
@@ -20,6 +22,16 @@ class EditSubjectsViewModel with ChangeNotifier {
       dynamic assessmentModel,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.editSubject)) {
+
+      Utils.show(
+        "You don't have permission to edit subject",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

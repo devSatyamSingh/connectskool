@@ -4048,12 +4048,12 @@ import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.
 import 'package:school_pro/view_model/teacher_view_model/teacher_attendance_view_model.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../utils/permission_error_message.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/update_teacher_attendance_view_model.dart';
 import '../view_model/teacher_view_model/create_teacher_attendance_view_model.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
 // Row Model
-// ─────────────────────────────────────────────────────────────────────────────
 class _TeacherRow {
   final String id;
   final String name;
@@ -4079,9 +4079,6 @@ class _TeacherRow {
   void dispose() => remarksCtrl.dispose();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Screen
-// ─────────────────────────────────────────────────────────────────────────────
 class TeacherAttendanceScreen extends StatefulWidget {
   const TeacherAttendanceScreen({super.key});
 
@@ -4171,14 +4168,11 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     setState(() => _loading = false);
   }
 
-  // ── Attendance fetch and apply ─────────────────────────────────────────────
-  // ✅ FIX: r.attendanceId → yahan apne model ka sahi field name use karo.
-  //    Agar aapke TeacherAttendanceModel mein field "id" hai to
-  //    r.id?.toString() use karo. Agar "attendanceId" hai to wahi rakho.
+
   Future<void> _applyExistingAttendance() async {
     await context
         .read<TeacherAttendanceViewModel>()
-        .getTeacherAttendance(_apiDate);
+        .getTeacherAttendance(_apiDate, context);
 
     final existing = Provider.of<TeacherAttendanceViewModel>(
       context,
@@ -4277,6 +4271,13 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
 
   // ── Save NEW attendance ───────────────────────────────────────────────────
   Future<void> _saveAll() async {
+    if (!PermissionGuard.check(
+      context,
+      PermissionKeys.markTeacherAttendance,
+      "Mark Teacher Attendance",
+    )) {
+      return;
+    }
     final pending = _rows.where((r) => !r.alreadyMarked).toList();
 
     if (pending.isEmpty) {
@@ -4331,8 +4332,14 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
   }
 
   // ── Update EXISTING attendance ────────────────────────────────────────────
-  // ✅ FIX: Accountant ke bilkul same pattern — attendanceId (PK) se update
   Future<void> _updateAttendance(_TeacherRow row, StateSetter setRow) async {
+    if (!PermissionGuard.check(
+      context,
+      PermissionKeys.markTeacherAttendance,
+      "Update Teacher Attendance",
+    )) {
+      return;
+    }
     if (row.attendanceStatus == null) {
       _snack('Please select a status before saving.',
           Colors.orange, Icons.warning_rounded);
@@ -4403,9 +4410,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     ));
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
   // BUILD
-  // ─────────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final alreadyCount = _rows.where((r) => r.alreadyMarked).length;

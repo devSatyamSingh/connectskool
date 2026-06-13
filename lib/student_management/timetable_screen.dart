@@ -11,6 +11,8 @@ import '../../model/school_model/all_sections_model.dart';
 import '../../model/student_model/timetable_model.dart';
 import '../../view_model/school_view_model/all_classes_view_model.dart';
 import '../res/app_color.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
 import '../view_model/school_view_model/all_scetions_view_model.dart';
 import '../view_model/student_view_model/timetable_viewmodel.dart';
@@ -52,7 +54,22 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewTimetable,
+      )) {
+
+        Utils.show(
+          "You don't have permission to view timetable",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
+
       context.read<AllClassesViewModel>().allClassesApi(context);
     });
   }

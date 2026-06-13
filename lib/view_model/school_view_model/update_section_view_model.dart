@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../repo/school_repo/update_section_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class UpdateSectionViewModel extends ChangeNotifier {
@@ -14,6 +16,16 @@ class UpdateSectionViewModel extends ChangeNotifier {
       BuildContext context,
       UpdateSectionRequest request,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageSections)) {
+
+      Utils.show(
+        "You don't have permission to update section",
+        context,
+      );
+
+      return;
+    }
 
     _loading = true;
     notifyListeners();
@@ -29,8 +41,9 @@ class UpdateSectionViewModel extends ChangeNotifier {
       //   const SnackBar(content: Text("Section Updated Successfully")),
       // );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to Update Section")),
+      Utils.show(
+        "Failed to Update Section",
+        context,
       );
     }
   }

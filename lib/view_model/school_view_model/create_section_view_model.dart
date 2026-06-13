@@ -6,6 +6,8 @@ import 'package:school_pro/repo/school_repo/create_section_repo.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class CreateSectionViewModel with ChangeNotifier {
@@ -23,6 +25,16 @@ class CreateSectionViewModel with ChangeNotifier {
       dynamic capacity,
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageSections)) {
+
+      Utils.show(
+        "You don't have permission to create section",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

@@ -15,6 +15,9 @@ import 'package:school_pro/view_model/school_view_model/delete_section_view_mode
 import 'package:school_pro/repo/school_repo/update_section_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+
 class ClassesPage extends StatefulWidget {
   const ClassesPage({super.key});
 
@@ -81,6 +84,7 @@ class _ClassesPageState extends State<ClassesPage>
   Future<void> _onRefresh() async {
     _animationController.reset();
 
+
     final classVM = Provider.of<AllClassesViewModel>(context, listen: false);
     final sectionVM = Provider.of<AllSectionsViewModel>(context, listen: false);
 
@@ -93,10 +97,15 @@ class _ClassesPageState extends State<ClassesPage>
       classes.map((c) => sectionVM.allSectionsApi(context, c.classId.toString())),
     );
 
+    print(
+      "REFRESH CLASSES => ${classes.length}",
+    );
     // ✅ Expanded classes ke sections dobara explicitly fetch karo
     for (final classId in _expandedClassIds) {
       await sectionVM.allSectionsApi(context, classId.toString());
     }
+
+    if (!mounted) return;
 
     _animationController.forward();
     setState(() {}); // ✅ Force rebuild
@@ -128,6 +137,11 @@ class _ClassesPageState extends State<ClassesPage>
     final sectionVM = Provider.of<AllSectionsViewModel>(context);
     final allClasses = classVM.allClassesModel?.data ?? [];
 
+    final canViewClasses =
+    PermissionExtensions.canAccess(
+      PermissionKeys.viewClasses,
+    );
+
     final filteredClasses = _searchQuery.isEmpty
         ? allClasses
         : allClasses
@@ -139,6 +153,20 @@ class _ClassesPageState extends State<ClassesPage>
             .toLowerCase()
             .contains(_searchQuery.toLowerCase()))
         .toList();
+
+    if (!canViewClasses) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            "You don't have permission to view classes",
+          ),
+        ),
+      );
+    }
+
+    print(
+      "BUILD CLASSES => ${classVM.allClassesModel?.data?.length}",
+    );
 
     return Scaffold(
       backgroundColor: AppColor.pageBgColor,
@@ -484,7 +512,21 @@ class _ClassesPageState extends State<ClassesPage>
                     icon: Icons.edit_note_rounded,
                     color: color,
                     bg: color.withOpacity(0.10),
-                    onTap: () => _openEditClassSheet(c, color),
+                    onTap: () {
+
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageClasses)) {
+
+                        Utils.show(
+                          "You don't have permission to edit classes",
+                          context,
+                        );
+
+                        return;
+                      }
+
+                      _openEditClassSheet(c, color);
+                    },
                   ),
                   const SizedBox(width: 6),
                   _cardIconBtn(
@@ -492,6 +534,17 @@ class _ClassesPageState extends State<ClassesPage>
                     color: AppColor.error,
                     bg: AppColor.error.withOpacity(0.08),
                     onTap: () async {
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageClasses)) {
+
+                        Utils.show(
+                          "You don't have permission to delete classes",
+                          context,
+                        );
+
+                        return;
+                      }
+
                       final confirmed =
                       await _showDeleteDialog(c.className ?? "", "Class");
                       if (confirmed) {
@@ -608,7 +661,21 @@ class _ClassesPageState extends State<ClassesPage>
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
             child: GestureDetector(
-              onTap: () => _openAddSectionSheet(classData),
+              onTap: () {
+
+                if (!PermissionExtensions.canAccess(
+                    PermissionKeys.manageSections)) {
+
+                  Utils.show(
+                    "You don't have permission to add sections",
+                    context,
+                  );
+
+                  return;
+                }
+
+                _openAddSectionSheet(classData);
+              },
               child: Container(
                 padding: const EdgeInsets.symmetric(
                     vertical: 10, horizontal: 16),
@@ -773,7 +840,21 @@ class _ClassesPageState extends State<ClassesPage>
                 icon: Icons.edit_note_rounded,
                 color: classColor,
                 bg: classColor.withOpacity(0.10),
-                onTap: () => _openEditSectionSheet(s, classColor),
+                onTap: () {
+
+                  if (!PermissionExtensions.canAccess(
+                      PermissionKeys.manageSections)) {
+
+                    Utils.show(
+                      "You don't have permission to edit sections",
+                      context,
+                    );
+
+                    return;
+                  }
+
+                  _openEditSectionSheet(s, classColor);
+                },
               ),
               const SizedBox(width: 4),
               _cardIconBtn(

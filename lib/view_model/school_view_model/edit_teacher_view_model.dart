@@ -5,6 +5,8 @@ import 'package:school_pro/repo/school_repo/edit_student_repo.dart';
 import 'package:school_pro/repo/school_repo/edit_teacher_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 import 'dart:io';
 
@@ -40,6 +42,16 @@ class EditTeacherViewModel with ChangeNotifier {
     File? teacher_photo,
     File? aadharCard,
   }) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.editTeacher)) {
+      Utils.show(
+        "You don't have permission to edit teacher",
+        context,
+      );
+      return false;
+    }
+
     setLoading(true);
 
     try {

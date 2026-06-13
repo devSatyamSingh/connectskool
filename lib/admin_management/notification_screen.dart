@@ -12,6 +12,8 @@ import 'package:school_pro/view_model/school_view_model/delete_notification_view
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../repo/school_repo/all_sections_repo.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/mark_as_all_read_notication_view_model.dart';
 
 // ── Target Audience types ──
@@ -39,6 +41,17 @@ class _NotificationScreenState extends State<NotificationScreen>
     )..forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.notificationView)) {
+
+        Utils.show(
+          "You don't have permission to view notifications",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
       Provider.of<AllNotificationViewModel>(context, listen: false)
           .allNotificationApi(context);
       Provider.of<GetSendNotificationViewModel>(context, listen: false)
@@ -94,7 +107,12 @@ class _NotificationScreenState extends State<NotificationScreen>
     final markReadVM = Provider.of<MarkAsAllReadNotificationViewModel>(context);
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
-      floatingActionButton: _buildFAB(),
+      floatingActionButton:
+      PermissionExtensions.canAccess(
+        PermissionKeys.notificationSend,
+      )
+          ? _buildFAB()
+          : null,
       body: Column(children: [
         _buildHeader(markReadVM),
         Expanded(
@@ -408,8 +426,23 @@ class _NotificationScreenState extends State<NotificationScreen>
                       ),
                       const SizedBox(width: 8),
                       GestureDetector(
-                        onTap: () => _showDeleteDialog(n.notificationId),
-                        child: Container(
+                        onTap: () {
+
+                          if (!PermissionExtensions.canAccess(
+                              PermissionKeys.notificationSend)) {
+
+                            Utils.show(
+                              "You don't have permission to delete notifications",
+                              context,
+                            );
+
+                            return;
+                          }
+
+                          _showDeleteDialog(
+                            n.notificationId,
+                          );
+                        },                        child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: AppColor.error.withOpacity(0.08),
@@ -1288,7 +1321,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                   context, listen: false);
               final allVM = Provider.of<AllNotificationViewModel>(
                   context, listen: false);
-              final success = await deleteVM.deleteNotificationApi(id);
+              final success = await deleteVM.deleteNotificationApi(id, context);
               if (success) {
                 allVM.removeNotification(id);
                 _snack("Notification deleted");

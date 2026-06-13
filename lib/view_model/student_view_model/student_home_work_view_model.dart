@@ -3,6 +3,9 @@ import 'package:school_pro/model/student_model/student_home_work_model.dart';
 import 'package:school_pro/repo/student_repo/student_home_work_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class StudentHomeworkViewModel extends ChangeNotifier {
   final StudentHomeworkRepository _repository =
   StudentHomeworkRepository();
@@ -24,6 +27,16 @@ class StudentHomeworkViewModel extends ChangeNotifier {
   }
 
   Future<void> studentHomeWorkApi(BuildContext context) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewHomework)) {
+
+      Utils.show(
+        "You don't have permission to view homework",
+        context,
+      );
+
+      return;
+    }
     _setLoading(true);
 
     try {

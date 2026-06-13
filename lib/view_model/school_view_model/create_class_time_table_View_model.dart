@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/create_class_timetable_repo.dart';
 import 'package:school_pro/view_model/school_view_model/Exam_management_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class CreateClassTimetableViewModel with ChangeNotifier {
@@ -28,15 +30,16 @@ class CreateClassTimetableViewModel with ChangeNotifier {
       context,
       ) async {
 
-    print("========== CREATE TIMETABLE API ==========");
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTimetable)) {
 
-    print("classId: $classId");
-    print("sectionId: $sectionId");
-    print("subjectId: $subjectId");
-    print("teacherId: $teacherId");
-    print("dayOfWeek: $dayOfWeek");
-    print("startTime: $startTime");
-    print("endTime: $endTime");
+      Utils.show(
+        "You don't have permission to manage timetable",
+        context,
+      );
+
+      return false;
+    }
 
     setLoading(true);
 

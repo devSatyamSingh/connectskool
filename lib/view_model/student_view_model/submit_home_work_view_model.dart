@@ -68,6 +68,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/student_repo/submit_home_work_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/student_home_work_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class SubmitHomeworkViewModel with ChangeNotifier {
@@ -89,6 +91,16 @@ class SubmitHomeworkViewModel with ChangeNotifier {
     required String homeworkId,
     File? attachments,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.submitHomework)) {
+
+      Utils.show(
+        "You don't have permission to submit homework",
+        context,
+      );
+
+      return false;
+    }
     _setLoading(true);
 
     try {

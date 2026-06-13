@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../repo/school_repo/save_user_permission_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class SaveUserPermissionViewModel extends ChangeNotifier {
 
@@ -14,6 +17,12 @@ class SaveUserPermissionViewModel extends ChangeNotifier {
     required int userId,
     required Map<int, String> permissionStateMap,
   }) async {
+
+    // ✅ Pattern C - ViewModel/API level guard
+    if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
+      Utils.show("Permission denied", context);
+      return false;
+    }
 
     _loading = true;
     notifyListeners();

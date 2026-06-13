@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
 
 import '../../repo/school_repo/add_accountant_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class AddAccountantViewModel with ChangeNotifier {
@@ -37,6 +39,16 @@ class AddAccountantViewModel with ChangeNotifier {
     File? accountant_photo,
     File? aadharCard,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.addAccountant)) {
+
+      Utils.show(
+        "You don't have permission to add accountant",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     try {

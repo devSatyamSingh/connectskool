@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../model/school_model/cms_model.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/cms_viewmodel.dart';
 
 class CmsScreen extends StatefulWidget {
@@ -38,6 +40,17 @@ class _CmsScreenState extends State<CmsScreen> {
     return Consumer<CmsViewModel>(
       builder: (context, vm, child) {
         final CmsPage? page = vm.getPageByType(widget.pageType);
+        if (!PermissionExtensions.canAccess(
+            PermissionKeys.manageSchoolSettings)) {
+
+          return Scaffold(
+            body: Center(
+              child: AppText.customText(
+                "You don't have permission",
+              ),
+            ),
+          );
+        }
 
         return Scaffold(
           backgroundColor: AppColor.bg,

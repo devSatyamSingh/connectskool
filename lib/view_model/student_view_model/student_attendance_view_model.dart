@@ -4,6 +4,9 @@ import 'package:school_pro/model/student_model/student_attendance_model.dart';
 import 'package:school_pro/repo/student_repo/student_attendance_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class StudentAttendanceViewModel extends ChangeNotifier {
   final _allStudentListRepo = StudentAttendanceRepository();
 
@@ -76,6 +79,16 @@ class StudentAttendanceViewModel extends ChangeNotifier {
   //   }
   // }
   Future<void> studentAttendanceApi(BuildContext context) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewOneStudentAttendance)) {
+
+      Utils.show(
+        "You don't have permission to view attendance",
+        context,
+      );
+
+      return;
+    }
     setLoading(true);
 
     try {

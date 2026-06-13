@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/edit_classes_time_table_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class EditClassesTimeTableViewModel with ChangeNotifier {
@@ -24,6 +26,16 @@ class EditClassesTimeTableViewModel with ChangeNotifier {
       dynamic endTime,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTimetable)) {
+
+      Utils.show(
+        "You don't have permission to edit timetable",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

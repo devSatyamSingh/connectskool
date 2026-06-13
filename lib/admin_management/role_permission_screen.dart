@@ -4,6 +4,8 @@ import 'package:school_pro/main.dart';
 import 'package:school_pro/view_model/school_view_model/assign_role_view_model.dart';
 import '../res/app_color.dart';
 import '../res/const_text.dart';
+import '../utils/permission_error_message.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/remove_role_viewmodel.dart';
 import '../view_model/school_view_model/select_role_view_model.dart';
 
@@ -21,8 +23,6 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
 
   Map<int, bool> permissionLoading = {};
 
-  @override
-  @override
   @override
   void initState() {
     super.initState();
@@ -119,6 +119,13 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
   //   preparePermissions(vm);
   // }
   void changeRole(String role) async {
+    if (!PermissionGuard.check(
+      context,
+      PermissionKeys.managePermissions,
+      "Manage Permissions",
+    )) {
+      return;
+    }
     selectedRole = role;
     setState(() {});
     final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
@@ -156,6 +163,13 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
     int permId,
     bool newValue,
   ) async {
+    if (!PermissionGuard.check(
+      context,
+      PermissionKeys.managePermissions,
+      "Manage Permissions",
+    )) {
+      return;
+    }
     permissionLoading[permId] = true;
 
     setState(() {});
@@ -232,6 +246,13 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
   //   );
   // }
   void callAssignApi() {
+    if (!PermissionGuard.check(
+      context,
+      PermissionKeys.managePermissions,
+      "Manage Permissions",
+    )) {
+      return;
+    }
     final roleVM = Provider.of<SelectRoleViewModel>(context, listen: false);
 
     List<int> selectedIds = [];

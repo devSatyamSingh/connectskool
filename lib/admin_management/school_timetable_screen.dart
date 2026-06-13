@@ -15,6 +15,9 @@ import 'package:shimmer/shimmer.dart';
 import '../model/school_model/classes_time_table_model.dart';
 import '../res/app_color.dart';
 import '../res/const_text.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
 import '../view_model/school_view_model/all_classes_view_model.dart';
 import '../view_model/school_view_model/all_scetions_view_model.dart';
 import '../view_model/school_view_model/create_class_time_table_View_model.dart';
@@ -269,6 +272,17 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.viewTimetable)) {
+
+        Utils.show(
+          "You don't have permission to view timetable",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
       Provider.of<AllClassesViewModel>(context, listen: false)
           .allClassesApi(context);
       Provider.of<AllSubjectsVieModel>(context, listen: false)
@@ -439,7 +453,19 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
     return Scaffold(
       backgroundColor: AppColor.pageBgColor,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showCreateSheet,
+        onPressed: () {
+          if (!PermissionExtensions.canAccess(
+              PermissionKeys.manageTimetable)) {
+
+            Utils.show(
+              "You don't have permission to manage timetable",
+              context,
+            );
+            return;
+          }
+
+          _showCreateSheet();
+        },
         backgroundColor: AppColor.lightBlueColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         icon: const Icon(Icons.add_rounded, color: Colors.white),
@@ -903,7 +929,19 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
-                    onTap: () => _showEditSheet(period),
+                    onTap: () {
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageTimetable)) {
+
+                        Utils.show(
+                          "You don't have permission to edit timetable",
+                          context,
+                        );
+                        return;
+                      }
+
+                      _showEditSheet(period);
+                    },
                     child: Container(
                       width: 32,
                       height: 32,
@@ -915,7 +953,19 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                   ),
                   const SizedBox(width: 6),
                   GestureDetector(
-                    onTap: () => _confirmDelete(period),
+                    onTap: () {
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageTimetable)) {
+
+                        Utils.show(
+                          "You don't have permission to delete timetable",
+                          context,
+                        );
+                        return;
+                      }
+
+                      _confirmDelete(period);
+                    },
                     child: Container(
                       width: 32,
                       height: 32,

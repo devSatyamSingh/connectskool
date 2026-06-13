@@ -2170,6 +2170,9 @@ import 'package:school_pro/view_model/student_view_model/create_student_attendan
 import '../../repo/school_repo/all_sections_repo.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 import '../../view_model/school_view_model/all_student_attendance_view_model.dart';
 import '../../view_model/school_view_model/update_student_attendance_view_model.dart';
 
@@ -2209,7 +2212,7 @@ class _StudentRow {
   bool alreadyMarked;
   bool isEditing;
   String? markedStatus;
-  String? attendanceId;           // ← ADD THIS
+  String? attendanceId; // ← ADD THIS
   final TextEditingController remarksCtrl;
 
   _StudentRow({
@@ -2221,11 +2224,12 @@ class _StudentRow {
     this.alreadyMarked = false,
     this.isEditing = false,
     this.markedStatus,
-    this.attendanceId,            // ← ADD THIS
+    this.attendanceId, // ← ADD THIS
   }) : remarksCtrl = TextEditingController();
 
   void dispose() => remarksCtrl.dispose();
 }
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Screen
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2233,7 +2237,8 @@ class AllStudentAdminAttendanceScreen extends StatefulWidget {
   const AllStudentAdminAttendanceScreen({super.key});
 
   @override
-  State<AllStudentAdminAttendanceScreen> createState() => _AllStudentAdminAttendanceScreenState();
+  State<AllStudentAdminAttendanceScreen> createState() =>
+      _AllStudentAdminAttendanceScreenState();
 }
 
 class _AllStudentAdminAttendanceScreenState
@@ -2321,8 +2326,10 @@ class _AllStudentAdminAttendanceScreenState
       _classesVm = Provider.of<AllClassesViewModel>(context, listen: false);
       _classesVm.allClassesApi(context);
       _classesVm.addListener(_onClassesLoaded);
-      Provider.of<AllStudentListVieModel>(context, listen: false)
-          .allStudentListApi(context);
+      Provider.of<AllStudentListVieModel>(
+        context,
+        listen: false,
+      ).allStudentListApi(context);
     });
   }
 
@@ -2332,10 +2339,12 @@ class _AllStudentAdminAttendanceScreenState
     if (data.isNotEmpty && _classes.isEmpty) {
       setState(() {
         _classes = data
-            .map((e) => {
-          'class_id': e.classId.toString(),
-          'class_name': e.className ?? '',
-        })
+            .map(
+              (e) => {
+                'class_id': e.classId.toString(),
+                'class_name': e.className ?? '',
+              },
+            )
             .toList();
       });
     }
@@ -2362,25 +2371,30 @@ class _AllStudentAdminAttendanceScreenState
     if (_selectedClassId.isEmpty || _selectedSectionId.isEmpty) return;
     setState(() => _loadingRows = true);
 
-    await Provider.of<AllStudentAdminAttendanceViewModel>(context,
-        listen: false)
-        .getAttendance(
+    await Provider.of<AllStudentAdminAttendanceViewModel>(
+      context,
+      listen: false,
+    ).getAttendance(
       classId: int.parse(_selectedClassId),
       sectionId: int.parse(_selectedSectionId),
       date: _apiDate,
       context: context,
     );
 
-    final attVm = Provider.of<AllStudentAdminAttendanceViewModel>(context,
-        listen: false);
+    final attVm = Provider.of<AllStudentAdminAttendanceViewModel>(
+      context,
+      listen: false,
+    );
     final markedList = attVm.attendanceModel?.data?.students ?? [];
-// Change this map to also capture the attendance record PK
+    // Change this map to also capture the attendance record PK
     final Map<String, Map<String, String>> markedMap = {
       for (final r in markedList)
         if (r.studentId != null)
           r.studentId.toString(): {
             'status': r.status ?? '',
-            'attendanceId': r.attendanceId?.toString() ?? '',  // ← use your model's PK field name
+            'attendanceId':
+                r.attendanceId?.toString() ??
+                '', // ← use your model's PK field name
           },
     };
     // final Map<String, String> markedMap = {
@@ -2389,15 +2403,18 @@ class _AllStudentAdminAttendanceScreenState
     // };
 
     final allStudents =
-        Provider.of<AllStudentListVieModel>(context, listen: false)
-            .allStudentListModel
-            ?.data ??
-            [];
+        Provider.of<AllStudentListVieModel>(
+          context,
+          listen: false,
+        ).allStudentListModel?.data ??
+        [];
 
     final filtered = allStudents
-        .where((s) =>
-    s.classId.toString() == _selectedClassId &&
-        s.sectionId.toString() == _selectedSectionId)
+        .where(
+          (s) =>
+              s.classId.toString() == _selectedClassId &&
+              s.sectionId.toString() == _selectedSectionId,
+        )
         .toList();
 
     for (final r in _rows) r.dispose();
@@ -2429,7 +2446,9 @@ class _AllStudentAdminAttendanceScreenState
           isEditing: false,
           markedStatus: already ? markedMap[id]!['status'] : null,
           attendanceStatus: already ? markedMap[id]!['status'] : null,
-          attendanceId: already ? markedMap[id]!['attendanceId'] : null,  // ← ADD THIS
+          attendanceId: already
+              ? markedMap[id]!['attendanceId']
+              : null, // ← ADD THIS
         );
       }).toList();
       _loadingRows = false;
@@ -2449,7 +2468,8 @@ class _AllStudentAdminAttendanceScreenState
       final res = await AllSectionsRepository().allSectionsApi(classId);
       if (res['success'] == true) {
         setState(
-                () => _sections = List<Map<String, dynamic>>.from(res['data']));
+          () => _sections = List<Map<String, dynamic>>.from(res['data']),
+        );
       }
     } catch (_) {}
   }
@@ -2495,38 +2515,47 @@ class _AllStudentAdminAttendanceScreenState
     final pending = _rows.where((r) => !r.alreadyMarked).toList();
 
     if (pending.isEmpty) {
-      _snack('All students\' attendance has already been marked.',
-          Colors.blue, Icons.info_rounded);
+      _snack(
+        'All students\' attendance has already been marked.',
+        Colors.blue,
+        Icons.info_rounded,
+      );
       return;
     }
 
-    final incomplete =
-    pending.where((r) => r.attendanceStatus == null).toList();
+    final incomplete = pending
+        .where((r) => r.attendanceStatus == null)
+        .toList();
     if (incomplete.isNotEmpty) {
       _snack(
-          '${incomplete.length} student(s) attendance status is not selected.',
-          Colors.orange,
-          Icons.warning_rounded);
+        '${incomplete.length} student(s) attendance status is not selected.',
+        Colors.orange,
+        Icons.warning_rounded,
+      );
       return;
     }
 
     setState(() => _saving = true);
 
-    final ok = await Provider.of<CreateStudentAttendanceViewModel>(context,
-        listen: false)
-        .createStudentAttendanceApi(
-      classId: int.parse(_selectedClassId),
-      sectionId: int.parse(_selectedSectionId),
-      attendanceDate: _apiDate,
-      students: pending
-          .map((r) => {
-        'student_id': int.parse(r.id),
-        'status': r.attendanceStatus,
-        'remarks': r.remarksCtrl.text.trim(),
-      })
-          .toList(),
-      context: context,
-    );
+    final ok =
+        await Provider.of<CreateStudentAttendanceViewModel>(
+          context,
+          listen: false,
+        ).createStudentAttendanceApi(
+          classId: int.parse(_selectedClassId),
+          sectionId: int.parse(_selectedSectionId),
+          attendanceDate: _apiDate,
+          students: pending
+              .map(
+                (r) => {
+                  'student_id': int.parse(r.id),
+                  'status': r.attendanceStatus,
+                  'remarks': r.remarksCtrl.text.trim(),
+                },
+              )
+              .toList(),
+          context: context,
+        );
 
     if (ok) {
       setState(() {
@@ -2544,42 +2573,52 @@ class _AllStudentAdminAttendanceScreenState
   // ── Update EXISTING attendance (edit flow) ────────────────────────────────
   Future<void> _updateAttendance(_StudentRow row, StateSetter setRow) async {
     if (row.attendanceStatus == null) {
-      _snack('Please select a status before saving.',
-          Colors.orange, Icons.warning_rounded);
+      _snack(
+        'Please select a status before saving.',
+        Colors.orange,
+        Icons.warning_rounded,
+      );
       return;
     }
 
     if (row.attendanceId == null || row.attendanceId!.isEmpty) {
-      _snack('Attendance ID not found. Please refresh and try again.',
-          Colors.red, Icons.error_rounded);
+      _snack(
+        'Attendance ID not found. Please refresh and try again.',
+        Colors.red,
+        Icons.error_rounded,
+      );
       return;
     }
 
     setState(() => _saving = true);
 
-    final ok = await Provider.of<UpdateStudentAttendanceViewModel>(
-      context,
-      listen: false,
-    ).updateStudentAttendanceApi(
-      int.parse(row.attendanceId!),
-      int.parse(row.id),        // ✅ student_id
-      row.attendanceStatus!,
-      row.remarksCtrl.text.trim(),
-      _apiDate,
-      context,
-    );
+    final ok =
+        await Provider.of<UpdateStudentAttendanceViewModel>(
+          context,
+          listen: false,
+        ).updateStudentAttendanceApi(
+          int.parse(row.attendanceId!),
+          int.parse(row.id), // ✅ student_id
+          row.attendanceStatus!,
+          row.remarksCtrl.text.trim(),
+          _apiDate,
+          context,
+        );
 
     setState(() => _saving = false);
 
     if (ok) {
       setRow(() {
         row.alreadyMarked = true;
-        row.isEditing     = false;
-        row.markedStatus  = row.attendanceStatus;
+        row.isEditing = false;
+        row.markedStatus = row.attendanceStatus;
       });
       if (mounted) {
-        _snack('Attendance updated successfully.',
-            Colors.green, Icons.check_circle_rounded);
+        _snack(
+          'Attendance updated successfully.',
+          Colors.green,
+          Icons.check_circle_rounded,
+        );
       }
     }
   }
@@ -2629,16 +2668,20 @@ class _AllStudentAdminAttendanceScreenState
 
   // ── Snack helper ──────────────────────────────────────────────────────────
   void _snack(String msg, Color color, IconData icon) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Row(children: [
-        Icon(icon, color: Colors.white, size: 18),
-        const SizedBox(width: 8),
-        Expanded(child: Text(msg)),
-      ]),
-      backgroundColor: color,
-      behavior: SnackBarBehavior.floating,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white, size: 18),
+            const SizedBox(width: 8),
+            Expanded(child: Text(msg)),
+          ],
+        ),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
   }
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -2649,44 +2692,78 @@ class _AllStudentAdminAttendanceScreenState
     final hasPending = _rows.any((r) => !r.alreadyMarked);
     return Scaffold(
       backgroundColor: AppColor.screenBg,
-      body: Column(children: [_buildHeader(), Expanded(child: _buildBody())]),
+      body: Column(
+        children: [
+          _buildHeader(),
+          Expanded(child: _buildBody()),
+        ],
+      ),
       floatingActionButton: hasPending
           ? Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(children: [
-          FloatingActionButton(
-            heroTag: 'mark_all_p',
-            onPressed: _saving ? null : _markAllPresent,
-            backgroundColor: const Color(0xFF22C55E),
-            tooltip: 'Mark All Present',
-            child: const Icon(Icons.done_all_rounded, color: Colors.white),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: FloatingActionButton.extended(
-              heroTag: 'save_all_btn',
-              onPressed: _saving ? null : _saveAll,
-              backgroundColor: AppColor.lightBlueColor,
-              elevation: 4,
-              icon: _saving
-                  ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2))
-                  : const Icon(Icons.save_rounded, color: Colors.white),
-              label: Text(
-                _saving ? 'Saving...' : 'Save All Attendance',
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15),
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  FloatingActionButton(
+                    heroTag: 'mark_all_p',
+                    onPressed:
+                        !PermissionExtensions.canAccess(
+                          PermissionKeys.markStudentAttendance,
+                        )
+                        ? () {
+                            Utils.show(
+                              "You don't have permission to marks attendance",
+                              context,
+                            );
+                          }
+                        : (_saving ? null : _markAllPresent),
+                    backgroundColor: const Color(0xFF22C55E),
+                    tooltip: 'Mark All Present',
+                    child: const Icon(
+                      Icons.done_all_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FloatingActionButton.extended(
+                      heroTag: 'save_all_btn',
+                      onPressed:
+                          !PermissionExtensions.canAccess(
+                            PermissionKeys.markStudentAttendance,
+                          )
+                          ? () {
+                              Utils.show(
+                                "You don't have permission to marks attendance",
+                                context,
+                              );
+                            }
+                          : (_saving ? null : _saveAll),
+                      backgroundColor: AppColor.lightBlueColor,
+                      elevation: 4,
+                      icon: _saving
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(Icons.save_rounded, color: Colors.white),
+                      label: Text(
+                        _saving ? 'Saving...' : 'Save All Attendance',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-        ]),
-      )
+            )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -2698,145 +2775,198 @@ class _AllStudentAdminAttendanceScreenState
       padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
       decoration: BoxDecoration(
         gradient: AppColor.primaryGradient,
-        borderRadius:
-        const BorderRadius.vertical(bottom: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
-              color: AppColor.blueShadow,
-              blurRadius: 18,
-              offset: const Offset(0, 10))
+            color: AppColor.blueShadow,
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
-      child: Column(children: [
-        Row(children: [
-          InkWell(
-            onTap: () => Navigator.pop(context),
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                  color: AppColor.glassWhite, shape: BoxShape.circle),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white, size: 20),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-              child: AppText.customText('Student Attendance',
-                  size: 19,
-                  weight: FontWeight.bold,
-                  color: Colors.white)),
-        ]),
-        const SizedBox(height: 16),
-        Row(children: [
-          Expanded(
-              child: _filterDropdown(
-                label: 'Class',
-                value: _selectedClassId.isEmpty ? null : _selectedClassId,
-                items: _classes
-                    .map((e) => DropdownMenuItem<String>(
-                    value: e['class_id'] as String,
-                    child: Text(e['class_name'] as String)))
-                    .toList(),
-                onChanged: _onClassChanged,
-              )),
-          const SizedBox(width: 12),
-          Expanded(
-              child: _filterDropdown(
-                label: 'Section',
-                value:
-                _selectedSectionId.isEmpty ? null : _selectedSectionId,
-                items: _sections
-                    .map((e) => DropdownMenuItem<String>(
-                    value: e['section_id'].toString(),
-                    child:
-                    Text(e['section_name']?.toString() ?? '')))
-                    .toList(),
-                onChanged: _onSectionChanged,
-              )),
-        ]),
-        const SizedBox(height: 12),
-        GestureDetector(
-          onTap: _pickDate,
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16),
-              border:
-              Border.all(color: Colors.white.withOpacity(0.3)),
-            ),
-            child: Row(children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.calendar_month_rounded,
-                    color: Colors.white, size: 18),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              InkWell(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppColor.glassWhite,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                  child: Column(
+                child: AppText.customText(
+                  'Student Attendance',
+                  size: 19,
+                  weight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _filterDropdown(
+                  label: 'Class',
+                  value: _selectedClassId.isEmpty ? null : _selectedClassId,
+                  items: _classes
+                      .map(
+                        (e) => DropdownMenuItem<String>(
+                          value: e['class_id'] as String,
+                          child: Text(e['class_name'] as String),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: _onClassChanged,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _filterDropdown(
+                  label: 'Section',
+                  value: _selectedSectionId.isEmpty ? null : _selectedSectionId,
+                  items: _sections
+                      .map(
+                        (e) => DropdownMenuItem<String>(
+                          value: e['section_id'].toString(),
+                          child: Text(e['section_name']?.toString() ?? ''),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: _onSectionChanged,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: _pickDate,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.calendar_month_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppText.customText('Selected Date',
-                            size: 11, color: Colors.white70),
-                        AppText.customText(_displayDate,
-                            size: 15,
-                            weight: FontWeight.bold,
-                            color: Colors.white),
-                      ])),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20)),
-                child: Row(children: [
-                  const Icon(Icons.edit_calendar_rounded,
-                      color: Colors.white, size: 13),
-                  const SizedBox(width: 4),
-                  AppText.customText('Change',
-                      size: 11, color: Colors.white),
-                ]),
+                        AppText.customText(
+                          'Selected Date',
+                          size: 11,
+                          color: Colors.white70,
+                        ),
+                        AppText.customText(
+                          _displayDate,
+                          size: 15,
+                          weight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.edit_calendar_rounded,
+                          color: Colors.white,
+                          size: 13,
+                        ),
+                        const SizedBox(width: 4),
+                        AppText.customText(
+                          'Change',
+                          size: 11,
+                          color: Colors.white,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ]),
+            ),
           ),
-        ),
-        const SizedBox(height: 14),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
+          const SizedBox(height: 14),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
               children: _statuses.map((s) {
                 final color = _statusColor(s['code']);
                 return Container(
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 5),
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: color.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: color.withOpacity(0.5)),
                   ),
-                  child:
-                  Row(mainAxisSize: MainAxisSize.min, children: [
-                    Container(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
                         width: 8,
                         height: 8,
                         decoration: BoxDecoration(
-                            color: color, shape: BoxShape.circle)),
-                    const SizedBox(width: 5),
-                    Text('${s['code']} = ${s['full']}',
+                          color: color,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        '${s['code']} = ${s['full']}',
                         style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500)),
-                  ]),
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 );
-              }).toList()),
-        ),
-      ]),
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2844,78 +2974,106 @@ class _AllStudentAdminAttendanceScreenState
   Widget _buildBody() {
     if (_selectedClassId.isEmpty || _selectedSectionId.isEmpty) {
       return Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.filter_list_rounded,
-                    size: 72,
-                    color: AppColor.lightBlueColor.withOpacity(0.3)),
-                const SizedBox(height: 16),
-                AppText.customText('Select Class & Section',
-                    size: 16, weight: FontWeight.bold),
-                const SizedBox(height: 6),
-                AppText.customText(
-                    'Choose class and section to mark attendance',
-                    size: 13,
-                    color: AppColor.softGreyText),
-              ]));
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.filter_list_rounded,
+              size: 72,
+              color: AppColor.lightBlueColor.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            AppText.customText(
+              'Select Class & Section',
+              size: 16,
+              weight: FontWeight.bold,
+            ),
+            const SizedBox(height: 6),
+            AppText.customText(
+              'Choose class and section to mark attendance',
+              size: 13,
+              color: AppColor.softGreyText,
+            ),
+          ],
+        ),
+      );
     }
     if (_loadingRows) {
       return Center(
-          child: CircularProgressIndicator(
-              color: AppColor.lightBlueColor));
+        child: CircularProgressIndicator(color: AppColor.lightBlueColor),
+      );
     }
     if (_rows.isEmpty) {
       return Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.people_outline_rounded,
-                    size: 72,
-                    color: AppColor.lightBlueColor.withOpacity(0.3)),
-                const SizedBox(height: 16),
-                AppText.customText('No Students Found',
-                    size: 16, weight: FontWeight.bold),
-              ]));
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.people_outline_rounded,
+              size: 72,
+              color: AppColor.lightBlueColor.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            AppText.customText(
+              'No Students Found',
+              size: 16,
+              weight: FontWeight.bold,
+            ),
+          ],
+        ),
+      );
     }
 
     final alreadyCount = _rows.where((r) => r.alreadyMarked).length;
     final pendingCount = _rows.length - alreadyCount;
 
-    return Column(children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-        child: Row(children: [
-          if (alreadyCount > 0) ...[
-            _countPill('$alreadyCount Already Marked', Colors.green,
-                Icons.check_circle_rounded),
-            const SizedBox(width: 8),
-          ],
-          if (pendingCount > 0)
-            _countPill('$pendingCount Pending', Colors.orange,
-                Icons.pending_rounded),
-          const Spacer(),
-          Text('Total: ${_rows.length}',
-              style: TextStyle(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          child: Row(
+            children: [
+              if (alreadyCount > 0) ...[
+                _countPill(
+                  '$alreadyCount Already Marked',
+                  Colors.green,
+                  Icons.check_circle_rounded,
+                ),
+                const SizedBox(width: 8),
+              ],
+              if (pendingCount > 0)
+                _countPill(
+                  '$pendingCount Pending',
+                  Colors.orange,
+                  Icons.pending_rounded,
+                ),
+              const Spacer(),
+              Text(
+                'Total: ${_rows.length}',
+                style: TextStyle(
                   fontSize: 12,
                   color: AppColor.softGreyText,
-                  fontWeight: FontWeight.w500)),
-        ]),
-      ),
-      Expanded(
-        child: RefreshIndicator(
-          onRefresh: _onRefresh,
-          color: AppColor.lightBlueColor,
-          backgroundColor: Colors.white,
-          strokeWidth: 2.5,
-          child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
-            itemCount: _rows.length,
-            itemBuilder: (_, i) => _buildStudentCard(_rows[i]),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
           ),
         ),
-      ),
-    ]);
+        Expanded(
+          child: RefreshIndicator(
+            onRefresh: _onRefresh,
+            color: AppColor.lightBlueColor,
+            backgroundColor: Colors.white,
+            strokeWidth: 2.5,
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 120),
+              itemCount: _rows.length,
+              itemBuilder: (_, i) => _buildStudentCard(_rows[i]),
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   // ── Student card ──────────────────────────────────────────────────────────
@@ -2924,167 +3082,203 @@ class _AllStudentAdminAttendanceScreenState
       row.attendanceStatus = 'P';
     }
 
-    return StatefulBuilder(builder: (context, setRow) {
-      // isLocked = marked AND not currently being edited
-      final isLocked = row.alreadyMarked && !row.isEditing;
+    return StatefulBuilder(
+      builder: (context, setRow) {
+        // isLocked = marked AND not currently being edited
+        final isLocked = row.alreadyMarked && !row.isEditing;
 
-      final borderColor = row.isEditing
-          ? AppColor.lightBlueColor.withOpacity(0.5)
-          : isLocked
-          ? _statusColor(row.markedStatus).withOpacity(0.4)
-          : (row.attendanceStatus != null
-          ? _statusColor(row.attendanceStatus).withOpacity(0.3)
-          : Colors.grey.shade200);
+        final borderColor = row.isEditing
+            ? AppColor.lightBlueColor.withOpacity(0.5)
+            : isLocked
+            ? _statusColor(row.markedStatus).withOpacity(0.4)
+            : (row.attendanceStatus != null
+                  ? _statusColor(row.attendanceStatus).withOpacity(0.3)
+                  : Colors.grey.shade200);
 
-      return Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: row.isEditing
-              ? AppColor.lightBlueColor.withOpacity(0.02)
-              : isLocked
-              ? _statusColor(row.markedStatus).withOpacity(0.03)
-              : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: borderColor, width: 1.5),
-          boxShadow: [
-            BoxShadow(
+        return Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          decoration: BoxDecoration(
+            color: row.isEditing
+                ? AppColor.lightBlueColor.withOpacity(0.02)
+                : isLocked
+                ? _statusColor(row.markedStatus).withOpacity(0.03)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderColor, width: 1.5),
+            boxShadow: [
+              BoxShadow(
                 color: AppColor.cardShadow,
                 blurRadius: 6,
-                offset: const Offset(0, 3))
-          ],
-        ),
-        child: Column(children: [
-          // ── Top: avatar / info / badges ────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Avatar
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: row.isEditing
-                          ? AppColor.lightBlueColor.withOpacity(0.15)
-                          : isLocked
-                          ? _statusColor(row.markedStatus)
-                          .withOpacity(0.12)
-                          : AppColor.lightBlueColor.withOpacity(0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              // ── Top: avatar / info / badges ────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Avatar
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: row.isEditing
+                            ? AppColor.lightBlueColor.withOpacity(0.15)
+                            : isLocked
+                            ? _statusColor(row.markedStatus).withOpacity(0.12)
+                            : AppColor.lightBlueColor.withOpacity(0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
                         child: Text(
-                          row.name.isNotEmpty
-                              ? row.name[0].toUpperCase()
-                              : '?',
+                          row.name.isNotEmpty ? row.name[0].toUpperCase() : '?',
                           style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: row.isEditing
-                                  ? AppColor.lightBlueColor
-                                  : isLocked
-                                  ? _statusColor(row.markedStatus)
-                                  : AppColor.lightBlueColor),
-                        )),
-                  ),
-                  const SizedBox(width: 10),
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: row.isEditing
+                                ? AppColor.lightBlueColor
+                                : isLocked
+                                ? _statusColor(row.markedStatus)
+                                : AppColor.lightBlueColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
 
-                  // Name + admission + father
-                  Expanded(
+                    // Name + admission + father
+                    Expanded(
                       child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              row.name.isNotEmpty
-                                  ? row.name[0].toUpperCase() +
-                                  row.name.substring(1)
-                                  : '—',
-                              style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold),
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            row.name.isNotEmpty
+                                ? row.name[0].toUpperCase() +
+                                      row.name.substring(1)
+                                : '—',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(height: 2),
-                            Text('Adm: ${row.admissionNo}',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: AppColor.softGreyText)),
-                            if (row.fatherName.isNotEmpty) ...[
-                              const SizedBox(height: 1),
-                              Text('Father: ${row.fatherName}',
-                                  style: TextStyle(
-                                      fontSize: 11,
-                                      color: AppColor.softGreyText)),
-                            ],
-                          ])),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Adm: ${row.admissionNo}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColor.softGreyText,
+                            ),
+                          ),
+                          if (row.fatherName.isNotEmpty) ...[
+                            const SizedBox(height: 1),
+                            Text(
+                              'Father: ${row.fatherName}',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: AppColor.softGreyText,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
 
-                  // ── RIGHT-SIDE BADGES ──────────────────────────────
-                  Column(
+                    // ── RIGHT-SIDE BADGES ──────────────────────────────
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         // Already marked: status badge + Edit button
                         if (isLocked) ...[
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: _statusColor(row.markedStatus)
-                                  .withOpacity(0.12),
+                              color: _statusColor(
+                                row.markedStatus,
+                              ).withOpacity(0.12),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                  color: _statusColor(row.markedStatus)
-                                      .withOpacity(0.4)),
+                                color: _statusColor(
+                                  row.markedStatus,
+                                ).withOpacity(0.4),
+                              ),
                             ),
                             child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.lock_rounded,
-                                      size: 10,
-                                      color:
-                                      _statusColor(row.markedStatus)),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    '${_statusLabel(row.markedStatus)} • Marked',
-                                    style: TextStyle(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w600,
-                                        color: _statusColor(
-                                            row.markedStatus)),
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.lock_rounded,
+                                  size: 10,
+                                  color: _statusColor(row.markedStatus),
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  '${_statusLabel(row.markedStatus)} • Marked',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: _statusColor(row.markedStatus),
                                   ),
-                                ]),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 4),
                           // ── EDIT BUTTON ──
                           GestureDetector(
-                            onTap: () =>
-                                setRow(() => row.isEditing = true),
+                            onTap: () {
+                              if (!PermissionExtensions.canAccess(
+                                PermissionKeys.markStudentAttendance,
+                              )) {
+                                Utils.show(
+                                  "You don't have permission to edit attendance",
+                                  context,
+                                );
+
+                                return;
+                              }
+
+                              setRow(() => row.isEditing = true);
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: AppColor.lightBlueColor
-                                    .withOpacity(0.1),
-                                borderRadius:
-                                BorderRadius.circular(20),
+                                color: AppColor.lightBlueColor.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                    color: AppColor.lightBlueColor
-                                        .withOpacity(0.4)),
+                                  color: AppColor.lightBlueColor.withOpacity(
+                                    0.4,
+                                  ),
+                                ),
                               ),
                               child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.edit_rounded,
-                                        size: 10,
-                                        color: AppColor.lightBlueColor),
-                                    const SizedBox(width: 3),
-                                    Text('Edit',
-                                        style: TextStyle(
-                                            color:
-                                            AppColor.lightBlueColor,
-                                            fontSize: 10,
-                                            fontWeight:
-                                            FontWeight.w600)),
-                                  ]),
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.edit_rounded,
+                                    size: 10,
+                                    color: AppColor.lightBlueColor,
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    'Edit',
+                                    style: TextStyle(
+                                      color: AppColor.lightBlueColor,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -3093,29 +3287,35 @@ class _AllStudentAdminAttendanceScreenState
                         if (row.isEditing) ...[
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: AppColor.lightBlueColor
-                                  .withOpacity(0.12),
-                              borderRadius:
-                              BorderRadius.circular(20),
+                              color: AppColor.lightBlueColor.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                  color: AppColor.lightBlueColor
-                                      .withOpacity(0.4)),
+                                color: AppColor.lightBlueColor.withOpacity(0.4),
+                              ),
                             ),
                             child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.edit_rounded,
-                                      size: 10,
-                                      color: AppColor.lightBlueColor),
-                                  const SizedBox(width: 3),
-                                  Text('Editing',
-                                      style: TextStyle(
-                                          color: AppColor.lightBlueColor,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600)),
-                                ]),
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.edit_rounded,
+                                  size: 10,
+                                  color: AppColor.lightBlueColor,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  'Editing',
+                                  style: TextStyle(
+                                    color: AppColor.lightBlueColor,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 4),
                           GestureDetector(
@@ -3124,239 +3324,298 @@ class _AllStudentAdminAttendanceScreenState
                             }),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.red.withOpacity(0.1),
-                                borderRadius:
-                                BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                    color:
-                                    Colors.red.withOpacity(0.4)),
+                                  color: Colors.red.withOpacity(0.4),
+                                ),
                               ),
                               child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Icon(Icons.close_rounded,
-                                        size: 10, color: Colors.red),
-                                    SizedBox(width: 3),
-                                    Text('Cancel',
-                                        style: TextStyle(
-                                            color: Colors.red,
-                                            fontSize: 10,
-                                            fontWeight:
-                                            FontWeight.w600)),
-                                  ]),
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Icon(
+                                    Icons.close_rounded,
+                                    size: 10,
+                                    color: Colors.red,
+                                  ),
+                                  SizedBox(width: 3),
+                                  Text(
+                                    'Cancel',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
-                      ]),
-                ]),
-          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
 
-          Divider(height: 1, color: Colors.grey.shade100),
+              Divider(height: 1, color: Colors.grey.shade100),
 
-          // ── Status chips ───────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(children: [
-                    AppText.customText('ATTENDANCE STATUS',
-                        size: 10,
-                        weight: FontWeight.bold,
-                        color: AppColor.softGreyText),
-                    if (row.isEditing) ...[
-                      const SizedBox(width: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColor.lightBlueColor
-                              .withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
+              // ── Status chips ───────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        AppText.customText(
+                          'ATTENDANCE STATUS',
+                          size: 10,
+                          weight: FontWeight.bold,
+                          color: AppColor.softGreyText,
                         ),
-                        child: Text('Edit Mode',
-                            style: TextStyle(
+                        if (row.isEditing) ...[
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColor.lightBlueColor.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              'Edit Mode',
+                              style: TextStyle(
                                 color: AppColor.lightBlueColor,
                                 fontSize: 9,
-                                fontWeight: FontWeight.w600)),
-                      ),
-                    ],
-                  ]),
-                  const SizedBox(height: 8),
-                  Row(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
                       children: _statuses.map((s) {
                         final code = s['code']!;
                         final selected = row.attendanceStatus == code;
                         final color = _statusColor(code);
                         return Expanded(
-                            child: GestureDetector(
-                              onTap: isLocked
-                                  ? null
-                                  : () => setRow(() =>
-                              row.attendanceStatus =
-                              selected ? null : code),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                margin: const EdgeInsets.only(right: 5),
-                                padding:
-                                const EdgeInsets.symmetric(vertical: 8),
-                                decoration: BoxDecoration(
+                          child: GestureDetector(
+                            onTap: isLocked
+                                ? null
+                                : () => setRow(
+                                    () => row.attendanceStatus = selected
+                                        ? null
+                                        : code,
+                                  ),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 180),
+                              margin: const EdgeInsets.only(right: 5),
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                color: selected
+                                    ? color.withOpacity(0.15)
+                                    : (isLocked
+                                          ? Colors.grey.shade100
+                                          : Colors.grey.shade50),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
                                   color: selected
-                                      ? color.withOpacity(0.15)
-                                      : (isLocked
-                                      ? Colors.grey.shade100
-                                      : Colors.grey.shade50),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
+                                      ? color
+                                      : Colors.grey.shade200,
+                                  width: selected ? 1.5 : 1,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 14,
+                                    height: 14,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: selected
+                                            ? color
+                                            : Colors.grey.shade400,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: selected
+                                        ? Center(
+                                            child: Container(
+                                              width: 7,
+                                              height: 7,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: color,
+                                              ),
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    code,
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
                                       color: selected
                                           ? color
-                                          : Colors.grey.shade200,
-                                      width: selected ? 1.5 : 1),
-                                ),
-                                child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: 14,
-                                        height: 14,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                              color: selected
-                                                  ? color
-                                                  : Colors.grey.shade400,
-                                              width: 1.5),
-                                        ),
-                                        child: selected
-                                            ? Center(
-                                            child: Container(
-                                                width: 7,
-                                                height: 7,
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: color)))
-                                            : null,
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(code,
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                              color: selected
-                                                  ? color
-                                                  : (isLocked
-                                                  ? Colors.grey.shade400
-                                                  : AppColor
-                                                  .softGreyText))),
-                                    ]),
+                                          : (isLocked
+                                                ? Colors.grey.shade400
+                                                : AppColor.softGreyText),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ));
-                      }).toList()),
-                ]),
-          ),
-
-          // ── Remarks ────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 6, 14, 14),
-            child: TextField(
-              controller: row.remarksCtrl,
-              enabled: !isLocked,
-              style: const TextStyle(fontSize: 12),
-              decoration: InputDecoration(
-                isDense: true,
-                hintText: isLocked
-                    ? 'Attendance already marked'
-                    : row.isEditing
-                    ? 'Update remarks...'
-                    : 'Enter remarks...',
-                hintStyle: TextStyle(
-                    color: isLocked
-                        ? _statusColor(row.markedStatus)
-                        .withOpacity(0.6)
-                        : AppColor.softGreyText,
-                    fontSize: 12),
-                filled: true,
-                fillColor: row.isEditing
-                    ? AppColor.lightBlueColor.withOpacity(0.04)
-                    : isLocked
-                    ? _statusColor(row.markedStatus)
-                    .withOpacity(0.04)
-                    : Colors.grey.shade50,
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 10),
-                prefixIcon: isLocked
-                    ? Icon(Icons.lock_rounded,
-                    size: 14,
-                    color: _statusColor(row.markedStatus))
-                    : row.isEditing
-                    ? Icon(Icons.edit_note_rounded,
-                    size: 14,
-                    color: AppColor.lightBlueColor)
-                    : null,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide:
-                    BorderSide(color: Colors.grey.shade200)),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                        color: row.isEditing
-                            ? AppColor.lightBlueColor
-                            .withOpacity(0.3)
-                            : Colors.grey.shade200)),
-                disabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                        color: _statusColor(row.markedStatus)
-                            .withOpacity(0.2))),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                        color: AppColor.lightBlueColor, width: 1.5)),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ),
 
-          // ── UPDATE SAVE BUTTON (edit mode only) ────────────────────
-          if (row.isEditing)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-              child: SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: ElevatedButton.icon(
-                  onPressed: _saving
-                      ? null
-                      : () => _updateAttendance(row, setRow),
-                  icon: _saving
-                      ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2))
-                      : const Icon(Icons.save_rounded,
-                      color: Colors.white, size: 18),
-                  label: Text(
-                    _saving ? 'Saving...' : 'Update Attendance',
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.lightBlueColor,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    elevation: 0,
+              // ── Remarks ────────────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 6, 14, 14),
+                child: TextField(
+                  controller: row.remarksCtrl,
+                  enabled: !isLocked,
+                  style: const TextStyle(fontSize: 12),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: isLocked
+                        ? 'Attendance already marked'
+                        : row.isEditing
+                        ? 'Update remarks...'
+                        : 'Enter remarks...',
+                    hintStyle: TextStyle(
+                      color: isLocked
+                          ? _statusColor(row.markedStatus).withOpacity(0.6)
+                          : AppColor.softGreyText,
+                      fontSize: 12,
+                    ),
+                    filled: true,
+                    fillColor: row.isEditing
+                        ? AppColor.lightBlueColor.withOpacity(0.04)
+                        : isLocked
+                        ? _statusColor(row.markedStatus).withOpacity(0.04)
+                        : Colors.grey.shade50,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    prefixIcon: isLocked
+                        ? Icon(
+                            Icons.lock_rounded,
+                            size: 14,
+                            color: _statusColor(row.markedStatus),
+                          )
+                        : row.isEditing
+                        ? Icon(
+                            Icons.edit_note_rounded,
+                            size: 14,
+                            color: AppColor.lightBlueColor,
+                          )
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: row.isEditing
+                            ? AppColor.lightBlueColor.withOpacity(0.3)
+                            : Colors.grey.shade200,
+                      ),
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: _statusColor(row.markedStatus).withOpacity(0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(
+                        color: AppColor.lightBlueColor,
+                        width: 1.5,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-        ]),
-      );
-    });
+
+              // ── UPDATE SAVE BUTTON (edit mode only) ────────────────────
+              if (row.isEditing)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 44,
+                    child: ElevatedButton.icon(
+                      onPressed:
+                          !PermissionExtensions.canAccess(
+                            PermissionKeys.markStudentAttendance,
+                          )
+                          ? () {
+                              Utils.show(
+                                "You don't have permission to update attendance",
+                                context,
+                              );
+                            }
+                          : (_saving
+                                ? null
+                                : () => _updateAttendance(row, setRow)),
+                      icon: _saving
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Icon(
+                              Icons.save_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                      label: Text(
+                        _saving ? 'Saving...' : 'Update Attendance',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColor.lightBlueColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────
@@ -3367,64 +3626,76 @@ class _AllStudentAdminAttendanceScreenState
     required void Function(String?) onChanged,
   }) {
     return Container(
-      padding:
-      const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: value != null
-                ? Colors.white.withOpacity(0.6)
-                : Colors.white.withOpacity(0.3),
-            width: 1.5),
+          color: value != null
+              ? Colors.white.withOpacity(0.6)
+              : Colors.white.withOpacity(0.3),
+          width: 1.5,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           isExpanded: true,
           dropdownColor: Colors.white,
-          hint: Text(label,
-              style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 13)),
+          hint: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 13,
+            ),
+          ),
           value: value,
-          icon: const Icon(Icons.keyboard_arrow_down_rounded,
-              color: Colors.white),
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: Colors.white,
+          ),
           items: items,
           onChanged: onChanged,
           selectedItemBuilder: (context) => items
-              .map((item) => Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              (item.child as Text).data ?? '',
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600),
-            ),
-          ))
+              .map(
+                (item) => Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    (item.child as Text).data ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              )
               .toList(),
         ),
       ),
     );
   }
 
-  Widget _countPill(String label, Color color, IconData icon) =>
-      Container(
-        padding:
-        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: color.withOpacity(0.3)),
+  Widget _countPill(String label, Color color, IconData icon) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: color.withOpacity(0.3)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: color),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(icon, size: 13, color: color),
-          const SizedBox(width: 4),
-          Text(label,
-              style: TextStyle(
-                  color: color,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600)),
-        ]),
-      );
+      ],
+    ),
+  );
 }

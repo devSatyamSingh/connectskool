@@ -5,6 +5,8 @@ import 'package:school_pro/repo/accountant_repo/create_accountant_attebndance_re
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 
 import '../../repo/teacher_repo/create_teacher_attendance_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class CreateTeacherAttendanceViewModel with ChangeNotifier {
@@ -23,6 +25,11 @@ class CreateTeacherAttendanceViewModel with ChangeNotifier {
       dynamic remarks,
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.markTeacherAttendance)) {
+      Utils.show("Permission denied", context);
+      return false;
+    }
     setLoading(true);
 
     Map data = {

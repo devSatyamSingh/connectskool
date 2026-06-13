@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 // ✅ Existing model — already has PermissionItem defined
 import '../../model/school_model/user_permission_model.dart';
 import '../../repo/school_repo/user_permission_repo.dart';
-import '../../utils/permission_manager.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class GetUserPermissionViewModel extends ChangeNotifier {
 
@@ -26,6 +28,16 @@ class GetUserPermissionViewModel extends ChangeNotifier {
     required int userId,
     required String role,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.managePermissions)) {
+
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+
+      return;
+    }
     _setLoading(true);
 
     try {
@@ -54,8 +66,6 @@ class GetUserPermissionViewModel extends ChangeNotifier {
 
     if (sections == null) return;
 
-    final List<String> activePermissions = [];
-
     sections.forEach((section, items) {
 
       for (var item in items) {
@@ -69,25 +79,12 @@ class GetUserPermissionViewModel extends ChangeNotifier {
           permissionStateMap[item.permissionId!] =
               item.state ?? 'default';
         }
-
-        if (
-        item.key != null &&
-            item.state != "denied"
-        ) {
-
-          activePermissions.add(
-            item.key!,
-          );
-        }
       }
     });
 
-    PermissionManager.setPermissions(
-      activePermissions,
-    );
 
     debugPrint(
-      "ACTIVE PERMISSIONS => $activePermissions",
+      "PERMISSION STATE MAP BUILT => ${permissionStateMap.length} entries",
     );
 
     notifyListeners();

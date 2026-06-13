@@ -304,6 +304,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../services/get_server_key.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 import '../user_view_model.dart';
 
 class CreateNotificationViewModel with ChangeNotifier {
@@ -316,6 +319,17 @@ class CreateNotificationViewModel with ChangeNotifier {
       List<Map<String, dynamic>> targets,
       BuildContext context,
       ) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.notificationSend)) {
+
+      Utils.show(
+        "You don't have permission to send notifications",
+        context,
+      );
+
+      return false;
+    }
 
     loading = true;
     notifyListeners();

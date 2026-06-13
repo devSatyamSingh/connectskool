@@ -189,6 +189,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/create_time_table_repo.dart';
 import 'package:school_pro/view_model/school_view_model/Exam_management_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class CreateTimetableViewModel with ChangeNotifier {
@@ -234,6 +236,16 @@ class CreateTimetableViewModel with ChangeNotifier {
       String instructions,
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTimetable)) {
+
+      Utils.show(
+        "You don't have permission to manage timetable",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     final convertedStart = _to24Hour(startTime);

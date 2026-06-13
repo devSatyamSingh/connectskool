@@ -6,6 +6,8 @@ import 'package:school_pro/student_management/student_widget/student_home_work_s
 import '../../../model/student_model/student_home_work_model.dart';
 import '../../../res/app_color.dart';
 import '../../../res/const_text.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 
 class HomeworkSubmissionDetailsScreen extends StatelessWidget {
   final StudentProfileData homework;
@@ -33,6 +35,17 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
     final submittedPdfCount = homework.submittedFile != null ? 1 : 0;
 
     final submittedPhotoCount = homework.submittedPhotos?.length ?? 0;
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewHomework)) {
+
+      return const Scaffold(
+        body: Center(
+          child: Text(
+            "You don't have permission",
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColor.bg,

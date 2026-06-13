@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/model/school_model/school_teachers_detail_model.dart';
 import '../../repo/school_repo/school_teachers_detail_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class TeacherDetailViewModel with ChangeNotifier {
@@ -32,6 +34,14 @@ class TeacherDetailViewModel with ChangeNotifier {
   //   }
   // }
   Future<void> schoolTeachersDetailApi(int teacherId, BuildContext context) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewOneTeacherProfile)) {
+      Utils.show(
+        "You don't have permission to view teacher profile",
+        context,
+      );
+      return;
+    }
     setLoading(true);
     try {
       final response = await _repository.schoolTeachersDetailApi(teacherId);

@@ -44,7 +44,18 @@ class AllSectionsViewModel extends ChangeNotifier {
 
       if (data['success'] == true) {
 
-        setModel(AllSectionsModel.fromJson(data));
+        final model =
+        AllSectionsModel.fromJson(data);
+
+        print(
+          "CLASS ID => $classId",
+        );
+
+        print(
+          "SECTIONS => ${model.data?.length}",
+        );
+
+        setModel(model);
 
       } else {
 

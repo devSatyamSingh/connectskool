@@ -7,33 +7,11 @@ import 'package:school_pro/view_model/school_view_model/all_accountant_list_view
 import 'package:school_pro/view_model/accountant_attendance_view_model/accountant_attendance_view_model.dart';
 import 'package:school_pro/view_model/accountant_attendance_view_model/create_accountant_attendance_view_model.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 import '../../view_model/school_view_model/update_accountant_aatendance_view_model.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Model
-// ─────────────────────────────────────────────────────────────────────────────
-// class _AccountantRow {
-//   final String id;
-//   final String name;
-//   final String qualification;
-//   final String activeStatus;
-//   String? attendanceStatus; // P | A | L | H | OL
-//   bool alreadyMarked; // true = API already has a record for this date
-//   bool isEditing; // true = unlocked for edit
-//   final TextEditingController remarksCtrl;
-//
-//   _AccountantRow({
-//     required this.id,
-//     required this.name,
-//     required this.qualification,
-//     required this.activeStatus,
-//     this.attendanceStatus,
-//     this.alreadyMarked = false,
-//     this.isEditing = false,
-//   }) : remarksCtrl = TextEditingController();
-//
-//   void dispose() => remarksCtrl.dispose();
-// }
 class _AccountantRow {
   final String id;
   final String name;
@@ -57,9 +35,7 @@ class _AccountantRow {
 
   void dispose() => remarksCtrl.dispose();
 }
-// ─────────────────────────────────────────────────────────────────────────────
-// Screen
-// ─────────────────────────────────────────────────────────────────────────────
+
 class SchoolAccountantAttendanceScreen extends StatefulWidget {
   const SchoolAccountantAttendanceScreen({super.key});
 
@@ -125,6 +101,17 @@ class _SchoolAccountantAttendanceScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.viewAccountants)) {
+
+        Utils.show(
+          "You don't have permission to view accountant attendance",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
       await Provider.of<AllAccountantListVieModel>(context, listen: false)
           .allAccountantListApi(context);
       await _fetchAndApplyExisting();
@@ -139,35 +126,7 @@ class _SchoolAccountantAttendanceScreenState
     super.dispose();
   }
 
-  // ── Fetch already-marked records and pre-fill rows ─────────────────────────
-  // Future<void> _fetchAndApplyExisting() async {
-  //   await context
-  //       .read<AccountantAttendanceViewModel>()
-  //       .getAccountantAttendance(_apiDate);
-  //
-  //   final existing = Provider.of<AccountantAttendanceViewModel>(
-  //     context,
-  //     listen: false,
-  //   ).attendanceList;
-  //
-  //   final Map<String, String> markedMap = {
-  //     for (final r in existing)
-  //       if (r.accountantId != null) r.accountantId.toString(): r.status ?? '',
-  //   };
-  //
-  //   setState(() {
-  //     for (final row in _rows) {
-  //       if (markedMap.containsKey(row.id)) {
-  //         row.alreadyMarked = true;
-  //         row.isEditing = false;
-  //         row.attendanceStatus = markedMap[row.id];
-  //       } else {
-  //         row.alreadyMarked = false;
-  //         row.isEditing = false;
-  //       }
-  //     }
-  //   });
-  // }
+
   Future<void> _fetchAndApplyExisting() async {
     await context
         .read<AccountantAttendanceViewModel>()
@@ -253,14 +212,23 @@ class _SchoolAccountantAttendanceScreenState
 
   // ── Save NEW attendance for all pending rows ───────────────────────────────
   Future<void> _saveAll() async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.markTeacherAttendance)) {
+
+      Utils.show(
+        "You don't have permission to mark accountant attendance",
+        context,
+      );
+
+      return;
+    }
     final pending = _rows.where((r) => !r.alreadyMarked).toList();
 
     if (pending.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(_snack(
-        'Attendance has already been marked for all accountants.',
-        Colors.blue,
-        Icons.info_rounded,
-      ));
+      Utils.show(
+        "Attendance has already been marked for all accountants.",
+        context,
+      );
       return;
     }
 
@@ -313,13 +281,23 @@ class _SchoolAccountantAttendanceScreenState
 
   // ── Update EXISTING attendance (edit flow) ─────────────────────────────────
   Future<void> _updateAttendance(
+
       _AccountantRow row, StateSetter setRow) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.markTeacherAttendance)) {
+
+      Utils.show(
+        "ou don't have permission to update accountant attendance",
+        context,
+      );
+
+      return;
+    }
     if (row.attendanceStatus == null) {
-      ScaffoldMessenger.of(context).showSnackBar(_snack(
-        'Please select a status before saving.',
-        Colors.orange,
-        Icons.warning_rounded,
-      ));
+      Utils.show(
+        "Please select a status before saving.",
+        context,
+      );
       return;
     }
 
@@ -362,53 +340,7 @@ class _SchoolAccountantAttendanceScreenState
       }
     }
   }
-  // Future<void> _updateAttendance(
-  //     _AccountantRow row, StateSetter setRow) async
-  // {
-  //   if (row.attendanceStatus == null) {
-  //     ScaffoldMessenger.of(context).showSnackBar(_snack(
-  //       'Please select a status before saving.',
-  //       Colors.orange,
-  //       Icons.warning_rounded,
-  //     ));
-  //     return;
-  //   }
-  //
-  //   setState(() => _saving = true);
-  //
-  //   final createVm = Provider.of<CreateAccountantAttendanceViewModel>(
-  //     context,
-  //     listen: false,
-  //   );
-  //
-  //   // NOTE: swap createAccountantAttendanceApi with your update VM method
-  //   // (e.g. updateAccountantAttendanceApi) if your backend uses PUT/PATCH.
-  //   final ok = await createVm.createAccountantAttendanceApi(
-  //     int.parse(row.id),
-  //     _apiDate,
-  //     row.attendanceStatus!,
-  //     row.remarksCtrl.text.trim(),
-  //     context,
-  //   );
-  //
-  //   setState(() => _saving = false);
-  //
-  //   if (ok) {
-  //     setRow(() {
-  //       row.alreadyMarked = true;
-  //       row.isEditing = false;
-  //     });
-  //     if (mounted) {
-  //       ScaffoldMessenger.of(context).showSnackBar(_snack(
-  //         'Attendance updated successfully.',
-  //         Colors.green,
-  //         Icons.check_circle_rounded,
-  //       ));
-  //     }
-  //   }
-  // }
 
-  // ── Snack helper ──────────────────────────────────────────────────────────
   SnackBar _snack(String msg, Color color, IconData icon) => SnackBar(
     content: Row(children: [
       Icon(icon, color: Colors.white, size: 18),
@@ -420,9 +352,6 @@ class _SchoolAccountantAttendanceScreenState
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
   );
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // BUILD
-  // ─────────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -828,7 +757,21 @@ class _SchoolAccountantAttendanceScreenState
                           const SizedBox(height: 4),
                           // ── EDIT BUTTON ──
                           GestureDetector(
-                            onTap: () => setRow(() => row.isEditing = true),
+                            onTap: () {
+
+                              if (!PermissionExtensions.canAccess(
+                                  PermissionKeys.markTeacherAttendance)) {
+
+                                Utils.show(
+                                  "You don't have permission to edit attendance",
+                                  context,
+                                );
+
+                                return;
+                              }
+
+                              setRow(() => row.isEditing = true);
+                            },
                             child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 8, vertical: 4),

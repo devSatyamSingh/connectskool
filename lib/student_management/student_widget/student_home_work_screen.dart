@@ -15,6 +15,9 @@ import '../../model/student_model/student_home_work_model.dart';
 import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 import 'homework_submission_details_screen.dart';
 
 class StudentHomeworkScreen extends StatefulWidget {
@@ -31,6 +34,20 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewHomework,
+      )) {
+
+        Utils.show(
+          "You don't have permission to view Homework",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
+
       Provider.of<StudentHomeworkViewModel>(
         context,
         listen: false,
@@ -40,6 +57,18 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
 
 
   Future<void> _refreshHomework() async {
+    if (!PermissionExtensions.canAccess(
+      PermissionKeys.viewHomework,
+    )) {
+
+      Utils.show(
+        "You don't have permission to view Homework",
+        context,
+      );
+
+      Navigator.pop(context);
+      return;
+    }
     await Provider.of<StudentHomeworkViewModel>(
       context,
       listen: false,
@@ -362,6 +391,18 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                     height: 52,
                     child: OutlinedButton.icon(
                       onPressed: () {
+
+                        if (!PermissionExtensions.canAccess(
+                            PermissionKeys.viewHomework)) {
+
+                          Utils.show(
+                            "You don't have permission to view homework",
+                            context,
+                          );
+
+                          return;
+                        }
+
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -398,8 +439,21 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () =>
-                          _openSubmitBottomSheet(data),
+                      onPressed: () {
+
+                        if (!PermissionExtensions.canAccess(
+                            PermissionKeys.submitHomework)) {
+
+                          Utils.show(
+                            "You don't have permission to submit homework",
+                            context,
+                          );
+
+                          return;
+                        }
+
+                        _openSubmitBottomSheet(data);
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColor.primary,
                         foregroundColor: Colors.white,

@@ -1686,6 +1686,15 @@ class _AllTeacherListScreenState extends State
     final w = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: () {
+
+        if (!PermissionGuard.check(
+          context,
+          PermissionKeys.viewOneTeacherProfile,
+          "View Teacher Profile",
+        )) {
+          return;
+        }
+
         Navigator.push(
           context,
           MaterialPageRoute(

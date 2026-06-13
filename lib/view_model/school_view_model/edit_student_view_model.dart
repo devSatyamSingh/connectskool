@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/edit_student_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 import 'dart:io';
 
@@ -54,6 +56,16 @@ class EditStudentViewModel with ChangeNotifier {
     File? motherPhoto,
     required BuildContext context,
   }) async {
+
+    if (!PermissionExtensions.canAccess(
+      PermissionKeys.editStudent,
+    )) {
+      Utils.show(
+        "You don't have permission to edit student",
+        context,
+      );
+      return false;
+    }
     setLoading(true);
 
     try {
@@ -88,10 +100,10 @@ class EditStudentViewModel with ChangeNotifier {
         motherMobile: motherMobile,
         guardianName: guardianName,
         emergencyContactNumber: emergencyContactNumber,
-        city:   city,
+        city: city,
         state: state,
-        pincode:    pincode,
-       roll_no:   roll_no
+        pincode: pincode,
+       roll_no: roll_no
       );
 
       setLoading(false);

@@ -4,6 +4,9 @@ import 'package:school_pro/model/accountant_model/accountant_profile_model.dart'
 import 'package:school_pro/repo/accountant_repo/accountant_profile_repo.dart';
 import 'package:school_pro/repo/student_repo/student_profile_repo.dart';
 import '../../model/student_model/student_profile_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class AccountantProfileViewModel with ChangeNotifier {
   final AccountantProfileRepository _loginRepo = AccountantProfileRepository();
@@ -25,6 +28,16 @@ class AccountantProfileViewModel with ChangeNotifier {
   }
 
   Future<void> accountantProfileApi(BuildContext context) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewAccountants)) {
+
+      Utils.show(
+        "You don't have permission to view accountant profile",
+        context,
+      );
+
+      return;
+    }
     setLoading(true);
 
     try {

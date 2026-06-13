@@ -42,7 +42,6 @@ class AddTeachersViewModel with ChangeNotifier {
     File? teacher_photo,
     File? aadharCard,
   }) async {
-    setLoading(true);
 
     if(
     !PermissionExtensions.canAccess(
@@ -55,6 +54,8 @@ class AddTeachersViewModel with ChangeNotifier {
       );
       return false;
     }
+
+    setLoading(true);
 
     try {
       /// ✅ fields map

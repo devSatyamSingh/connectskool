@@ -81,6 +81,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/student_repo/create_student_attendance_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 class CreateStudentAttendanceViewModel with ChangeNotifier {
   final _repo = CreateStudentAttendanceRepository();
@@ -111,6 +113,16 @@ class CreateStudentAttendanceViewModel with ChangeNotifier {
     required List<Map<String, dynamic>> students,
     required BuildContext context,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.markStudentAttendance)) {
+
+      Utils.show(
+        "You don't have permission to mark attendance",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     final Map<String, dynamic> data = {

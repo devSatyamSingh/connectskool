@@ -6,6 +6,9 @@ import 'package:school_pro/repo/school_repo/all_student_list_repo.dart';
 import 'package:school_pro/repo/teacher_repo/teacher_profile_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class TeacherProfileViewModel extends ChangeNotifier {
   final _allStudentListRepo = TeacherProfileRepository();
 
@@ -35,6 +38,19 @@ class TeacherProfileViewModel extends ChangeNotifier {
 
   // 🔥 API CALL (POSTMAN STATUS CODE HANDLING)
   Future<void> teacherProfileApi(BuildContext context) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewOneTeacherProfile)) {
+
+      setPermissionDenied(true);
+
+      Utils.show(
+        "You don't have permission to view teacher profile",
+        context,
+        type: "warning",
+      );
+
+      return;
+    }
     setLoading(true);
 
     try {
@@ -57,12 +73,6 @@ class TeacherProfileViewModel extends ChangeNotifier {
 
         case 403:
           setPermissionDenied(true);
-
-          Utils.show(
-            "Your profile access has been disabled by administrator.",
-            context,
-            type: "warning",
-          );
           break;
 
         case 404:

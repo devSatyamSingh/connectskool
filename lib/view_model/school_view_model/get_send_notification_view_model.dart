@@ -6,6 +6,9 @@ import 'package:school_pro/repo/school_repo/all_notification_repo.dart';
 import 'package:school_pro/repo/school_repo/get_send_notification_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class GetSendNotificationViewModel extends ChangeNotifier {
   final _allStudentListRepo = GetSendNotificationRepository();
 
@@ -26,6 +29,18 @@ class GetSendNotificationViewModel extends ChangeNotifier {
   }
 
   Future<void> getSendNotificationApi(BuildContext context) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.notificationView)) {
+
+      Utils.show(
+        "You don't have permission to view notifications",
+        context,
+      );
+
+      return;
+    }
+
     setLoading(true);
 
     try {

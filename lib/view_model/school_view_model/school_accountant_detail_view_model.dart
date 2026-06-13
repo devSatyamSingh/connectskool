@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/model/school_model/school_accountant_detail_model.dart';
 import 'package:school_pro/repo/school_repo/school_accountant_detail_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class SchoolAccountantDetailViewModel with ChangeNotifier {
@@ -19,6 +21,17 @@ class SchoolAccountantDetailViewModel with ChangeNotifier {
   }
 
   Future<void> schoolAccountantDetailApi(int accountantId, BuildContext context) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewAccountants)) {
+
+      Utils.show(
+        "You don't have permission to view accountant details",
+        context,
+      );
+
+      return;
+    }
     setLoading(true);
     try {
       final response = await _repository.schoolAccountantDetailApi(accountantId);

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../model/school_model/all_student_attendance_model.dart';
 import '../../repo/school_repo/get_all_student_admin_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class AllStudentAdminAttendanceViewModel with ChangeNotifier {
 
@@ -16,6 +19,17 @@ class AllStudentAdminAttendanceViewModel with ChangeNotifier {
     required String date,
     required BuildContext context,
   }) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewOneStudentAttendance)) {
+
+      Utils.show(
+        "You don't have permission to view attendance",
+        context,
+      );
+
+      return;
+    }
 
     loading = true;
     notifyListeners();

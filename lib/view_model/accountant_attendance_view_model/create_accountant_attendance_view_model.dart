@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/accountant_repo/create_accountant_attebndance_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 import '../school_view_model/all_accountant_list_view_model.dart';
 
@@ -23,6 +25,16 @@ class CreateAccountantAttendanceViewModel with ChangeNotifier {
       dynamic remarks,
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.markTeacherAttendance)) {
+
+      Utils.show(
+        "You don't have permission to mark accountant attendance",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

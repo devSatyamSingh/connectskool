@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:school_pro/repo/school_repo/update_accountant_attendance_repo.dart';
 import 'package:school_pro/repo/school_repo/update_school_admin_marksheet_repo.dart';
 import '../../repo/school_repo/edit_exam_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class UpdateAccountantAttendanceViewModel with ChangeNotifier {
@@ -19,6 +21,16 @@ class UpdateAccountantAttendanceViewModel with ChangeNotifier {
       dynamic remarks,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.markTeacherAttendance)) {
+
+      Utils.show(
+        "You don't have permission to update accountant attendance",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

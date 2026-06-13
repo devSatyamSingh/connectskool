@@ -11,6 +11,10 @@ import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.
 import 'package:school_pro/view_model/school_view_model/add_subject_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/edit_subject_view_model.dart';
 
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
+
 class AllSubjectsScreen extends StatefulWidget {
   const AllSubjectsScreen({super.key});
 
@@ -61,7 +65,21 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
       backgroundColor: AppColor.pageBgColor,
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColor.lightBlueColor,
-        onPressed: () => _openSubjectSheet(),
+        onPressed: () {
+
+          if (!PermissionExtensions.canAccess(
+              PermissionKeys.addSubject)) {
+
+            Utils.show(
+              "You don't have permission to add subject",
+              context,
+            );
+
+            return;
+          }
+
+          _openSubjectSheet();
+        },
         icon: Icon(Icons.add_rounded, color: AppColor.white),
         label: const Text(
           "Add Subject",
@@ -321,12 +339,36 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
           Row(
             children: [
               IconButton(
-                onPressed: () => _openSubjectSheet(subject: s),
+                onPressed: () {
+
+                  if (!PermissionExtensions.canAccess(
+                      PermissionKeys.editSubject)) {
+
+                    Utils.show(
+                      "You don't have permission to edit subject",
+                      context,
+                    );
+
+                    return;
+                  }
+
+                  _openSubjectSheet(subject: s);
+                },
                 icon:
                 const Icon(Icons.edit, color: Colors.grey, size: 22),
               ),
               IconButton(
                 onPressed: () async {
+                  if (!PermissionExtensions.canAccess(
+                      PermissionKeys.deleteSubject)) {
+
+                    Utils.show(
+                      "You don't have permission to delete subject",
+                      context,
+                    );
+
+                    return;
+                  }
                   bool confirmed = await _showDeleteDialog();
                   if (confirmed) {
                     await viewModel.deleteSubjectApi(
@@ -699,6 +741,32 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                         //   Navigator.pop(context);
                         // },
                         onTap: () async {
+                          if (isEdit) {
+
+                            if (!PermissionExtensions.canAccess(
+                                PermissionKeys.editSubject)) {
+
+                              Utils.show(
+                                "You don't have permission to edit subject",
+                                context,
+                              );
+
+                              return;
+                            }
+
+                          } else {
+
+                            if (!PermissionExtensions.canAccess(
+                                PermissionKeys.addSubject)) {
+
+                              Utils.show(
+                                "You don't have permission to add subject",
+                                context,
+                              );
+
+                              return;
+                            }
+                          }
                           final vm = Provider.of<AddSubjectViewModel>(context, listen: false);
                           final editVm = Provider.of<EditSubjectsViewModel>(context, listen: false);
                           final listVm = Provider.of<AllSubjectsVieModel>(context, listen: false);

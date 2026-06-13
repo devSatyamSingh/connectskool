@@ -4,6 +4,8 @@ import 'package:school_pro/repo/school_repo/update_accountant_attendance_repo.da
 import 'package:school_pro/repo/school_repo/update_school_admin_marksheet_repo.dart';
 import 'package:school_pro/repo/school_repo/update_teacher_attendance_repo.dart';
 import '../../repo/school_repo/edit_exam_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class UpdateTeacherAttendanceViewModel with ChangeNotifier {
@@ -14,19 +16,27 @@ class UpdateTeacherAttendanceViewModel with ChangeNotifier {
     _loading = value;
     notifyListeners();
   }
+
   Future<bool> updateTeacherAttendanceApi(
-      dynamic attendance_id,
-      dynamic status,
-      dynamic remarks,
-      BuildContext context,
-      ) async {
+    dynamic attendance_id,
+    dynamic status,
+    dynamic remarks,
+    BuildContext context,
+  ) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.markTeacherAttendance)) {
+      Utils.show(
+        "You don't have permission to mark teacher attendance",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {
       "attendance_id": attendance_id,
       "status": status,
       "remarks": remarks,
-
     };
 
     try {
@@ -34,21 +44,17 @@ class UpdateTeacherAttendanceViewModel with ChangeNotifier {
 
       setLoading(false);
 
-      if (response['status_code'] == 200 ||
-          response['status_code'] == 201) {
-
+      if (response['status_code'] == 200 || response['status_code'] == 201) {
         Utils.show(response['message'], context);
         return true; // ✅ bas yahin khatam
       }
 
       Utils.show(response['message'] ?? "Something went wrong", context);
       return false;
-
     } catch (e) {
       setLoading(false);
       Utils.show("Network error", context);
       return false;
     }
   }
-
 }

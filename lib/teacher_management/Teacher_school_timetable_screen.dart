@@ -6,6 +6,9 @@ import 'package:shimmer/shimmer.dart';
 import '../model/school_model/classes_time_table_model.dart';
 import '../res/app_color.dart';
 import '../res/const_text.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
 import '../view_model/school_view_model/all_classes_view_model.dart';
 import '../view_model/school_view_model/all_scetions_view_model.dart';
 import '../view_model/school_view_model/create_class_time_table_View_model.dart';
@@ -33,6 +36,17 @@ class _TeacherSchoolTimetableScreenState extends State<TeacherSchoolTimetableScr
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.viewTimetable)) {
+
+        Utils.show(
+          "You don't have permission to view timetable",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
       Provider.of<AllClassesViewModel>(context, listen: false)
           .allClassesApi(context);
       Provider.of<AllSubjectsVieModel>(context, listen: false)

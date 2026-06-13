@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../repo/school_repo/mark_as_all_read_read_notification_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 // class MarkAsAllReadNotificationViewModel with ChangeNotifier {
@@ -60,6 +62,18 @@ class MarkAsAllReadNotificationViewModel with ChangeNotifier {
   }
 
   Future<bool> markAsAllReadNotificationApi(context) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.notificationView)) {
+
+      Utils.show(
+        "You don't have permission",
+        context,
+      );
+
+      return false;
+    }
+
     setLoading(true);
 
     try {

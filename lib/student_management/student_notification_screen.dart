@@ -10,6 +10,9 @@ import 'package:school_pro/view_model/school_view_model/delete_notification_view
 import 'package:school_pro/view_model/student_view_model/student_notification_view_model.dart';
 import 'package:shimmer/shimmer.dart';
 
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
 import '../view_model/school_view_model/mark_as_all_read_notication_view_model.dart';
 
 class StudentNotificationScreen extends StatefulWidget {
@@ -35,6 +38,19 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     )..forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.notificationView)) {
+
+        Utils.show(
+          "You don't have permission to view notifications",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
+
       Provider.of<StudentNotificationViewModel>(
         context,
         listen: false,

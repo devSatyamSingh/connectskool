@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../model/school_model/user_role_model.dart';
 import '../../repo/school_repo/user_role_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class GetUsersByRoleViewModel extends ChangeNotifier {
 
@@ -39,6 +42,16 @@ class GetUsersByRoleViewModel extends ChangeNotifier {
     required BuildContext context,
     required String role,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.managePermissions)) {
+
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+
+      return;
+    }
     _setLoading(true);
     _model = null;
     _selectedUser = null;

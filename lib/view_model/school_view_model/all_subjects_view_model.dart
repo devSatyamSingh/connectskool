@@ -4,6 +4,9 @@ import 'package:school_pro/model/school_model/all_subjects_model.dart';
 import 'package:school_pro/repo/school_repo/all_subjects_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class AllSubjectsVieModel extends ChangeNotifier {
   final _allStudentListRepo = AllSubjectsRepository();
 
@@ -25,6 +28,16 @@ class AllSubjectsVieModel extends ChangeNotifier {
 
   // 🔥 API CALL (POSTMAN STATUS CODE HANDLING)
   Future<void> allSubjectsApi(BuildContext context) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewSubjects)) {
+
+      Utils.show(
+        "You don't have permission to view subjects",
+        context,
+      );
+
+      return;
+    }
     setLoading(true);
 
     try {

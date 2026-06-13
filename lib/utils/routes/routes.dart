@@ -90,8 +90,8 @@ class Routers {
         return (context) => const SchoolAdminPrivacyPolicyScreen();
         case RoutesName.notificationScreen:
         return (context) => const NotificationScreen();
-        case RoutesName.studentSubjectScreen:
-        return (context) => const StudentSubjectScreen();
+        // case RoutesName.studentSubjectScreen:
+        // return (context) => const StudentSubjectScreen();
       case RoutesName.studentProfileScreen:
         return (context) => const StudentProfileScreen();
       case RoutesName.studentAttendanceScreen:

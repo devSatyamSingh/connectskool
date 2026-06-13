@@ -7,6 +7,8 @@ import 'package:school_pro/repo/school_repo/delete_teacher_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class DeleteClassViewModel with ChangeNotifier {
@@ -24,6 +26,18 @@ class DeleteClassViewModel with ChangeNotifier {
       dynamic classId,
       BuildContext context,
       ) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageClasses)) {
+
+      Utils.show(
+        "You don't have permission to delete class",
+        context,
+      );
+
+      return false;
+    }
+
     setLoading(true);
 
     Map<String, dynamic> data = {

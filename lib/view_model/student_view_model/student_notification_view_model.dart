@@ -5,6 +5,9 @@ import 'package:http/http.dart' as http;
 import '../../model/school_model/all_notification_model.dart';
 import '../../model/student_model/student_notification_model.dart';
 import '../../res/api_url.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 import '../user_view_model.dart';
 
 class StudentNotificationViewModel extends ChangeNotifier {
@@ -45,6 +48,18 @@ class StudentNotificationViewModel extends ChangeNotifier {
   //   notifyListeners();
   // }
   Future<void> studentNotificationApi(BuildContext context) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.notificationView)) {
+
+      Utils.show(
+        "You don't have permission to view notifications",
+        context,
+      );
+
+      return;
+    }
+
     _loading = true;
     notifyListeners();
 

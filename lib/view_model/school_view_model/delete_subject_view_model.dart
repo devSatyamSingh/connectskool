@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/delete_subject_repo.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class DeleteSubjectViewModel with ChangeNotifier {
@@ -21,6 +23,16 @@ class DeleteSubjectViewModel with ChangeNotifier {
       dynamic subjectId,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.deleteSubject)) {
+
+      Utils.show(
+        "You don't have permission to delete subject",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map<String, dynamic> data = {

@@ -7,6 +7,8 @@ import '../res/app_button.dart';
 import '../res/app_color.dart';
 import '../res/app_text_field.dart';
 import '../res/const_text.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 
 class CreateClassScreen extends StatefulWidget {
   const CreateClassScreen({super.key});
@@ -30,6 +32,16 @@ class _CreateClassScreenState extends State<CreateClassScreen> {
 
   void _submitClass() {
     final createClass = Provider.of<CreateClassesViewModel>(context,listen: false);
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageClasses)) {
+
+      Utils.show(
+        "You don't have permission to create class",
+        context,
+      );
+
+      return;
+    }
 
     final name = _nameController.text.trim();
     final orderText = _orderController.text.trim();

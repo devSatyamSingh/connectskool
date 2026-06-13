@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/add_teachers_repo.dart';
 import 'package:school_pro/repo/school_repo/create_admin_teacher_homework.dart';
 import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class CreateAdminTeachersHomeworkViewModel with ChangeNotifier {
@@ -31,6 +33,16 @@ class CreateAdminTeachersHomeworkViewModel with ChangeNotifier {
 
     required int allowSubmission,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.teacherCreateHomework)) {
+
+      Utils.show(
+        "You don't have permission to create homework",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     try {

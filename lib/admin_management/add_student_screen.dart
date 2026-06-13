@@ -14,6 +14,9 @@ import 'package:school_pro/view_model/school_view_model/fees_head_management_vie
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
+import '../utils/permission_error_message.dart';
+import '../utils/permission_keys.dart';
+
 class AddStudentPage extends StatefulWidget {
   const AddStudentPage({super.key});
 
@@ -156,6 +159,13 @@ class _AddStudentPageState extends State<AddStudentPage> {
 
   // ── Submit ──
   Future<void> _submit() async {
+    if (!PermissionGuard.check(
+      context,
+      PermissionKeys.addStudent,
+      "Add Student",
+    )) {
+      return;
+    }
     if (nameCtrl.text.trim().isEmpty) {
       Utils.show("Enter student name", context);
       return;

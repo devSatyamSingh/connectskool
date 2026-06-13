@@ -14,6 +14,8 @@ import '../model/school_model/all_classes_model.dart';
 import '../model/school_model/all_home_work_model.dart';
 import '../model/school_model/homework_details_model.dart';
 import '../res/app_button.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
 import '../view_model/school_view_model/all_classes_view_model.dart';
 import '../view_model/school_view_model/all_scetions_view_model.dart';
@@ -83,6 +85,17 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.viewHomework)) {
+
+        Utils.show(
+          "You don't have permission to view homework",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
       Provider.of<AllClassesViewModel>(
         context,
         listen: false,
@@ -2072,7 +2085,21 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: _showHomeworkBottomSheet,
+          onTap: () {
+
+            if (!PermissionExtensions.canAccess(
+                PermissionKeys.teacherCreateHomework)) {
+
+              Utils.show(
+                "You don't have permission to create homework",
+                context,
+              );
+
+              return;
+            }
+
+            _showHomeworkBottomSheet();
+          },
           borderRadius: BorderRadius.circular(18),
           child: const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
@@ -2101,89 +2128,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     );
   }
 
-  // Widget _animatedCard(int index, HomeworkData hw) {
-  //   final submitted = int.tryParse(hw.submittedCount ?? "0") ?? 0;
-  //   final total     = hw.totalStudents ?? 1;
-  //   final progress  = submitted / total;
-  //   final delay     = index * 0.08;
-  //
-  //   return AnimatedBuilder(
-  //     animation: _controller,
-  //     builder: (_, child) {
-  //       final raw    = (_controller.value - delay).clamp(0.0, 1.0);
-  //       final curved = Curves.easeOutCubic.transform(raw);
-  //       return Transform.translate(offset: Offset(0, 40 * (1 - curved)),
-  //           child: Opacity(opacity: curved, child: child));
-  //     },
-  //     child: Container(
-  //       margin: const EdgeInsets.only(bottom: 14),
-  //       decoration: _DS.cardDecor(),
-  //       child: ClipRRect(borderRadius: BorderRadius.circular(20),
-  //           child: Column(children: [
-  //             Container(height: 4, decoration: const BoxDecoration(gradient: _DS.gradientHeader)),
-  //             Padding(padding: const EdgeInsets.all(16),
-  //                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-  //                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-  //                     _pill("${hw.className ?? ''} • ${hw.sectionName ?? ''}", _DS.primaryLight, _DS.primary, Icons.school_rounded),
-  //                     _pill(_formatDate(hw.dueDate), const Color(0xFFFFF3E0), _DS.orange, Icons.event_rounded),
-  //                   ]),
-  //                   const SizedBox(height: 14),
-  //                   Row(children: [
-  //                     Container(width: 38, height: 38,
-  //                         decoration: BoxDecoration(gradient: _DS.gradientHeader, borderRadius: BorderRadius.circular(10)),
-  //                         child: const Icon(Icons.menu_book_rounded, color: Colors.white, size: 18)),
-  //                     const SizedBox(width: 12),
-  //                     Expanded(child: Text(hw.subjectName ?? "",
-  //                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _DS.textDark, letterSpacing: -0.2))),
-  //                   ]),
-  //                   const SizedBox(height: 10),
-  //                   if (hw.description?.isNotEmpty ?? false)
-  //                     Container(padding: const EdgeInsets.all(12),
-  //                         decoration: BoxDecoration(color: _DS.bg, borderRadius: BorderRadius.circular(10)),
-  //                         child: Text(hw.description ?? "",
-  //                             style: const TextStyle(fontSize: 13, color: _DS.textMid, height: 1.5),
-  //                             maxLines: 2, overflow: TextOverflow.ellipsis)),
-  //                   const SizedBox(height: 14),
-  //                   Row(children: [
-  //                     _statusChip("✅ ${hw.submittedCount ?? '0'}", _DS.green),
-  //                     const SizedBox(width: 8),
-  //                     _statusChip("⏳ ${hw.pendingCount ?? '0'}",   _DS.orange),
-  //                     const SizedBox(width: 8),
-  //                     _statusChip("🕐 ${hw.lateCount ?? '0'}",     _DS.red),
-  //                   ]),
-  //                   const SizedBox(height: 14),
-  //                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-  //                     const Text("Submission Progress",
-  //                         style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: _DS.textLight, letterSpacing: 0.3)),
-  //                     Text("${(progress * 100).round()}%",
-  //                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: _DS.primary)),
-  //                   ]),
-  //                   const SizedBox(height: 6),
-  //                   ClipRRect(borderRadius: BorderRadius.circular(99),
-  //                       child: LinearProgressIndicator(value: progress, minHeight: 7,
-  //                           backgroundColor: _DS.primaryLight,
-  //                           valueColor: const AlwaysStoppedAnimation<Color>(_DS.primary))),
-  //                   const SizedBox(height: 14),
-  //
-  //                   // ✅ FIX #3 — View Submission Status button
-  //                   SizedBox(width: double.infinity,
-  //                       child: OutlinedButton.icon(
-  //                         onPressed: () => _showSubmissionStatus(hw),
-  //                         icon: const Icon(Icons.bar_chart_rounded, size: 16),
-  //                         label: const Text("View Submission Status",
-  //                             style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
-  //                         style: OutlinedButton.styleFrom(
-  //                             foregroundColor: _DS.primary,
-  //                             side: BorderSide(color: AppColor.primary.withOpacity(0.4), width: 1.5),
-  //                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-  //                             padding: const EdgeInsets.symmetric(vertical: 10),
-  //                             backgroundColor: AppColor.primaryLight),
-  //                       )),
-  //                 ])),
-  //           ])),
-  //     ),
-  //   );
-  // }
   Widget _animatedCard(int index, HomeworkData hw) {
     final submitted = int.tryParse(hw.submittedCount ?? "0") ?? 0;
     final pending = int.tryParse(hw.pendingCount ?? "0") ?? 0;
@@ -2326,6 +2270,16 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                       onPressed: loadingHomeworkId == hw.homeworkId
                           ? null
                           : () async {
+                        if (!PermissionExtensions.canAccess(
+                            PermissionKeys.viewHomework)) {
+
+                          Utils.show(
+                            "You don't have permission to view homework submissions",
+                            context,
+                          );
+
+                          return;
+                        }
                               setState(() {
                                 loadingHomeworkId = hw.homeworkId;
                               });

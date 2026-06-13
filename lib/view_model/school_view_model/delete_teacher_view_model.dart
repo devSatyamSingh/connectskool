@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/delete_teacher_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class DeleteTeacherViewModel with ChangeNotifier {
@@ -20,6 +22,16 @@ class DeleteTeacherViewModel with ChangeNotifier {
       dynamic teacherId,
       BuildContext context,
       ) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.deleteTeacher)) {
+      Utils.show(
+        "You don't have permission to delete teacher",
+        context,
+      );
+      return false;
+    }
+
     setLoading(true);
 
     Map<String, dynamic> data = {

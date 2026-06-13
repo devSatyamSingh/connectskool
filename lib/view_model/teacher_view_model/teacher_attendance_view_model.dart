@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:school_pro/repo/teacher_repo/teacher_attendance_repo.dart';
 import '../../model/accountant_model/accountant_attendance_model.dart';
 import '../../model/teacher_model/teacher_attendance_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 // class TeacherAttendanceViewModel with ChangeNotifier {
 //
@@ -54,7 +57,17 @@ class TeacherAttendanceViewModel with ChangeNotifier {
 
   List<AttendanceData> attendanceList = [];   // ✅ FIXED
 
-  Future<void> getTeacherAttendance(String date) async {
+  Future<void> getTeacherAttendance(String date, BuildContext context) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewOneTeacherAttendance)) {
+
+      Utils.show(
+        "You don't have permission to view attendance",
+        context,
+      );
+
+      return;
+    }
 
     loading = true;
     notifyListeners();

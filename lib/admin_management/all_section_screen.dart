@@ -9,6 +9,8 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 import '../repo/school_repo/update_section_repo.dart';
 import '../res/app_button.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
 import '../view_model/school_view_model/all_scetions_view_model.dart';
 import '../view_model/school_view_model/delete_section_view_model.dart';
@@ -105,30 +107,7 @@ class _SectionsPageState extends State<SectionsPage>
       ),
     );
   }
-  // void _snack(BuildContext ctx, String msg) {
-  //   ScaffoldMessenger.of(ctx).showSnackBar(
-  //     SnackBar(
-  //       content: Row(children: [
-  //         const Icon(Icons.info_outline_rounded,
-  //             color: Colors.white, size: 18),
-  //         const SizedBox(width: 8),
-  //         Expanded(
-  //             child: Text(msg,
-  //                 style:
-  //                 const TextStyle(fontWeight: FontWeight.w500))),
-  //       ]),
-  //       backgroundColor: AppColor.error,
-  //       behavior: SnackBarBehavior.floating,
-  //       shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(12)),
-  //       margin: const EdgeInsets.all(16),
-  //     ),
-  //   );
-  // }
 
-  // ─────────────────────────────────────────────
-  //  Build
-  // ─────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final sectionVM = Provider.of<AllSectionsViewModel>(context);
@@ -148,7 +127,19 @@ class _SectionsPageState extends State<SectionsPage>
       backgroundColor: AppColor.pageBgColor,
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColor.primary,
-        onPressed: _openAddSheet,
+        onPressed: () {
+          if (!PermissionExtensions.canAccess(
+              PermissionKeys.manageSections)) {
+
+            Utils.show(
+              "You don't have permission to add section",
+              context,
+            );
+            return;
+          }
+
+          _openAddSheet();
+        },
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text(
           'Add Section',
@@ -210,7 +201,21 @@ class _SectionsPageState extends State<SectionsPage>
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: _openAddSheet,
+                      onTap: () {
+
+                        if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageSections)) {
+
+                          Utils.show(
+                            "You don't have permission to add section",
+                            context,
+                          );
+
+                          return;
+                        }
+
+                        _openAddSheet();
+                      },
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -504,7 +509,21 @@ class _SectionsPageState extends State<SectionsPage>
                       icon: Icons.edit_note_rounded,
                       color: color,
                       bg: color.withOpacity(0.10),
-                      onTap: () => _openEditSheet(s, color),
+                      onTap: () {
+
+                        if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageSections)) {
+
+                          Utils.show(
+                            "You don't have permission to edit section",
+                            context,
+                          );
+
+                          return;
+                        }
+
+                        _openEditSheet(s, color);
+                      },
                     ),
                     const SizedBox(height: 6),
                     _cardIconBtn(
@@ -512,6 +531,16 @@ class _SectionsPageState extends State<SectionsPage>
                       color: AppColor.error,
                       bg: AppColor.error.withOpacity(0.08),
                       onTap: () async {
+                        if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageSections)) {
+
+                          Utils.show(
+                            "You don't have permission to delete section",
+                            context,
+                          );
+
+                          return;
+                        }
                         final confirmed =
                         await _showDeleteDialog(s.sectionName ?? "");
                         if (confirmed) {

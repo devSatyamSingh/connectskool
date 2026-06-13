@@ -3,6 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/repo/school_repo/delete_notification_repo.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
+
 class DeleteNotificationViewModel with ChangeNotifier {
   final DeleteNotificationRepository _repo = DeleteNotificationRepository();
 
@@ -14,7 +18,22 @@ class DeleteNotificationViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> deleteNotificationApi(int id) async {
+  Future<bool> deleteNotificationApi(
+      int id,
+      BuildContext context,
+      ) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.notificationSend)) {
+
+      Utils.show(
+        "You don't have permission to delete notifications",
+        context,
+      );
+
+      return false;
+    }
+
     setLoading(true);
 
     try {

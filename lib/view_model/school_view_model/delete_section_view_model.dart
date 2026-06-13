@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/delete_section_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
 import '../../repo/school_repo/delete_student_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class DeleteSectionViewModel with ChangeNotifier {
@@ -21,6 +23,16 @@ class DeleteSectionViewModel with ChangeNotifier {
       dynamic sectionId,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageSections)) {
+
+      Utils.show(
+        "You don't have permission to delete section",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map<String, dynamic> data = {

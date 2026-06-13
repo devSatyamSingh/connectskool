@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/repo/school_repo/edit_notification_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class EditNotificationViewModel with ChangeNotifier {
@@ -21,6 +23,16 @@ class EditNotificationViewModel with ChangeNotifier {
       dynamic status,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.notificationSend)) {
+
+      Utils.show(
+        "You don't have permission to edit notifications",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

@@ -2065,6 +2065,7 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
 import '../repo/school_repo/all_sections_repo.dart';
 import '../res/app_button.dart';
+import '../utils/permission_error_message.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
@@ -2176,19 +2177,34 @@ class _AllStudentListState extends State<AllStudentList>
 
     return Scaffold(
       backgroundColor: AppColor.pageBgColor,
-      floatingActionButton: PermissionExtensions.canAccess(PermissionKeys.addStudent)
-      ? FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColor.lightBlueColor,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const AddStudentPage()),
-        ),
+        onPressed: () {
+
+          if (!PermissionGuard.check(
+            context,
+            PermissionKeys.addStudent,
+            "Add Student",
+          )) {
+            return;
+          }
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const AddStudentPage(),
+            ),
+          );
+        },
         icon: Icon(Icons.add_rounded, color: AppColor.white),
         label: const Text(
           'Add Student',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ): null,
+      ),
       body: Column(
         children: [
           // ── Header ──
@@ -2581,16 +2597,24 @@ class _AllStudentListState extends State<AllStudentList>
   Widget _studentCard(Map<String, dynamic> s) {
     final w = MediaQuery.of(context).size.width;
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SchoolStudentDetailScreen(
-            studentId: s["id"],
-            className: s["class"],
-            sectionName: s["section"],
+      onTap: () {
+        if (!PermissionExtensions.canAccess(
+            PermissionKeys.viewOneStudentProfile)) {
+          Utils.show("You don't have permission", context);
+          return;
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SchoolStudentDetailScreen(
+              studentId: s["id"],
+              className: s["class"],
+              sectionName: s["section"],
+            ),
           ),
-        ),
-      ),
+        );
+      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
@@ -2647,7 +2671,12 @@ class _AllStudentListState extends State<AllStudentList>
               Column(
                 children: [
                   GestureDetector(
-                    onTap: () => _openStudentSheet(student: s),
+                    onTap: () {
+                      if (!PermissionGuard.check(context, PermissionKeys.editStudent, "Edit Student")) {
+                        return;
+                      }
+                      _openStudentSheet(student: s);
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
@@ -2661,11 +2690,25 @@ class _AllStudentListState extends State<AllStudentList>
                   const SizedBox(height: 6),
                   GestureDetector(
                     onTap: () async {
+
+                      if (!PermissionGuard.check(
+                        context,
+                        PermissionKeys.deleteStudent,
+                        "Delete Student",
+                      )) {
+                        return;
+                      }
+
                       bool confirmed = await _showDeleteDialog();
+
                       if (confirmed) {
-                        Provider.of<DeleteStudentViewModel>(context,
-                            listen: false)
-                            .deleteStudentApi(s["id"], context);
+                        Provider.of<DeleteStudentViewModel>(
+                          context,
+                          listen: false,
+                        ).deleteStudentApi(
+                          s["id"],
+                          context,
+                        );
                       }
                     },
                     child: Container(

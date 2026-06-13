@@ -358,6 +358,8 @@ import 'package:school_pro/utils/utils.dart';
 import '../../model/school_model/all_permissions_model.dart';
 import '../../repo/school_repo/all_role_permissions_repo.dart';
 import '../../model/school_model/select_role_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 
 class SelectRoleViewModel extends ChangeNotifier {
   final _repo = SelectRoleRepository();
@@ -478,6 +480,16 @@ class SelectRoleViewModel extends ChangeNotifier {
   // 🔥 SELECT ROLE API — pehle local check
   // =========================================================
   Future<void> selectRoleApi(BuildContext context, String role) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.managePermissions)) {
+
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+
+      return;
+    }
     setLoading(true);
 
     try {
@@ -508,6 +520,17 @@ class SelectRoleViewModel extends ChangeNotifier {
   }
 
   Future<void> loadRolePermissions(BuildContext context, String role) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.managePermissions)) {
+
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+
+      return;
+    }
     setLoading(true);
 
     try {
@@ -574,6 +597,17 @@ class SelectRoleViewModel extends ChangeNotifier {
   // 🔥 SAVE USER PERMISSIONS API
   // =========================================================
   Future<void> saveUserPermissions(BuildContext context, int userId) async {
+
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.managePermissions)) {
+
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+
+      return;
+    }
     List<Map<String, dynamic>> permissionList = [];
 
     permissionState.forEach((section, perms) {
