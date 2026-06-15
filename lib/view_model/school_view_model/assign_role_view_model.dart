@@ -23,11 +23,11 @@ class AssignRoleViewModel with ChangeNotifier {
         bool showMessage = true,
       }) async {
 
-    // ✅ Pattern C - ViewModel/API level guard
-    if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
-      if (showMessage) Utils.show("Permission denied", context);
-      return false;
-    }
+    // // ✅ Pattern C - ViewModel/API level guard
+    // if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
+    //   if (showMessage) Utils.show("Permission denied", context);
+    //   return false;
+    // }
 
     setLoading(true);
 

@@ -72,10 +72,10 @@ class LoginViewModel with ChangeNotifier {
   // 🔹 LOGIN API — FIXED
   // ==============================
   Future<void> loginApi(
-    BuildContext context,
-    String email,
-    String password,
-  ) async {
+      BuildContext context,
+      String email,
+      String password,
+      ) async {
     setLoading(true);
 
     try {
@@ -105,9 +105,13 @@ class LoginViewModel with ChangeNotifier {
 
         await UserViewModel().savePermissions(permissions);
 
+        // ⚠️ TEMPORARY snapshot (login response ka data backend cache se stale
+        // ho sakta hai). Yeh sirf ek instant fallback hai — neeche
+        // getUserPermissionApi(isCurrentUser: true) call FRESH/accurate data
+        // se PermissionManager ko turant overwrite kar dega.
         PermissionManager.setPermissions(permissions);
         print(
-            "LOGIN PERMISSIONS => ${PermissionManager.permissions}"
+            "LOGIN PERMISSIONS (temp snapshot) => ${PermissionManager.permissions}"
         );
 
         await Future.wait([
@@ -132,7 +136,13 @@ class LoginViewModel with ChangeNotifier {
           context: context,
           userId: int.tryParse(userId.toString()) ?? 0,
           role: role,
+          isCurrentUser: true, // ✅ fresh permissions -> PermissionManager sync
         );
+
+        print("================================");
+        print("FINAL PERMISSIONS");
+        print(PermissionManager.permissions);
+        print("================================");
 
         Utils.show(response['message'], context);
 
@@ -152,157 +162,6 @@ class LoginViewModel with ChangeNotifier {
       Utils.show("Login failed", context);
     }
   }
-  // Future<void> loginApi(
-  //     BuildContext context, String email, String password) async
-  // {
-  //
-  //   setLoading(true);
-  //
-  //   try {
-  //
-  //     final results = await Future.wait([
-  //       getFcmToken(),
-  //       getDeviceInfo(),
-  //     ]);
-  //
-  //     final fcmToken = results[0] as String?;
-  //
-  //     final data = {
-  //       "user_email": email,
-  //       "password": password,
-  //       "device_token": fcmToken ?? "",
-  //       "device_type": Platform.isIOS ? "ios" : "android",
-  //     };
-  //
-  //     final response = await _repo.loginApi(data);
-  //
-  //     if (response['status_code'] == 200) {
-  //
-  //       final user      = response['data']['user'];
-  //       final role      = user['role'];
-  //       final token     = response['data']['token'];
-  //       final schoolId  = user['school_id'];
-  //       final classId   = user['class_id'];
-  //       final sectionId = user['section_id'];
-  //       final userId    = user['user_id'];
-  //
-  //       await Future.wait([
-  //         UserViewModel().saveUser(userId),
-  //         UserViewModel().saveRole(role),
-  //         UserViewModel().saveToken(token),
-  //         UserViewModel().saveSchoolId(schoolId),
-  //         UserViewModel().saveClassId(classId),
-  //         UserViewModel().saveSectionId(sectionId),
-  //         _subscribeToTopics(
-  //           schoolId,
-  //           role,
-  //           classId: classId,
-  //           sectionId: sectionId,
-  //         ),
-  //       ]);
-  //
-  //       await Provider.of<GetUserPermissionViewModel>(
-  //         context,
-  //         listen: false,
-  //       ).getUserPermissionApi(
-  //         context: context,
-  //         userId: int.tryParse(userId.toString()) ?? 0,
-  //         role: role,
-  //       );
-  //
-  //       Utils.show(response['message'], context);
-  //
-  //       // ✅ Navigation se pehle loader band mat karo
-  //       _navigateFromRole(context, role);
-  //
-  //       // ✅ Ab band karo (jab sab kaam ho gaya)
-  //       setLoading(false);
-  //
-  //     } else {
-  //       setLoading(false);
-  //       Utils.show(response['message'], context);
-  //     }
-  //
-  //   } catch (e) {
-  //     setLoading(false);
-  //     Utils.show("Login failed", context);
-  //   }
-  // }
-  // Future<void> loginApi(
-  //     BuildContext context, String email, String password) async
-  // {
-  //   setLoading(true);
-  //
-  //   try {
-  //     // ✅ FCM token + device info parallel fetch
-  //     final results = await Future.wait([
-  //       getFcmToken(),
-  //       getDeviceInfo(),
-  //     ]);
-  //
-  //     final fcmToken  = results[0] as String?;
-  //
-  //     final data = {
-  //       "user_email": email,
-  //       "password": password,
-  //       "device_token": fcmToken ?? "",
-  //       "device_type": Platform.isIOS ? "ios" : "android",
-  //     };
-  //
-  //     final response = await _repo.loginApi(data);
-  //     setLoading(false);
-  //
-  //     if (response['status_code'] == 200) {
-  //       final user      = response['data']['user'];
-  //       final role      = user['role'];
-  //       final token     = response['data']['token'];
-  //       final schoolId  = user['school_id'];
-  //       final classId   = user['class_id'];
-  //       final sectionId = user['section_id'];
-  //       final userId    = user['user_id'];
-  //
-  //       // ✅ User data save + topics subscribe parallel
-  //       await Future.wait([
-  //         UserViewModel().saveUser(userId),
-  //         UserViewModel().saveRole(role),
-  //         UserViewModel().saveToken(token),
-  //         UserViewModel().saveSchoolId(schoolId),
-  //         UserViewModel().saveClassId(classId),
-  //         UserViewModel().saveSectionId(sectionId),
-  //         _subscribeToTopics(
-  //           schoolId,
-  //           role,
-  //           classId: classId,
-  //           sectionId: sectionId,
-  //         ),
-  //       ]);
-  //
-  //       // ✅ Permissions fetch
-  //       await Provider.of<GetUserPermissionViewModel>(context, listen: false)
-  //           .getUserPermissionApi(
-  //         context: context,
-  //         userId: int.tryParse(userId.toString()) ?? 0,
-  //         role: role,
-  //       );
-  //
-  //       Utils.show(response['message'], context);
-  //
-  //       Future.delayed(Duration.zero, () {
-  //         _navigateFromRole(context, role);
-  //       });
-  //
-  //     } else {
-  //       Utils.show(response['message'], context);
-  //     }
-  //   } catch (e) {
-  //     setLoading(false);
-  //     Utils.show("Login failed", context);
-  //   }
-  // }
-
-  // ==============================
-  // 🔹 LOGOUT API — FIXED
-  // ==============================
   Future<void> logoutApi(BuildContext context) async {
     setLoading(true);
 
@@ -336,11 +195,11 @@ class LoginViewModel with ChangeNotifier {
   // 🔹 SUBSCRIBE — FIXED (parallel)
   // ==============================
   Future<void> _subscribeToTopics(
-    dynamic schoolId,
-    String role, {
-    dynamic classId,
-    dynamic sectionId,
-  }) async {
+      dynamic schoolId,
+      String role, {
+        dynamic classId,
+        dynamic sectionId,
+      }) async {
     final messaging = FirebaseMessaging.instance;
 
     // ✅ Sab topics parallel subscribe
@@ -368,18 +227,15 @@ class LoginViewModel with ChangeNotifier {
     print("✅ Topics Subscribed");
   }
 
-  // ==============================
-  // 🔹 UNSUBSCRIBE — FIXED (parallel)
-  // ==============================
   Future<void> _unsubscribeFromTopics(
-    dynamic schoolId,
-    String role, {
-    dynamic classId,
-    dynamic sectionId,
-  }) async {
+      dynamic schoolId,
+      String role, {
+        dynamic classId,
+        dynamic sectionId,
+      }) async {
     final messaging = FirebaseMessaging.instance;
 
-    // ✅ Sab topics parallel unsubscribe
+    //  Sab topics parallel unsubscribe
     final List<Future> tasks = [
       messaging.unsubscribeFromTopic("school_$schoolId"),
       messaging.unsubscribeFromTopic("school_${schoolId}_role_$role"),
@@ -404,9 +260,7 @@ class LoginViewModel with ChangeNotifier {
     print("✅ Topics Unsubscribed");
   }
 
-  // ==============================
-  // 🔹 NAVIGATION
-  // ==============================
+
   void _navigateFromRole(BuildContext context, String role) {
     switch (role) {
       case "school_admin":

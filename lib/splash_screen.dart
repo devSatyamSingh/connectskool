@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:school_pro/accountant_management/accountant_management_dash_board_screen.dart';
 import 'package:school_pro/student_management/student_dash_board_screen.dart';
 import 'package:school_pro/teacher_management/teacher_management_dashboard_screen.dart';
@@ -10,6 +11,7 @@ import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/user_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/user_permission_view_model.dart';
 
 import 'admin_management/school_management_dashboard_screen.dart';
 import 'main.dart';
@@ -99,76 +101,12 @@ class _SplashScreenState extends State<SplashScreen>
 
     await _checkSession();
   }
-
-  // Future<void> _checkSession() async {
-  //   try {
-  //     UserViewModel userViewModel = UserViewModel();
-  //
-  //     int? userId = await userViewModel.getUser();
-  //     String? role = await userViewModel.getRole();
-  //
-  //     if (userId != null && userId != 0 && role != null) {
-  //
-  //       if (role == "school_admin") {
-  //         Navigator.pushReplacement(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (_) => SchoolManagementDashboardScreen(),
-  //           ),
-  //         );
-  //       }
-  //       else if (role == "teacher") {
-  //         // Navigator.pushReplacementNamed(
-  //         //   context,
-  //         //   RoutesName.teacherDashboard,
-  //         // );
-  //       }//student
-  //       else if (role == "accountant") {
-  //
-  //         // Navigator.pushReplacement(
-  //         //   context,
-  //         //   MaterialPageRoute(
-  //         //     builder: (_) => StudentDashboardScreen(),
-  //         //   ),
-  //         // );
-  //       }
-  //       else if (role == "student") {
-  //
-  //         Navigator.pushReplacement(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (_) => StudentDashboardScreen(),
-  //           ),
-  //         );
-  //       }
-  //
-  //       else {
-  //         Navigator.pushReplacementNamed(
-  //           context,
-  //           RoutesName.onboardingScreen,
-  //         );
-  //       }
-  //
-  //     } else {
-  //       Navigator.pushReplacementNamed(
-  //         context,
-  //         RoutesName.onboardingScreen,
-  //       );
-  //     }
-  //
-  //   } catch (e) {
-  //     Navigator.pushReplacementNamed(
-  //       context,
-  //       RoutesName.onboardingScreen,
-  //     );
-  //   }
-  // }
   Future<void> _checkSession() async {
     try {
       final userViewModel = UserViewModel();
 
       // ==========================
-      // Restore Permissions
+      // Restore Permissions (temporary fallback from local storage)
       // ==========================
       final permissions =
       await userViewModel.getPermissions();
@@ -185,6 +123,24 @@ class _SplashScreenState extends State<SplashScreen>
 
       final String? token =
       await userViewModel.getToken();
+
+      // ✅ FIX: Local storage wali list stale ho sakti hai (agar admin ne
+      // last login ke baad role/user permissions change kiye hain). App
+      // reopen hote hi fresh permissions fetch karke PermissionManager ko
+      // sync karo, taki admin ke changes turant reflect ho.
+      if (userId != null && userId != 0 && role != null && role.isNotEmpty) {
+        // Fire-and-forget: navigation ko block na karo, but jaldi hi
+        // PermissionManager update ho jayega.
+        Provider.of<GetUserPermissionViewModel>(
+          context,
+          listen: false,
+        ).getUserPermissionApi(
+          context: context,
+          userId: userId,
+          role: role,
+          isCurrentUser: true,
+        );
+      }
 
       print("USER ID => $userId");
       print("ROLE => $role");

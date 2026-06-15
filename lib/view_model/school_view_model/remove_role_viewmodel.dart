@@ -19,10 +19,10 @@ class RemoveRoleViewModel extends ChangeNotifier {
       ) async {
 
     // ✅ Pattern C - ViewModel/API level guard
-    if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
-      Utils.show("Permission denied", context);
-      return false;
-    }
+    // if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
+    //   Utils.show("Permission denied", context);
+    //   return false;
+    // }
 
     _loading = true;
     notifyListeners();

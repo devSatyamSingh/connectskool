@@ -480,16 +480,16 @@ class SelectRoleViewModel extends ChangeNotifier {
   // 🔥 SELECT ROLE API — pehle local check
   // =========================================================
   Future<void> selectRoleApi(BuildContext context, String role) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.managePermissions)) {
-
-      Utils.show(
-        "Permission denied",
-        context,
-      );
-
-      return;
-    }
+    // if (!PermissionExtensions.canAccess(
+    //     PermissionKeys.managePermissions)) {
+    //
+    //   Utils.show(
+    //     "Permission denied",
+    //     context,
+    //   );
+    //
+    //   return;
+    // }
     setLoading(true);
 
     try {
@@ -521,16 +521,16 @@ class SelectRoleViewModel extends ChangeNotifier {
 
   Future<void> loadRolePermissions(BuildContext context, String role) async {
 
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.managePermissions)) {
-
-      Utils.show(
-        "Permission denied",
-        context,
-      );
-
-      return;
-    }
+    // // if (!PermissionExtensions.canAccess(
+    // //     PermissionKeys.managePermissions)) {
+    // //
+    // //   Utils.show(
+    // //     "Permission denied",
+    // //     context,
+    // //   );
+    // //
+    // //   return;
+    // }
     setLoading(true);
 
     try {
@@ -598,16 +598,16 @@ class SelectRoleViewModel extends ChangeNotifier {
   // =========================================================
   Future<void> saveUserPermissions(BuildContext context, int userId) async {
 
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.managePermissions)) {
-
-      Utils.show(
-        "Permission denied",
-        context,
-      );
-
-      return;
-    }
+    // // if (!PermissionExtensions.canAccess(
+    // //     PermissionKeys.managePermissions)) {
+    // //
+    // //   Utils.show(
+    // //     "Permission denied",
+    // //     context,
+    // //   );
+    //
+    //   return;
+    // }
     List<Map<String, dynamic>> permissionList = [];
 
     permissionState.forEach((section, perms) {

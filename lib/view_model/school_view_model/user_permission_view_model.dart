@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-// ✅ Existing model — already has PermissionItem defined
+// Existing model — already has PermissionItem defined
 import '../../model/school_model/user_permission_model.dart';
 import '../../repo/school_repo/user_permission_repo.dart';
-import '../../utils/permission_extensions.dart';
-import '../../utils/permission_keys.dart';
-import '../../utils/utils.dart';
+import '../../utils/permission_manager.dart';
 
 class GetUserPermissionViewModel extends ChangeNotifier {
 
@@ -22,22 +20,12 @@ class GetUserPermissionViewModel extends ChangeNotifier {
 
   final _repo = GetUserPermissionRepository();
 
-
   Future<void> getUserPermissionApi({
     required BuildContext context,
     required int userId,
     required String role,
+    isCurrentUser = true,
   }) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.managePermissions)) {
-
-      Utils.show(
-        "Permission denied",
-        context,
-      );
-
-      return;
-    }
     _setLoading(true);
 
     try {
@@ -48,7 +36,7 @@ class GetUserPermissionViewModel extends ChangeNotifier {
       debugPrint(response.toString());
 
       _model = GetUserPermissionModel.fromJson(response);
-      _buildStateMap();
+      _buildStateMap(syncPermissionManager: isCurrentUser);
 
     } catch (e) {
       debugPrint('getUserPermissionApi error: $e');
@@ -58,7 +46,7 @@ class GetUserPermissionViewModel extends ChangeNotifier {
   }
 
 
-  void _buildStateMap() {
+  void _buildStateMap({bool syncPermissionManager = false}) {
 
     permissionStateMap.clear();
 
@@ -66,9 +54,21 @@ class GetUserPermissionViewModel extends ChangeNotifier {
 
     if (sections == null) return;
 
+    // Sirf un permissions ke keys jo "denied" state me NAHI hai — yeh hi
+    // PermissionManager ko diya jayega (Pattern: canAccess() => list me hai
+    // to allowed, nahi hai to denied).
+    final List<String> effectivePermissions = [];
+
     sections.forEach((section, items) {
 
       for (var item in items) {
+        print(
+            "KEY=${item.key}"
+        );
+
+        print(
+            "STATE=${item.state}"
+        );
 
         debugPrint(
           "KEY=${item.key} STATE=${item.state}",
@@ -79,9 +79,35 @@ class GetUserPermissionViewModel extends ChangeNotifier {
           permissionStateMap[item.permissionId!] =
               item.state ?? 'default';
         }
+
+        // "denied" => is permission ko PermissionManager list me shamil
+        // NAHI karna (canAccess() => false ho jayega).
+        // "allowed" / "default" (jab role_default true ho ya admin ne
+        // explicitly allow kiya ho) => shamil karo.
+        if (item.key != null && item.state != "denied") {
+          effectivePermissions.add(item.key!);
+        }
       }
     });
 
+    // ✅ FIX: Sirf CURRENTLY LOGGED-IN user ke liye PermissionManager ko fresh
+    // data se sync karo, taki admin ke role/user permission changes turant
+    // (next refresh / re-login par) reflect ho.
+    //
+    // Kisi OTHER user (jis teacher/student ki permission admin abhi edit kar
+    // raha hai) ke liye yeh call NAHI hota — varna admin ke khud ke session
+    // ke permissions overwrite ho jaate.
+    if (syncPermissionManager) {
+      PermissionManager.setPermissions(effectivePermissions);
+      print(
+        "✅ EFFECTIVE PERMISSIONS => $effectivePermissions",
+      );
+
+      debugPrint(
+        "🔄 PermissionManager SYNCED (current user) => "
+            "${effectivePermissions.length} permissions",
+      );
+    }
 
     debugPrint(
       "PERMISSION STATE MAP BUILT => ${permissionStateMap.length} entries",
@@ -90,14 +116,12 @@ class GetUserPermissionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ─── Update Single Permission ──────────────────────────────────────────────
 
   void updatePermissionState(int permissionId, String newState) {
     permissionStateMap[permissionId] = newState;
     notifyListeners();
   }
 
-  // ─── Select All in Section ─────────────────────────────────────────────────
 
   void selectAllInSection(String section, String state) {
     final items = _model?.data?.permissions?[section];
@@ -112,14 +136,12 @@ class GetUserPermissionViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ─── Reset All ─────────────────────────────────────────────────────────────
 
   void resetAll() {
     permissionStateMap.updateAll((key, value) => 'default');
     notifyListeners();
   }
 
-  // ─── Helpers ───────────────────────────────────────────────────────────────
   bool canAccess(String permissionKey) {
     for (final section in sections) {
       for (final item in getItemsForSection(section)) {
@@ -149,7 +171,6 @@ class GetUserPermissionViewModel extends ChangeNotifier {
       .map((e) => e.key)
       .toList();
 
-  // ─── Private ───────────────────────────────────────────────────────────────
 
   void _setLoading(bool value) {
     _loading = value;

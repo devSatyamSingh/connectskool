@@ -18,11 +18,11 @@ class SaveUserPermissionViewModel extends ChangeNotifier {
     required Map<int, String> permissionStateMap,
   }) async {
 
-    // ✅ Pattern C - ViewModel/API level guard
-    if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
-      Utils.show("Permission denied", context);
-      return false;
-    }
+    // // ✅ Pattern C - ViewModel/API level guard
+    // if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
+    //   Utils.show("Permission denied", context);
+    //   return false;
+    // }
 
     _loading = true;
     notifyListeners();

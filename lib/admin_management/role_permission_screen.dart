@@ -119,13 +119,13 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
   //   preparePermissions(vm);
   // }
   void changeRole(String role) async {
-    if (!PermissionGuard.check(
-      context,
-      PermissionKeys.managePermissions,
-      "Manage Permissions",
-    )) {
-      return;
-    }
+    // if (!PermissionGuard.check(
+    //   context,
+    //   PermissionKeys.managePermissions,
+    //   "Manage Permissions",
+    // )) {
+    //   return;
+    // }
     selectedRole = role;
     setState(() {});
     final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
@@ -163,13 +163,13 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
     int permId,
     bool newValue,
   ) async {
-    if (!PermissionGuard.check(
-      context,
-      PermissionKeys.managePermissions,
-      "Manage Permissions",
-    )) {
-      return;
-    }
+    // if (!PermissionGuard.check(
+    //   context,
+    //   PermissionKeys.managePermissions,
+    //   "Manage Permissions",
+    // )) {
+    //   return;
+    // }
     permissionLoading[permId] = true;
 
     setState(() {});
@@ -246,13 +246,13 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
   //   );
   // }
   void callAssignApi() {
-    if (!PermissionGuard.check(
-      context,
-      PermissionKeys.managePermissions,
-      "Manage Permissions",
-    )) {
-      return;
-    }
+    // if (!PermissionGuard.check(
+    //   context,
+    //   PermissionKeys.managePermissions,
+    //   "Manage Permissions",
+    // )) {
+    //   return;
+    // }
     final roleVM = Provider.of<SelectRoleViewModel>(context, listen: false);
 
     List<int> selectedIds = [];

@@ -42,16 +42,7 @@ class GetUsersByRoleViewModel extends ChangeNotifier {
     required BuildContext context,
     required String role,
   }) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.managePermissions)) {
 
-      Utils.show(
-        "Permission denied",
-        context,
-      );
-
-      return;
-    }
     _setLoading(true);
     _model = null;
     _selectedUser = null;

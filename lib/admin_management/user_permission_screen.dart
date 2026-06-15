@@ -73,13 +73,13 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
   }
 
   void _fetchUsersByRole(String role) async {
-    if (!PermissionGuard.check(
-      context,
-      PermissionKeys.managePermissions,
-      "Manage Permissions",
-    )) {
-      return;
-    }
+    // if (!PermissionGuard.check(
+    //   context,
+    //   PermissionKeys.managePermissions,
+    //   "Manage Permissions",
+    // )) {
+    //   return;
+    // }
     setState(() => _selectedRole = role);
 
     final usersVm = Provider.of<GetUsersByRoleViewModel>(
@@ -106,6 +106,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
       context: context,
       userId: userId,
       role: _selectedRole,
+      isCurrentUser: false,
     );
   }
 
@@ -175,6 +176,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
         context: context,
         userId: userId,
         role: _selectedRole,
+        isCurrentUser: false,
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
