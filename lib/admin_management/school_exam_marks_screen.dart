@@ -7,6 +7,9 @@ import 'package:shimmer/shimmer.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
 import '../model/school_model/exam_marks_model.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
 import '../view_model/school_view_model/all_classes_view_model.dart';
 import '../view_model/school_view_model/all_subjects_view_model.dart';
 import '../view_model/school_view_model/create_exam_maerks_view_model.dart';
@@ -50,6 +53,17 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     )..forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.viewMarks)) {
+
+        Utils.show(
+          "You don't have permission to perform this action",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
       // Classes load
       final classesVm =
       Provider.of<AllClassesViewModel>(context, listen: false);
@@ -291,10 +305,24 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16)),
             onPressed: () {
+
+              if (!PermissionExtensions.canAccess(
+                  PermissionKeys.assignMarks)) {
+
+                Utils.show(
+                  "You don't have permission to assign marks.",
+                  context,
+                  type: "warning",
+                );
+
+                return;
+              }
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => CreateExamMarksPage()),
+                  builder: (_) => const CreateExamMarksPage(),
+                ),
               );
             },
             icon: const Icon(Icons.edit_rounded, color: Colors.white),

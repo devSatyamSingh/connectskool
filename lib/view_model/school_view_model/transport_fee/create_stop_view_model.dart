@@ -5,6 +5,8 @@ import 'package:school_pro/repo/school_repo/transport_repo/create_route_repo.dar
 import 'package:school_pro/repo/school_repo/transport_repo/create_stop_repo.dart';
 import 'package:school_pro/view_model/school_view_model/fine_rule_view_model.dart';
 
+import '../../../utils/permission_extensions.dart';
+import '../../../utils/permission_keys.dart';
 import '../../../utils/utils.dart';
 
 class CreateStopViewModel with ChangeNotifier {
@@ -26,6 +28,16 @@ class CreateStopViewModel with ChangeNotifier {
 
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTransport)) {
+
+      Utils.show(
+        "You don't have permission to perform this action.",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

@@ -5,6 +5,9 @@ import 'package:school_pro/model/school_model/fine_rule_model.dart';
 import 'package:school_pro/repo/school_repo/fees_management_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class FeesManagementViewModel extends ChangeNotifier {
   final _allStudentListRepo = FeesManagementRepository();
 
@@ -34,11 +37,24 @@ class FeesManagementViewModel extends ChangeNotifier {
   }
 
 
-
   Future<Map<String, dynamic>> deleteFee(
       dynamic feeId,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageFees)) {
+
+      Utils.show(
+        "You don't have permission to delete fees.",
+        context,
+      );
+
+      return {
+        "success": false,
+        "message": "Permission denied",
+      };
+
+    }
     try {
       setDeleteLoading(true);
 
@@ -61,7 +77,7 @@ class FeesManagementViewModel extends ChangeNotifier {
     }
   }
 
-  // 🔥 API CALL (POSTMAN STATUS CODE HANDLING)
+  // API CALL (POSTMAN STATUS CODE HANDLING)
   Future<void> feesManagementApi(BuildContext context) async {
     setLoading(true);
 

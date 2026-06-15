@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/view_model/school_view_model/Exam_management_view_model.dart';
 import '../../repo/school_repo/create_exam_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class CreateExamViewModel with ChangeNotifier {
@@ -24,6 +26,16 @@ class CreateExamViewModel with ChangeNotifier {
       dynamic resultDate,
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.createExam)) {
+
+      Utils.show(
+        "You don't have permission to create exams",
+        context,
+      );
+
+      return false;
+    }
 
     setLoading(true);
 
@@ -87,7 +99,11 @@ class CreateExamViewModel with ChangeNotifier {
 
       } else {
 
-        Utils.show("Something went wrong", context);
+        Utils.show(
+          response['error']?.toString() ??
+              'Something went wrong',
+          context,
+        );
         return false;
 
       }
@@ -96,7 +112,6 @@ class CreateExamViewModel with ChangeNotifier {
 
       setLoading(false);
 
-      /// 🔹 ERROR PRINT
       if (kDebugMode) {
         print("CREATE EXAM ERROR 👉 $e");
       }

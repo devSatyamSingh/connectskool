@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/repo/school_repo/update_school_admin_marksheet_repo.dart';
 import '../../repo/school_repo/edit_exam_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class UpdateSchoolAdminMarkSheetViewModel with ChangeNotifier {
@@ -17,6 +19,16 @@ class UpdateSchoolAdminMarkSheetViewModel with ChangeNotifier {
       dynamic grade,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.generateMarksheet)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

@@ -10,6 +10,9 @@ import 'package:school_pro/view_model/school_view_model/transport_fee/update_rou
 
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 // ─── Screen ──────────────────────────────────────────────────────────────────
 
@@ -161,8 +164,40 @@ class _RouteScreenState extends State<RouteScreen> {
                   const SizedBox(height: 12),
                   itemBuilder: (_, i) => _RouteCard(
                     route: routes[i],
-                    onEdit: () => _openSheet(existing: routes[i]),
-                    onDelete: () => _confirmDelete(routes[i]),
+                    onEdit: () {
+
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageTransport)) {
+
+                        Utils.show(
+                          "You don't have permission to perform this action.",
+                          context,
+                        );
+
+                        return;
+                      }
+
+                      _openSheet(
+                        existing: routes[i],
+                      );
+                    },
+                    onDelete: () {
+
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageTransport)) {
+
+                        Utils.show(
+                          "You don't have permission to perform this action.",
+                          context,
+                        );
+
+                        return;
+                      }
+
+                      _confirmDelete(
+                        routes[i],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -171,7 +206,21 @@ class _RouteScreenState extends State<RouteScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openSheet(),
+        onPressed: () {
+
+          if (!PermissionExtensions.canAccess(
+              PermissionKeys.manageTransport)) {
+
+            Utils.show(
+              "You don't have permission to perform this action.",
+              context,
+            );
+
+            return;
+          }
+
+          _openSheet();
+        },
         backgroundColor: const Color(0xFF3F72FF),
         elevation: 6,
         icon: const Icon(Icons.add_rounded, color: Colors.white),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/view_model/school_view_model/fees_head_management_view_model.dart';
 import '../../repo/school_repo/create_fees_head_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 import 'fees_management_view_model.dart';
 
@@ -21,6 +23,15 @@ class CreateFeesHeadViewModel with ChangeNotifier {
 
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+      PermissionKeys.manageFees,
+    )) {
+      Utils.show(
+        "You don't have permission to perform this action.",
+        context,
+      );
+      return false;
+    }
     setLoading(true);
 
     Map data = {

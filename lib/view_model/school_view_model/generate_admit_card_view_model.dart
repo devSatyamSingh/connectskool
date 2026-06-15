@@ -32,8 +32,12 @@
 //   }
 // }
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import '../../model/school_model/generate_admit_card_model.dart';
 import '../../repo/school_repo/generate_admit_card_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class GenerateAdmitCardViewModel with ChangeNotifier {
 
@@ -47,8 +51,19 @@ class GenerateAdmitCardViewModel with ChangeNotifier {
       int examId,
       int classId,
       int sectionId,
-      int studentId
+      int studentId,
+      BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.generateAdmitCard)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return;
+    }
 
     loading = true;
     notifyListeners();

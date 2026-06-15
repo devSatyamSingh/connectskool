@@ -14,6 +14,14 @@ class AccountantProfileViewModel with ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
 
+  bool _permissionDenied = false;
+  bool get permissionDenied => _permissionDenied;
+
+  void setPermissionDenied(bool value) {
+    _permissionDenied = value;
+    notifyListeners();
+  }
+
   AccountantProfileModel? _accountantProfileModel;
   AccountantProfileModel? get accountantProfileModel => _accountantProfileModel;
 
@@ -27,17 +35,28 @@ class AccountantProfileViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> accountantProfileApi(BuildContext context) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.viewAccountants)) {
+  // [showMessage] = false (default) -> dashboard jaise auto-load screens se
+  // call hone par koi toast NAHI dikhega, sirf permissionDenied flag set hoga.
+  //
+  // [showMessage] = true -> explicit user action (e.g. "View Profile" button)
+  // par hi toast dikhana hai.
+  Future<void> accountantProfileApi(
+      BuildContext context, {
+        bool showMessage = false,
+      }) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.viewAccountants)) {
+      setPermissionDenied(true);
 
-      Utils.show(
-        "You don't have permission to view accountant profile",
-        context,
-      );
+      if (showMessage) {
+        Utils.show(
+          "You don't have permission to view accountant profile",
+          context,
+        );
+      }
 
       return;
     }
+
     setLoading(true);
 
     try {
@@ -50,8 +69,7 @@ class AccountantProfileViewModel with ChangeNotifier {
         return;
       }
 
-      final Map<String, dynamic> json =
-      Map<String, dynamic>.from(response);
+      final Map<String, dynamic> json = Map<String, dynamic>.from(response);
 
       debugPrint("✅ Parsed JSON: $json");
 

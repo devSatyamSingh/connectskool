@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../model/school_model/time_table_model.dart';
 import '../../repo/school_repo/exam_timetable_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class TimeTableViewModel extends ChangeNotifier {
   final _repo = TimetableRepository();
@@ -19,6 +22,16 @@ class TimeTableViewModel extends ChangeNotifier {
     required int sectionId,
     required BuildContext context,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewExamTimetable)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return;
+    }
     _loading = true;
     _error = null;
     notifyListeners();

@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:school_pro/model/school_model/school_admin_marksheet_model.dart';
 import '../../repo/school_repo/get_school_admin_marksheet_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class GetCoScholasticViewModel with ChangeNotifier {
 
@@ -18,6 +21,16 @@ class GetCoScholasticViewModel with ChangeNotifier {
       String academicYear,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewMarks)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return;
+    }
     setLoading(true);
 
     try {

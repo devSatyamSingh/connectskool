@@ -4,6 +4,9 @@ import 'package:school_pro/model/school_model/all_student_list_model.dart';
 import 'package:school_pro/repo/school_repo/all_student_list_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class AllStudentListVieModel extends ChangeNotifier {
   final _allStudentListRepo = AllStudentListRepository();
 
@@ -24,11 +27,26 @@ class AllStudentListVieModel extends ChangeNotifier {
   }
 
   // 🔥 API CALL (POSTMAN STATUS CODE HANDLING)
+  //
+  // [showMessage] = false (default) -> dashboard jaise auto-load screens se
+  // call hone par "Access denied" toast NAHI dikhega.
+  //
+  // [showMessage] = true -> explicit user action (e.g. "All Students" screen
+  // open karne par) par hi toast dikhana hai.
   Future<void> allStudentListApi(
-    BuildContext context, {
-    String? classId,
-    String? sectionId,
-  }) async {
+      BuildContext context, {
+        String? classId,
+        String? sectionId,
+        bool showMessage = false,
+      }) async {
+    // ✅ Pattern C - ViewModel level permission guard
+    if (!PermissionExtensions.canAccess(PermissionKeys.viewAllStudent)) {
+      if (showMessage) {
+        Utils.show("You don't have permission to view all student", context);
+      }
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -53,7 +71,9 @@ class AllStudentListVieModel extends ChangeNotifier {
           break;
 
         case 403:
-          Utils.show("Access denied", context);
+          if (showMessage) {
+            Utils.show("Access denied", context);
+          }
           break;
 
         case 404:
@@ -73,7 +93,9 @@ class AllStudentListVieModel extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint("Student List Error => $e");
-      Utils.show("Failed to load students", context);
+      if (showMessage) {
+        Utils.show("Failed to load students", context);
+      }
     } finally {
       setLoading(false);
     }

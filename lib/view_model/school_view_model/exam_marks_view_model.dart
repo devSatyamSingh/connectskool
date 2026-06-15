@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../model/school_model/exam_marks_model.dart';
 import '../../repo/school_repo/exaam_marks_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 
 class ExamMarksViewModel extends ChangeNotifier {
   final ExamMarksRepository _repo = ExamMarksRepository();
@@ -22,6 +25,14 @@ class ExamMarksViewModel extends ChangeNotifier {
     List<Map<String, dynamic>>? students, // ← required se optional karo
     required BuildContext context,
   }) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewMarks)) {
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+      return;
+    }
     _loading = true;
     _examMarksModel = null;
     notifyListeners();

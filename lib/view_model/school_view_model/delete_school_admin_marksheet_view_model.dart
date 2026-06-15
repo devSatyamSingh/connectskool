@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:school_pro/repo/school_repo/delete_fees_head_view_model.dart';
 import 'package:school_pro/repo/school_repo/delete_school_admin_result_repo.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
+
 class DeleteSchoolAdminMarkSheetViewModel with ChangeNotifier {
   final _repo = DeleteSChoolAdminMarkSheetRepository();
 
@@ -13,7 +17,17 @@ class DeleteSchoolAdminMarkSheetViewModel with ChangeNotifier {
     _loading = value;
     notifyListeners();
   }
-  Future<bool> deleteSchoolAdminMarkSheetApi(dynamic gradeId) async {
+  Future<bool> deleteSchoolAdminMarkSheetApi(dynamic gradeId, BuildContext context,) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.generateMarksheet)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     try {

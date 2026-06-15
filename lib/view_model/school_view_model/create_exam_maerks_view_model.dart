@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/create_exam_marks_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class CreateExamMarksViewModel with ChangeNotifier {
@@ -22,6 +24,16 @@ class CreateExamMarksViewModel with ChangeNotifier {
       dynamic remarks,
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.assignMarks)) {
+
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

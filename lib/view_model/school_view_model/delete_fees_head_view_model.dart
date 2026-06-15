@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/repo/school_repo/delete_fees_head_view_model.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
+
 class DeleteFeesHeadViewModel with ChangeNotifier {
   final _repo = DeleteFeesHeadRepository();
 
@@ -12,7 +16,16 @@ class DeleteFeesHeadViewModel with ChangeNotifier {
     _loading = value;
     notifyListeners();
   }
-  Future<bool> deleteFeesHeadApi(dynamic feeHeadId) async {
+  Future<bool> deleteFeesHeadApi(dynamic feeHeadId, BuildContext context,) async {
+    if (!PermissionExtensions.canAccess(
+      PermissionKeys.manageFees,
+    )) {
+      Utils.show(
+        "You don't have permission to perform this action.",
+        context,
+      );
+      return false;
+    }
     setLoading(true);
 
     try {

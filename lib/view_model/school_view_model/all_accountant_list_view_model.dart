@@ -8,6 +8,9 @@ import 'package:school_pro/repo/school_repo/all_student_list_repo.dart';
 import 'package:school_pro/repo/school_repo/all_teachers_list_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+
 class AllAccountantListVieModel extends ChangeNotifier {
   final _allStudentListRepo = AllAccountantListRepository();
 
@@ -28,7 +31,23 @@ class AllAccountantListVieModel extends ChangeNotifier {
   }
 
   // 🔥 API CALL (POSTMAN STATUS CODE HANDLING)
-  Future<void> allAccountantListApi(BuildContext context) async {
+  //
+  // [showMessage] = false (default) -> dashboard jaise auto-load screens se
+  // call hone par "Access denied" toast NAHI dikhega.
+  //
+  // [showMessage] = true -> explicit user action (e.g. "All Accountants"
+  // screen open karne par) par hi toast dikhana hai.
+  Future<void> allAccountantListApi(
+      BuildContext context, {
+        bool showMessage = false,
+      }) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.viewAccountants)) {
+      if (showMessage) {
+        Utils.show("Access denied", context);
+      }
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -55,7 +74,9 @@ class AllAccountantListVieModel extends ChangeNotifier {
           break;
 
         case 403:
-          Utils.show("Access denied", context);
+          if (showMessage) {
+            Utils.show("Access denied", context);
+          }
           break;
 
         case 404:
@@ -75,7 +96,9 @@ class AllAccountantListVieModel extends ChangeNotifier {
       }
     } catch (e) {
       print("❌ Exception fetching teachers: $e");
-      Utils.show("Failed to load teachers", context);
+      if (showMessage) {
+        Utils.show("Failed to load teachers", context);
+      }
     } finally {
       setLoading(false);
     }

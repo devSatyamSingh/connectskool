@@ -6,6 +6,8 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/utils/utils.dart';
 import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
 import '../repo/school_repo/all_sections_repo.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/all_classes_view_model.dart';
 import '../view_model/school_view_model/Exam_management_view_model.dart';
 import '../view_model/school_view_model/generate_admit_card_view_model.dart';
@@ -460,6 +462,16 @@ class _AdmitCardTabState extends State<_AdmitCardTab>
       String sectionId,
       String studentId,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.generateAdmitCard)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return;
+    }
     final vm =
     Provider.of<GenerateAdmitCardViewModel>(context, listen: false);
     await vm.getAdmitCard(
@@ -467,6 +479,7 @@ class _AdmitCardTabState extends State<_AdmitCardTab>
       int.parse(classId),
       int.parse(sectionId),
       int.parse(studentId),
+      context
     );
     if (!mounted) return;
 
@@ -740,6 +753,16 @@ class _IdCardTabState extends State<_IdCardTab>
       String sectionId,
       String studentId,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.generateAdmitCard)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return;
+    }
     final vm =
     Provider.of<GenerateAdmitCardViewModel>(context, listen: false);
     await vm.getAdmitCard(
@@ -747,6 +770,7 @@ class _IdCardTabState extends State<_IdCardTab>
       int.parse(classId),
       int.parse(sectionId),
       int.parse(studentId),
+      context
     );
     if (!mounted) return;
 

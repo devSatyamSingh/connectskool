@@ -264,6 +264,7 @@ class _TeacherManagementDashBoardScreenState
               accountantTotal,
               teacherTotal,
             ),
+            SizedBox(height: 7,),
             Expanded(child: _buildGrid(context)),
             // _buildBottomNav(),
           ],

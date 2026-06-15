@@ -5,6 +5,8 @@ import 'package:school_pro/repo/school_repo/edit_subject_repo.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/discontinue_student_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.dart';
 
+import '../../../utils/permission_extensions.dart';
+import '../../../utils/permission_keys.dart';
 import '../../../utils/utils.dart';
 
 class DiscontinueStudentViewModel with ChangeNotifier {
@@ -17,20 +19,24 @@ class DiscontinueStudentViewModel with ChangeNotifier {
   }
 
   Future<bool> discontinueStudentApi(
-      dynamic studentId,
-      dynamic academicYear,
-      dynamic discontinuedOn,
-      dynamic discontinueReason,
-      context,
-      ) async {
+    dynamic studentId,
+    dynamic academicYear,
+    dynamic discontinuedOn,
+    dynamic discontinueReason,
+    context,
+  ) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.manageTransport)) {
+      Utils.show("You don't have permission to perform this action.", context);
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {
-      "student_id":studentId,
+      "student_id": studentId,
       "academic_year": academicYear,
       "discontinued_on": discontinuedOn,
       "discontinue_reason": discontinueReason,
-
     };
 
     try {
@@ -48,8 +54,6 @@ class DiscontinueStudentViewModel with ChangeNotifier {
           context,
           listen: false,
         ).allSubjectsApi(context);
-
-
 
         return true;
       } else if (statusCode == 400) {

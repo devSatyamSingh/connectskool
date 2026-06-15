@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/view_model/school_view_model/school_admin_profile_view_model.dart';
 import '../../res/app_color.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
+import '../../utils/utils.dart';
 import '../../view_model/school_view_model/academic_view_model.dart';
 import '../../view_model/school_view_model/all_classes_view_model.dart';
 import '../../view_model/school_view_model/all_scetions_view_model.dart';
@@ -225,6 +228,15 @@ class _MarksheetScreenState extends State<MarksheetScreen>
   }
 
   Future<void> _fetchMarksheet() async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.viewMarks)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+      return;
+    }
     if (_selectedStudent == null) return;
 
     setState(() => _selectedTerm = '');
@@ -1379,7 +1391,7 @@ class _MarksheetScreenState extends State<MarksheetScreen>
               bool ok = true;
 
               if (s.id != null) {
-                ok = await vm.deleteSchoolAdminMarkSheetApi(s.id);
+                ok = await vm.deleteSchoolAdminMarkSheetApi(s.id, context);
               }
 
               if (ok && mounted) {
@@ -1485,79 +1497,6 @@ class _MarksheetScreenState extends State<MarksheetScreen>
   // ─────────────────────────────────────────────────────────────────────────────
 
   @override
-  // Widget build(BuildContext context) {
-  //   final adminProfile = Provider.of<SchoolAdminProfileViewModel>(context).schoolAdminProfileModel;
-  //   return Scaffold(
-  //     backgroundColor: _bg,
-  //     floatingActionButton: _selectedStudent == null
-  //         ? null
-  //         : Column(
-  //       mainAxisSize: MainAxisSize.min,
-  //       children: [
-  //         // ── GENERATE PDF button ─────────────────────────────────────
-  //         FloatingActionButton.extended(
-  //           heroTag: 'pdf_btn',
-  //           onPressed: _generatePdf,
-  //           backgroundColor: const Color(0xFFC8922A),   // gold
-  //           icon: const Icon(Icons.picture_as_pdf_rounded, color: Colors.white),
-  //           label: const Text(
-  //             'Generate PDF',
-  //             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-  //           ),
-  //         ),
-  //         const SizedBox(height: 10),
-  //         // ── ADD MARKS button ────────────────────────────────────────
-  //         FloatingActionButton.extended(
-  //           heroTag: 'add_btn',
-  //           onPressed: () => _openMarkSheet(),
-  //           backgroundColor: const Color(0xFF0D2B55),   // navy
-  //           icon: const Icon(Icons.add_rounded, color: Colors.white),
-  //           label: const Text(
-  //             'Add Marks',
-  //             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //     // floatingActionButton: _selectedStudent == null
-  //     //     ? null
-  //     //     : FloatingActionButton.extended(
-  //       onPressed: () => _openMarkSheet(),
-  //       backgroundColor: _navy,
-  //       icon: const Icon(Icons.add_rounded, color: Colors.white),
-  //       label: const Text('Add Marks',
-  //           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-  //     ),
-  //     body: FadeTransition(
-  //       opacity: _fadeAnim,
-  //       child: Column(children: [
-  //         _buildHeader(context),
-  //         Expanded(
-  //           child: SingleChildScrollView(
-  //             padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-  //             child: Column(children: [
-  //
-  //               // ── FILTER CARD ───────────────────────────────────────────────
-  //               _buildFilterCard(),
-  //               const SizedBox(height: 14),
-  //
-  //               // ── Only show rest when student is selected ───────────────────
-  //               if (_selectedStudent != null) ...[
-  //                 _buildStudentCard(),
-  //                 const SizedBox(height: 14),
-  //                 _buildTermSelector(),
-  //                 const SizedBox(height: 14),
-  //                 _buildMarksTable(),
-  //               ] else
-  //                 _buildEmptyState(),
-  //             ]),
-  //           ),
-  //         ),
-  //       ]),
-  //     ),
-  //   );
-  // }
-  @override
   Widget build(BuildContext context) {
     final adminProfile = Provider.of<SchoolAdminProfileViewModel>(
       context,
@@ -1572,8 +1511,20 @@ class _MarksheetScreenState extends State<MarksheetScreen>
                 // ── GENERATE PDF button ───────────────────────────────────
                 FloatingActionButton.extended(
                   heroTag: 'pdf_btn',
-                  onPressed: _generatePdf,
-                  backgroundColor: const Color(0xFFC8922A), // gold
+                  onPressed: () {
+
+                    if (!PermissionExtensions.canAccess(
+                        PermissionKeys.generateMarksheet)) {
+
+                      Utils.show(
+                        "You don't have permission to perform this action",
+                        context,
+                      );
+                      return;
+                    }
+
+                    _generatePdf();
+                  },                  backgroundColor: const Color(0xFFC8922A), // gold
                   icon: const Icon(
                     Icons.picture_as_pdf_rounded,
                     color: Colors.white,
@@ -1590,8 +1541,20 @@ class _MarksheetScreenState extends State<MarksheetScreen>
                 // ── ADD MARKS button ──────────────────────────────────────
                 FloatingActionButton.extended(
                   heroTag: 'add_btn',
-                  onPressed: () => _openMarkSheet(),
-                  backgroundColor: _navy, // navy
+                  onPressed: () {
+
+                    if (!PermissionExtensions.canAccess(
+                        PermissionKeys.generateMarksheet)) {
+
+                      Utils.show(
+                        "You don't have permission to perform this action",
+                        context,
+                      );
+                      return;
+                    }
+
+                    _openMarkSheet();
+                  },                  backgroundColor: _navy, // navy
                   icon: const Icon(Icons.add_rounded, color: Colors.white),
                   label: const Text(
                     'Add Marks',
@@ -2521,8 +2484,20 @@ class _MarksheetScreenState extends State<MarksheetScreen>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             GestureDetector(
-                              onTap: () => _openMarkSheet(existing: sm),
-                              child: Container(
+                              onTap: () {
+
+                                if (!PermissionExtensions.canAccess(
+                                    PermissionKeys.generateMarksheet)) {
+
+                                  Utils.show(
+                                    "You don't have permission to perform this action",
+                                    context,
+                                  );
+                                  return;
+                                }
+
+                                _openMarkSheet(existing: sm);
+                              },                              child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
                                   color: Colors.blue.shade50,
@@ -2537,8 +2512,20 @@ class _MarksheetScreenState extends State<MarksheetScreen>
                             ),
                             const SizedBox(width: 6),
                             GestureDetector(
-                              onTap: () => _confirmDelete(sm, i),
-                              child: Container(
+                              onTap: () {
+
+                                if (!PermissionExtensions.canAccess(
+                                    PermissionKeys.generateMarksheet)) {
+
+                                  Utils.show(
+                                    "You don't have permission to perform this action",
+                                    context,
+                                  );
+                                  return;
+                                }
+
+                                _confirmDelete(sm, i);
+                              },                              child: Container(
                                 padding: const EdgeInsets.all(6),
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade50,

@@ -13,6 +13,8 @@ import 'package:school_pro/view_model/school_view_model/transport_fee/create_sto
 
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../view_model/school_view_model/transport_fee/delete_stop_view_model.dart';
 import '../../view_model/school_view_model/transport_fee/update_stop_view_model.dart';
 
@@ -256,13 +258,40 @@ class _StopScreenState extends State<StopScreen> {
                     stop: stops[i],
                     freqLabel: _freqLabel(
                         stops[i].feeFrequency),
-                    onEdit: () => _openSheet(
-                      existing: stops[i],
-                      routes: routes,
-                      feeHeads: feeHeads,
-                    ),
-                    onDelete: () =>
-                        _confirmDelete(stops[i]),
+                    onEdit: () {
+
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageTransport)) {
+
+                        Utils.show(
+                          "You don't have permission to edit stops.",
+                          context,
+                        );
+
+                        return;
+                      }
+
+                      _openSheet(
+                        existing: stops[i],
+                        routes: routes,
+                        feeHeads: feeHeads,
+                      );
+                    },
+                    onDelete: () {
+
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageTransport)) {
+
+                        Utils.show(
+                          "You don't have permission to delete stops.",
+                          context,
+                        );
+
+                        return;
+                      }
+
+                      _confirmDelete(stops[i]);
+                    },
                   ),
                 ),
               ),
@@ -280,8 +309,24 @@ class _StopScreenState extends State<StopScreen> {
               feeHeadVm.feesHeadManagementModel?.data?.feeHeads ?? [];
 
           return FloatingActionButton.extended(
-            onPressed: () =>
-                _openSheet(routes: routes, feeHeads: feeHeads),
+            onPressed: () {
+
+              if (!PermissionExtensions.canAccess(
+                  PermissionKeys.manageTransport)) {
+
+                Utils.show(
+                  "You don't have permission to add stops.",
+                  context,
+                );
+
+                return;
+              }
+
+              _openSheet(
+                routes: routes,
+                feeHeads: feeHeads,
+              );
+            },
             backgroundColor: const Color(0xFF3F72FF),
             elevation: 6,
             icon: const Icon(Icons.add_rounded, color: Colors.white),

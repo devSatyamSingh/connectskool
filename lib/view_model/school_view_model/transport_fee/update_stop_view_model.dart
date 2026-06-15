@@ -5,6 +5,8 @@ import 'package:school_pro/repo/school_repo/transport_repo/update_route_repo.dar
 import 'package:school_pro/repo/school_repo/transport_repo/update_stop_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 
+import '../../../utils/permission_extensions.dart';
+import '../../../utils/permission_keys.dart';
 import '../../../utils/utils.dart';
 
 class UpdateStopViewModel with ChangeNotifier {
@@ -23,6 +25,16 @@ class UpdateStopViewModel with ChangeNotifier {
       dynamic feeFrequency,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTransport)) {
+
+      Utils.show(
+        "You don't have permission to perform this action.",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

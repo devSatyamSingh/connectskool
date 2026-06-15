@@ -10,6 +10,9 @@ import 'package:school_pro/view_model/school_view_model/create_time_table_view_m
 import 'package:school_pro/view_model/school_view_model/delete_exam_time_table_view_model.dart';
 import 'package:shimmer/shimmer.dart';
 import '../model/school_model/get_school_exam_time_table_model.dart';
+import '../utils/permission_error_message.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
 import '../view_model/school_view_model/academic_view_model.dart';
 import '../view_model/school_view_model/all_classes_view_model.dart';
@@ -30,6 +33,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
   late AnimationController _animController;
   late TabController _tabController;
   final _ttExamDateCtrl = TextEditingController();
+
 
   // ── Exam form controllers ──
   final _examNameCtrl = TextEditingController();
@@ -74,30 +78,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
   String? _selectedTeacherId;
   String? _selectedSubjectId;
 
-  @override
-  // void initState() {
-  //   super.initState();
-  //
-  //   _tabController = TabController(length: 2, vsync: this);
-  //   _animController = AnimationController(
-  //     vsync: this,
-  //     duration: const Duration(milliseconds: 900),
-  //   )..forward();
-  //
-  //   _tabController.addListener(() {
-  //     if (_tabController.indexIsChanging) {
-  //       _animController.reset();
-  //       _animController.forward();
-  //     }
-  //   });
-  //
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     Provider.of<AllClassesViewModel>(context, listen: false)
-  //         .allClassesApi(context);
-  //     Provider.of<ExamManagementViewModel>(context, listen: false)
-  //         .examManagementApi(context);
-  //   });
-  // }
+
   @override
   void initState() {
     super.initState();
@@ -210,7 +191,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     return map[d] ?? const Color(0xFF607D8B);
   }
 
-  // ─── EXAM BOTTOM SHEET ───────────────────────
 
   void _showExamBottomSheet({dynamic exam}) {
     final isEdit = exam != null;
@@ -421,7 +401,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ─── DELETE EXAM DIALOG ───────────────────────
 
   void _showDeleteExamDialog(dynamic exam) {
     showDialog(
@@ -1152,16 +1131,48 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
       backgroundColor: AppColor.pageBgColor,
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColor.lightBlueColor,
-        onPressed: () => _tabController.index == 0
-            ? _showExamBottomSheet()
-            : _showTimetableBottomSheet(),
-        icon: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+
+          if (_tabController.index == 0) {
+
+            if (!PermissionGuard.check(
+              context,
+              PermissionKeys.createExam,
+              "Create Exam",
+            )) {
+              return;
+            }
+
+            _showExamBottomSheet();
+
+          } else {
+
+            // Add Timetable
+            if (!PermissionGuard.check(
+              context,
+              PermissionKeys.createExamTimetable,
+              "Create Exam Timetable",
+            )) {
+              return;
+            }
+
+            _showTimetableBottomSheet();
+          }
+        },
+        icon: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
         label: AnimatedBuilder(
           animation: _tabController,
           builder: (_, __) => Text(
-            _tabController.index == 0 ? 'Add Exam' : 'Add Timetable',
+            _tabController.index == 0
+                ? 'Add Exam'
+                : 'Add Timetable',
             style: const TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -1403,15 +1414,46 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                       borderRadius: BorderRadius.circular(12)),
                   itemBuilder: (_) => [
                     PopupMenuItem(
-                      onTap: () => Future.delayed(Duration.zero,
-                              () => _showExamBottomSheet(exam: exam)),
+                      onTap: () => Future.delayed(
+                        Duration.zero,
+                            () {
+
+                          if (!PermissionExtensions.canAccess(
+                              PermissionKeys.editExam)) {
+
+                            Utils.show(
+                              "You don't have permission to perform this action",
+                              context,
+                            );
+
+                            return;
+                          }
+
+                          _showExamBottomSheet(exam: exam);
+                        },
+                      ),
                       child: _menuRow(Icons.edit, 'Edit', Colors.blue),
                     ),
                     PopupMenuItem(
-                      onTap: () => Future.delayed(Duration.zero,
-                              () => _showDeleteExamDialog(exam)),
-                      child:
-                      _menuRow(Icons.delete, 'Delete', Colors.red),
+                      onTap: () => Future.delayed(
+                        Duration.zero,
+                            () {
+
+                          if (!PermissionExtensions.canAccess(
+                              PermissionKeys.deleteExam)) {
+
+                            Utils.show(
+                              "You don't have permission to perform this action",
+                              context,
+                            );
+
+                            return;
+                          }
+
+                          _showDeleteExamDialog(exam);
+                        },
+                      ),
+                      child: _menuRow(Icons.delete, 'Delete', Colors.red),
                     ),
                   ],
                 ),

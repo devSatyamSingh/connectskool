@@ -14,6 +14,9 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/res/app_button.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+
 class FeesManagementScreen extends StatefulWidget {
   const FeesManagementScreen({super.key});
 
@@ -31,10 +34,14 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<FeesManagementViewModel>(context, listen: false)
-          .feesManagementApi(context);
-      Provider.of<AllClassesViewModel>(context, listen: false)
-          .allClassesApi(context);
+      Provider.of<FeesManagementViewModel>(
+        context,
+        listen: false,
+      ).feesManagementApi(context);
+      Provider.of<AllClassesViewModel>(
+        context,
+        listen: false,
+      ).allClassesApi(context);
     });
 
     _animationController = AnimationController(
@@ -57,12 +64,19 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
         builder: (context, viewModel, child) {
           final allFees = viewModel.feesManagementModel?.data?.fees ?? [];
 
-          final totalFees      = allFees.length;
-          final monthlyCount   = allFees.where((f) => f.feeFrequency?.toLowerCase() == 'monthly').length;
-          final yearlyCount    = allFees.where((f) => f.feeFrequency?.toLowerCase() == 'yearly').length;
-          final oneTimeCount   = allFees.where((f) => f.feeFrequency?.toLowerCase() == 'one_time').length;
-          final totalAmount    = allFees.fold<double>(
-            0, (sum, f) => sum + (double.tryParse(f.totalAmount ?? '0') ?? 0),
+          final totalFees = allFees.length;
+          final monthlyCount = allFees
+              .where((f) => f.feeFrequency?.toLowerCase() == 'monthly')
+              .length;
+          final yearlyCount = allFees
+              .where((f) => f.feeFrequency?.toLowerCase() == 'yearly')
+              .length;
+          final oneTimeCount = allFees
+              .where((f) => f.feeFrequency?.toLowerCase() == 'one_time')
+              .length;
+          final totalAmount = allFees.fold<double>(
+            0,
+            (sum, f) => sum + (double.tryParse(f.totalAmount ?? '0') ?? 0),
           );
 
           return Column(
@@ -72,8 +86,16 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                 padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
                 decoration: BoxDecoration(
                   gradient: AppColor.primaryGradient,
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
-                  boxShadow: [BoxShadow(color: AppColor.blueShadow, blurRadius: 18, offset: const Offset(0, 10))],
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(28),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColor.blueShadow,
+                      blurRadius: 18,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
@@ -83,18 +105,41 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                           onTap: () => Navigator.pop(context),
                           child: Container(
                             padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(color: AppColor.glassWhite, shape: BoxShape.circle),
-                            child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                            decoration: BoxDecoration(
+                              color: AppColor.glassWhite,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Colors.white,
+                              size: 18,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: AppText.customText('Fee Management', size: 19, weight: FontWeight.bold, color: Colors.white),
+                          child: AppText.customText(
+                            'Fee Management',
+                            size: 19,
+                            weight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(color: AppColor.glassWhite, borderRadius: BorderRadius.circular(20)),
-                          child: AppText.customText(totalFees.toString(), size: 16, weight: FontWeight.bold, color: Colors.white),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColor.glassWhite,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: AppText.customText(
+                            totalFees.toString(),
+                            size: 16,
+                            weight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ],
                     ),
@@ -103,11 +148,32 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                     // Stats Row
                     Row(
                       children: [
-                        Expanded(child: _buildStatCard('Monthly',   monthlyCount.toString(),  Icons.calendar_month, Colors.blue.shade100)),
+                        Expanded(
+                          child: _buildStatCard(
+                            'Monthly',
+                            monthlyCount.toString(),
+                            Icons.calendar_month,
+                            Colors.blue.shade100,
+                          ),
+                        ),
                         const SizedBox(width: 8),
-                        Expanded(child: _buildStatCard('Yearly',    yearlyCount.toString(),   Icons.calendar_today, Colors.green.shade100)),
+                        Expanded(
+                          child: _buildStatCard(
+                            'Yearly',
+                            yearlyCount.toString(),
+                            Icons.calendar_today,
+                            Colors.green.shade100,
+                          ),
+                        ),
                         const SizedBox(width: 8),
-                        Expanded(child: _buildStatCard('One Time',  oneTimeCount.toString(),  Icons.payment,        Colors.orange.shade100)),
+                        Expanded(
+                          child: _buildStatCard(
+                            'One Time',
+                            oneTimeCount.toString(),
+                            Icons.payment,
+                            Colors.orange.shade100,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -121,14 +187,19 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                   physics: const BouncingScrollPhysics(),
                   child: Column(
                     children: [
-
                       // ── Total Amount card ──────────────────────────────
                       Container(
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: AppColor.cardWhite,
                           borderRadius: BorderRadius.circular(16),
-                          boxShadow: [BoxShadow(color: AppColor.cardShadow, blurRadius: 8, offset: const Offset(0, 4))],
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColor.cardShadow,
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
                         child: Row(
                           children: [
@@ -138,17 +209,27 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                                 color: AppColor.lightBlueColor.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Icon(Icons.account_balance_wallet, color: AppColor.lightBlueColor, size: 24),
+                              child: Icon(
+                                Icons.account_balance_wallet,
+                                color: AppColor.lightBlueColor,
+                                size: 24,
+                              ),
                             ),
                             const SizedBox(width: 14),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                AppText.customText('Total Fee Structure Amount', size: 12, color: AppColor.softGreyText),
+                                AppText.customText(
+                                  'Total Fee Structure Amount',
+                                  size: 12,
+                                  color: AppColor.softGreyText,
+                                ),
                                 const SizedBox(height: 4),
                                 AppText.customText(
                                   '₹${totalAmount.toStringAsFixed(2)}',
-                                  size: 20, weight: FontWeight.bold, color: AppColor.lightBlueColor,
+                                  size: 20,
+                                  weight: FontWeight.bold,
+                                  color: AppColor.lightBlueColor,
                                 ),
                               ],
                             ),
@@ -166,9 +247,24 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                         subtitle: 'Create & manage fee categories',
                         btnLabel: 'Open',
                         btnColor: AppColor.lightBlueColor,
-                        onTap: () => Navigator.pushNamed(context, RoutesName.feesHeadManagementScreen),
+                        onTap: () {
+                          if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageFees,
+                          )) {
+                            Utils.show(
+                              "You don't have permission to perform this action.",
+                              context,
+                            );
+                            return;
+                          }
+
+                          Navigator.pushNamed(
+                            context,
+                            RoutesName.feesHeadManagementScreen,
+                          );
+                        },
                       ),
-                       SizedBox(height: 10),
+                      SizedBox(height: 10),
                       _menuCard(
                         icon: Icons.category,
                         iconBg: Colors.blue.shade50,
@@ -177,10 +273,25 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                         subtitle: 'Create & manage Fine Rules',
                         btnLabel: 'Open',
                         btnColor: AppColor.success,
-                        onTap: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=>FineManagementScreen()));
-                        }
-                            // Navigator.pushNamed(context, RoutesName.fine),
+                        onTap: () {
+                          if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageFees,
+                          )) {
+                            Utils.show(
+                              "You don't have permission to perform this action.",
+                              context,
+                            );
+                            return;
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => FineManagementScreen(),
+                            ),
+                          );
+                        },
+                        // Navigator.pushNamed(context, RoutesName.fine),
                       ),
                       const SizedBox(height: 10),
                       // ── Fee Structure ──────────────────────────────────
@@ -192,7 +303,23 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                         subtitle: 'Create & manage fee structures',
                         btnLabel: 'Add',
                         btnColor: Colors.green.shade600,
-                        onTap: () => Navigator.pushNamed(context, RoutesName.adminViewFeesStructureScreen),
+                        onTap: () {
+                          if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageFees,
+                          )) {
+                            Utils.show(
+                              "You don't have permission to perform this action.",
+                              context,
+                            );
+                            return;
+                          }
+
+                          Navigator.pushNamed(
+                            context,
+                            RoutesName.adminViewFeesStructureScreen,
+                          );
+                        },
+                        // onTap: () => Navigator.pushNamed(context, RoutesName.adminViewFeesStructureScreen),
                       ),
                       const SizedBox(height: 10),
 
@@ -205,7 +332,22 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                         subtitle: 'Record & collect student payments',
                         btnLabel: 'Collect',
                         btnColor: Colors.purple.shade600,
-                        onTap: () => Navigator.pushNamed(context, RoutesName.schoolCollectFeesScreen),
+                        onTap: () {
+                          if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageFees,
+                          )) {
+                            Utils.show(
+                              "You don't have permission to perform this action.",
+                              context,
+                            );
+                            return;
+                          }
+
+                          Navigator.pushNamed(
+                            context,
+                            RoutesName.schoolCollectFeesScreen,
+                          );
+                        },
                       ),
                       const SizedBox(height: 10),
 
@@ -219,22 +361,26 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                         subtitle: 'Browse all existing fee structures',
                         btnLabel: 'View',
                         btnColor: Colors.orange.shade700,
-                        onTap: () => Navigator.pushNamed(
-                          context,
-                          RoutesName.adminViewFeesStructureScreen,
-                          arguments: {'initialTab': 1}, // ✅ View All tab index
-                        ),
+                        onTap: () {
+                          if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageFees,
+                          )) {
+                            Utils.show(
+                              "You don't have permission to perform this action.",
+                              context,
+                            );
+                            return;
+                          }
+
+                          Navigator.pushNamed(
+                            context,
+                            RoutesName.adminViewFeesStructureScreen,
+                            arguments: {
+                              'initialTab': 1,
+                            },
+                          );
+                        },
                       ),
-                      // _menuCard(
-                      //   icon: Icons.list_alt_rounded,
-                      //   iconBg: Colors.orange.shade50,
-                      //   iconColor: Colors.orange.shade700,
-                      //   title: 'View Fee Structure',
-                      //   subtitle: 'Browse all existing fee structures',
-                      //   btnLabel: 'View',
-                      //   btnColor: Colors.orange.shade700,
-                      //   onTap: () => Navigator.pushNamed(context, RoutesName.adminViewFeesStructureScreen),
-                      // ),
                     ],
                   ),
                 ),
@@ -262,13 +408,22 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: AppColor.cardShadow, blurRadius: 8, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: AppColor.cardShadow,
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+              color: iconBg,
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Icon(icon, color: iconColor, size: 22),
           ),
           const SizedBox(width: 14),
@@ -278,7 +433,11 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
               children: [
                 AppText.customText(title, size: 15, weight: FontWeight.bold),
                 const SizedBox(height: 4),
-                AppText.customText(subtitle, size: 12, color: AppColor.softGreyText),
+                AppText.customText(
+                  subtitle,
+                  size: 12,
+                  color: AppColor.softGreyText,
+                ),
               ],
             ),
           ),
@@ -286,11 +445,20 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
             onPressed: onTap,
             style: ElevatedButton.styleFrom(
               backgroundColor: btnColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               elevation: 0,
             ),
-            child: Text(btnLabel, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+            child: Text(
+              btnLabel,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -298,15 +466,28 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
   }
 
   // ── Stat card ─────────────────────────────────────────────────────────────
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
         children: [
           Icon(icon, size: 18, color: Colors.blue.shade700),
           const SizedBox(height: 4),
-          AppText.customText(value, size: 16, weight: FontWeight.bold, color: Colors.blue.shade700),
+          AppText.customText(
+            value,
+            size: 16,
+            weight: FontWeight.bold,
+            color: Colors.blue.shade700,
+          ),
           AppText.customText(title, size: 10, color: Colors.blue.shade700),
         ],
       ),

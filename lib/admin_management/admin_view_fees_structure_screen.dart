@@ -1423,6 +1423,8 @@ import 'package:school_pro/view_model/school_view_model/fees_head_management_vie
 import 'package:school_pro/view_model/school_view_model/fees_management_view_model.dart';
 
 import '../model/school_model/academic_model.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/academic_view_model.dart';
 
 class _Installment {
@@ -2244,7 +2246,21 @@ class _AdminViewFeesStructureScreenState
                   width: double.infinity,
                   height: 52,
                   child: ElevatedButton.icon(
-                    onPressed: vm.loading ? null : _submit,
+                    onPressed: vm.loading
+                        ? null
+                        : () {
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageFees)) {
+                        Utils.show(
+                          "Permission denied",
+                          context,
+                        );
+
+                        return;
+                      }
+
+                      _submit();
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColor.lightBlueColor,
                       disabledBackgroundColor: AppColor.lightBlueColor
@@ -2700,6 +2716,18 @@ class _AdminViewFeesStructureScreenState
                 ),
                 InkWell(
                   onTap: () {
+
+                    if (!PermissionExtensions.canAccess(
+                        PermissionKeys.manageFees)) {
+
+                      Utils.show(
+                        "Permission denied",
+                        context,
+                      );
+
+                      return;
+                    }
+
                     _showDeleteDialog(fee);
                   },
                   borderRadius: BorderRadius.circular(12),

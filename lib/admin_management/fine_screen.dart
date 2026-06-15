@@ -8,6 +8,8 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/res/app_button.dart';
 import 'package:school_pro/utils/utils.dart';
 
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/fees_head_management_view_model.dart';
 
 class FineManagementScreen extends StatefulWidget {
@@ -551,11 +553,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: AppText.customText(
-              "Cancel",
-              size: 14,
-              color: Colors.black,
-            ),
+            child: AppText.customText("Cancel", size: 14, color: Colors.black),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -572,7 +570,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text("Delete", style: TextStyle(color: Colors.white),),
+            child: const Text("Delete", style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -596,7 +594,17 @@ class _FineManagementScreenState extends State<FineManagementScreen>
       backgroundColor: AppColor.pageBgColor,
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColor.lightBlueColor,
-        onPressed: _openAddEditFineSheet,
+        onPressed: () {
+          if (!PermissionExtensions.canAccess(PermissionKeys.manageFees)) {
+            Utils.show(
+              "You don't have permission to perform this action.",
+              context,
+            );
+            return;
+          }
+
+          _openAddEditFineSheet();
+        },
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text(
           "Add Rule",
@@ -909,6 +917,15 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                           ),
 
                           onSelected: (value) {
+                            if (!PermissionExtensions.canAccess(
+                              PermissionKeys.manageFees,
+                            )) {
+                              Utils.show(
+                                "You don't have permission to perform this action.",
+                                context,
+                              );
+                              return;
+                            }
                             if (value == "edit") {
                               _openAddEditFineSheet(
                                 isEdit: true,
@@ -922,22 +939,16 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                 feeHeadId: feeHeadId,
                               );
                             }
-
                             if (value == "delete") {
-                              _confirmDelete(
-                                fineRuleId.toString(),
-                                ruleName,
-                              );
+                              _confirmDelete(fineRuleId.toString(), ruleName);
                             }
                           },
 
                           itemBuilder: (_) => [
-
                             PopupMenuItem(
                               value: "edit",
                               child: Row(
                                 children: [
-
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
@@ -967,7 +978,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                               value: "delete",
                               child: Row(
                                 children: [
-
                                   Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
@@ -994,7 +1004,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                             ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
 

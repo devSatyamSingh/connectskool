@@ -13,6 +13,8 @@ import 'package:school_pro/view_model/school_view_model/transport_fee/discontinu
 
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 import '../../view_model/school_view_model/academic_view_model.dart';
 import '../../view_model/school_view_model/all_classes_view_model.dart';
@@ -477,6 +479,18 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     onPressed: () {
+
+                                      if (!PermissionExtensions.canAccess(
+                                          PermissionKeys.manageTransport)) {
+
+                                        Utils.show(
+                                          "You don't have permission to perform this action.",
+                                          context,
+                                        );
+
+                                        return;
+                                      }
+
                                       _openDiscontinueDialog(
                                         studentId: data.studentId,
                                         studentName:
@@ -519,7 +533,21 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
       ),
 
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openAssignSheet,
+        onPressed: () {
+
+          if (!PermissionExtensions.canAccess(
+              PermissionKeys.manageTransport)) {
+
+            Utils.show(
+              "You don't have permission to perform this action.",
+              context,
+            );
+
+            return;
+          }
+
+          _openAssignSheet();
+        },
         backgroundColor: const Color(0xFF3F72FF),
         elevation: 6,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
@@ -1232,6 +1260,16 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
   }
 
   Future<void> _save() async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTransport)) {
+
+      Utils.show(
+        "You don't have permission to perform this action.",
+        context,
+      );
+
+      return;
+    }
     if (!_formKey.currentState!.validate()) return;
     if (_selectedStudent == null) {
       Utils.show('Please select a student', context);

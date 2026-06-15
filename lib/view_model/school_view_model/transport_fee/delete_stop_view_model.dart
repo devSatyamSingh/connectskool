@@ -6,6 +6,8 @@ import 'package:school_pro/repo/school_repo/transport_repo/delete_route_repo.dar
 import 'package:school_pro/repo/school_repo/transport_repo/delete_stop_repo.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 
+import '../../../utils/permission_extensions.dart';
+import '../../../utils/permission_keys.dart';
 import '../../../utils/utils.dart';
 
 class DeleteStopViewModel with ChangeNotifier {
@@ -23,6 +25,16 @@ class DeleteStopViewModel with ChangeNotifier {
       dynamic transportRouteStopId,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTransport)) {
+
+      Utils.show(
+        "You don't have permission to perform this action.",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map<String, dynamic> data = {

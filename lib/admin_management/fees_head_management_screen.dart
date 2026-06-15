@@ -244,7 +244,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                 await Provider.of<DeleteFeesHeadViewModel>(
                   context,
                   listen: false,
-                ).deleteFeesHeadApi(head.feeHeadId);
+                ).deleteFeesHeadApi(head.feeHeadId, context);
 
                 if (!mounted) return; // 🔥 MOST IMPORTANT LINE
 

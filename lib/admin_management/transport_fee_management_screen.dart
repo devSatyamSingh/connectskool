@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import '../res/app_color.dart';
 import '../res/const_text.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
 
 class TransportFeeManagementScreen extends StatefulWidget {
   const TransportFeeManagementScreen({super.key});
@@ -87,6 +90,20 @@ class _TransportFeeManagementScreenState
                 /// ROUTE
                 GestureDetector(
                   onTap: () {
+                    if (!PermissionExtensions.canAccess(
+                        PermissionKeys.manageTransport)) {
+
+                      Utils.show(
+                        "You don't have permission to access this module.",
+                        context,
+                      );
+                      return;
+                    }
+
+                    Navigator.pushNamed(
+                      context,
+                      RoutesName.routeScreen,
+                    );
                     Navigator.pushNamed(context, RoutesName.routeScreen);
                   },
                   child: _gridCard(
@@ -98,6 +115,20 @@ class _TransportFeeManagementScreenState
                 /// STOP
                 GestureDetector(
                   onTap: () {
+                    if (!PermissionExtensions.canAccess(
+                        PermissionKeys.manageTransport)) {
+
+                      Utils.show(
+                        "You don't have permission to access this module.",
+                        context,
+                      );
+                      return;
+                    }
+
+                    Navigator.pushNamed(
+                      context,
+                      RoutesName.routeScreen,
+                    );
                     Navigator.pushNamed(context, RoutesName.stopScreen);
                   },
                   child: _gridCard(
@@ -109,6 +140,20 @@ class _TransportFeeManagementScreenState
                 /// TRANSPORT FEE
                 GestureDetector(
                   onTap: () {
+                    if (!PermissionExtensions.canAccess(
+                        PermissionKeys.manageTransport)) {
+
+                      Utils.show(
+                        "You don't have permission to access this module.",
+                        context,
+                      );
+                      return;
+                    }
+
+                    Navigator.pushNamed(
+                      context,
+                      RoutesName.routeScreen,
+                    );
                     Navigator.pushNamed(
                         context, RoutesName.transportFeeScreen);
                   },

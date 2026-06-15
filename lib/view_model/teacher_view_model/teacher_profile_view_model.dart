@@ -37,20 +37,33 @@ class TeacherProfileViewModel extends ChangeNotifier {
   }
 
   // 🔥 API CALL (POSTMAN STATUS CODE HANDLING)
-  Future<void> teacherProfileApi(BuildContext context) async {
+  //
+  // [showMessage] = false (default) -> dashboard jaise auto-load screens se
+  // call hone par koi toast NAHI dikhega, sirf permissionDenied flag set hoga
+  // (UI khud hide/disable kar sakti hai).
+  //
+  // [showMessage] = true -> jab user explicitly "View Profile" jaisa button
+  // click kare, tab hi toast dikhana hai.
+  Future<void> teacherProfileApi(
+      BuildContext context, {
+        bool showMessage = false,
+      }) async {
     if (!PermissionExtensions.canAccess(
-        PermissionKeys.viewOneTeacherProfile)) {
-
+      PermissionKeys.viewOneTeacherProfile,
+    )) {
       setPermissionDenied(true);
 
-      Utils.show(
-        "You don't have permission to view teacher profile",
-        context,
-        type: "warning",
-      );
+      if (showMessage) {
+        Utils.show(
+          "You don't have permission to view teacher profile",
+          context,
+          type: "warning",
+        );
+      }
 
       return;
     }
+
     setLoading(true);
 
     try {

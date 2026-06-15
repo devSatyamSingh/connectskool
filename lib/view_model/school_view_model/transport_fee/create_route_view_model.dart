@@ -8,6 +8,8 @@ import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/fine_rule_view_model.dart';
 
+import '../../../utils/permission_extensions.dart';
+import '../../../utils/permission_keys.dart';
 import '../../../utils/utils.dart';
 
 class CreateRouteViewModel with ChangeNotifier {
@@ -27,6 +29,16 @@ class CreateRouteViewModel with ChangeNotifier {
 
       context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageTransport)) {
+
+      Utils.show(
+        "You don't have permission to perform this action.",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/admin_management/student_profile_fees_screen.dart';
 import '../res/app_color.dart';
 import '../res/const_text.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
+import '../view_model/school_view_model/academic_view_model.dart';
 import '../view_model/school_view_model/all_student_list_view_model.dart';
 import '../view_model/school_view_model/school_student_fee_view_model.dart';
 
@@ -20,9 +24,17 @@ class _SchoolCollectFeesScreenState extends State<SchoolCollectFeesScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AllStudentListVieModel>(context, listen: false)
-          .allStudentListApi(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+
+      await Provider.of<AcademicViewModel>(
+        context,
+        listen: false,
+      ).academicApi(context);
+
+      await Provider.of<AllStudentListVieModel>(
+        context,
+        listen: false,
+      ).allStudentListApi(context);
     });
   }
 
@@ -81,26 +93,56 @@ class _SchoolCollectFeesScreenState extends State<SchoolCollectFeesScreen> {
 
                 return GestureDetector(
 
-                  onTap: () async {
+                    onTap: () async {
 
-                    final vm = Provider.of<StudentFeeViewModel>(
-                      context,
-                      listen: false,
-                    );
+                      if (!PermissionExtensions.canAccess(
+                          PermissionKeys.manageFees)) {
 
-                    await vm.fetchStudentFees(
-                      studentId: s.studentId!,
-                      academicYear: "2026-27",
-                    );
+                        Utils.show(
+                          "You don't have permission to collect fees.",
+                          context,
+                        );
+                        return;
+                      }
 
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            StudentProfileFeesScreen(student: s),
-                      ),
-                    );
-                  },
+                      final academicVm =
+                      Provider.of<AcademicViewModel>(
+                        context,
+                        listen: false,
+                      );
+
+                      final academicYear =
+                          academicVm.currentYear?.yearName;
+
+                      if (academicYear == null ||
+                          academicYear.isEmpty) {
+
+                        Utils.show(
+                          "Academic year not found",
+                          context,
+                        );
+                        return;
+                      }
+
+                      final vm =
+                      Provider.of<StudentFeeViewModel>(
+                        context,
+                        listen: false,
+                      );
+
+                      await vm.fetchStudentFees(
+                        studentId: s.studentId!,
+                        academicYear: academicYear,
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              StudentProfileFeesScreen(student: s),
+                        ),
+                      );
+                    },
 
                   child: Container(
                     margin: const EdgeInsets.symmetric(

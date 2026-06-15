@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/create_fees_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 import 'fees_management_view_model.dart';
 
@@ -24,6 +26,16 @@ class CreateFeesViewModel with ChangeNotifier {
     dynamic end_due_date,
     context,
   ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.manageFees)) {
+
+      Utils.show(
+        "You don't have permission to perform this action",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

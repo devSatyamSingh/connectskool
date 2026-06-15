@@ -1306,6 +1306,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
+import '../utils/permission_extensions.dart';
+import '../utils/permission_keys.dart';
+import '../utils/utils.dart';
 import '../view_model/school_view_model/create_exam_maerks_view_model.dart';
 import '../view_model/school_view_model/school_exam_time_table_view_model.dart';
 import '../view_model/school_view_model/all_classes_view_model.dart';
@@ -1354,8 +1357,22 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     super.initState();
     _headerAnim = AnimationController(vsync: this, duration: const Duration(milliseconds: 600))..forward();
     _cardAnim   = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
-    WidgetsBinding.instance.addPostFrameCallback((_) => _initDropdowns());
-  }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+
+      if (!PermissionExtensions.canAccess(
+          PermissionKeys.assignMarks)) {
+
+        Utils.show(
+          "You don't have permission to perform this action",
+          context,
+        );
+
+        Navigator.pop(context);
+        return;
+      }
+
+      _initDropdowns();
+    });  }
 
   // ── Load Classes + Exams ──
   Future<void> _initDropdowns() async {
@@ -2112,7 +2129,22 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
         boxShadow: [BoxShadow(color: AppColor.lightBlueColor.withOpacity(0.35), blurRadius: 14, offset: const Offset(0, 5))],
       ),
       child: ElevatedButton(
-        onPressed: _saving ? null : _saveAll,
+        onPressed: _saving
+            ? null
+            : () {
+
+          if (!PermissionExtensions.canAccess(
+              PermissionKeys.assignMarks)) {
+
+            Utils.show(
+              "You don't have permission to perform this action",
+              context,
+            );
+            return;
+          }
+
+          _saveAll();
+        },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,

@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../repo/school_repo/edit_exam_repo.dart';
+import '../../utils/permission_extensions.dart';
+import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
 
 class EditExamViewModel with ChangeNotifier {
@@ -21,6 +23,16 @@ class EditExamViewModel with ChangeNotifier {
       dynamic resultDate,
       BuildContext context,
       ) async {
+    if (!PermissionExtensions.canAccess(
+        PermissionKeys.editExam)) {
+
+      Utils.show(
+        "Permission denied",
+        context,
+      );
+
+      return false;
+    }
     setLoading(true);
 
     Map data = {

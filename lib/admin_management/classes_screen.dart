@@ -291,61 +291,55 @@ class _ClassesPageState extends State<ClassesPage>
           Expanded(
             child: classVM.loading
                 ? _shimmer()
-                : RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: AppColor.primary,
-              backgroundColor: Colors.white,
-              strokeWidth: 2.5,
-              child: filteredClasses.isEmpty
-                  ? ListView(
-                physics:
-                const AlwaysScrollableScrollPhysics(),
-                children: [
-                  SizedBox(
-                    height:
-                    MediaQuery.of(context).size.height *
-                        0.5,
-                    child: Column(
-                      mainAxisAlignment:
-                      MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.search_off,
-                            size: 60, color: Colors.grey),
-                        SizedBox(height: 10),
-                        Text("No classes found",
-                            style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                                fontWeight:
-                                FontWeight.w500)),
-                      ],
+                : filteredClasses.isEmpty
+                    ? ListView(
+                  physics:
+                  const AlwaysScrollableScrollPhysics(),
+                  children: [
+                    SizedBox(
+                      height:
+                      MediaQuery.of(context).size.height *
+                          0.5,
+                      child: Column(
+                        mainAxisAlignment:
+                        MainAxisAlignment.center,
+                        children: const [
+                          Icon(Icons.search_off,
+                              size: 60, color: Colors.grey),
+                          SizedBox(height: 10),
+                          Text("No classes found",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                  fontWeight:
+                                  FontWeight.w500)),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              )
-                  : ListView.builder(
-                physics:
-                const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(
-                    18, 8, 18, 100),
-                itemCount: filteredClasses.length,
-                itemBuilder: (context, index) {
-                  final c = filteredClasses[index];
-                  final classId = c.classId ?? 0;
-                  final allSections =
-                      sectionVM.allSectionsModel?.data ??
-                          [];
-                  final classSections = allSections
-                      .where((s) =>
-                  s.classId.toString() ==
-                      classId.toString())
-                      .toList();
+                  ],
+                )
+                    : ListView.builder(
+                  physics:
+                  const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(
+                      18, 8, 18, 100),
+                  itemCount: filteredClasses.length,
+                  itemBuilder: (context, index) {
+                    final c = filteredClasses[index];
+                    final classId = c.classId ?? 0;
+                    final allSections =
+                        sectionVM.allSectionsModel?.data ??
+                            [];
+                    final classSections = allSections
+                        .where((s) =>
+                    s.classId.toString() ==
+                        classId.toString())
+                        .toList();
 
-                  return _animatedCard(
-                      index, c, classSections, sectionVM);
-                },
-              ),
-            ),
+                    return _animatedCard(
+                        index, c, classSections, sectionVM);
+                  },
+                ),
           ),
         ],
       ),
