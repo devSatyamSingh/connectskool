@@ -12,7 +12,7 @@ class UpdateSchoolAdminMarkSheetRepository {
 
   Future<dynamic> updateSchoolAdminMarkSheetApi(dynamic data) async {
     try {
-      dynamic response = await _apiServices.getPutApiResponse(ApiUrl.updateAdminMarkSheet,data);
+      dynamic response = await _apiServices.getPutApiResponse(ApiUrl.updateCoScholasticGrade,data);
       debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
       return (response);
     } catch (e) {

@@ -44,11 +44,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
 
   // ── Role options matching the screenshot ─────────────────────────────
   final List<Map<String, dynamic>> _roles = [
-    {
-      'key': 'school_admin',
-      'label': 'School Admin',
-      'icon': Icons.admin_panel_settings_rounded,
-    },
     {'key': 'teacher', 'label': 'Teacher', 'icon': Icons.person_rounded},
     {'key': 'student', 'label': 'Student', 'icon': Icons.school_rounded},
     {

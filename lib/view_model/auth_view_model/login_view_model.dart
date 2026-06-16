@@ -52,9 +52,8 @@ class LoginViewModel with ChangeNotifier {
     return {"device_id": deviceId, "device_name": deviceName};
   }
 
-  // ==============================
-  // 🔹 FCM TOKEN
-  // ==============================
+  // FCM TOKEN
+
   Future<String?> getFcmToken() async {
     try {
       final messaging = FirebaseMessaging.instance;
@@ -68,14 +67,15 @@ class LoginViewModel with ChangeNotifier {
     }
   }
 
-  // ==============================
-  // 🔹 LOGIN API — FIXED
-  // ==============================
+
+  // LOGIN API — FIXED
+
   Future<void> loginApi(
       BuildContext context,
       String email,
       String password,
       ) async {
+    PermissionManager.clear();
     setLoading(true);
 
     try {
@@ -101,15 +101,22 @@ class LoginViewModel with ChangeNotifier {
         final classId = user['class_id'];
         final sectionId = user['section_id'];
         final userId = user['user_id'];
-        final permissions = List<String>.from(user['permissions'] ?? []);
+        final permissions =
+        List<String>.from(
+          user['permissions'] ?? [],
+        );
 
-        await UserViewModel().savePermissions(permissions);
+        print("================================");
+        print("LOGIN ROLE => $role");
+        print("LOGIN USER ID => $userId");
+        print("LOGIN PERMISSIONS => $permissions");
+        print("================================");
 
-        // ⚠️ TEMPORARY snapshot (login response ka data backend cache se stale
-        // ho sakta hai). Yeh sirf ek instant fallback hai — neeche
-        // getUserPermissionApi(isCurrentUser: true) call FRESH/accurate data
-        // se PermissionManager ko turant overwrite kar dega.
-        PermissionManager.setPermissions(permissions);
+        PermissionManager.setRole(role);
+
+        PermissionManager.setPermissions(
+          permissions,
+        );
         print(
             "LOGIN PERMISSIONS (temp snapshot) => ${PermissionManager.permissions}"
         );
@@ -129,20 +136,27 @@ class LoginViewModel with ChangeNotifier {
           ),
         ]);
 
-        await Provider.of<GetUserPermissionViewModel>(
-          context,
-          listen: false,
-        ).getUserPermissionApi(
-          context: context,
-          userId: int.tryParse(userId.toString()) ?? 0,
-          role: role,
-          isCurrentUser: true, // ✅ fresh permissions -> PermissionManager sync
-        );
+        // if (role == "school_admin") {
+        //
+        //   await Provider.of<GetUserPermissionViewModel>(
+        //     context,
+        //     listen: false,
+        //   ).getUserPermissionApi(
+        //     context: context,
+        //     userId: int.tryParse(userId.toString()) ?? 0,
+        //     role: role,
+        //     isCurrentUser: true,
+        //   );
+        // }
 
         print("================================");
-        print("FINAL PERMISSIONS");
+        print("BEFORE USER API");
         print(PermissionManager.permissions);
         print("================================");
+        print("AFTER USER API");
+        print(PermissionManager.permissions);
+        print("LOGIN ROLE => $role");
+        print("LOGIN PERMISSIONS => $permissions");
 
         Utils.show(response['message'], context);
 
@@ -163,9 +177,8 @@ class LoginViewModel with ChangeNotifier {
     }
   }
   Future<void> logoutApi(BuildContext context) async {
-    setLoading(true);
 
-    final userVM = UserViewModel();
+    setLoading(true);
 
     try {
       await _repo.logoutApi({
@@ -179,7 +192,14 @@ class LoginViewModel with ChangeNotifier {
       await FirebaseMessaging.instance.deleteToken();
     } catch (_) {}
 
-    await userVM.clearUser();
+    try {
+      await FirebaseMessaging.instance.unsubscribeFromTopic(
+        "school_role",
+      );
+    } catch (_) {}
+
+    await UserViewModel().clearUser();
+
     PermissionManager.clear();
 
     setLoading(false);

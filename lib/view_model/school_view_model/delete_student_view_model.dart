@@ -5,6 +5,7 @@ import 'package:school_pro/view_model/school_view_model/all_student_list_view_mo
 import '../../repo/school_repo/delete_student_repo.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
+import '../../utils/permission_manager.dart';
 import '../../utils/utils.dart';
 
 class DeleteStudentViewModel with ChangeNotifier {
@@ -26,6 +27,14 @@ class DeleteStudentViewModel with ChangeNotifier {
     if (!PermissionExtensions.canAccess(
       PermissionKeys.deleteStudent,
     )) {
+
+      print(
+        "DELETE PERMISSION FAILED",
+      );
+
+      print(
+        "CURRENT PERMISSIONS => ${PermissionManager.permissions}",
+      );
       Utils.show(
         "You don't have permission to delete student",
         context,
@@ -39,9 +48,11 @@ class DeleteStudentViewModel with ChangeNotifier {
     };
 
     try {
+      print("DELETE REQUEST => $data");
       // ✅ Pass the data to repo
       final response = await _repo.deleteStudentApi(data);
 
+      print("DELETE RESPONSE => $response");
       setLoading(false);
 
       final statusCode = response['status_code'];
@@ -65,7 +76,7 @@ class DeleteStudentViewModel with ChangeNotifier {
         Utils.show("Server error. Try again later", context);
         return false;
       } else {
-        Utils.show("Something went wrong", context);
+        Utils.show("You don't have permission to perform this action, context", context);
         return false;
       }
     } catch (e) {

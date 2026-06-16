@@ -266,7 +266,7 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
     Provider.of<AssignRoleViewModel>(
       context,
       listen: false,
-    ).assignRoleApi(context, selectedRole, selectedIds);
+    ).assignRoleApi(context, selectedRole, selectedIds, );
   }
 
   @override
@@ -679,97 +679,6 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                         }).toList(),
                       ),
                     ),
-
-                    // Expanded(
-                    //   child: ListView(
-                    //     padding: const EdgeInsets.all(12),
-                    //     // children: vm.permissionState.entries.map((sectionEntry) {
-                    //     //
-                    //     //   String section = sectionEntry.key;
-                    //     //   Map<int, bool> permissions = sectionEntry.value;
-                    //     children: vm.permissionState.entries.map((sectionEntry) {
-                    //       String section = sectionEntry.key;
-                    //
-                    //       // ✅ Sirf active (true) permissions lo
-                    //       Map<int, bool> activePermissions = Map.fromEntries(
-                    //         sectionEntry.value.entries.where((e) => e.value == true),
-                    //       );
-                    //
-                    //       // ✅ Agar section mein koi active permission nahi, section hide karo
-                    //       if (activePermissions.isEmpty) return const SizedBox.shrink();
-                    //       return Container(
-                    //         margin: const EdgeInsets.only(bottom: 14),
-                    //         padding: const EdgeInsets.all(12),
-                    //         decoration: BoxDecoration(
-                    //           color: Colors.white,
-                    //           borderRadius: BorderRadius.circular(14),
-                    //           boxShadow: [
-                    //             BoxShadow(
-                    //               color: Colors.grey.shade300,
-                    //               blurRadius: 6,
-                    //               offset: const Offset(0, 3),
-                    //             )
-                    //           ],
-                    //         ),
-                    //         child: Column(
-                    //           crossAxisAlignment: CrossAxisAlignment.start,
-                    //           children: [
-                    //
-                    //             Text(
-                    //               section.toUpperCase(),
-                    //               style: const TextStyle(
-                    //                 fontSize: 15,
-                    //                 fontWeight: FontWeight.bold,
-                    //                 color: Color(0xff357ABD),
-                    //               ),
-                    //             ),
-                    //
-                    //             const Divider(),
-                    //
-                    //             ...activePermissions.entries.map((permEntry) {
-                    //
-                    //               int permId = permEntry.key;
-                    //               bool value = permEntry.value;
-                    //               bool loading =
-                    //                   permissionLoading[permId] == true;
-                    //
-                    //               return Row(
-                    //                 children: [
-                    //
-                    //                   loading
-                    //                       ? const SizedBox(
-                    //                     width: 22,
-                    //                     height: 22,
-                    //                     child: CircularProgressIndicator(
-                    //                         strokeWidth: 2),
-                    //                   )
-                    //                       : Checkbox(
-                    //                     value: value,
-                    //                     onChanged: (val) {
-                    //                       onPermissionTap(
-                    //                         section,
-                    //                         permId,
-                    //                         val ?? false,
-                    //                       );
-                    //                     },
-                    //                   ),
-                    //
-                    //                   Expanded(
-                    //                     child: Text(
-                    //                       getPermissionName(permId),
-                    //                     ),
-                    //                   ),
-                    //                 ],
-                    //               );
-                    //             })
-                    //
-                    //           ],
-                    //         ),
-                    //       );
-                    //
-                    //     }).toList(),
-                    //   ),
-                    // ),
                   ],
                 );
               },

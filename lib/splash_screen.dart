@@ -105,15 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
     try {
       final userViewModel = UserViewModel();
 
-      // ==========================
-      // Restore Permissions (temporary fallback from local storage)
-      // ==========================
-      final permissions =
-      await userViewModel.getPermissions();
-
-      PermissionManager.setPermissions(
-        permissions,
-      );
+      PermissionManager.clear();
 
       final int? userId =
       await userViewModel.getUser();

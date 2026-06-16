@@ -18,6 +18,10 @@ class RemoveRoleViewModel extends ChangeNotifier {
       List<int> ids,
       ) async {
 
+    print("========== REMOVE ==========");
+    print("ROLE => $role");
+    print("IDS => $ids");
+
     // ✅ Pattern C - ViewModel/API level guard
     // if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {
     //   Utils.show("Permission denied", context);

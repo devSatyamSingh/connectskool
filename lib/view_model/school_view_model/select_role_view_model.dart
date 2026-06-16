@@ -417,79 +417,9 @@ class SelectRoleViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // =========================================================
-  // 🔥 LOCAL STORAGE — SAVE
-  // // =========================================================
-  // Future<void> _savePermissionsLocally(
-  //   String role,
-  //   Map<String, Map<int, bool>> state,
-  // ) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //
-  //   Map<String, dynamic> encoded = {};
-  //   state.forEach((section, perms) {
-  //     encoded[section] = perms.map((id, val) => MapEntry(id.toString(), val));
-  //   });
-  //
-  //   await prefs.setString('permissions_$role', jsonEncode(encoded));
-  // }
-  //
-  // // =========================================================
-  // // 🔥 LOCAL STORAGE — LOAD
-  // // =========================================================
-  // Future<bool> _loadPermissionsLocally(String role) async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final String? saved = prefs.getString('permissions_$role');
-  //
-  //     if (saved == null) return false;
-  //
-  //     final Map<String, dynamic> decoded = jsonDecode(saved);
-  //
-  //     permissionState = decoded.map((section, perms) {
-  //       Map<int, bool> permMap = (perms as Map<String, dynamic>).map(
-  //         (id, val) => MapEntry(int.parse(id), val as bool),
-  //       );
-  //       return MapEntry(section, permMap);
-  //     });
-  //
-  //     notifyListeners();
-  //     return true;
-  //   } catch (e) {
-  //     return false;
-  //   }
-  // }
-  //
-  // // =========================================================
-  // // 🔥 TOGGLE PERMISSION + LOCAL SAVE
-  // // =========================================================
-  // void updatePermission(
-  //   String section,
-  //   int permissionId,
-  //   bool value,
-  //   String role,
-  // ) async {
-  //   permissionState[section]?[permissionId] = value;
-  //   notifyListeners();
-  //
-  //   // ✅ Har toggle ke baad local save
-  //   await _savePermissionsLocally(role, permissionState);
-  // }
 
-  // =========================================================
-  // 🔥 SELECT ROLE API — pehle local check
-  // =========================================================
   Future<void> selectRoleApi(BuildContext context, String role) async {
-    // if (!PermissionExtensions.canAccess(
-    //     PermissionKeys.managePermissions)) {
-    //
-    //   Utils.show(
-    //     "Permission denied",
-    //     context,
-    //   );
-    //
-    //   return;
-    // }
+
     setLoading(true);
 
     try {
@@ -521,16 +451,7 @@ class SelectRoleViewModel extends ChangeNotifier {
 
   Future<void> loadRolePermissions(BuildContext context, String role) async {
 
-    // // if (!PermissionExtensions.canAccess(
-    // //     PermissionKeys.managePermissions)) {
-    // //
-    // //   Utils.show(
-    // //     "Permission denied",
-    // //     context,
-    // //   );
-    // //
-    // //   return;
-    // }
+
     setLoading(true);
 
     try {
@@ -551,10 +472,18 @@ class SelectRoleViewModel extends ChangeNotifier {
       );
 
 
-      final roleModel =
-      SelectRoleModel.fromJson(
+      final roleModel = SelectRoleModel.fromJson(
         Map<String, dynamic>.from(roleBody),
       );
+
+      print("========== ROLE CHECK ==========");
+      print("SELECTED ROLE => $role");
+
+      for (var p in roleModel.data?.permissions ?? []) {
+        print(
+          "ROLE=$role | ID=${p.permissionId} | KEY=${p.key}",
+        );
+      }
 
       permissionState.clear();
 
@@ -598,16 +527,6 @@ class SelectRoleViewModel extends ChangeNotifier {
   // =========================================================
   Future<void> saveUserPermissions(BuildContext context, int userId) async {
 
-    // // if (!PermissionExtensions.canAccess(
-    // //     PermissionKeys.managePermissions)) {
-    // //
-    // //   Utils.show(
-    // //     "Permission denied",
-    // //     context,
-    // //   );
-    //
-    //   return;
-    // }
     List<Map<String, dynamic>> permissionList = [];
 
     permissionState.forEach((section, perms) {

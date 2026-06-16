@@ -12,7 +12,7 @@ class CreateAdminMarkSheetRepository {
 
   Future<dynamic> createAdminMarkSheetApi(dynamic data) async {
     try {
-      dynamic response = await _apiServices.getPostApiResponse(ApiUrl.createAdminMarkSheet,data);
+      dynamic response = await _apiServices.getPostApiResponse(ApiUrl.createCoScholasticGrade,data);
       debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
       return (response);
     } catch (e) {

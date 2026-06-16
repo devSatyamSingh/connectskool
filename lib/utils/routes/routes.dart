@@ -18,6 +18,7 @@ import '../../admin_management/fees_management_screen.dart';
 import '../../admin_management/fine_screen.dart';
 import '../../admin_management/help_support_screen.dart';
 import '../../admin_management/manage_permission.dart';
+import '../../admin_management/marksheet/co_scholastic_grade_screen.dart';
 import '../../admin_management/marksheet/marksheet_screen.dart';
 import '../../admin_management/notification_screen.dart';
 import '../../admin_management/role_permission_screen.dart';
@@ -117,7 +118,9 @@ class Routers {
         case RoutesName.schoolCollectFeesScreen:
         return (context) => const SchoolCollectFeesScreen();
         case RoutesName.marksheetScreen:
-        return (context) => const MarksheetScreen();
+        return (context) => const CoScholasticScreen();
+      // case RoutesName.marksheetScreen:
+      //   return (context) => const marksheetScreen();
         case RoutesName.schoolAdmitCardScreen:
         return (context) => const SchoolAdmitCardScreen();
         case RoutesName.accountantManagementDashBoardScreen:

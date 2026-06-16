@@ -24,22 +24,56 @@ class GetUserPermissionViewModel extends ChangeNotifier {
     required BuildContext context,
     required int userId,
     required String role,
-    isCurrentUser = true,
+    bool isCurrentUser = true,
   }) async {
     _setLoading(true);
 
     try {
+
       final response = await _repo.getUserPermissionApi(
         userId: userId,
       );
 
-      debugPrint(response.toString());
+      debugPrint(
+        "USER PERMISSION RESPONSE => $response",
+      );
 
-      _model = GetUserPermissionModel.fromJson(response);
-      _buildStateMap(syncPermissionManager: isCurrentUser);
+      final int statusCode =
+          response["status_code"] ?? 200;
+
+      // ==========================
+      // API FAILED
+      // ==========================
+      if (statusCode != 200) {
+
+        debugPrint(
+          "Permission API failed => $statusCode",
+        );
+
+        // IMPORTANT:
+        // login wali permissions ko mat hatao
+
+        _setLoading(false);
+        notifyListeners();
+        return;
+      }
+
+      // ==========================
+      // API SUCCESS
+      // ==========================
+      _model = GetUserPermissionModel.fromJson(
+        response,
+      );
+
+      _buildStateMap(
+        syncPermissionManager: isCurrentUser,
+      );
 
     } catch (e) {
-      debugPrint('getUserPermissionApi error: $e');
+
+      debugPrint(
+        "Permission API Error => $e",
+      );
     }
 
     _setLoading(false);
@@ -70,6 +104,10 @@ class GetUserPermissionViewModel extends ChangeNotifier {
             "STATE=${item.state}"
         );
 
+        print(
+            "ROLE_DEFAULT=${item.roleDefault}"
+        );
+
         debugPrint(
           "KEY=${item.key} STATE=${item.state}",
         );
@@ -84,19 +122,29 @@ class GetUserPermissionViewModel extends ChangeNotifier {
         // NAHI karna (canAccess() => false ho jayega).
         // "allowed" / "default" (jab role_default true ho ya admin ne
         // explicitly allow kiya ho) => shamil karo.
-        if (item.key != null && item.state != "denied") {
-          effectivePermissions.add(item.key!);
+        if (item.key == null) continue;
+
+        switch (item.state) {
+
+          case "allowed":
+            effectivePermissions.add(item.key!);
+            break;
+
+          case "denied":
+            break;
+
+          case "default":
+          default:
+
+            if (item.roleDefault == true) {
+              effectivePermissions.add(item.key!);
+            }
+
+            break;
         }
       }
     });
 
-    // ✅ FIX: Sirf CURRENTLY LOGGED-IN user ke liye PermissionManager ko fresh
-    // data se sync karo, taki admin ke role/user permission changes turant
-    // (next refresh / re-login par) reflect ho.
-    //
-    // Kisi OTHER user (jis teacher/student ki permission admin abhi edit kar
-    // raha hai) ke liye yeh call NAHI hota — varna admin ke khud ke session
-    // ke permissions overwrite ho jaate.
     if (syncPermissionManager) {
       PermissionManager.setPermissions(effectivePermissions);
       print(
@@ -143,14 +191,30 @@ class GetUserPermissionViewModel extends ChangeNotifier {
   }
 
   bool canAccess(String permissionKey) {
+
     for (final section in sections) {
+
       for (final item in getItemsForSection(section)) {
+
         if (item.key == permissionKey) {
-          return getState(item.permissionId ?? 0) != 'denied';
+
+          final state =
+          getState(item.permissionId ?? 0);
+
+          if (state == "allowed") {
+            return true;
+          }
+
+          if (state == "denied") {
+            return false;
+          }
+
+          return item.roleDefault == true;
         }
       }
     }
-    return true; // key nahi mili → default allow
+
+    return false;
   }
   List<String> get sections =>
       (_model?.data?.permissions?.keys.toList() ?? [])..sort();

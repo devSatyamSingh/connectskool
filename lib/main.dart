@@ -28,6 +28,7 @@ import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.
 import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/assign_role_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/cms_viewmodel.dart';
+import 'package:school_pro/view_model/school_view_model/co_scholastic_grade_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/collect_fee_payment_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/create_admin_mark_sheet_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/create_admin_teacher_home_work_view_model.dart';
@@ -411,8 +412,10 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SupportTicketViewModel()),
         ChangeNotifierProvider(create: (_) => CmsViewModel()),
     ChangeNotifierProvider(create: (_) => SchoolTimetableViewModel()),
-        ChangeNotifierProvider(create: (_) => HomeworkDetailsViewModel(),
-
+        ChangeNotifierProvider(create: (_) => HomeworkDetailsViewModel(),),
+        ChangeNotifierProvider(
+          create: (_) =>
+              CoScholasticGradeViewModel(),
         ),
       ],
       child: MaterialApp(

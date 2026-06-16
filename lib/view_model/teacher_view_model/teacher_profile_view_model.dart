@@ -86,6 +86,13 @@ class TeacherProfileViewModel extends ChangeNotifier {
 
         case 403:
           setPermissionDenied(true);
+
+          Utils.show(
+            response["message"] ??
+                "You don't have permission to view teacher profile",
+            context,
+          );
+
           break;
 
         case 404:

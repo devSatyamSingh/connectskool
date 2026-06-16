@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/view_model/school_view_model/Exam_management_view_model.dart';
 import 'package:shimmer/shimmer.dart';
@@ -122,8 +123,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
   // ────────────────────────────────────────────
   Future<void> _loadTimetables(
       String examId, String classId, String sectionId) async {
-    final vm =
-    Provider.of<SchoolExamTimeTableViewModel>(context, listen: false);
+    final vm = Provider.of<SchoolExamTimeTableViewModel>(context, listen: false);
     await vm.getExamTimetable(
       examId: int.parse(examId),
       classId: int.parse(classId),
@@ -271,9 +271,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     }
   }
 
-  // ────────────────────────────────────────────
-  // DATE FORMAT HELPER
-  // ────────────────────────────────────────────
+
   String _formatDate(String? dateStr) {
     if (dateStr == null) return '—';
     try {
@@ -288,9 +286,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     }
   }
 
-  // ────────────────────────────────────────────
-  // BUILD
-  // ────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ExamMarksViewModel>(
@@ -299,38 +295,41 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
 
         return Scaffold(
           backgroundColor: AppColor.pageBgColor,
-          floatingActionButton: marks.isEmpty
-              ? FloatingActionButton.extended(
+          floatingActionButton: FloatingActionButton.extended(
             backgroundColor: AppColor.lightBlueColor,
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
-            onPressed: () {
+              borderRadius: BorderRadius.circular(16),
+            ),
+              onPressed: () {
 
-              if (!PermissionExtensions.canAccess(
-                  PermissionKeys.assignMarks)) {
+                if (!PermissionExtensions.canAccess(
+                    PermissionKeys.assignMarks)) {
 
-                Utils.show(
-                  "You don't have permission to assign marks.",
+                  Utils.show(
+                    "You don't have permission to assign marks.",
+                    context,
+                    type: "warning",
+                  );
+
+                  return;
+                }
+
+                Navigator.push(
                   context,
-                  type: "warning",
+                  MaterialPageRoute(
+                    builder: (_) => const CreateExamMarksPage(),
+                  ),
                 );
-
-                return;
-              }
-
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const CreateExamMarksPage(),
-                ),
-              );
-            },
+              },
             icon: const Icon(Icons.edit_rounded, color: Colors.white),
-            label: const Text('Enter Marks',
-                style: TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600)),
-          )
-              : null,
+            label: Text(
+              'Enter Marks',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
           body: Column(
             children: [
               _buildHeader(marks),
@@ -882,6 +881,12 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
   Widget _tableRow(ExamMarksData s, int index) {
     final pct = _percentage(s);
     final pctColor = _percentageColor(pct);
+    final totalMarks = s.totalMarks ?? 100;
+
+    final progressValue =
+    totalMarks > 0
+        ? (s.marksObtained ?? 0) / totalMarks
+        : 0.0;
     final bg =
     index.isEven ? Colors.white : const Color(0xFFFAFBFC);
 
@@ -1014,23 +1019,14 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
                     borderRadius:
                     BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: pct / 100,
+                      value: progressValue.clamp(0.0, 1.0),
                       minHeight: 5,
-                      backgroundColor:
-                      const Color(0xFFE5E7EB),
-                      valueColor:
-                      AlwaysStoppedAnimation<Color>(
-                          pctColor),
+                      backgroundColor: const Color(0xFFE5E7EB),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        pctColor,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${pct.toStringAsFixed(1)}%',
-                  style: TextStyle(
-                      fontSize: 10,
-                      color: pctColor,
-                      fontWeight: FontWeight.w500),
                 ),
               ],
             )

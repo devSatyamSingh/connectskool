@@ -10,7 +10,7 @@ class DeleteSChoolAdminMarkSheetRepository {
   Future<dynamic> deleteSchoolAdminMarkSheetApi(Map<String, dynamic> data) async {
     try {
       dynamic response = await _apiServices.getDeleteApiResponse(
-        ApiUrl.deleteAdminMarkSheet, // yahan API ka URL
+        ApiUrl.deleteCoScholasticGrade, // yahan API ka URL
         data, // pass Map data
       );
       debugPrint("✅ API Raw Response: ${jsonEncode(response)}");

@@ -5,6 +5,15 @@ class PermissionManager {
 
   static final Set<String> _permissions = {};
 
+  static String _currentRole = "";
+
+  static String get role => _currentRole;
+
+  static void setRole(String role) {
+    _currentRole = role;
+    log("👤 Current Role => $role");
+  }
+
   static void setPermissions(List<String> permissions) {
     _permissions
       ..clear()
@@ -15,35 +24,46 @@ class PermissionManager {
       );
 
     log("✅ Permissions Loaded: ${_permissions.length}");
+    log("✅ Role: $_currentRole");
   }
 
-  static List<String> get permissions =>
-      _permissions.toList();
+  static List<String> get permissions => _permissions.toList();
 
   static bool has(String permission) {
-    if (permission.isEmpty) return false;
+
+    // 🔥 Admin bypass
+    if (_currentRole == "school_admin") {
+      return true;
+    }
 
     return _permissions.contains(permission);
   }
 
   static bool hasAny(List<String> permissions) {
+
+    if (_currentRole == "school_admin") {
+      return true;
+    }
+
     return permissions.any(
           (permission) => _permissions.contains(permission),
     );
   }
 
   static bool hasAll(List<String> permissions) {
+
+    if (_currentRole == "school_admin") {
+      return true;
+    }
+
     return permissions.every(
           (permission) => _permissions.contains(permission),
     );
   }
 
-  static bool get isEmpty => _permissions.isEmpty;
-
-  static bool get isNotEmpty => _permissions.isNotEmpty;
-
   static void clear() {
     _permissions.clear();
+    _currentRole = "";
     log("🗑 Permissions Cleared");
   }
 }

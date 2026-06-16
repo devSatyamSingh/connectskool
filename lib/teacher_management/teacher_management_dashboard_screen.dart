@@ -119,10 +119,16 @@ class _TeacherManagementDashBoardScreenState
         context,
         listen: false,
       ).allAccountantListApi(context);
-      Provider.of<AllTeachersListVieModel>(
-        context,
-        listen: false,
-      ).allTeachersListApi(context);
+      if (
+      PermissionExtensions.canAccess(
+        PermissionKeys.viewOneTeacherProfile,
+      )
+      ) {
+        Provider.of<TeacherProfileViewModel>(
+          context,
+          listen: false,
+        ).teacherProfileApi(context);
+      }
     });
 
 

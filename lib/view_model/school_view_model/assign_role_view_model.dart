@@ -22,6 +22,9 @@ class AssignRoleViewModel with ChangeNotifier {
       List<int> permissionIds, {
         bool showMessage = true,
       }) async {
+    print("========== ASSIGN ==========");
+    print("ROLE => $role");
+
 
     // // ✅ Pattern C - ViewModel/API level guard
     // if (!PermissionExtensions.canAccess(PermissionKeys.managePermissions)) {

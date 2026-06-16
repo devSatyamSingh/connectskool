@@ -35,7 +35,7 @@ class GetCoScholasticRepo {
       ) async {
 
     String url =
-        "${ApiUrl.getAdminMarkSheet}?student_id=$studentId&academic_year=$academicYear";
+        "${ApiUrl.getCoScholasticGrades}?student_id=$studentId&academic_year=$academicYear";
 
     // 🔍 Debug prints
     print("📌 API URL: $url");
