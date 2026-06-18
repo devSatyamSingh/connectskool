@@ -4,11 +4,11 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/model/school_model/transport_model/route_model.dart';
 import 'package:school_pro/model/school_model/transport_model/stop_model.dart';
-import 'package:school_pro/model/school_model/fees_head_management_model.dart' hide Data;
+import 'package:school_pro/model/school_model/fees/fees_head_management_model.dart' hide Data;
 import 'package:school_pro/utils/utils.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/get_route_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/get_stop_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/fees_head_management_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/fees_head_management_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/create_stop_view_model.dart';
 
 import '../../res/app_color.dart';

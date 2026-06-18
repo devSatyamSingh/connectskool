@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
-import 'package:school_pro/view_model/user_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/user_permission_view_model.dart';
+import 'package:school_pro/view_model/auth_view_model/user_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/permission/user_permission_view_model.dart';
 
 import 'admin_management/school_management_dashboard_screen.dart';
 import 'main.dart';
@@ -101,29 +101,19 @@ class _SplashScreenState extends State<SplashScreen>
 
     await _checkSession();
   }
+  // splash_screen.dart — _checkSession() mein yeh change karo
+
   Future<void> _checkSession() async {
     try {
       final userViewModel = UserViewModel();
-
       PermissionManager.clear();
 
-      final int? userId =
-      await userViewModel.getUser();
+      final int? userId  = await userViewModel.getUser();
+      final String? role = await userViewModel.getRole();
+      final String? token = await userViewModel.getToken();
 
-      final String? role =
-      await userViewModel.getRole();
-
-      final String? token =
-      await userViewModel.getToken();
-
-      // ✅ FIX: Local storage wali list stale ho sakti hai (agar admin ne
-      // last login ke baad role/user permissions change kiye hain). App
-      // reopen hote hi fresh permissions fetch karke PermissionManager ko
-      // sync karo, taki admin ke changes turant reflect ho.
       if (userId != null && userId != 0 && role != null && role.isNotEmpty) {
-        // Fire-and-forget: navigation ko block na karo, but jaldi hi
-        // PermissionManager update ho jayega.
-        Provider.of<GetUserPermissionViewModel>(
+        await Provider.of<GetUserPermissionViewModel>(
           context,
           listen: false,
         ).getUserPermissionApi(
@@ -134,13 +124,6 @@ class _SplashScreenState extends State<SplashScreen>
         );
       }
 
-      print("USER ID => $userId");
-      print("ROLE => $role");
-      print("TOKEN => $token");
-
-      // ==========================
-      // Session Validation
-      // ==========================
       if (userId != null &&
           userId != 0 &&
           role != null &&
@@ -149,71 +132,39 @@ class _SplashScreenState extends State<SplashScreen>
           token.isNotEmpty) {
 
         switch (role) {
-
           case "school_admin":
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    SchoolManagementDashboardScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => SchoolManagementDashboardScreen()),
             );
             break;
-
           case "student":
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (_) =>
-                const StudentDashboardScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const StudentDashboardScreen()),
             );
             break;
-
           case "teacher":
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    TeacherManagementDashBoardScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => TeacherManagementDashBoardScreen()),
             );
             break;
-
           case "accountant":
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    AccountantManagementDashBoardScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => AccountantManagementDashBoardScreen()),
             );
             break;
-
           default:
-            Navigator.pushReplacementNamed(
-              context,
-              RoutesName.dashboardScreen,
-            );
+            Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
         }
       } else {
-
-        print("❌ Session Not Found");
-
-        Navigator.pushReplacementNamed(
-          context,
-          RoutesName.dashboardScreen,
-        );
+        Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
       }
-
     } catch (e) {
-
       print("CHECK SESSION ERROR => $e");
-
-      Navigator.pushReplacementNamed(
-        context,
-        RoutesName.dashboardScreen,
-      );
+      Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
     }
   }
   @override

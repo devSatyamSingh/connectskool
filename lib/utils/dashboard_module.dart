@@ -128,7 +128,7 @@ class DashboardModules {
       icon: Icons.fact_check_rounded,
       color: Color(0xFF0288D1),
       permission: PermissionKeys.markStudentAttendance,
-      route: RoutesName.schoolAttendanceScreen,
+      route: RoutesName.staffAttendanceScreen,
     ),
 
     DashboardModule(

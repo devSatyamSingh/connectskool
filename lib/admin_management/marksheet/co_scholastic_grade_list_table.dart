@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../model/school_model/co_scholastic_grade_model.dart';
+import '../../model/school_model/co_scholastic/co_scholastic_grade_model.dart';
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
-import '../../view_model/school_view_model/co_scholastic_grade_view_model.dart';
+import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
 
 class CoScholasticGradeListTable extends StatefulWidget {
   const CoScholasticGradeListTable({super.key});
@@ -48,32 +49,6 @@ class _CoScholasticGradeListTableState
               // Header with icon and search
               Row(
                 children: [
-                  // Container(
-                  //   padding: const EdgeInsets.all(10),
-                  //   decoration: BoxDecoration(
-                  //     gradient: const LinearGradient(
-                  //       colors: [AppColor.primary, Color(0xFF6366F1)],
-                  //     ),
-                  //     borderRadius: BorderRadius.circular(12),
-                  //   ),
-                  //   child: const Icon(
-                  //     Icons.grade_rounded,
-                  //     color: Colors.white,
-                  //     size: 20,
-                  //   ),
-                  // ),
-                  // const SizedBox(width: 12),
-                  // const Expanded(
-                  //   child: Text(
-                  //     "Grade Records",
-                  //     style: TextStyle(
-                  //       fontSize: 16,
-                  //       fontWeight: FontWeight.w700,
-                  //       color: Color(0xFF1A1A2E),
-                  //     ),
-                  //   ),
-                  // ),
-                  // Search Field
                   Expanded(
                     child: Container(
                       width: 200,
@@ -123,7 +98,6 @@ class _CoScholasticGradeListTableState
                 ],
               ),
               const SizedBox(height: 20),
-              // Table Content
               _buildTableContent(vm, filtered),
             ],
           ),
@@ -362,7 +336,7 @@ class _CoScholasticGradeListTableState
     final colors = {
       'TERM 1': const Color(0xFF3B82F6),
       'TERM 2': const Color(0xFF8B5CF6),
-      'FINAL': const Color(0xFF10B981),
+      'TERM 3': const Color(0xFF10B981),
     };
 
     final color = colors[term.toUpperCase()] ?? Colors.grey.shade600;
@@ -428,152 +402,257 @@ class _CoScholasticGradeListTableState
       BuildContext context,
       CoScholasticGradeData grade,
       ) {
-
-    String selectedGrade =
-        grade.grade ?? "A1";
+    String selectedGrade = grade.grade ?? "A1";
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) {
-
         return StatefulBuilder(
           builder: (context, setDialogState) {
-
-            return AlertDialog(
-
+            return Dialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(28),
               ),
+              child: Container(
+                width: 420,
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
 
-              title: const Text(
-                "Update Grade",
-              ),
-
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-
-                  Text(
-                    grade.studentName ?? "",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    /// HEADER
+                    Container(
+                      width: 75,
+                      height: 75,
+                      decoration: BoxDecoration(
+                        gradient: AppColor.primaryGradient,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.edit_note_rounded,
+                        color: Colors.white,
+                        size: 38,
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 8),
+                    const SizedBox(height: 16),
 
-                  Text(
-                    grade.subjectName ?? "",
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  DropdownButtonFormField<String>(
-                    value: selectedGrade,
-                    items: const [
-
-                      DropdownMenuItem(
-                        value: "A1",
-                        child: Text("A1"),
+                    const Text(
+                      "Update Grade",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
                       ),
+                    ),
 
-                      DropdownMenuItem(
-                        value: "A2",
-                        child: Text("A2"),
+                    const SizedBox(height: 6),
+
+                    Text(
+                      "Modify student co-scholastic grade",
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 13,
                       ),
+                    ),
 
-                      DropdownMenuItem(
-                        value: "B1",
-                        child: Text("B1"),
+                    const SizedBox(height: 24),
+
+                    /// STUDENT CARD
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(18),
                       ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: AppColor.primary,
+                            child: Text(
+                              (grade.studentName ?? "S")
+                                  .substring(0, 1)
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
 
-                      DropdownMenuItem(
-                        value: "B2",
-                        child: Text("B2"),
+                          const SizedBox(width: 14),
+
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  grade.studentName ?? "",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 4),
+
+                                Text(
+                                  "Roll No : ${grade.rollNo ?? "-"}",
+                                  style: TextStyle(
+                                    color: Colors.grey.shade600,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      DropdownMenuItem(
-                        value: "C1",
-                        child: Text("C1"),
+                    const SizedBox(height: 16),
+
+                    /// SUBJECT
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
                       ),
-
-                      DropdownMenuItem(
-                        value: "C2",
-                        child: Text("C2"),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(14),
                       ),
-
-                      DropdownMenuItem(
-                        value: "D",
-                        child: Text("D"),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.menu_book_rounded,
+                            color: Colors.orange.shade700,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              grade.subjectName ?? "",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
 
-                    onChanged: (v) {
+                    const SizedBox(height: 22),
 
-                      setDialogState(() {
-                        selectedGrade = v!;
-                      });
-                    },
-                  ),
-                ],
+                    /// GRADE DROPDOWN
+                    DropdownButtonFormField<String>(
+                      dropdownColor: Colors.white,
+                      value: selectedGrade,
+                      decoration: InputDecoration(
+                        labelText: "Select Grade",
+                        prefixIcon: const Icon(
+                          Icons.grade_rounded,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(value: "A1", child: Text("A1")),
+                        DropdownMenuItem(value: "A2", child: Text("A2")),
+                        DropdownMenuItem(value: "B1", child: Text("B1")),
+                        DropdownMenuItem(value: "B2", child: Text("B2")),
+                        DropdownMenuItem(value: "C1", child: Text("C1")),
+                        DropdownMenuItem(value: "C2", child: Text("C2")),
+                        DropdownMenuItem(value: "D", child: Text("D")),
+                      ],
+                      onChanged: (value) {
+                        setDialogState(() {
+                          selectedGrade = value!;
+                        });
+                      },
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    /// BUTTONS
+                    Row(
+                      children: [
+
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () {
+                              Navigator.pop(dialogContext);
+                            },
+                            style: OutlinedButton.styleFrom(
+                              minimumSize: const Size(
+                                double.infinity,
+                                52,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text("Cancel"),
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        Expanded(
+                          child: AppButton(
+                            title: "Update",
+                            icon: Icons.save_rounded,
+                            onTap: () async {
+
+                              final success =
+                              await context
+                                  .read<
+                                  CoScholasticGradeViewModel>()
+                                  .updateGradeApi(
+                                gradeId: grade
+                                    .coScholasticGradesId!,
+                                grade: selectedGrade,
+                                context: context,
+                              );
+
+                              if (success) {
+
+                                Navigator.pop(dialogContext);
+
+                                await context
+                                    .read<
+                                    CoScholasticGradeViewModel>()
+                                    .getGradesApi(
+                                  studentId: grade.studentId
+                                      .toString(),
+                                  academicYear:
+                                  grade.academicYear ?? "",
+                                  context: context,
+                                );
+
+                                _showSnackBar(
+                                  "Grade updated successfully",
+                                  isError: false,
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-
-              actions: [
-
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(dialogContext);
-                  },
-                  child: const Text("Cancel"),
-                ),
-
-                ElevatedButton(
-                  onPressed: () async {
-
-                    final success =
-                    await context
-                        .read<
-                        CoScholasticGradeViewModel>()
-                        .updateGradeApi(
-                      gradeId:
-                      grade.coScholasticGradesId!,
-                      grade:
-                      selectedGrade,
-                      context:
-                      context,
-                    );
-
-                    if (success) {
-
-                      Navigator.pop(
-                        dialogContext,
-                      );
-
-                      await context
-                          .read<
-                          CoScholasticGradeViewModel>()
-                          .getGradesApi(
-                        studentId:
-                        grade.studentId
-                            .toString(),
-                        academicYear:
-                        grade.academicYear ??
-                            "",
-                        context:
-                        context,
-                      );
-
-                      _showSnackBar(
-                        "Grade updated successfully",
-                        isError: false,
-                      );
-                    }
-                  },
-                  child: const Text(
-                    "Update",
-                  ),
-                ),
-              ],
             );
           },
         );
@@ -586,137 +665,236 @@ class _CoScholasticGradeListTableState
       ) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(
-                Icons.delete_rounded,
-                color: Colors.red,
-                size: 20,
-              ),
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+          child: Container(
+            width: 420,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(28),
             ),
-            const SizedBox(width: 12),
-            const Text(
-              "Delete Grade",
-              style: TextStyle(
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF1A1A2E),
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Are you sure you want to delete this grade?",
-              style: TextStyle(
-                color: Colors.grey.shade700,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.red.shade100),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.grade_rounded,
-                    color: Colors.red,
-                    size: 16,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+
+                /// DELETE ICON
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    "${grade.subjectName} - ${grade.grade}",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A2E),
+                  child: Icon(
+                    Icons.delete_forever_rounded,
+                    color: Colors.red.shade600,
+                    size: 42,
+                  ),
+                ),
+
+                const SizedBox(height: 18),
+
+                const Text(
+                  "Delete Grade",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  "This action cannot be undone.",
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 13,
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                /// STUDENT INFO
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: Colors.grey.shade200,
                     ),
                   ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(
-              "Cancel",
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w600,
-              ),
+                  child: Row(
+                    children: [
+
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: Colors.red.shade400,
+                        child: Text(
+                          (grade.studentName ?? "S")
+                              .substring(0, 1)
+                              .toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 14),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+
+                            Text(
+                              grade.studentName ?? "",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                            ),
+
+                            const SizedBox(height: 4),
+
+                            Text(
+                              "Roll No : ${grade.rollNo ?? "-"}",
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// SUBJECT CARD
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.red.shade100,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                    children: [
+
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.menu_book_rounded,
+                            color: Colors.red.shade600,
+                            size: 18,
+                          ),
+
+                          const SizedBox(width: 8),
+
+                          Expanded(
+                            child: Text(
+                              grade.subjectName ?? "",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                          BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          "Grade : ${grade.grade ?? "-"}",
+                          style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 28),
+
+                /// BUTTONS
+                Row(
+                  children: [
+
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.pop(
+                            dialogContext,
+                            false,
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(
+                            double.infinity,
+                            52,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text(
+                          "Cancel",
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: AppButton(
+                        title: "Delete",
+                        icon: Icons.delete_rounded,
+                        bgColor: Colors.red,
+                        onTap: () {
+                          Navigator.pop(
+                            dialogContext,
+                            true,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade600,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-            child: const Text(
-              "Delete",
-              style: TextStyle(fontWeight: FontWeight.w600),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
-
-    if (confirm == true) {
-
-      final success =
-      await context
-          .read<
-          CoScholasticGradeViewModel>()
-          .deleteGradeApi(
-        gradeId:
-        grade.coScholasticGradesId!,
-        context: context,
-      );
-
-      if (success) {
-
-        await context
-            .read<
-            CoScholasticGradeViewModel>()
-            .getGradesApi(
-          studentId:
-          grade.studentId
-              .toString(),
-          academicYear:
-          grade.academicYear ??
-              "",
-          context:
-          context,
-        );
-
-        _showSnackBar(
-          "Grade deleted successfully",
-          isError: false,
-        );
-      }
-    }
   }
 
   void _showSnackBar(String message, {bool isError = true}) {

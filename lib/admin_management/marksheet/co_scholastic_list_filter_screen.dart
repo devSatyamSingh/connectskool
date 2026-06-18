@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
-import '../../view_model/school_view_model/academic_view_model.dart';
-import '../../view_model/school_view_model/all_classes_view_model.dart';
-import '../../view_model/school_view_model/all_scetions_view_model.dart';
-import '../../view_model/school_view_model/all_student_list_view_model.dart';
-import '../../view_model/school_view_model/co_scholastic_grade_view_model.dart';
+import '../../view_model/auth_view_model/academic_view_model.dart';
+import '../../view_model/school_view_model/classes/all_classes_view_model.dart';
+import '../../view_model/school_view_model/section/all_scetions_view_model.dart';
+import '../../view_model/school_view_model/student/all_student_list_view_model.dart';
+import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
 
 class CoScholasticListFilterCard extends StatefulWidget {
   const CoScholasticListFilterCard({super.key});
@@ -48,13 +49,11 @@ class _CoScholasticListFilterCardState
     return Card(
       elevation: 4,
       shadowColor: Colors.black.withOpacity(0.08),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-         color: Colors.grey.shade200
+          color: Colors.grey.shade200,
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -87,18 +86,6 @@ class _CoScholasticListFilterCardState
                       color: Color(0xFF1A1A2E),
                     ),
                   ),
-                  const Spacer(),
-                  if (_isLoading)
-                    const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColor.primary,
-                        ),
-                      ),
-                    ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -107,20 +94,23 @@ class _CoScholasticListFilterCardState
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: selectedAcademicYear,
-                      decoration: _inputDecoration("Academic Year", Icons.calendar_today_rounded),
+                      decoration: _inputDecoration(
+                        "Academic Year",
+                        Icons.calendar_today_rounded,
+                      ),
                       items: academicVm.years
                           .map(
                             (e) => DropdownMenuItem<String>(
-                          value: e.yearName,
-                          child: Text(
-                            e.yearName ?? "",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                              value: e.yearName,
+                              child: Text(
+                                e.yearName ?? "",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      )
+                          )
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -140,28 +130,34 @@ class _CoScholasticListFilterCardState
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       value: selectedClassId,
-                      decoration: _inputDecoration("Class", Icons.class_rounded),
-                      items: classVm.allClassesModel?.data
-                          ?.map(
-                            (e) => DropdownMenuItem<String>(
-                          value: e.classId.toString(),
-                          child: Text(
-                            e.className ?? "",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      )
-                          .toList() ??
+                      decoration: _inputDecoration(
+                        "Class",
+                        Icons.class_rounded,
+                      ),
+                      items:
+                          classVm.allClassesModel?.data
+                              ?.map(
+                                (e) => DropdownMenuItem<String>(
+                                  value: e.classId.toString(),
+                                  child: Text(
+                                    e.className ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList() ??
                           [],
                       onChanged: (value) async {
+                        studentVm.clearStudents();
                         setState(() {
                           selectedClassId = value;
                           selectedSectionId = null;
                           selectedStudentId = null;
                         });
+
                         if (value != null) {
                           await sectionVm.allSectionsApi(context, value);
                         }
@@ -181,27 +177,34 @@ class _CoScholasticListFilterCardState
               // Section Dropdown
               DropdownButtonFormField<String>(
                 value: selectedSectionId,
-                decoration: _inputDecoration("Section", Icons.view_agenda_rounded),
-                items: sectionVm.allSectionsModel?.data
-                    ?.map(
-                      (e) => DropdownMenuItem<String>(
-                    value: e.sectionId.toString(),
-                    child: Text(
-                      e.sectionName ?? "",
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                )
-                    .toList() ??
+                decoration: _inputDecoration(
+                  "Section",
+                  Icons.view_agenda_rounded,
+                ),
+                items:
+                    sectionVm.allSectionsModel?.data
+                        ?.map(
+                          (e) => DropdownMenuItem<String>(
+                            value: e.sectionId.toString(),
+                            child: Text(
+                              e.sectionName ?? "",
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList() ??
                     [],
                 onChanged: (value) async {
+                  studentVm.clearStudents();
+
                   setState(() {
                     selectedSectionId = value;
                     selectedStudentId = null;
                   });
+
                   if (selectedClassId != null && value != null) {
                     await studentVm.allStudentListApi(
                       context,
@@ -230,8 +233,19 @@ class _CoScholasticListFilterCardState
                         "Student",
                         Icons.person_rounded,
                       ),
-                      items: studentVm.allStudentListModel?.data
-                          ?.map(
+
+                      hint: Text(
+                        selectedClassId == null
+                            ? "Select Class First"
+                            : selectedSectionId == null
+                            ? "Select Section First"
+                            : "Select Student",
+                      ),
+
+                      items: (selectedClassId == null || selectedSectionId == null)
+                          ? []
+                          : (studentVm.allStudentListModel?.data ?? [])
+                          .map(
                             (student) => DropdownMenuItem<int>(
                           value: student.studentId,
                           child: SizedBox(
@@ -244,9 +258,12 @@ class _CoScholasticListFilterCardState
                           ),
                         ),
                       )
-                          .toList() ??
-                          [],
-                      onChanged: (value) {
+                          .toList(),
+
+                      onChanged: (selectedClassId == null ||
+                          selectedSectionId == null)
+                          ? null
+                          : (value) {
                         setState(() {
                           selectedStudentId = value;
                         });
@@ -256,45 +273,11 @@ class _CoScholasticListFilterCardState
                 ],
               ),
               const SizedBox(height: 16),
-
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton.icon(
-                  onPressed: _isLoading
-                      ? null
-                      : _loadGrades,
-                  icon: _isLoading
-                      ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Icon(
-                    Icons.search_rounded,
-                    size: 20,
-                  ),
-                  label: Text(
-                    _isLoading
-                        ? "Loading..."
-                        : "Load Student Grades",
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColor.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                ),
+              AppButton(
+                title: "Load Student Grades",
+                icon: Icons.search_rounded,
+                loading: _isLoading,
+                onTap: _loadGrades,
               ),
             ],
           ),
@@ -311,11 +294,7 @@ class _CoScholasticListFilterCardState
         fontSize: 13,
         fontWeight: FontWeight.w500,
       ),
-      prefixIcon: Icon(
-        icon,
-        color: AppColor.primary,
-        size: 20,
-      ),
+      prefixIcon: Icon(icon, color: AppColor.primary, size: 20),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
@@ -333,15 +312,26 @@ class _CoScholasticListFilterCardState
       ),
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 14,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       floatingLabelBehavior: FloatingLabelBehavior.auto,
     );
   }
 
   Future<void> _loadGrades() async {
+    if (selectedClassId == null) {
+      _showSnackBar("Please select class");
+      return;
+    }
+
+    if (selectedSectionId == null) {
+      _showSnackBar("Please select section");
+      return;
+    }
+
+    if (selectedStudentId == null) {
+      _showSnackBar("Please select student");
+      return;
+    }
     if (selectedStudentId == null || selectedAcademicYear == null) {
       _showSnackBar("Please select both student and academic year");
       return;
@@ -368,15 +358,10 @@ class _CoScholasticListFilterCardState
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: const TextStyle(color: Colors.white),
-        ),
+        content: Text(message, style: const TextStyle(color: Colors.white)),
         backgroundColor: Colors.red.shade700,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
         duration: const Duration(seconds: 3),
       ),

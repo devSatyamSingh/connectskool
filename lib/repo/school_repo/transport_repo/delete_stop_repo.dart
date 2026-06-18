@@ -14,10 +14,10 @@ class DeleteStopRepository {
         ApiUrl.deleteStops,
         data,
       );
-      debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
+      debugPrint(" API Raw Response: ${jsonEncode(response)}");
       return response;
     } catch (e) {
-      debugPrint('❌ Error occurred during deleteStopApi: $e');
+      debugPrint(' Error occurred during deleteStopApi: $e');
       rethrow;
     }
   }

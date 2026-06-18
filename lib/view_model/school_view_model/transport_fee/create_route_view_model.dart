@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:school_pro/repo/school_repo/create_classes_repo.dart';
-import 'package:school_pro/repo/school_repo/create_fine_repo.dart';
+import 'package:school_pro/repo/school_repo/classes/create_classes_repo.dart';
+import 'package:school_pro/repo/school_repo/fees/create_fine_repo.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/create_route_repo.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
-import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/fine_rule_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/all_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/fine_rule_view_model.dart';
 
 import '../../../utils/permission_extensions.dart';
 import '../../../utils/permission_keys.dart';

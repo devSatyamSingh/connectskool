@@ -3,17 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/app_button.dart';
-import 'package:school_pro/view_model/school_view_model/all_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/get_send_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/all_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/get_send_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/create_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/delete_notification_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/student_notification_view_model.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
-import '../view_model/school_view_model/mark_as_all_read_notication_view_model.dart';
+import '../view_model/school_view_model/notification/mark_as_all_read_notication_view_model.dart';
 
 class StudentNotificationScreen extends StatefulWidget {
   const StudentNotificationScreen({super.key});
@@ -65,7 +65,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     super.dispose();
   }
 
-  // ── Animation card ────────────────────────────────────────
   Widget _animCard({required int index, required Widget child}) {
     return AnimatedBuilder(
       animation: _animCtrl,
@@ -82,7 +81,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     );
   }
 
-  // ── Snackbar ──────────────────────────────────────────────
   void _snack(String msg, {bool error = false}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -110,7 +108,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     );
   }
 
-  // ── Helpers ───────────────────────────────────────────────
   String _formatRole(String role) {
     switch (role) {
       case 'school_admin':
@@ -144,32 +141,24 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     }
   }
 
-  // ════════════════════════════════════════════════════════
-  //  BUILD
-  // ════════════════════════════════════════════════════════
+
   @override
   Widget build(BuildContext context) {
-    // final markReadVM =
-    // Provider.of<MarkAsAllReadNotificationViewModel>(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
-      // floatingActionButton: _buildFAB(),
       body: Column(
         children: [
           _buildHeader(),
           Expanded(
-            // ✅ Uncomment
-            child: _buildInbox(), // ✅ Direct inbox, no TabBarView needed
+            child: _buildInbox(), // Direct inbox, no TabBarView needed
           ),
         ],
       ),
     );
   }
 
-  // ─── FAB ─────────────────────────────────────────────────
 
-  // ─── Header ──────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 54, 16, 0),
@@ -239,9 +228,7 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     );
   }
 
-  // ════════════════════════════════════════════════════════
-  //  INBOX TAB
-  // ════════════════════════════════════════════════════════
+
   Widget _buildInbox() {
     final vm = Provider.of<StudentNotificationViewModel>(context);
     final notifications =
@@ -288,7 +275,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Icon bubble
                     Container(
                       width: 38,
                       height: 38,
@@ -305,13 +291,10 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                       ),
                     ),
                     const SizedBox(width: 12),
-
-                    // Content
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title + unread dot
                           Row(
                             children: [
                               Expanded(
@@ -338,8 +321,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                             ],
                           ),
                           const SizedBox(height: 4),
-
-                          // Description
                           Text(
                             n.description ?? "",
                             style: TextStyle(
@@ -351,11 +332,8 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 8),
-
-                          // Meta row
                           Row(
                             children: [
-                              // Sender chip
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
@@ -385,8 +363,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                                 ),
                               ),
                               const SizedBox(width: 6),
-
-                              // Type badge (Message / Alert etc.)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
@@ -397,7 +373,7 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                                   borderRadius: BorderRadius.circular(7),
                                 ),
                                 child: Text(
-                                  "Message", // ya n.type ?? "Message"
+                                  "Message",
                                   style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -405,10 +381,7 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                                   ),
                                 ),
                               ),
-
                               const Spacer(),
-
-                              // Time
                               Text(
                                 _formatTime(n.createdAt),
                                 style: TextStyle(
@@ -418,21 +391,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                               ),
                             ],
                           ),
-
-                          // "Click to read →"
-                          // Align(
-                          //   alignment: Alignment.centerRight,
-                          //   child: Padding(
-                          //     padding: const EdgeInsets.only(top: 6),
-                          //     child: Text(
-                          //       "Click to read →",
-                          //       style: TextStyle(
-                          //         fontSize: 11,
-                          //         color: AppColor.sub.withOpacity(0.7),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -441,185 +399,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
               ),
             ),
           );
-          // return _animCard(
-          //   index: index,
-          //   child: Container(
-          //     margin: const EdgeInsets.only(bottom: 12),
-          //     decoration: BoxDecoration(
-          //       color: Colors.white,
-          //       borderRadius: BorderRadius.circular(20),
-          //       border: isRead
-          //           ? null
-          //           : Border.all(
-          //         color: AppColor.primary.withOpacity(0.25),
-          //         width: 1.5,
-          //       ),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.black.withOpacity(0.05),
-          //           blurRadius: 12,
-          //           offset: const Offset(0, 4),
-          //         ),
-          //       ],
-          //     ),
-          //     child: Padding(
-          //       padding: const EdgeInsets.all(16),
-          //       child: Row(
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         children: [
-          //           // ── Icon Bubble ──
-          //           Container(
-          //             width: 44,
-          //             height: 44,
-          //             decoration: BoxDecoration(
-          //               gradient: isRead
-          //                   ? LinearGradient(colors: [
-          //                 Colors.grey.shade200,
-          //                 Colors.grey.shade300,
-          //               ])
-          //                   : AppColor.primaryGradient,
-          //               borderRadius: BorderRadius.circular(14),
-          //               boxShadow: isRead
-          //                   ? []
-          //                   : [
-          //                 BoxShadow(
-          //                   color: AppColor.primary.withOpacity(0.3),
-          //                   blurRadius: 8,
-          //                   offset: const Offset(0, 3),
-          //                 ),
-          //               ],
-          //             ),
-          //             child: Icon(
-          //               isRead
-          //                   ? Icons.mark_email_read_rounded
-          //                   : Icons.mark_email_unread_rounded,
-          //               color:
-          //               isRead ? Colors.grey.shade500 : Colors.white,
-          //               size: 20,
-          //             ),
-          //           ),
-          //           const SizedBox(width: 14),
-          //
-          //           // ── Content ──
-          //           Expanded(
-          //             child: Column(
-          //               crossAxisAlignment: CrossAxisAlignment.start,
-          //               children: [
-          //                 // Title + unread dot
-          //                 Row(
-          //                   crossAxisAlignment: CrossAxisAlignment.start,
-          //                   children: [
-          //                     Expanded(
-          //                       child: Text(
-          //                         n.title ?? "",
-          //                         style: TextStyle(
-          //                           fontSize: 14.5,
-          //                           fontWeight: isRead
-          //                               ? FontWeight.w500
-          //                               : FontWeight.w700,
-          //                           color: AppColor.text,
-          //                           letterSpacing: -0.2,
-          //                         ),
-          //                       ),
-          //                     ),
-          //                     if (!isRead)
-          //                       Container(
-          //                         margin: const EdgeInsets.only(
-          //                             top: 4, left: 6),
-          //                         width: 8,
-          //                         height: 8,
-          //                         decoration: BoxDecoration(
-          //                           color: AppColor.primary,
-          //                           shape: BoxShape.circle,
-          //                         ),
-          //                       ),
-          //                   ],
-          //                 ),
-          //                 const SizedBox(height: 5),
-          //
-          //                 // Description
-          //                 Text(
-          //                   n.description ?? "",
-          //                   style: const TextStyle(
-          //                     fontSize: 13,
-          //                     color: AppColor.sub,
-          //                     height: 1.4,
-          //                   ),
-          //                   maxLines: 2,
-          //                   overflow: TextOverflow.ellipsis,
-          //                 ),
-          //                 const SizedBox(height: 10),
-          //
-          //                 // Sender + Role + Time
-          //                 Row(
-          //                   children: [
-          //                     // Sender chip
-          //                     Container(
-          //                       padding: const EdgeInsets.symmetric(
-          //                           horizontal: 8, vertical: 4),
-          //                       decoration: BoxDecoration(
-          //                         color: AppColor.primaryLight,
-          //                         borderRadius: BorderRadius.circular(8),
-          //                       ),
-          //                       child: Row(
-          //                         children: [
-          //                           Icon(
-          //                             Icons.person_outline_rounded,
-          //                             size: 11,
-          //                             color: AppColor.primary,
-          //                           ),
-          //                           const SizedBox(width: 4),
-          //                           Text(
-          //                             n.senderName ?? "Unknown",
-          //                             style: TextStyle(
-          //                               fontSize: 11,
-          //                               fontWeight: FontWeight.w600,
-          //                               color: AppColor.primary,
-          //                             ),
-          //                           ),
-          //                         ],
-          //                       ),
-          //                     ),
-          //                     const SizedBox(width: 6),
-          //
-          //                     // Role badge
-          //                     Container(
-          //                       padding: const EdgeInsets.symmetric(
-          //                           horizontal: 8, vertical: 4),
-          //                       decoration: BoxDecoration(
-          //                         color: const Color(0xFFEFF6FF),
-          //                         borderRadius: BorderRadius.circular(8),
-          //                       ),
-          //                       child: Text(
-          //                         _formatRole(n.senderRole ?? ""), // ✅ Fixed
-          //                         style: const TextStyle(
-          //                           fontSize: 11,
-          //                           fontWeight: FontWeight.w600,
-          //                           color: Color(0xFF3B82F6),
-          //                         ),
-          //                       ),
-          //                     ),
-          //
-          //                     const Spacer(),
-          //
-          //                     // Time
-          //                     Text(
-          //                       _formatTime(n.createdAt),
-          //                       style: const TextStyle(
-          //                         fontSize: 11,
-          //                         color: AppColor.sub,
-          //                       ),
-          //                     ),
-          //                   ],
-          //                 ),
-          //               ],
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //   ),
-          // );
         },
       ),
     );
@@ -644,7 +423,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     );
   }
 
-  // ── Empty state ───────────────────────────────────────────
   Widget _emptyState(String msg) {
     return Center(
       child: Column(

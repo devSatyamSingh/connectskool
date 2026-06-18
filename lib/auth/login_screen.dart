@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
-
-import '../module_screen.dart';
 import '../view_model/auth_view_model/login_view_model.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
-import '../../view_model/school_view_model/academic_view_model.dart';
-import '../../view_model/school_view_model/all_student_list_view_model.dart';
-import '../../view_model/school_view_model/get_student_transport_view_model.dart';
+import '../../view_model/auth_view_model/academic_view_model.dart';
+import '../../view_model/school_view_model/student/all_student_list_view_model.dart';
+import '../../view_model/school_view_model/transport_fee/get_student_transport_view_model.dart';
 
 class StudentTransportFeeScreen extends StatefulWidget {
   const StudentTransportFeeScreen({super.key});
@@ -19,16 +19,6 @@ class _StudentTransportFeeScreenState
   String? selectedStudent;
   String? selectedYear;
 
-  // List yearList = ["2026-27", "2025-26"];
-  // String? selectedYear;
-  @override
-  // void initState() {
-  //   super.initState();
-  //   Future.microtask(() {
-  //     Provider.of<AllStudentListVieModel>(context, listen: false)
-  //         .allStudentListApi(context);
-  //   });
-  // }
   @override
   void initState() {
     super.initState();
@@ -36,7 +26,6 @@ class _StudentTransportFeeScreenState
       Provider.of<AllStudentListVieModel>(context, listen: false)
           .allStudentListApi(context);
 
-      // ✅ Academic years load karo
       final academicVm = Provider.of<AcademicViewModel>(context, listen: false);
       await academicVm.academicApi(context);
 
@@ -58,7 +47,6 @@ class _StudentTransportFeeScreenState
       backgroundColor: const Color(0xFFF4F6FB),
       body: Column(
         children: [
-          /// ── HEADER ──────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.fromLTRB(12, 52, 20, 24),
             decoration: BoxDecoration(
@@ -124,7 +112,6 @@ class _StudentTransportFeeScreenState
 
           const SizedBox(height: 20),
 
-          /// ── FILTER SECTION ──────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -189,27 +176,6 @@ class _StudentTransportFeeScreenState
                     );
                   },
                 ),
-                // _buildDropdown(
-                //   icon: Icons.calendar_today_rounded,
-                //   iconColor: const Color(0xFF00B894),
-                //   iconBg: const Color(0xFFECFDF5),
-                //   hint: "Select Academic Year",
-                //   value: selectedYear,
-                //   items: yearList
-                //       .map(
-                //         (e) => DropdownMenuItem(value: e, child: Text(e)),
-                //   )
-                //       .toList(),
-                //   onChanged: (v) {
-                //     setState(() => selectedYear = v.toString());
-                //     if (selectedStudent != null && selectedYear != null) {
-                //       Provider.of<GetStudentTransportViewModel>(context,
-                //           listen: false)
-                //           .getStudentTransportApi(
-                //           selectedStudent!, selectedYear!, context);
-                //     }
-                //   },
-                // ),
               ],
             ),
           ),

@@ -9,12 +9,12 @@ import '../utils/dashboard_module.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
 import '../view_model/accountant/accountant_profile_view_model.dart';
-import '../view_model/school_view_model/all_accountant_list_view_model.dart';
-import '../view_model/school_view_model/all_student_list_view_model.dart';
-import '../view_model/school_view_model/all_teachers_view_model.dart';
-import '../view_model/user_view_model.dart';
-import '../admin_management/cms_screen.dart';
-import '../admin_management/manage_permission.dart';
+import '../view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
+import '../view_model/school_view_model/student/all_student_list_view_model.dart';
+import '../view_model/school_view_model/teacher/all_teachers_view_model.dart';
+import '../view_model/auth_view_model/user_view_model.dart';
+import '../admin_management/settings/cms_screen.dart';
+import '../admin_management/permission/manage_permission.dart';
 
 class AccountantManagementDashBoardScreen extends StatefulWidget {
   const AccountantManagementDashBoardScreen({super.key});

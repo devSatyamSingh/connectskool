@@ -2,12 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/accountant_repo/create_accountant_attebndance_repo.dart';
-import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/all_classes_view_model.dart';
 
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
-import '../school_view_model/all_accountant_list_view_model.dart';
+import '../school_view_model/accountant/all_accountant_list_view_model.dart';
 
 class CreateAccountantAttendanceViewModel with ChangeNotifier {
   final _loginRepo = CreateAccountantAttendanceRepository();

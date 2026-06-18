@@ -48,9 +48,7 @@ class InternetService {
   }
 }
 
-// ─────────────────────────────────────────────
-//  2. InternetAwareWrapper
-// ─────────────────────────────────────────────
+
 class InternetAwareWrapper extends StatefulWidget {
   final Widget child;
   const InternetAwareWrapper({super.key, required this.child});

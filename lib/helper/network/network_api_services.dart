@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import '../../view_model/user_view_model.dart';
+import '../../view_model/auth_view_model/user_view_model.dart';
 import 'base_api_services.dart';
 
 class NetworkApiServices extends BaseApiServices {

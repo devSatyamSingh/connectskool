@@ -13,10 +13,10 @@ class CreateRouteRepository {
   Future<dynamic> createRouteApi(dynamic data) async {
     try {
       dynamic response = await _apiServices.getPostApiResponse(ApiUrl.createRoute,data);
-      debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
+      debugPrint(" API Raw Response: ${jsonEncode(response)}");
       return (response);
     } catch (e) {
-      debugPrint('❌ Error occurred during createRouteApi: $e');
+      debugPrint(' Error occurred during createRouteApi: $e');
       rethrow;
     }
   }

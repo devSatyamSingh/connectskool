@@ -1030,7 +1030,7 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Only .pdf files • Max size 1 MB",
+                          "Only .pdf files * Max size 1 MB",
                           style: TextStyle(
                             color: Colors.grey.shade500,
                             fontSize: 12,

@@ -63,7 +63,7 @@ class Assets {
   static const String libSplashScreen = 'lib/splash_screen.dart';
   static const String marksheetAdmitCardPdfService = 'lib/admin_management/marksheet/admit_card_pdf_service.dart';
   static const String marksheetGenerateIdCardService = 'lib/admin_management/marksheet/generate_id_card_service.dart';
-  static const String marksheetGenerateMarksheet = 'lib/admin_management/marksheet/generate_marksheet.dart';
+  static const String marksheetGenerateMarksheet = 'lib/admin_management/marksheet/generate_marksheet_model.dart';
   static const String marksheetMarksheetScreen = 'lib/admin_management/marksheet/marksheet_screen.dart';
   static const String networkBaseApiServices = 'lib/helper/network/base_api_services.dart';
   static const String networkInternetPopup = 'lib/helper/network/internet_popup.dart';
@@ -240,9 +240,9 @@ class Assets {
   static const String schoolViewModelEditStudentViewModel = 'lib/view_model/school_view_model/edit_student_view_model.dart';
   static const String schoolViewModelEditSubjectViewModel = 'lib/view_model/school_view_model/edit_subject_view_model.dart';
   static const String schoolViewModelEditTeacherViewModel = 'lib/view_model/school_view_model/edit_teacher_view_model.dart';
-  static const String schoolViewModelExamManagementViewModel = 'lib/view_model/school_view_model/Exam_management_view_model.dart';
+  static const String schoolViewModelExamManagementViewModel = 'lib/view_model/school_view_model/exam_management_view_model.dart';
   static const String schoolViewModelExamMarksViewModel = 'lib/view_model/school_view_model/exam_marks_view_model.dart';
-  static const String schoolViewModelExamTimeTableViewModel = 'lib/view_model/school_view_model/exam_time_table_view_model.dart';
+  static const String schoolViewModelExamTimeTableViewModel = 'lib/view_model/school_view_model/time_table_view_model.dart';
   static const String schoolViewModelFeesHeadManagementViewModel = 'lib/view_model/school_view_model/fees_head_management_view_model.dart';
   static const String schoolViewModelFeesManagementViewModel = 'lib/view_model/school_view_model/fees_management_view_model.dart';
   static const String schoolViewModelFineRuleViewModel = 'lib/view_model/school_view_model/fine_rule_view_model.dart';

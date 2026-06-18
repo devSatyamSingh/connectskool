@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/create_route_repo.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/create_stop_repo.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/create_student_transport_fee_repo.dart';
-import 'package:school_pro/view_model/school_view_model/fine_rule_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/fine_rule_view_model.dart';
 
 import '../../../utils/permission_extensions.dart';
 import '../../../utils/permission_keys.dart';
@@ -22,8 +22,6 @@ class CreateStudentTransportFeeViewModel with ChangeNotifier {
       dynamic studentId,
       dynamic transportRouteId,
       dynamic transportRouteStopId,
-      dynamic academicYear,
-      dynamic academicYearEnd,
       dynamic assignedOn,
       context,
       ) async {
@@ -44,8 +42,6 @@ class CreateStudentTransportFeeViewModel with ChangeNotifier {
       "student_id": studentId,
       "transport_route_id": transportRouteId,
       "transport_route_stop_id": transportRouteStopId,
-      "academic_year": academicYear,
-      "academic_year_end": academicYearEnd,
       "assigned_on": assignedOn,
     };
 
@@ -55,8 +51,6 @@ class CreateStudentTransportFeeViewModel with ChangeNotifier {
       print("student_id: $studentId");
       print("transport_route_id: $transportRouteId");
       print("transport_route_stop_id: $transportRouteStopId");
-      print("academic_year: $academicYear");
-      print("academic_year_end: $academicYearEnd");
       print("assigned_on: $assignedOn");
       print("Full Request Body: $data");
     }

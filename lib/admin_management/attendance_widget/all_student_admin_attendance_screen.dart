@@ -2164,17 +2164,17 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/all_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/create_student_attendance_view_model.dart';
-import '../../repo/school_repo/all_sections_repo.dart';
+import '../../repo/school_repo/section/all_sections_repo.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
-import '../../view_model/school_view_model/all_student_attendance_view_model.dart';
-import '../../view_model/school_view_model/update_student_attendance_view_model.dart';
+import '../../view_model/school_view_model/attendance/all_student_attendance_view_model.dart';
+import '../../view_model/school_view_model/attendance/update_student_attendance_view_model.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Model

@@ -20,7 +20,7 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
     }
 
     try {
-      return DateFormat('MMM dd, yyyy • hh:mm a').format(DateTime.parse(value));
+      return DateFormat('MMM dd, yyyy * hh:mm a').format(DateTime.parse(value));
     } catch (_) {
       return value;
     }

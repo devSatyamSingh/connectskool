@@ -55,7 +55,6 @@ class StudentFeesViewModel extends ChangeNotifier {
   // ── API Call ─────────────────────────────────────────────
   Future<void> fetchFees({
     required String academicYear,
-    required String token,
   }) async {
     _state = FeesState.loading;
     _errorMessage = '';
@@ -64,8 +63,8 @@ class StudentFeesViewModel extends ChangeNotifier {
     try {
       final response = await _repo.getStudentFees(
         academicYear: academicYear,
-        token: token,
       );
+
       _feesResponse = response;
       _state = FeesState.success;
     } catch (e) {

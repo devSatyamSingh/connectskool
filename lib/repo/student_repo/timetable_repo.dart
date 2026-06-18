@@ -11,8 +11,7 @@ class SchoolTimetableRepo {
       String sectionId,
       ) async {
 
-    final url =
-        "${ApiUrl.getTimetable}"
+    final url = "${ApiUrl.getTimetable}"
         "?class_id=$classId"
         "&section_id=$sectionId";
 

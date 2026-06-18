@@ -9,12 +9,12 @@ import 'package:school_pro/admin_management/school_management_dashboard_screen.d
 import 'package:school_pro/splash_screen.dart';
 import 'package:school_pro/student_management/student_dash_board_screen.dart';
 import 'package:school_pro/teacher_management/teacher_management_dashboard_screen.dart';
-import 'package:school_pro/view_model/user_view_model.dart';
+import 'package:school_pro/view_model/auth_view_model/user_view_model.dart';
 import '../../repo/auth_repo/auth_repo.dart';
 import '../../utils/permission_manager.dart';
 import '../../utils/routes/routes_name.dart';
 import '../../utils/utils.dart';
-import '../school_view_model/user_permission_view_model.dart';
+import '../school_view_model/permission/user_permission_view_model.dart';
 
 class LoginViewModel with ChangeNotifier {
   final AuthRepository _repo = AuthRepository();
@@ -128,6 +128,7 @@ class LoginViewModel with ChangeNotifier {
           UserViewModel().saveSchoolId(schoolId),
           UserViewModel().saveClassId(classId),
           UserViewModel().saveSectionId(sectionId),
+          UserViewModel().savePermissions(permissions),
           _subscribeToTopics(
             schoolId,
             role,
@@ -136,18 +137,21 @@ class LoginViewModel with ChangeNotifier {
           ),
         ]);
 
-        // if (role == "school_admin") {
-        //
-        //   await Provider.of<GetUserPermissionViewModel>(
-        //     context,
-        //     listen: false,
-        //   ).getUserPermissionApi(
-        //     context: context,
-        //     userId: int.tryParse(userId.toString()) ?? 0,
-        //     role: role,
-        //     isCurrentUser: true,
-        //   );
-        // }
+        await Provider.of<GetUserPermissionViewModel>(
+          context,
+          listen: false,
+        ).getUserPermissionApi(
+          context: context,
+          userId: int.tryParse(userId.toString()) ?? 0,
+          role: role,
+          isCurrentUser: true,
+        );
+
+        if (!context.mounted) return;
+
+        _navigateFromRole(context, role);
+
+        setLoading(false);
 
         print("================================");
         print("BEFORE USER API");
@@ -160,11 +164,6 @@ class LoginViewModel with ChangeNotifier {
 
         Utils.show(response['message'], context);
 
-        // ✅ Navigation se pehle loader band mat karo
-        _navigateFromRole(context, role);
-
-        // ✅ Ab band karo (jab sab kaam ho gaya)
-        setLoading(false);
       } else {
         setLoading(false);
         Utils.show(response['message'], context);

@@ -13,10 +13,10 @@ class CreateStopRepository {
   Future<dynamic> createStopApi(dynamic data) async {
     try {
       dynamic response = await _apiServices.getPostApiResponse(ApiUrl.createStop,data);
-      debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
+      debugPrint(" API Raw Response: ${jsonEncode(response)}");
       return (response);
     } catch (e) {
-      debugPrint('❌ Error occurred during createStopApi: $e');
+      debugPrint(' Error occurred during createStopApi: $e');
       rethrow;
     }
   }

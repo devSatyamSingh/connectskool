@@ -18,7 +18,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-import '../../model/school_model/generate_admit_card_model.dart';
+import '../../model/school_model/marksheet/generate_admit_card_model.dart';
 
 class IdCardPdfService {
   // ════════════════════════════════════════════════════════════════════════════
@@ -506,7 +506,7 @@ class IdCardPdfService {
                       ),
                     ),
                     Text(
-                      '${students.length} student(s)  •  '
+                      '${students.length} student(s) * '
                       '${model.data?.schoolInfo?.schoolName ?? ''}',
                       style: TextStyle(
                         fontSize: 11,

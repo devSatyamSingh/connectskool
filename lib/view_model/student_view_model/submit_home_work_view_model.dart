@@ -66,7 +66,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/student_repo/submit_home_work_repo.dart';
-import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/student_home_work_view_model.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';

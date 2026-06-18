@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
-import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/school_admin_profile_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart'; // ✅ added
+import 'package:school_pro/view_model/school_view_model/teacher/all_teachers_view_model.dart';
+import 'package:school_pro/view_model/auth_view_model/school_admin_profile_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart'; // ✅ added
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../repo/auth_repo/auth_repo.dart';
@@ -14,12 +14,12 @@ import '../utils/dashboard_module.dart';
 import '../utils/permission_error_message.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
-import '../view_model/school_view_model/all_accountant_list_view_model.dart';
-import '../view_model/school_view_model/cms_viewmodel.dart';
-import '../view_model/school_view_model/user_permission_view_model.dart';
-import '../view_model/user_view_model.dart';
-import 'cms_screen.dart';
-import 'manage_permission.dart';
+import '../view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
+import '../view_model/school_view_model/settings/cms_viewmodel.dart';
+import '../view_model/school_view_model/permission/user_permission_view_model.dart';
+import '../view_model/auth_view_model/user_view_model.dart';
+import 'settings/cms_screen.dart';
+import 'permission/manage_permission.dart';
 
 class SchoolManagementDashboardScreen extends StatefulWidget {
   const SchoolManagementDashboardScreen({super.key});

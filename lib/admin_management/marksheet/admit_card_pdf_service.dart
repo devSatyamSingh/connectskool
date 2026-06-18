@@ -18,7 +18,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-import '../../model/school_model/generate_admit_card_model.dart';
+import '../../model/school_model/marksheet/generate_admit_card_model.dart';
 
 class AdmitCardPdfService {
   // ── Palette (matches website exactly) ──────────────────────────────────────
@@ -447,7 +447,6 @@ class AdmitCardPdfService {
     child: pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('• ', style: pw.TextStyle(fontSize: 7.5, color: _black)),
         pw.Expanded(
           child: pw.Text(
             text,
@@ -546,7 +545,7 @@ class AdmitCardPdfService {
                       ),
                     ),
                     Text(
-                      '${students.length} student(s)  •  '
+                      '${students.length} student(s) '
                       '${model.data?.examInfo?.examName ?? ''}',
                       style: TextStyle(
                         fontSize: 11,

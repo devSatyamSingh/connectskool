@@ -15,10 +15,10 @@ class DiscontinueStudentRepository {
         ApiUrl.discontinueStudentTransport,
         data,
       );
-      debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
+      debugPrint(" API Raw Response: ${jsonEncode(response)}");
       return (response);
     } catch (e) {
-      debugPrint('❌ Error occurred during discontinueStudentApi: $e');
+      debugPrint(' Error occurred during discontinueStudentApi: $e');
       rethrow;
     }
   }

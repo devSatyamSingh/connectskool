@@ -1306,21 +1306,16 @@ import 'package:school_pro/res/const_text.dart';
 
 import '../model/student_model/student_fee_model.dart';
 import '../view_model/student_view_model/student_fee_view_model.dart';
-import '../view_model/user_view_model.dart';
+import '../view_model/auth_view_model/user_view_model.dart';
 
-/// ── How to register the ViewModel ──────────────────────────────────────
-/// In your route/widget tree (e.g. in main.dart or a MultiProvider):
-///
-///   ChangeNotifierProvider(
-///     create: (_) => StudentFeesViewModel(),
-///     child: StudentFeesScreen(),
-///   )
-///
-/// Or use a ProxyProvider if you inject a token from another provider.
-/// ───────────────────────────────────────────────────────────────────────
 
 class StudentFeesScreen extends StatefulWidget {
-  const StudentFeesScreen({super.key});
+  final String yearName;
+
+  const StudentFeesScreen({
+    super.key,
+    required this.yearName,
+  });
 
   @override
   State<StudentFeesScreen> createState() => _StudentFeesScreenState();
@@ -1331,27 +1326,9 @@ class _StudentFeesScreenState extends State<StudentFeesScreen>
   late AnimationController _animationController;
   late TabController _tabController;
 
-  // TODO: replace with your actual token source (SharedPrefs / AuthViewModel)
-  static const String _demoToken = 'YOUR_AUTH_TOKEN_HERE';
-  static const String _academicYear = '2026-27';
 
   @override
-  // void initState() {
-  //   super.initState();
-  //   _animationController = AnimationController(
-  //     vsync: this,
-  //     duration: const Duration(milliseconds: 1000),
-  //   );
-  //   _tabController = TabController(length: 3, vsync: this);
-  //
-  //   // Fetch after first frame so the ViewModel is available via context.
-  //   WidgetsBinding.instance.addPostFrameCallback((_) {
-  //     context.read<StudentFeesViewModel>().fetchFees(
-  //       academicYear: _academicYear,
-  //       token: _demoToken,
-  //     );
-  //   });
-  // }
+
   void initState() {
     super.initState();
     _animationController = AnimationController(
@@ -1360,26 +1337,10 @@ class _StudentFeesScreenState extends State<StudentFeesScreen>
     );
     _tabController = TabController(length: 2, vsync: this);
 
-    // UserViewModel se token fetch karke fees load karo
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final userVm = context.read<UserViewModel>();
-      final token = await userVm.getToken();
-
-      if (token == null) {
-        // Token nahi mila — logout ya error handle karo
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Session expired. Please login again.'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-        return;
-      }
 
       await context.read<StudentFeesViewModel>().fetchFees(
-        academicYear: '2026-27',
-        token: token,
+        academicYear: widget.yearName,
       );
     });
   }
@@ -1538,7 +1499,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen>
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () => vm.fetchFees(
-                  academicYear: _academicYear, token: _demoToken),
+                  academicYear: widget.yearName,),
               icon: const Icon(Icons.refresh_rounded),
               label: const Text('Retry'),
               style: ElevatedButton.styleFrom(

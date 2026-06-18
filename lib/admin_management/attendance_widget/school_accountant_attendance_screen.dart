@@ -3,14 +3,14 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
-import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
 import 'package:school_pro/view_model/accountant_attendance_view_model/accountant_attendance_view_model.dart';
 import 'package:school_pro/view_model/accountant_attendance_view_model/create_accountant_attendance_view_model.dart';
 
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
-import '../../view_model/school_view_model/update_accountant_aatendance_view_model.dart';
+import '../../view_model/school_view_model/attendance/update_accountant_aatendance_view_model.dart';
 
 class _AccountantRow {
   final String id;

@@ -140,7 +140,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                         ),
                         const SizedBox(height: 8),
                         AppText.customText(
-                          "$className • Section $sectionName",
+                          "$className * Section $sectionName",
                           size: 14,
                           weight: FontWeight.w500,
                           color: AppColor.sub,

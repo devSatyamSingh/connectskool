@@ -4044,13 +4044,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/teacher/all_teachers_view_model.dart';
 import 'package:school_pro/view_model/teacher_view_model/teacher_attendance_view_model.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../utils/permission_error_message.dart';
 import '../utils/permission_keys.dart';
-import '../view_model/school_view_model/update_teacher_attendance_view_model.dart';
+import '../view_model/school_view_model/attendance/update_teacher_attendance_view_model.dart';
 import '../view_model/teacher_view_model/create_teacher_attendance_view_model.dart';
 
 // Row Model

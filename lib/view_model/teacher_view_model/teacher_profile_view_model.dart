@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:school_pro/model/school_model/all_student_list_model.dart';
+import 'package:school_pro/model/school_model/student/all_student_list_model.dart';
 import 'package:school_pro/model/teacher_model/teacher_profile_model.dart';
-import 'package:school_pro/repo/school_repo/all_student_list_repo.dart';
+import 'package:school_pro/repo/school_repo/student/all_student_list_repo.dart';
 import 'package:school_pro/repo/teacher_repo/teacher_profile_repo.dart';
 import 'package:school_pro/utils/utils.dart';
 

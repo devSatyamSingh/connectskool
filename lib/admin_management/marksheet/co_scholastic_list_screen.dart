@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../res/app_color.dart';
-import '../../view_model/school_view_model/school_admin_profile_view_model.dart';
+import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
+import '../../view_model/auth_view_model/school_admin_profile_view_model.dart';
 import 'co_scholastic_grade_list_table.dart';
 import 'co_scholastic_list_filter_screen.dart';
 
@@ -16,6 +17,15 @@ class CoScholasticGradesListScreen extends StatefulWidget {
 
 class _CoScholasticGradesListScreenState
     extends State<CoScholasticGradesListScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CoScholasticGradeViewModel>().clear();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,8 +118,8 @@ class CoScholasticHeader extends StatelessWidget {
                       "Co-Scholastic Grades List",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
                         letterSpacing: 0.3,
                       ),
                     ),
@@ -118,41 +128,12 @@ class CoScholasticHeader extends StatelessWidget {
                       "View, Edit & Delete Saved Grades",
                       style: TextStyle(
                         color: Color(0xFFD6E5FF),
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.2,
                       ),
                     ),
                   ],
-                ),
-              ),
-              // Board Badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFFC107), Color(0xFFFFB300)],
-                  ),
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFFFC107).withOpacity(0.4),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: const Text(
-                  "CBSE",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                  ),
                 ),
               ),
             ],

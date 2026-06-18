@@ -6,15 +6,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import '../../model/school_model/all_classes_model.dart';
-import '../../model/school_model/all_sections_model.dart';
+import '../model/school_model/classes/all_classes_model.dart';
+import '../model/school_model/section/all_sections_model.dart';
 import '../../model/student_model/timetable_model.dart';
-import '../../view_model/school_view_model/all_classes_view_model.dart';
+import '../view_model/school_view_model/classes/all_classes_view_model.dart';
 import '../res/app_color.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
 import '../utils/utils.dart';
-import '../view_model/school_view_model/all_scetions_view_model.dart';
+import '../view_model/school_view_model/section/all_scetions_view_model.dart';
 import '../view_model/student_view_model/timetable_viewmodel.dart';
 import 'dart:typed_data';
 import 'package:intl/intl.dart';
@@ -795,7 +795,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${displayData.first.className ?? ""} • Section ${displayData.first.sectionName ?? ""}",
+                        "${displayData.first.className ?? ""} * Section ${displayData.first.sectionName ?? ""}",
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -1268,7 +1268,7 @@ class TimetablePdfGenerator {
     if (sectionName.isNotEmpty) {
       classLine.write(" - Section $sectionName");
     }
-    classLine.write(" • $dayLabel");
+    classLine.write(" * $dayLabel");
 
     return pw.Center(
       child: pw.Column(

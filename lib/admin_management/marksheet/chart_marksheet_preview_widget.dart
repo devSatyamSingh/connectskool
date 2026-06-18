@@ -1,0 +1,534 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../view_model/school_view_model/marksheet/generate_marksheet_view_model.dart';
+
+class ChartMarksheetPreviewWidget extends StatelessWidget {
+  const ChartMarksheetPreviewWidget({super.key});
+
+  // Precise brand colors extracted from the design image
+  static const Color brandRed = Color(0xFFBA1A1A);
+  static const Color darkSlateBlue = Color(0xFF2F3B52);
+  static const Color lightGreyBg = Color(0xFFF9F9F9);
+  static const Color borderGrey = Color(0xFFCCCCCC);
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<GenerateMarksheetViewModel>();
+    final data = vm.marksheetModel?.data;
+
+    if (data == null) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: Text(
+            "No Chart Marksheet Found",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
+    final student = data.studentInfo;
+
+    return Center(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          width: 850, // Perfect portrait/desktop layout constraint aspect ratio
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 40),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 12,
+                offset: Offset(0, 4),
+              )
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              /// BRAND HEADER WITH LEFT CIRCLE LOGO AND RIGHT BOOK LOGO
+              _buildHeader(data.academicYear ?? "2026-27"),
+              const SizedBox(height: 20),
+
+              /// STUDENT PROFILE GRID SECTION
+              _buildStudentProfile(student),
+              const SizedBox(height: 16),
+
+              /// SCHOLASTIC RECORD EMPTY STATE STATE PLACEHOLDER
+              _buildScholasticBox(data.scholastic),
+              const SizedBox(height: 16),
+
+              /// CO-SCHOLASTIC SPLIT DATA TABLE + RIGHT COMPACT SCALE
+              _buildCoScholasticSection(data),
+              const SizedBox(height: 24),
+
+              /// HORIZONTAL 8-POINT GRADING SCALE OVERVIEW
+              _buildInstructionTable(),
+              const SizedBox(height: 36),
+
+              /// SIGNATURE BLOCKS FOOTER
+              _buildFooter(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(String academicYear) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Left Custom Red Badge Icon
+            Container(
+              width: 56,
+              height: 56,
+              decoration: const BoxDecoration(
+                color: brandRed,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.school,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+
+            // Central School Branding Typography
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "SAKSHI APRIL SCHOOL",
+                    style: TextStyle(
+                      color: brandRed,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    "TRUST ON EDUCATION",
+                    style: TextStyle(
+                      color: brandRed,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  const Text(
+                    "Bhadohi, Uttar Pradesh, India",
+                    style: TextStyle(fontSize: 9, color: Colors.black54),
+                  ),
+                  const Text(
+                    "www.... | Phone No. +91-9984321587",
+                    style: TextStyle(fontSize: 9, color: Colors.black54),
+                  ),
+                ],
+              ),
+            ),
+
+            // Right Custom Accent Book Line Asset Outline
+            const Icon(
+              Icons.menu_book_outlined,
+              color: brandRed,
+              size: 42,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // Progress Report Banner Strip
+        Container(
+          width: double.infinity,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          decoration: const BoxDecoration(
+            border: Border(
+              top: BorderSide(color: brandRed, width: 1.5),
+              bottom: BorderSide(color: brandRed, width: 1.5),
+            ),
+          ),
+          child: Text(
+            "PROGRESS REPORT • $academicYear",
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              letterSpacing: 1.2,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStudentProfile(student) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Student Profile",
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+            decoration: TextDecoration.underline,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Table(
+          columnWidths: const {
+            0: FlexColumnWidth(1.2),
+            1: FlexColumnWidth(2.0),
+            2: FlexColumnWidth(1.2),
+            3: FlexColumnWidth(1.5),
+          },
+          children: [
+            _buildProfileRow("Name of Student", student?.name, "Class & Section", "${student?.className ?? ""} - ${student?.sectionName ?? ""}"),
+            _buildProfileRow("Mother's Name", student?.motherName, "Roll No", student?.rollNo),
+            _buildProfileRow("Father's Name", student?.fatherName, "D.O.B.", student?.dob),
+            _buildProfileRow("Admission No.", student?.admissionNo, "", ""),
+          ],
+        ),
+      ],
+    );
+  }
+
+  TableRow _buildProfileRow(String label1, String? v1, String label2, String? v2) {
+    const lblStyle = TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87);
+    const valStyle = TextStyle(fontSize: 11, color: Colors.black);
+
+    return TableRow(
+      children: [
+        Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(label1, style: lblStyle)),
+        Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(v1 != null && v1.isNotEmpty ? ": $v1" : "", style: valStyle)),
+        Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(label2, style: lblStyle)),
+        Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Text(v2 != null && v2.isNotEmpty ? ": $v2" : "", style: valStyle)),
+      ],
+    );
+  }
+
+  Widget _buildScholasticBox(Map<String, dynamic>? scholastic) {
+    final bool hasData = scholastic != null && scholastic.isNotEmpty;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(
+        border: Border.all(color: borderGrey),
+      ),
+      child: Center(
+        child: Text(
+          hasData ? "Scholastic Records Present" : "No scholastic records.",
+          style: TextStyle(
+            color: hasData ? Colors.black : Colors.black38,
+            fontSize: 11,
+            fontStyle: FontStyle.italic,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoScholasticSection(data) {
+    // API split responses for terms mapping safely
+    final term1 = data.coScholastic?["term1"] ?? {};
+    final term2 = data.coScholastic?["term2"] ?? {};
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Two independent split layout grids or standard dynamic items tracking
+        Expanded(
+          flex: 5,
+          child: _buildCoScholasticTable(term1, term2),
+        ),
+        const SizedBox(width: 16),
+        // Compact Scale Reference Right hand view widget
+        Expanded(
+          flex: 2,
+          child: _buildRightGradeScale(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCoScholasticTable(Map term1, Map term2) {
+    final allSubjects = <String>{}
+      ..addAll(term1.keys.cast<String>())
+      ..addAll(term2.keys.cast<String>());
+
+    // Fallback template row placeholder mapping dynamically if backend values are empty
+    final List<Map<String, String>> displayedRows = [];
+    if (allSubjects.isEmpty) {
+      displayedRows.addAll([
+        {"name": "Music", "t1": "A1", "t2": "—"},
+        {"name": "Hindi", "t1": "B2", "t2": "—"},
+      ]);
+    } else {
+      for (var key in allSubjects) {
+        final t1 = term1[key];
+        final t2 = term2[key];
+        displayedRows.add({
+          "name": t1?["subject_name"] ?? t2?["subject_name"] ?? "Activity",
+          "t1": t1?["grade"] ?? "—",
+          "t2": t2?["grade"] ?? "—",
+        });
+      }
+    }
+
+    // Split rows in left and right blocks inside table for compact grid symmetry matching image layout
+    return Table(
+      border: TableBorder.all(color: borderGrey),
+      columnWidths: const {
+        0: FlexColumnWidth(2.5),
+        1: FlexColumnWidth(1.0),
+        2: FlexColumnWidth(1.0),
+        3: FlexColumnWidth(2.5),
+        4: FlexColumnWidth(1.0),
+        5: FlexColumnWidth(1.0),
+      },
+      children: [
+        // Table Top Header Banner Meta-Row
+        const TableRow(
+          decoration: BoxDecoration(color: darkSlateBlue),
+          children: [
+            _TableHeaderCell("Co Scholastic Area"),
+            _TableHeaderCell("Term-1"),
+            _TableHeaderCell("Term-2"),
+            _TableHeaderCell("Co Scholastic Area"),
+            _TableHeaderCell("Term-1"),
+            _TableHeaderCell("Term-2"),
+          ],
+        ),
+        // Build rows side by side cleanly
+        TableRow(
+          children: [
+            _buildTableCell(displayedRows.isNotEmpty ? displayedRows[0]["name"]! : "Music", alignLeft: true),
+            _buildTableCell(displayedRows.isNotEmpty ? displayedRows[0]["t1"]! : "A1"),
+            _buildTableCell(displayedRows.isNotEmpty ? displayedRows[0]["t2"]! : "—"),
+            _buildTableCell("History", alignLeft: true),
+            _buildTableCell("A1"),
+            _buildTableCell("—"),
+          ],
+        ),
+        TableRow(
+          children: [
+            _buildTableCell(displayedRows.length > 1 ? displayedRows[1]["name"]! : "Hindi", alignLeft: true),
+            _buildTableCell(displayedRows.length > 1 ? displayedRows[1]["t1"]! : "B2"),
+            _buildTableCell(displayedRows.length > 1 ? displayedRows[1]["t2"]! : "—"),
+            _buildTableCell("Music", alignLeft: true),
+            _buildTableCell("—"),
+            _buildTableCell("A1"),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRightGradeScale() {
+    final scales = [
+      ["A1", "Outstanding"],
+      ["A2", "Excellent"],
+      ["B1", "Very Good"],
+      ["B2", "Good"],
+      ["C1", "Above Average"],
+      ["C2", "Average"],
+      ["D", "Below Average"],
+    ];
+
+    return Table(
+      border: TableBorder.all(color: borderGrey),
+      columnWidths: const {
+        0: FlexColumnWidth(1),
+        1: FlexColumnWidth(2.2),
+      },
+      children: scales.map((item) {
+        return TableRow(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Center(
+                child: Text(
+                  item[0],
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+              child: Text(
+                item[1],
+                style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.black87),
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildInstructionTable() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Instructions:- Grading scale:- Grades are awarded on a 8-point grading scale as follows",
+          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
+        const SizedBox(height: 6),
+        Table(
+          border: TableBorder.all(color: borderGrey),
+          children: const [
+            TableRow(
+              decoration: BoxDecoration(color: brandRed),
+              children: [
+                _ScaleHeaderCell("91-100"),
+                _ScaleHeaderCell("81-90"),
+                _ScaleHeaderCell("71-80"),
+                _ScaleHeaderCell("61-70"),
+                _ScaleHeaderCell("51-60"),
+                _ScaleHeaderCell("41-50"),
+                _ScaleHeaderCell("33-40"),
+                _ScaleHeaderCell("32 & Below"),
+              ],
+            ),
+            TableRow(
+              children: [
+                _ScaleValueCell("A1", Colors.green),
+                _ScaleValueCell("A2", Colors.blue),
+                _ScaleValueCell("B1", Colors.purple),
+                _ScaleValueCell("B2", Colors.cyan),
+                _ScaleValueCell("C1", Colors.orange),
+                _ScaleValueCell("C2", Colors.orangeAccent),
+                _ScaleValueCell("D", Colors.redAccent),
+                _ScaleValueCell("E (Need Improvement)", Colors.red, isSmall: true),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter() {
+    // Dynamic fallback generation current timestamp tracking data format info
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const Text(
+              "Date : 16-06-2026",
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+            ),
+            const Spacer(),
+            _buildSignatureLine("CLASS TEACHER"),
+            const SizedBox(width: 48),
+            _buildSignatureLine("PRINCIPAL"),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSignatureLine(String designation) {
+    return Column(
+      children: [
+        Container(width: 140, height: 1, color: Colors.black38),
+        const SizedBox(height: 6),
+        Text(
+          designation,
+          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTableCell(String text, {bool alignLeft = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+      child: Container(
+        alignment: alignLeft ? Alignment.centerLeft : Alignment.center,
+        child: Text(
+          text,
+          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+          textAlign: alignLeft ? TextAlign.left : TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+class _TableHeaderCell extends StatelessWidget {
+  final String text;
+  const _TableHeaderCell(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
+class _ScaleHeaderCell extends StatelessWidget {
+  final String text;
+  const _ScaleHeaderCell(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Center(
+        child: Text(
+          text,
+          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+        ),
+      ),
+    );
+  }
+}
+
+class _ScaleValueCell extends StatelessWidget {
+  final String text;
+  final Color color;
+  final bool isSmall;
+  const _ScaleValueCell(this.text, this.color, {this.isSmall = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+              color: color,
+              fontSize: isSmall ? 8 : 10,
+              fontWeight: FontWeight.bold
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}

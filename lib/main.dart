@@ -9,100 +9,101 @@ import 'package:school_pro/view_model/accountant/accountant_profile_view_model.d
 import 'package:school_pro/view_model/accountant_attendance_view_model/accountant_attendance_view_model.dart';
 import 'package:school_pro/view_model/accountant_attendance_view_model/create_accountant_attendance_view_model.dart';
 import 'package:school_pro/view_model/auth_view_model/login_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/Exam_management_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/academic_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/add_accountant_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/add_student_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/add_subject_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/add_teacher_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_accountant_list_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_attendance_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_home_work_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_role_permissions_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_scetions_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_student_attendance_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_teachers_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/assign_role_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/cms_viewmodel.dart';
-import 'package:school_pro/view_model/school_view_model/co_scholastic_grade_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/collect_fee_payment_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_admin_mark_sheet_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_admin_teacher_home_work_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_class_time_table_View_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_classes_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_exam_maerks_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_exam_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_fees_head_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_fees_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_fine_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_section_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/create_time_table_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_accountant_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_class_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_classes_time_table_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_exam_time_table_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_exam_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_fees_head_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_school_admin_marksheet_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_section_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_student_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_subject_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/delete_teacher_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_accountant_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_class_time_table_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_classes_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_exam_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_fees_head_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_student_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_subject_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/edit_teacher_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/exam_marks_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/exam_time_table_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/fees_head_management_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/fees_management_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/fine_rule_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/generate_admit_card_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/get_classes_timetable_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/get_school_admin_marksheet_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/get_send_notification_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/get_student_transport_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/help_support_viewmodel.dart';
-import 'package:school_pro/view_model/school_view_model/homework_details_viewmodel.dart';
-import 'package:school_pro/view_model/school_view_model/mark_as_all_read_notication_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/remove_role_viewmodel.dart';
-import 'package:school_pro/view_model/school_view_model/save_permission_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/school_accountant_detail_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/school_admin_profile_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/school_exam_time_table_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/school_student_detail_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/school_student_fee_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/school_teachers_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/select_role_view_model.dart';
+import 'package:school_pro/view_model/auth_view_model/academic_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/accountant/add_accountant_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/exam_mark/create_exam_maerks_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/add_student_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/subject/add_subject_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/teacher/add_teacher_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/attendance/all_attendance_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/all_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/homework/all_home_work_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/all_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/permission/all_role_permissions_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/section/all_scetions_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/attendance/all_student_attendance_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/subject/all_subjects_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/teacher/all_teachers_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/permission/assign_role_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/settings/cms_viewmodel.dart';
+import 'package:school_pro/view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/collect_fee_payment_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/marksheet/create_admin_mark_sheet_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/homework/create_admin_teacher_home_work_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/create_class_time_table_View_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/create_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/exam/create_exam_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/create_fees_head_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/create_fees_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/create_fine_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/create_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/section/create_section_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/create_time_table_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/accountant/delete_accountant_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/delete_class_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/delete_classes_time_table_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/delete_exam_time_table_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/exam/delete_exam_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/delete_fees_head_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/delete_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/marksheet/delete_school_admin_marksheet_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/section/delete_section_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/delete_student_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/subject/delete_subject_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/teacher/delete_teacher_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/accountant/edit_accountant_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/edit_class_time_table_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/edit_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/exam/edit_exam_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/edit_fees_head_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/edit_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/edit_student_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/subject/edit_subject_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/teacher/edit_teacher_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/exam_mark/exam_marks_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/time_table_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/fees_head_management_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/fees_management_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/fine_rule_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/marksheet/generate_admit_card_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/marksheet/generate_marksheet_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/get_classes_timetable_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/marksheet/get_school_admin_marksheet_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/notification/get_send_notification_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/transport_fee/get_student_transport_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/settings/help_support_viewmodel.dart';
+import 'package:school_pro/view_model/school_view_model/homework/homework_details_viewmodel.dart';
+import 'package:school_pro/view_model/school_view_model/notification/mark_as_all_read_notication_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/permission/remove_role_viewmodel.dart';
+import 'package:school_pro/view_model/school_view_model/permission/save_permission_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/accountant/school_accountant_detail_view_model.dart';
+import 'package:school_pro/view_model/auth_view_model/school_admin_profile_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/timetable/school_exam_time_table_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/school_student_detail_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/school_student_fee_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/teacher/school_teachers_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/permission/select_role_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/create_route_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/create_stop_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/create_student_transport_fee_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/delete_route_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/delete_stop_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/discontinue_student_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/transport_fee/get_all_transport_student_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/get_route_student_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/get_route_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/get_stop_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/update_route_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/update_stop_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/update_accountant_aatendance_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/update_school_admin_mark_sheet_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/update_section_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/update_student_attendance_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/update_teacher_attendance_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/user_permission_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/user_role_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/attendance/update_accountant_aatendance_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/marksheet/update_school_admin_mark_sheet_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/section/update_section_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/attendance/update_student_attendance_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/attendance/update_teacher_attendance_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/permission/user_permission_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/permission/user_role_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/create_student_attendance_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/student_attendance_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/student_fee_view_model.dart';
@@ -114,11 +115,13 @@ import 'package:school_pro/view_model/student_view_model/timetable_viewmodel.dar
 import 'package:school_pro/view_model/teacher_view_model/create_teacher_attendance_view_model.dart';
 import 'package:school_pro/view_model/teacher_view_model/teacher_attendance_view_model.dart';
 import 'package:school_pro/view_model/teacher_view_model/teacher_profile_view_model.dart';
-import 'package:school_pro/view_model/user_view_model.dart';
+import 'package:school_pro/view_model/auth_view_model/user_view_model.dart';
 import 'firebase_options.dart';
-import 'helper/network/internet_popup.dart';
+import 'res/internet_popup.dart';
+import 'package:school_pro/view_model/school_view_model/exam/exam_management_view_model.dart';
 
-// ✅ Global variables
+
+//  Global variables
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -138,22 +141,22 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
-  // ✅ PEHLE Firebase initialize karo
+  //  PEHLE Firebase initialize karo
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // ✅ AB Token refresh listener lagao
+  //  AB Token refresh listener lagao
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    print("🔄 FCM Token Refreshed: $newToken");
+    print(" FCM Token Refreshed: $newToken");
     await reSubscribeTopics();
   });
 
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print("✅ App opened from notification: ${message.notification?.title}");
+    print(" App opened from notification: ${message.notification?.title}");
   });
 
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     if (message != null) {
-      print("✅ App launched from notification: ${message.notification?.title}");
+      print(" App launched from notification: ${message.notification?.title}");
     }
   });
 
@@ -179,11 +182,10 @@ void main() async {
 
   await getFCMToken();
 
-  // ✅ AB reSubscribe karo — Firebase already initialized hai
   await reSubscribeTopics();
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print("✅ Message aaya: ${message.notification?.title}");
+    print(" Message aaya: ${message.notification?.title}");
     RemoteNotification? notification = message.notification;
     if (notification != null) {
       flutterLocalNotificationsPlugin.show(
@@ -215,14 +217,13 @@ Future<void> getFCMToken() async {
     sound: true,
   );
 
-  // ✅ Yeh add karo
-  print("🔔 Permission Status: ${settings.authorizationStatus}");
+  print(" Permission Status: ${settings.authorizationStatus}");
 
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
     String? token = await messaging.getToken();
-    print("✅ FCM Token: $token");
+    print(" FCM Token: $token");
   } else {
-    print("❌ Permission denied - notification nahi aayegi");
+    print(" Permission denied - notification nahi aayegi");
   }
 }
 
@@ -237,13 +238,13 @@ Future<void> reSubscribeTopics() async {
       await FirebaseMessaging.instance.subscribeToTopic(
         "school_${schoolId}_role_$role",
       );
-      print("✅ Re-subscribed: school_$schoolId");
-      print("✅ Re-subscribed: school_${schoolId}_role_$role");
+      print(" Re-subscribed: school_$schoolId");
+      print(" Re-subscribed: school_${schoolId}_role_$role");
     } else {
-      print("⚠️ No saved session — skipping re-subscribe");
+      print(" No saved session — skipping re-subscribe");
     }
   } catch (e) {
-    print("❌ Re-subscribe error: $e");
+    print(" Re-subscribe error: $e");
   }
 }
 
@@ -325,7 +326,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(
           create: (_) => MarkAsAllReadNotificationViewModel(),
         ),
-        ChangeNotifierProvider(create: (_) => TimeTableViewModel()),
+        // ChangeNotifierProvider(create: (_) => TimeTableViewModel()),
         ChangeNotifierProvider(create: (_) => CreateTimetableViewModel()),
         ChangeNotifierProvider(create: (_) => AllRolePermissionViewModel()),
         ChangeNotifierProvider(create: (_) => SelectRoleViewModel()),
@@ -385,38 +386,25 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => StudentHomeworkViewModel()),
         ChangeNotifierProvider(create: (_) => SubmitHomeworkViewModel()),
         ChangeNotifierProvider(create: (_) => StudentAttendanceViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => CreateStudentAttendanceViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => CreateStudentAttendanceViewModel(),),
         ChangeNotifierProvider(create: (_) => AccountantAttendanceViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => CreateAccountantAttendanceViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => CreateAccountantAttendanceViewModel(),),
         ChangeNotifierProvider(create: (_) => AccountantProfileViewModel()),
         ChangeNotifierProvider(create: (_) => TeacherAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => StudentNotificationViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => CreateTeacherAttendanceViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => CreateTeacherAttendanceViewModel(),),
         ChangeNotifierProvider(create: (_) => TeacherProfileViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => UpdateAccountantAttendanceViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => UpdateStudentAttendanceViewModel(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => UpdateTeacherAttendanceViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => UpdateAccountantAttendanceViewModel(),),
+        ChangeNotifierProvider(create: (_) => UpdateStudentAttendanceViewModel(),),
+        ChangeNotifierProvider(create: (_) => UpdateTeacherAttendanceViewModel(),),
         ChangeNotifierProvider(create: (_) => RemoveRoleViewModel()),
         ChangeNotifierProvider(create: (_) => SupportTicketViewModel()),
         ChangeNotifierProvider(create: (_) => CmsViewModel()),
-    ChangeNotifierProvider(create: (_) => SchoolTimetableViewModel()),
+        ChangeNotifierProvider(create: (_) => SchoolTimetableViewModel()),
         ChangeNotifierProvider(create: (_) => HomeworkDetailsViewModel(),),
-        ChangeNotifierProvider(
-          create: (_) =>
-              CoScholasticGradeViewModel(),
-        ),
+        ChangeNotifierProvider(create: (_) => GenerateMarksheetViewModel()),
+        ChangeNotifierProvider(create: (_) => CoScholasticGradeViewModel(),),
+        ChangeNotifierProvider(create: (_) => GetAllTransportStudentsViewModel(),),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,

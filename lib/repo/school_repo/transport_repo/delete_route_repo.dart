@@ -14,10 +14,10 @@ class DeleteRouteRepository {
         ApiUrl.deleteRoutes,
         data,
       );
-      debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
+      debugPrint(" API Raw Response: ${jsonEncode(response)}");
       return response;
     } catch (e) {
-      debugPrint('❌ Error occurred during deleteRouteApi: $e');
+      debugPrint(' Error occurred during deleteRouteApi: $e');
       rethrow;
     }
   }

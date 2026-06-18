@@ -142,12 +142,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../view_model/user_view_model.dart';
+import '../view_model/auth_view_model/user_view_model.dart';
 import 'get_server_key.dart';
 
 class NotificationService {
 
-  // ✅ Backend mein save karo
+  //  Backend mein save karo
   static Future<bool> createNotification({
     required String title,
     required String description,
@@ -179,7 +179,7 @@ class NotificationService {
     }
   }
 
-  // ✅ FCM push directly bhejo
+  // FCM push directly bhejo
   static Future<void> sendFCMPush({
     required String deviceToken,
     required String title,

@@ -12,10 +12,10 @@ class UpdateRouteRepository {
   Future<dynamic> updateRouteApi(dynamic data) async {
     try {
       dynamic response = await _apiServices.getPutApiResponse(ApiUrl.updateRoutes,data);
-      debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
+      debugPrint(" API Raw Response: ${jsonEncode(response)}");
       return (response);
     } catch (e) {
-      debugPrint('❌ Error occurred during updateRouteApi: $e');
+      debugPrint(' Error occurred during updateRouteApi: $e');
       rethrow;
     }
   }

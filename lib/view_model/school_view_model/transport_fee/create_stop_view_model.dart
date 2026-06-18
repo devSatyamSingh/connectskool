@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/create_route_repo.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/create_stop_repo.dart';
-import 'package:school_pro/view_model/school_view_model/fine_rule_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/fine_rule_view_model.dart';
 
 import '../../../utils/permission_extensions.dart';
 import '../../../utils/permission_keys.dart';

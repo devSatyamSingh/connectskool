@@ -10,5 +10,4 @@ abstract class BaseApiServices{
   Future<dynamic> getDeleteApiResponse(String url, Map<String, dynamic> data);
 
 
-
 }

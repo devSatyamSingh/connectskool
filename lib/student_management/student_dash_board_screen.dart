@@ -1,19 +1,22 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/student_management/student_fees_screen.dart';
 import 'package:school_pro/student_management/timetable_screen.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
-import '../admin_management/school_timetable_screen.dart';
+import '../admin_management/timetable/school_timetable_screen.dart';
 import '../repo/auth_repo/auth_repo.dart';
 import '../res/app_color.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_manager.dart';
-import '../view_model/school_view_model/user_permission_view_model.dart';
+import '../view_model/auth_view_model/academic_view_model.dart';
+import '../view_model/school_view_model/permission/user_permission_view_model.dart';
 import '../view_model/student_view_model/student_fee_view_model.dart'; // ← ADD karo
 import '../view_model/student_view_model/student_profile_view_model.dart';
-import '../view_model/user_view_model.dart';
+import '../view_model/auth_view_model/user_view_model.dart';
+import 'exam_timetable_screen.dart';
 
 class StudentDashboardScreen extends StatefulWidget {
   const StudentDashboardScreen({super.key});
@@ -77,6 +80,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       'Class Schedule',
       'view_timetable',
     ),
+    _DashTile(
+      'Exam Timetable',
+      Icons.event_note_rounded,
+      Colors.indigoAccent,
+      'Exam Schedule',
+      'view_exam_timetable',
+    ),
   ];
 
   @override
@@ -122,19 +132,22 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         );
 
         await profileVm.studentProfileApi(context);
+        final academicVm = Provider.of<AcademicViewModel>(
+          context,
+          listen: false,
+        );
 
-        if (!mounted) return;
+        await academicVm.academicApi(context);
 
         final academicYear =
-            profileVm.studentProfileModel?.data?.academicYear ?? "2026-27";
+            academicVm.currentYear?.yearName ?? '';
 
-        // =========================
-        // Fee API
-        // =========================
         await Provider.of<StudentFeesViewModel>(
           context,
           listen: false,
-        ).fetchFees(academicYear: academicYear, token: token);
+        ).fetchFees(
+          academicYear: academicYear,
+        );
 
         debugPrint("✅ STUDENT DASHBOARD READY");
       } catch (e, s) {
@@ -154,6 +167,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   Future<void> _restorePermissions() async {
     final permissions =
     await UserViewModel().getPermissions();
+
+    print("RESTORED => $permissions");
+    print("COUNT => ${permissions.length}");
 
     PermissionManager.setPermissions(
       permissions,
@@ -199,11 +215,19 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         break;
 
       case 3:
+        final academicVm =
+        Provider.of<AcademicViewModel>(
+          context,
+          listen: false,
+        );
+
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                StudentFeesScreen(),
+            builder: (context) => StudentFeesScreen(
+              yearName:
+              academicVm.currentYear?.yearName ?? '',
+            ),
           ),
         );
         break;
@@ -224,6 +248,14 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
           ),
         );
         break;
+      case 6:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ExamTimetableScreen(),
+          ),
+        );
+        break;
     }
   }
 
@@ -241,6 +273,13 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     final String studentEmail =
         profile?.data?.userEmail ?? 'student@school.com';
     final String studentClass = profile?.data?.classId?.toString() ?? 'Class X';
+    if (!_permissionsLoaded) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return WillPopScope(
       onWillPop: () async {
         SystemNavigator.pop();
@@ -253,7 +292,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
           children: [
             _buildHeader(context, studentName, studentClass),
             Expanded(child: _buildGrid()),
-            // _buildBottomNav(),
           ],
         ),
       ),
@@ -266,9 +304,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     final String totalStr = loading ? '...' : _fmt(feesVm.totalAmount);
     final String paidStr = loading ? '...' : _fmt(feesVm.paidAmount);
     final String pendingStr = loading ? '...' : _fmt(feesVm.pendingAmount);
-    final int pendingCount =
-        feesVm.pendingInstallments.length +
-        feesVm.pendingTransportInstallments.length;
+    final int pendingCount = feesVm.pendingInstallments.length + feesVm.pendingTransportInstallments.length;
 
     return Container(
       decoration: BoxDecoration(
@@ -290,7 +326,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       ),
       child: Column(
         children: [
-          // ── Top Row ──
           Row(
             children: [
               Builder(
@@ -322,9 +357,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                   children: [
                     Text(
                       'STUDENT PORTAL',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 10,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white.withValues(alpha: 0.55),
                         letterSpacing: 1.5,
                       ),
@@ -332,9 +367,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                     const SizedBox(height: 2),
                     Text(
                       'Hi, $name 👋',
-                      style: const TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w500,
                         color: Colors.white,
                       ),
                     ),
@@ -380,10 +415,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
               // ),
             ],
           ),
-
           const SizedBox(height: 20),
-
-          // ── Info Cards Row — real data ──
           Row(
             children: [
               _infoCard(
@@ -431,9 +463,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
             const SizedBox(height: 5),
             Text(
               value,
-              style: const TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 13,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w600,
                 color: Colors.white,
               ),
               maxLines: 1,
@@ -442,7 +474,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
             const SizedBox(height: 1),
             Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontSize: 9,
                 color: Colors.white.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w500,
@@ -454,39 +486,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
     );
   }
 
-  // ─── GRID ────────────────────────────────────────────────────────────────────
-
-  // Widget _buildGrid() {
-  //   return GridView.builder(
-  //     padding: const EdgeInsets.fromLTRB(16, 22, 16, 16),
-  //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-  //       crossAxisCount: 2,
-  //       mainAxisSpacing: 14,
-  //       crossAxisSpacing: 14,
-  //       childAspectRatio: 1.05,
-  //     ),
-  //     itemCount: _tiles.length,
-  //     itemBuilder: (ctx, i) {
-  //       final tile = _tiles[i];
-  //       return AnimatedBuilder(
-  //         animation: _tileAnimations[i],
-  //         builder: (_, child) => Transform.scale(
-  //           scale: _tileAnimations[i].value,
-  //           child: Opacity(
-  //             opacity: _tileAnimations[i].value.clamp(0.0, 1.0),
-  //             child: child,
-  //           ),
-  //         ),
-  //         child: GestureDetector(
-  //           onTap: () => _onTileTap(i),
-  //           child: _buildTile(tile),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
   Widget _buildGrid() {
-    // ✅ Sirf woh tiles jo denied nahi hain
 
     if (!_permissionsLoaded) {
       return const Center(
@@ -593,16 +593,16 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 const SizedBox(height: 14),
                 Text(
                   tile.label,
-                  style: const TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 14,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 3),
                 Text(
                   tile.sub,
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 11,
                     color: Colors.white.withValues(alpha: 0.65),
                   ),
@@ -665,16 +665,16 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 const SizedBox(height: 14),
                 Text(
                   name,
-                  style: const TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w600,
                     color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   email,
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 12,
                     color: Colors.white.withValues(alpha: 0.65),
                   ),
@@ -769,7 +769,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       ),
       title: Text(
         title,
-        style: TextStyle(
+        style: GoogleFonts.poppins(
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: titleColor ?? Colors.black87,
@@ -867,7 +867,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   }
 }
 
-// ─── DATA MODELS ─────────────────────────────────────────────────────────────
 
 class _DashTile {
   final String label;

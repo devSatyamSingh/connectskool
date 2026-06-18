@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
-import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/all_student_list_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/all_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart';
 import 'package:school_pro/view_model/teacher_view_model/teacher_profile_view_model.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
@@ -15,11 +15,11 @@ import '../utils/dashboard_module.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
 import '../utils/permission_manager.dart';
-import '../view_model/school_view_model/all_accountant_list_view_model.dart';
-import '../view_model/school_view_model/all_teachers_view_model.dart';
-import '../view_model/user_view_model.dart';
-import '../admin_management/cms_screen.dart';
-import '../admin_management/manage_permission.dart';
+import '../view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
+import '../view_model/school_view_model/teacher/all_teachers_view_model.dart';
+import '../view_model/auth_view_model/user_view_model.dart';
+import '../admin_management/settings/cms_screen.dart';
+import '../admin_management/permission/manage_permission.dart';
 import 'Teacher_school_timetable_screen.dart';
 
 class TeacherManagementDashBoardScreen extends StatefulWidget {

@@ -1,41 +1,21 @@
-// ============================================================
-// lib/features/fees/repo/student_fees_repo.dart
-// ============================================================
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
+import '../../helper/network/network_api_services.dart';
 import '../../model/student_model/student_fee_model.dart';
+import '../../res/api_url.dart';
 
 class StudentFeesRepo {
-  static const String _baseUrl =
-      'https://university.fctesting.shop/api/student';
+  final NetworkApiServices _apiServices = NetworkApiServices();
 
-  /// Fetch student fees for a given academic year.
-  /// Pass the token (Bearer) that your app stores after login.
   Future<StudentFeesResponse> getStudentFees({
     required String academicYear,
-    required String token,
   }) async {
-    final uri = Uri.parse(
-      '$_baseUrl/getStudentFeesStudentSide?academic_year=$academicYear',
+    final response = await _apiServices.getGetApiResponse(
+      "${ApiUrl.studentFees}?academic_year=$academicYear",
     );
 
-    final response = await http.get(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+    final body = Map<String, dynamic>.from(response);
+    body.remove("status_code");
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> jsonData = json.decode(response.body);
-      return StudentFeesResponse.fromJson(jsonData);
-    } else {
-      throw Exception(
-        'Failed to fetch fees — HTTP ${response.statusCode}: ${response.body}',
-      );
-    }
+    return StudentFeesResponse.fromJson(body);
   }
 }

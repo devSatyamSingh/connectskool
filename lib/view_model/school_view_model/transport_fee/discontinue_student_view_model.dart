@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:school_pro/repo/school_repo/edit_subject_repo.dart';
+import 'package:school_pro/repo/school_repo/subject/edit_subject_repo.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/discontinue_student_repo.dart';
-import 'package:school_pro/view_model/school_view_model/all_subjects_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/subject/all_subjects_view_model.dart';
 
 import '../../../utils/permission_extensions.dart';
 import '../../../utils/permission_keys.dart';

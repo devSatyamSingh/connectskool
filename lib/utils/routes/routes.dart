@@ -1,40 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:school_pro/admin_management/all_student_list.dart';
+import 'package:school_pro/admin_management/student/all_student_list.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 
 import '../../accountant_management/accountant_management_dash_board_screen.dart';
-import '../../admin_management/admin_view_fees_structure_screen.dart';
-import '../../admin_management/all_accountant_list_screen.dart';
-import '../../admin_management/all_home_work_screen.dart';
-import '../../admin_management/all_section_screen.dart';
-import '../../admin_management/all_subjects_screen.dart';
-import '../../admin_management/all_teachers_screen.dart';
+import '../../admin_management/marksheet/Exam_marks_grade_selection_screen.dart';
+import '../../admin_management/fees/admin_view_fees_structure_screen.dart';
+import '../../admin_management/accountant/all_accountant_list_screen.dart';
+import '../../admin_management/homework/all_home_work_screen.dart';
+import '../../admin_management/section/all_section_screen.dart';
+import '../../admin_management/subject/all_subjects_screen.dart';
+import '../../admin_management/teacher/all_teachers_screen.dart';
 import '../../admin_management/attendance_widget/staff_attendence_screen.dart';
-import '../../admin_management/classes_screen.dart';
-import '../../admin_management/create_class_screen.dart';
-import '../../admin_management/exam_screen.dart';
-import '../../admin_management/fees_head_management_screen.dart';
-import '../../admin_management/fees_management_screen.dart';
-import '../../admin_management/fine_screen.dart';
-import '../../admin_management/help_support_screen.dart';
-import '../../admin_management/manage_permission.dart';
+import '../../admin_management/classes/classes_screen.dart';
+import '../../admin_management/classes/create_class_screen.dart';
+import '../../admin_management/exam/exam_screen.dart';
+import '../../admin_management/fees/fees_head_management_screen.dart';
+import '../../admin_management/fees/fees_management_screen.dart';
+import '../../admin_management/fees/fine_screen.dart';
+import '../../admin_management/settings/help_support_screen.dart';
+import '../../admin_management/permission/manage_permission.dart';
 import '../../admin_management/marksheet/co_scholastic_grade_screen.dart';
+import '../../admin_management/marksheet/generate_marksheet_screen.dart';
 import '../../admin_management/marksheet/marksheet_screen.dart';
-import '../../admin_management/notification_screen.dart';
-import '../../admin_management/role_permission_screen.dart';
-import '../../admin_management/school_admit_card_screen.dart';
-import '../../admin_management/school_attendance_screen.dart';
-import '../../admin_management/school_collect_fees_screen.dart';
-import '../../admin_management/school_exam_marks_screen.dart';
+import '../../admin_management/marksheet/marksheet_selection_screen.dart';
+import '../../admin_management/notification/notification_screen.dart';
+import '../../admin_management/permission/role_permission_screen.dart';
+import '../../admin_management/exam/school_admit_card_screen.dart';
+import '../../admin_management/attendance_widget/school_attendance_screen.dart';
+import '../../admin_management/fees/school_collect_fees_screen.dart';
+import '../../admin_management/exam/school_exam_marks_screen.dart';
 import '../../admin_management/school_management_dashboard_screen.dart';
-import '../../admin_management/school_timetable_screen.dart';
+import '../../admin_management/timetable/school_timetable_screen.dart';
 import '../../admin_management/setting_widget/school_admin_privacy_policy_screen.dart';
-import '../../admin_management/transport_fee_management_screen.dart';
+import '../../admin_management/transport_fee_widget/transport_fee_management_screen.dart';
 import '../../admin_management/transport_fee_widget/route_screen.dart';
 import '../../admin_management/transport_fee_widget/stop_screen.dart';
 import '../../admin_management/transport_fee_widget/student_transport_fee_screen.dart';
 import '../../admin_management/transport_fee_widget/transport_fee_screen.dart';
-import '../../admin_management/user_permission_screen.dart';
+import '../../admin_management/permission/user_permission_screen.dart';
 import '../../auth/login_screen.dart';
 import '../../dash_board_screen.dart';
 import '../../on_boarding/on_boarding_screen.dart';
@@ -104,7 +107,7 @@ class Routers {
         case RoutesName.schoolAttendanceScreen:
         return (context) => const SchoolAttendanceScreen();
         case RoutesName.schoolExamMarksScreen:
-        return (context) => const SchoolExamMarksScreen();
+        return (context) => const ExamMarksGradeSelectionScreen();
         case RoutesName.staffAttendanceScreen:
         return (context) => const StaffAttendanceScreen();
         case RoutesName.managePermission:
@@ -118,7 +121,7 @@ class Routers {
         case RoutesName.schoolCollectFeesScreen:
         return (context) => const SchoolCollectFeesScreen();
         case RoutesName.marksheetScreen:
-        return (context) => const CoScholasticScreen();
+        return (context) => const GenerateMarksheetScreen();
       // case RoutesName.marksheetScreen:
       //   return (context) => const marksheetScreen();
         case RoutesName.schoolAdmitCardScreen:

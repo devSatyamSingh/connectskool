@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
-import '../../view_model/school_view_model/academic_view_model.dart';
-import '../../view_model/school_view_model/all_classes_view_model.dart';
-import '../../view_model/school_view_model/all_scetions_view_model.dart';
-import '../../view_model/school_view_model/all_student_list_view_model.dart';
-import '../../view_model/school_view_model/all_subjects_view_model.dart';
-import '../../view_model/school_view_model/co_scholastic_grade_view_model.dart';
+import '../../view_model/auth_view_model/academic_view_model.dart';
+import '../../view_model/school_view_model/classes/all_classes_view_model.dart';
+import '../../view_model/school_view_model/section/all_scetions_view_model.dart';
+import '../../view_model/school_view_model/student/all_student_list_view_model.dart';
+import '../../view_model/school_view_model/subject/all_subjects_view_model.dart';
+import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
 
 class CoScholasticFilterCard extends StatefulWidget {
   final Function({
@@ -183,75 +184,69 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
 
           const SizedBox(height: 18),
 
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton.icon(
-              icon: const Icon(Icons.search),
-              label: const Text("Load Students"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primary,
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () async {
-                if (selectedClassId == null ||
-                    selectedSectionId == null ||
-                    selectedAcademicYear == null) {
-                  return;
-                }
+          AppButton(
+            title: "Load Students",
+            icon: Icons.search,
+            loading: false,
+            onTap: () async {
+              if (selectedClassId == null ||
+                  selectedSectionId == null ||
+                  selectedAcademicYear == null) {
+                return;
+              }
 
-                await context.read<AllStudentListVieModel>().allStudentListApi(
-                  context,
-                  classId: selectedClassId,
-                  sectionId: selectedSectionId,
-                );
+              await context.read<AllStudentListVieModel>().allStudentListApi(
+                context,
+                classId: selectedClassId,
+                sectionId: selectedSectionId,
+              );
 
-                await context.read<AllSubjectsVieModel>().allSubjectsApi(
-                  context,
-                );
+              await context.read<AllSubjectsVieModel>().allSubjectsApi(
+                context,
+              );
 
-                final gradeVm = context.read<CoScholasticGradeViewModel>();
+              final gradeVm = context.read<CoScholasticGradeViewModel>();
+              gradeVm.clearGradeMaps();
 
-                gradeVm.currentAcademicYear = selectedAcademicYear!;
+              gradeVm.currentAcademicYear = selectedAcademicYear!;
 
-                gradeVm.currentTerm = selectedTerm;
+              gradeVm.currentTerm = selectedTerm;
 
-                gradeVm.setStudents(
-                  context
-                          .read<AllStudentListVieModel>()
-                          .allStudentListModel
-                          ?.data ??
-                      [],
-                );
-
-                gradeVm.setSubjects(
-                  context.read<AllSubjectsVieModel>().allSubjectsModel?.data ??
-                      [],
-                );
-
-                final students = context
+              gradeVm.setStudents(
+                context
                     .read<AllStudentListVieModel>()
                     .allStudentListModel
                     ?.data ??
-                    [];
+                    [],
+              );
 
-                for (final student in students) {
+              gradeVm.setSubjects(
+                context.read<AllSubjectsVieModel>().allSubjectsModel?.data ??
+                    [],
+              );
 
-                  await gradeVm.getGradesApi(
-                    studentId: student.studentId.toString(),
-                    academicYear: selectedAcademicYear!,
-                    context: context,
-                  );
-                }
+              final students = context
+                  .read<AllStudentListVieModel>()
+                  .allStudentListModel
+                  ?.data ??
+                  [];
 
-                widget.onLoad(
-                  classId: selectedClassId!,
-                  sectionId: selectedSectionId!,
+              for (final student in students) {
+
+                await gradeVm.getGradesApi(
+                  studentId: student.studentId.toString(),
                   academicYear: selectedAcademicYear!,
-                  term: selectedTerm,
+                  context: context,
                 );
-              },
-            ),
+              }
+
+              widget.onLoad(
+                classId: selectedClassId!,
+                sectionId: selectedSectionId!,
+                academicYear: selectedAcademicYear!,
+                term: selectedTerm,
+              );
+            },
           ),
         ],
       ),

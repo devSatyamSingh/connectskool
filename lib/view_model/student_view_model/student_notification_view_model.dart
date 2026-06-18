@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import '../../model/school_model/all_notification_model.dart';
+import '../../model/school_model/notification/all_notification_model.dart';
 import '../../model/student_model/student_notification_model.dart';
 import '../../res/api_url.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
-import '../user_view_model.dart';
+import '../auth_view_model/user_view_model.dart';
 
 class StudentNotificationViewModel extends ChangeNotifier {
   bool _loading = false;

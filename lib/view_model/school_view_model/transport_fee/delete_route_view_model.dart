@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:school_pro/repo/school_repo/delete_classes_time_table_repo.dart';
+import 'package:school_pro/repo/school_repo/timetable/delete_classes_time_table_repo.dart';
 import 'package:school_pro/repo/school_repo/transport_repo/delete_route_repo.dart';
-import 'package:school_pro/view_model/school_view_model/all_classes_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/classes/all_classes_view_model.dart';
 
 import '../../../utils/permission_extensions.dart';
 import '../../../utils/permission_keys.dart';

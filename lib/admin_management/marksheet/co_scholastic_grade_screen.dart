@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../view_model/school_view_model/co_scholastic_grade_view_model.dart';
+import '../../res/app_button.dart';
+import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
 import '../../res/app_color.dart';
-import '../../view_model/school_view_model/school_admin_profile_view_model.dart';
+import '../../view_model/auth_view_model/school_admin_profile_view_model.dart';
 import 'co_scholastic_filter_card.dart';
 import 'co_scholastic_list_screen.dart';
 import 'co_scholastic_table.dart';
@@ -18,13 +18,11 @@ class CoScholasticScreen extends StatefulWidget {
 }
 
 class _CoScholasticScreenState extends State<CoScholasticScreen> {
-  static const Color _gold =
-  Color(0xFFFFB300);
+  static const Color _gold = Color(0xFFFFB300);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FA),
-
       body: SingleChildScrollView(
         child: Column(
             children: [
@@ -36,27 +34,15 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                   required academicYear,
                   required term,
                 }) async {
-        
-                  final gradeVm =
-                  context.read<
-                      CoScholasticGradeViewModel>();
-        
-                  gradeVm.currentAcademicYear =
-                      academicYear;
-        
-                  gradeVm.currentTerm =
-                      term;
-        
+                  final gradeVm = context.read<CoScholasticGradeViewModel>();
+                  gradeVm.currentAcademicYear = academicYear;
+                  gradeVm.currentTerm = term;
                   // students + subjects load yahan karna hai
                 },
               ),
-        
               const SizedBox(height: 16),
-        
               const CoScholasticTable(),
-
               const SizedBox(height: 20),
-        
               const SaveGradesButton(),
             ]
         ),
@@ -126,27 +112,27 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                   ],
                 ),
               ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: _gold,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'GRADE',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ),
-              SizedBox(width: 5,),
+              // //
+              // // Container(
+              // //   padding: const EdgeInsets.symmetric(
+              // //     horizontal: 10,
+              // //     vertical: 5,
+              // //   ),
+              // //   decoration: BoxDecoration(
+              // //     color: _gold,
+              // //     borderRadius: BorderRadius.circular(20),
+              // //   ),
+              // //   child: const Text(
+              // //     'GRADE',
+              // //     style: TextStyle(
+              // //       color: Colors.white,
+              // //       fontSize: 10,
+              // //       fontWeight: FontWeight.bold,
+              // //       letterSpacing: 1,
+              // //     ),
+              // //   ),
+              // // ),
+              // SizedBox(width: 5,),
               InkWell(
                 onTap: () {
                   Navigator.push(
@@ -160,8 +146,8 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                 borderRadius: BorderRadius.circular(30),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 6,
+                    horizontal: 14,
+                    vertical: 7,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(.15),
@@ -176,14 +162,14 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                       Icon(
                         Icons.list_alt_rounded,
                         color: Colors.white,
-                        size: 15,
+                        size: 16,
                       ),
                       SizedBox(width: 5),
                       Text(
                         "Grades List",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 10,
+                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -329,41 +315,18 @@ class SaveGradesButton extends StatelessWidget {
               ),
             ],
           ),
-          child: SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton.icon(
-              onPressed: vm.loading
-                  ? null
-                  : () async {
-                      await vm.saveAllGrades(context);
-                    },
-              icon: vm.loading
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.save_rounded),
-              label: Text(
-                vm.loading ? "Saving Grades..." : "Save All Grades",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-            ),
+          child: AppButton(
+            title: vm.loading
+                ? "Saving Grades..."
+                : "Save All Grades",
+
+            icon: Icons.save_rounded,
+
+            loading: vm.loading,
+
+            onTap: () async {
+              await vm.saveAllGrades(context);
+            },
           ),
         );
       },

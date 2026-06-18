@@ -1055,7 +1055,7 @@ class _StudentRecordsPageState extends State<StudentRecordsPage>
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: AppText.customText(
-                                "${studentData['rollNo']} • ${studentData['class']}",
+                                "${studentData['rollNo']} * ${studentData['class']}",
                                 size: 12,
                                 color: Colors.white,
                                 weight: FontWeight.w600,
@@ -1489,7 +1489,7 @@ class _StudentRecordsPageState extends State<StudentRecordsPage>
               ),
               const SizedBox(height: 8),
               AppText.customText(
-                "188 Present • 12 Absent",
+                "188 Present * 12 Absent",
                 size: 13,
                 color: Colors.white.withOpacity(0.9),
               ),

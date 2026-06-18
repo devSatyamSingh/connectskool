@@ -13,10 +13,10 @@ class CreateStudentTransportFeeRepository {
   Future<dynamic> createStudentTransportFeeApi(dynamic data) async {
     try {
       dynamic response = await _apiServices.getPostApiResponse(ApiUrl.assignStudentTransportFee,data);
-      debugPrint("✅ API Raw Response: ${jsonEncode(response)}");
+      debugPrint(" API Raw Response: ${jsonEncode(response)}");
       return (response);
     } catch (e) {
-      debugPrint('❌ Error occurred during createStudentTransportFeeApi: $e');
+      debugPrint(' Error occurred during createStudentTransportFeeApi: $e');
       rethrow;
     }
   }
