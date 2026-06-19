@@ -1,164 +1,9 @@
-// import 'package:flutter/material.dart';
-// import 'package:school_pro/main.dart';
-// import 'package:school_pro/res/app_color.dart';
-// import 'package:school_pro/res/const_text.dart';
-// import 'package:school_pro/utils/routes/routes_name.dart';
-// import '../res/app_button.dart';
-//
-// class OnboardingScreen extends StatefulWidget {
-//   const OnboardingScreen({super.key});
-//
-//   @override
-//   State<OnboardingScreen> createState() => _OnboardingScreenState();
-// }
-//
-// class _OnboardingScreenState extends State<OnboardingScreen> {
-//
-//   final PageController _controller = PageController();
-//   int currentIndex = 0;
-//
-//   final List<Map<String, dynamic>> pages = [
-//     {
-//       "icon": Icons.school_rounded,
-//       "title": "Manage Students Easily",
-//       "desc": "Add, update and track all student records in one place"
-//     },
-//     {
-//       "icon": Icons.fact_check_rounded,
-//       "title": "Attendance & Fees",
-//       "desc": "Mark attendance and manage school fees digitally"
-//     },
-//     {
-//       "icon": Icons.analytics_rounded,
-//       "title": "Reports & Communication",
-//       "desc": "Generate reports and connect with parents instantly"
-//     },
-//   ];
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Container(
-//         decoration: const BoxDecoration(
-//           gradient: AppColor.primaryGradient,
-//         ),
-//         child: Column(
-//           children: [
-//
-//             Expanded(
-//               child: PageView.builder(
-//                 controller: _controller,
-//                 itemCount: pages.length,
-//                 onPageChanged: (i) => setState(() => currentIndex = i),
-//                 itemBuilder: (context, index) {
-//                   final page = pages[index];
-//
-//                   return Padding(
-//                     padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-//                     child: Column(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: [
-//
-//                         Container(
-//                           padding: const EdgeInsets.all(34),
-//                           decoration: BoxDecoration(
-//                             color: Colors.white,
-//                             shape: BoxShape.circle,
-//                             boxShadow: [
-//                               BoxShadow(
-//                                 color: Colors.black.withOpacity(.12),
-//                                 blurRadius: 18,
-//                                 offset: const Offset(0, 8),
-//                               )
-//                             ],
-//                           ),
-//                           child: Icon(
-//                             page["icon"],
-//                             size: 120,
-//                             color: AppColor.lightBlueColor,
-//                           ),
-//                         ),
-//
-//                         SizedBox(height: screenHeight * 0.05),
-//
-//                         AppText.customText(
-//                           page["title"],
-//                           size: 28,
-//                           weight: FontWeight.bold,
-//                           align: TextAlign.center,
-//                           color: Colors.white,
-//                         ),
-//
-//                         SizedBox(height: screenHeight * 0.015),
-//
-//                         AppText.customText(
-//                           page["desc"],
-//                           size: 15,
-//                           color: Colors.white70,
-//                           align: TextAlign.center,
-//                         ),
-//                       ],
-//                     ),
-//                   );
-//                 },
-//               ),
-//             ),
-//
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: List.generate(
-//                 pages.length,
-//                     (index) => AnimatedContainer(
-//                   duration: const Duration(milliseconds: 300),
-//                   margin: const EdgeInsets.all(5),
-//                   height: 8,
-//                   width: currentIndex == index ? 26 : 8,
-//                   decoration: BoxDecoration(
-//                     color: currentIndex == index
-//                         ? Colors.white
-//                         : Colors.white38,
-//                     borderRadius: BorderRadius.circular(20),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//
-//             SizedBox(height: screenHeight * 0.03),
-//
-//             Padding(
-//               padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
-//               child: AppButton(
-//                 bgColor: Colors.white,
-//                 title: currentIndex == pages.length - 1
-//                     ? "Get Started"
-//                     : "Next",
-//                 textColor: Colors.black,
-//                 onTap: () {
-//                   if (currentIndex == pages.length - 1) {
-//                     Navigator.pushNamed(context, RoutesName.dashboardScreen);
-//                     // Navigator.pushReplacement(...)
-//                   } else {
-//                     _controller.nextPage(
-//                       duration: const Duration(milliseconds: 350),
-//                       curve: Curves.easeOut,
-//                     );
-//                   }
-//                 },
-//               ),
-//             ),
-//
-//             SizedBox(height: screenHeight * 0.08),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
 import 'package:flutter/material.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
+import 'package:school_pro/view_model/auth_view_model/user_view_model.dart';
 import '../res/app_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -231,6 +76,18 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _scaleController.forward();
   }
 
+  // ── Onboarding complete karo aur login pe jao ──────────────────────────────
+  Future<void> _finish() async {
+    await UserViewModel().markOnboardingDone();
+
+    if (mounted) {
+      Navigator.pushReplacementNamed(
+        context,
+        RoutesName.dashboardScreen,
+      );
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -258,9 +115,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 child: Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, RoutesName.dashboardScreen);
-                    },
+                    onPressed: _finish, // ← fix: sirf _finish()
                     child: AppText.customText(
                       "Skip",
                       size: 16,
@@ -290,14 +145,12 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Animated icon container with gradient
                               Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  // Outer glow circle
                                   Container(
                                     width: 240,
-                                    height: screenHeight*0.1,
+                                    height: screenHeight * 0.1,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       gradient: RadialGradient(
@@ -308,7 +161,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                       ),
                                     ),
                                   ),
-                                  // Middle circle
                                   Container(
                                     width: 200,
                                     height: 200,
@@ -321,7 +173,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                       ),
                                     ),
                                   ),
-                                  // Icon container
                                   Container(
                                     padding: const EdgeInsets.all(45),
                                     decoration: BoxDecoration(
@@ -347,7 +198,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
                               SizedBox(height: screenHeight * 0.07),
 
-                              // Title with gradient
                               ShaderMask(
                                 shaderCallback: (bounds) => LinearGradient(
                                   colors: [
@@ -361,14 +211,11 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                   weight: FontWeight.w900,
                                   align: TextAlign.center,
                                   color: Colors.white,
-                                  // height: 1.3,
-                                  // letterSpacing: 0.5,
                                 ),
                               ),
 
                               SizedBox(height: screenHeight * 0.025),
 
-                              // Description with container
                               Container(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: screenWidth * 0.04,
@@ -387,7 +234,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                   size: 16,
                                   color: Colors.white.withOpacity(0.9),
                                   align: TextAlign.center,
-                                  // height: 1.6,
                                   weight: FontWeight.w500,
                                 ),
                               ),
@@ -400,7 +246,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
               ),
 
-              // Page indicators with animation
+              // Page indicators
               Padding(
                 padding: EdgeInsets.symmetric(vertical: screenHeight * 0.03),
                 child: Row(
@@ -433,7 +279,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
               ),
 
-              // Bottom action buttons
+              // Bottom buttons
               Padding(
                 padding: EdgeInsets.symmetric(
                   horizontal: screenWidth * 0.06,
@@ -441,7 +287,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 ),
                 child: Row(
                   children: [
-                    // Back button
                     if (currentIndex > 0)
                       Expanded(
                         flex: 1,
@@ -472,7 +317,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         ),
                       ),
 
-                    // Next/Get Started button
                     Expanded(
                       flex: currentIndex > 0 ? 3 : 4,
                       child: Container(
@@ -499,10 +343,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             borderRadius: BorderRadius.circular(16),
                             onTap: () {
                               if (currentIndex == pages.length - 1) {
-                                Navigator.pushNamed(
-                                  context,
-                                  RoutesName.dashboardScreen,
-                                );
+                                _finish(); // ← fix: sirf _finish()
                               } else {
                                 _controller.nextPage(
                                   duration: const Duration(milliseconds: 350),

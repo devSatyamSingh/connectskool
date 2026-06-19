@@ -28,6 +28,19 @@ class GetSendNotificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeNotification(int id) {
+
+    if (_getSendNotificationModel?.data != null) {
+
+      _getSendNotificationModel!.data!
+          .removeWhere(
+            (item) => item.notificationId == id,
+      );
+
+      notifyListeners();
+    }
+  }
+
   Future<void> getSendNotificationApi(BuildContext context) async {
 
     if (!PermissionExtensions.canAccess(
@@ -45,6 +58,7 @@ class GetSendNotificationViewModel extends ChangeNotifier {
 
     try {
       final response = await _allStudentListRepo.getSendNotificationApi();
+      print("SENT API RESPONSE => $response");
 
       final int statusCode = response['status_code'] ?? 0;
 
@@ -55,9 +69,11 @@ class GetSendNotificationViewModel extends ChangeNotifier {
           // Remove status_code as it's not part of the model
           body.remove('status_code');
 
-          // Parse data array and pagination
           final model = GetSendNotificationModel.fromJson(body);
           setModelData(model);
+
+          print("TOTAL SENT => ${model.data?.length}");
+
 
           // print("✅ Teachers fetched: ${model.data?.length ?? 0}");
           break;

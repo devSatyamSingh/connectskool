@@ -28,52 +28,12 @@ class AllAccountantListModel {
   }
 }
 
-// class AccountantData {
-//   String? name;
-//   String? userEmail;
-//   int? status;
-//   int? accountantId;
-//   String? qualification;
-//   String? accountantPhotoUrl;
-//   String? aadharCardUrl;
-//
-//   AccountantData({
-//     this.name,
-//     this.userEmail,
-//     this.status,
-//     this.accountantId,
-//     this.qualification,
-//     this.accountantPhotoUrl,
-//     this.aadharCardUrl,
-//   });
-//
-//   AccountantData.fromJson(Map<String, dynamic> json) {
-//     name = json['name'];
-//     userEmail = json['user_email'];
-//     status = json['status'];
-//     accountantId = json['accountant_id'];
-//     qualification = json['qualification'];
-//     accountantPhotoUrl = json['accountant_photo_url'];
-//     aadharCardUrl = json['aadhar_card_url'];
-//   }
-//
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'name': name,
-//       'user_email': userEmail,
-//       'status': status,
-//       'accountant_id': accountantId,
-//       'qualification': qualification,
-//       'accountant_photo_url': accountantPhotoUrl,
-//       'aadhar_card_url': aadharCardUrl,
-//     };
-//   }
-// }
 class AccountantData {
   String? name;
   String? userEmail;
   int? status;
   int? accountantId;
+  int? userId;
   String? qualification;
   String? accountantPhotoUrl;
   String? aadharCardUrl;
@@ -91,6 +51,7 @@ class AccountantData {
     this.userEmail,
     this.status,
     this.accountantId,
+    this.userId,
     this.qualification,
     this.accountantPhotoUrl,
     this.aadharCardUrl,
@@ -109,6 +70,7 @@ class AccountantData {
     userEmail          = json['user_email'];
     status             = json['status'];
     accountantId       = json['accountant_id'];
+    userId             = json['user_id'];
     qualification      = json['qualification'];
     accountantPhotoUrl = json['accountant_photo_url'];
     aadharCardUrl      = json['aadhar_card_url'];
@@ -128,6 +90,7 @@ class AccountantData {
       'user_email'           : userEmail,
       'status'               : status,
       'accountant_id'        : accountantId,
+      'user_id'              : userId,
       'qualification'        : qualification,
       'accountant_photo_url' : accountantPhotoUrl,
       'aadhar_card_url'      : aadharCardUrl,
@@ -137,8 +100,8 @@ class AccountantData {
       'experience_years'     : experienceYears,
       'address'              : address,
       'joining_date'         : joiningDate,
-      'dob'                  : dob,             // ✅ ADD
-      'employment_type'      : employmentType,  // ✅ ADD
+      'dob'                  : dob,
+      'employment_type'      : employmentType,
     };
   }
 }

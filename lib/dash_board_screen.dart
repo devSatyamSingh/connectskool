@@ -20,6 +20,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     {
       "icon": Icons.school_rounded,
       "title": "Admin",
+      "role": "school_admin",
       "subtitle": "Classes, sections & fees",
       "color": Color(0xFF6C5CE7),
       "gradient": [Color(0xFF6C5CE7), Color(0xFF8B7EF7)],
@@ -27,6 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     {
       "icon": Icons.person_rounded,
       "title": "Teacher",
+      "role": "teacher",
       "subtitle": "Attendance & performance",
       "color": Color(0xFF00B894),
       "gradient": [Color(0xFF00B894), Color(0xFF00D2A4)],
@@ -34,6 +36,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     {
       "icon": Icons.groups_rounded,
       "title": "Accountant",
+      "role": "accountant",
       "subtitle": "Records & progress",
       "color": Color(0xFFFF6B6B),
       "gradient": [Color(0xFFFF6B6B), Color(0xFFFF8787)],
@@ -41,6 +44,7 @@ class _DashboardScreenState extends State<DashboardScreen>
     {
       "icon": Icons.menu_book_rounded,
       "title": "Student",
+      "role": "student",
       "subtitle": "Student Management",
       "color": Color(0xFFFFA502),
       "gradient": [Color(0xFFFFA502), Color(0xFFFFB732)],
@@ -168,44 +172,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                               ),
                             ],
                           ),
-
-                          // Notification Icon
-                          // Container(
-                          //   padding: const EdgeInsets.all(12),
-                          //   decoration: BoxDecoration(
-                          //     color: Colors.white.withOpacity(0.2),
-                          //     borderRadius: BorderRadius.circular(14),
-                          //     border: Border.all(
-                          //       color: Colors.white.withOpacity(0.3),
-                          //       width: 1,
-                          //     ),
-                          //   ),
-                          //   child: Stack(
-                          //     children: [
-                          //       const Icon(
-                          //         Icons.notifications_rounded,
-                          //         color: Colors.white,
-                          //         size: 26,
-                          //       ),
-                          //       Positioned(
-                          //         right: 0,
-                          //         top: 0,
-                          //         child: Container(
-                          //           width: 10,
-                          //           height: 10,
-                          //           decoration: BoxDecoration(
-                          //             color: Colors.red,
-                          //             shape: BoxShape.circle,
-                          //             border: Border.all(
-                          //               color: Colors.white,
-                          //               width: 2,
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
                         ],
                       ),
                       SizedBox(height: screenHeight * 0.02),
@@ -240,32 +206,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                           ],
                         ),
                       ),
-                      // SizedBox(height: screenHeight * 0.02),
-
-                      // Row(
-                      //   children: [
-                      //     _buildStatCard(
-                      //       icon: Icons.people_rounded,
-                      //       count: "1,234",
-                      //       label: "Students",
-                      //       color: Color(0xFF6C5CE7),
-                      //     ),
-                      //     SizedBox(width: screenWidth * 0.03),
-                      //     _buildStatCard(
-                      //       icon: Icons.person_rounded,
-                      //       count: "45",
-                      //       label: "Teachers",
-                      //       color: Color(0xFF00B894),
-                      //     ),
-                      //     SizedBox(width: screenWidth * 0.03),
-                      //     _buildStatCard(
-                      //       icon: Icons.class_rounded,
-                      //       count: "28",
-                      //       label: "Classes",
-                      //       color: Color(0xFFFF6B6B),
-                      //     ),
-                      //   ],
-                      // ),
                     ],
                   ),
                 ),
@@ -303,28 +243,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                             color: Colors.black87,
                           ),
                         ),
-                        // Expanded(
-                        //   child: GridView.builder(
-                        //     physics: const BouncingScrollPhysics(),
-                        //     itemCount: modules.length,
-                        //     padding: EdgeInsets.only(bottom: screenHeight * 0.02),
-                        //     gridDelegate:
-                        //     const SliverGridDelegateWithFixedCrossAxisCount(
-                        //       crossAxisCount: 2,
-                        //       mainAxisSpacing: 18,
-                        //       crossAxisSpacing: 18,
-                        //       childAspectRatio: 0.7,
-                        //     ),
-                        //     itemBuilder: (context, index) {
-                        //       final module = modules[index];
-                        //       return _buildAnimatedCard(
-                        //         index: index,
-                        //         module: module,
-                        //         context: context,
-                        //       );
-                        //     },
-                        //   ),
-                        // ),
                         Expanded(
                           child: GridView.builder(
                             physics: const BouncingScrollPhysics(),
@@ -425,15 +343,12 @@ class _DashboardScreenState extends State<DashboardScreen>
         color: module["color"],
         gradient: module["gradient"],
         onTap: () {
-          Navigator.pushNamed(context, RoutesName.loginScreen);
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (_) => ModuleScreen(
-          //       title: module["title"],
-          //     ),
-          //   ),
-          // );
+          Navigator.pushNamed(
+            context,
+            RoutesName.loginScreen,
+            arguments: module["role"],
+          );
+
         },
       ),
     );

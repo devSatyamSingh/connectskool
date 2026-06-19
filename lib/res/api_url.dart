@@ -74,7 +74,6 @@ class ApiUrl {
   static const String accountantAttendance = "$baseUrl/schooladmin/getAccountantAttendance";
 
 
-
   // TIMETABLE---------------------------------------------
   static const String getExamTimeTable = "$baseUrl/schooladmin/getExamTimetable";
   static const String createExamTimetable = "$baseUrl/schooladmin/createExamTimetable";

@@ -63,6 +63,8 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final String? role =
+    ModalRoute.of(context)?.settings.arguments as String?;
 
     return Scaffold(
       body: Container(
@@ -87,46 +89,16 @@ class _LoginScreenState extends State<LoginScreen>
               child: Column(
                 children: [
                   const SizedBox(height: 40),
-
-                  // School Logo/Icon with Animation
                   _buildAnimatedLogo(),
-
                   const SizedBox(height: 30),
-
-                  // Welcome Text
-                  _buildWelcomeText(),
-
+                  _buildWelcomeText(role),
                   const SizedBox(height: 30),
-
-                  // Login Form
                   _buildLoginForm(),
-
                   const SizedBox(height: 20),
-
-                  // Remember Me & Forgot Password
                   _buildRememberForgotRow(),
-
                   const SizedBox(height: 30),
-
-                  // Login Button
                   _buildLoginButton(),
-
                   const SizedBox(height: 20),
-
-                  // // Divider
-                  // _buildDivider(),
-                  //
-                  // const SizedBox(height: 20),
-                  //
-                  // // Social Login Buttons
-                  // _buildSocialLoginButtons(),
-                  //
-                  // const SizedBox(height: 30),
-
-                  // Sign Up Link
-                  // _buildSignUpLink(),
-
-                  // const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -169,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildWelcomeText() {
+  Widget _buildWelcomeText(String? role) {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -185,6 +157,13 @@ class _LoginScreenState extends State<LoginScreen>
             size: 32,
             weight: FontWeight.bold,
             color: Colors.black87,
+          ),
+          const SizedBox(height: 8),
+          AppText.customText(
+            "Login As ${role ?? ""}",
+            size: 18,
+            weight: FontWeight.bold,
+            color: AppColor.lightBlueColor,
           ),
           const SizedBox(height: 8),
           AppText.customText(
@@ -426,158 +405,6 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  // Widget _buildLoginButton() {
-  //   final loginViewModel = Provider.of<LoginViewModel>(context);
-  //   return AnimatedBuilder(
-  //     animation: _animationController,
-  //     builder: (context, child) {
-  //       final delay = 0.4;
-  //       final animationValue = Curves.easeOut.transform(
-  //         (_animationController.value - delay).clamp(0.0, 1.0) / (1.0 - delay),
-  //       );
-  //
-  //       return Transform.scale(
-  //         scale: animationValue,
-  //         child: Opacity(opacity: animationValue, child: child),
-  //       );
-  //     },
-  //     child: Container(
-  //       width: double.infinity,
-  //       height: 55,
-  //       decoration: BoxDecoration(
-  //         gradient: LinearGradient(
-  //           colors: [
-  //             AppColor.lightBlueColor,
-  //             AppColor.lightBlueColor.withValues(alpha: 0.8),
-  //           ],
-  //         ),
-  //         borderRadius: BorderRadius.circular(20),
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: AppColor.lightBlueColor.withOpacity(0.4),
-  //             blurRadius: 20,
-  //             offset: const Offset(0, 10),
-  //             spreadRadius: 2,
-  //           ),
-  //         ],
-  //       ),
-  //       child: Material(
-  //         color: Colors.transparent,
-  //         child: InkWell(
-  //           borderRadius: BorderRadius.circular(20),
-  //           // onTap: _handleLogin,
-  //           onTap: () {
-  //             loginViewModel.loginApi(
-  //               context,
-  //               _emailController.text,
-  //               _passwordController.text,
-  //             );
-  //             // Navigator.push(
-  //             //   context,
-  //             //   MaterialPageRoute(
-  //             //     builder: (_) => ModuleScreen(title: selectedRole),
-  //             //   ),
-  //             // );
-  //           },
-  //
-  //           child: Center(
-  //             child: Row(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 AppText.customText(
-  //                   "Sign In",
-  //                   size: 18,
-  //                   weight: FontWeight.bold,
-  //                   color: Colors.white,
-  //                 ),
-  //                 const SizedBox(width: 10),
-  //                 const Icon(
-  //                   Icons.arrow_forward_rounded,
-  //                   color: Colors.white,
-  //                   size: 24,
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // Widget _buildLoginButton() {
-  //   final loginViewModel = Provider.of<LoginViewModel>(context);
-  //
-  //   return AnimatedBuilder(
-  //     animation: _animationController,
-  //     builder: (context, child) {
-  //       final delay = 0.4;
-  //       final animationValue = Curves.easeOut.transform(
-  //         (_animationController.value - delay).clamp(0.0, 1.0) / (1.0 - delay),
-  //       );
-  //
-  //       return Transform.scale(
-  //         scale: animationValue,
-  //         child: Opacity(opacity: animationValue, child: child),
-  //       );
-  //     },
-  //     child: Container(
-  //       width: double.infinity,
-  //       height: 55,
-  //       decoration: BoxDecoration(
-  //         gradient: LinearGradient(
-  //           colors: [
-  //             AppColor.lightBlueColor,
-  //             AppColor.lightBlueColor.withValues(alpha: 0.8),
-  //           ],
-  //         ),
-  //         borderRadius: BorderRadius.circular(20),
-  //       ),
-  //       child: Material(
-  //         color: Colors.transparent,
-  //         child: InkWell(
-  //           borderRadius: BorderRadius.circular(20),
-  //           onTap: loginViewModel.loading
-  //               ? null
-  //               : () {
-  //             loginViewModel.loginApi(
-  //               context,
-  //               _emailController.text,
-  //               _passwordController.text,
-  //             );
-  //           },
-  //           child: Center(
-  //             child: loginViewModel.loading
-  //                 ? const SizedBox(
-  //               height: 22,
-  //               width: 22,
-  //               child: CircularProgressIndicator(
-  //                 color: Colors.white,
-  //                 strokeWidth: 2,
-  //               ),
-  //             )
-  //                 : Row(
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 AppText.customText(
-  //                   "Sign In",
-  //                   size: 18,
-  //                   weight: FontWeight.bold,
-  //                   color: Colors.white,
-  //                 ),
-  //                 const SizedBox(width: 10),
-  //                 const Icon(
-  //                   Icons.arrow_forward_rounded,
-  //                   color: Colors.white,
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget _buildLoginButton() {
     return AnimatedBuilder(
       animation: _animationController,

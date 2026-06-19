@@ -5,7 +5,6 @@ import 'package:school_pro/accountant_management/accountant_management_dash_boar
 import 'package:school_pro/student_management/student_dash_board_screen.dart';
 import 'package:school_pro/teacher_management/teacher_management_dashboard_screen.dart';
 import 'package:school_pro/utils/permission_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
@@ -31,7 +30,6 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
   late Animation<double> _rotateAnimation;
-  late Animation<double> _shimmerAnimation;
 
   @override
   void initState() {
@@ -73,100 +71,142 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
 
-    _shimmerAnimation = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
     _controller.forward();
 
+    // Splash animation ke baad navigation
     Future.delayed(const Duration(seconds: 2), () {
-      _handleNavigation();
+      if (mounted) _handleNavigation();
     });
   }
 
+  // ─── Navigation Decision Tree ─────────────────────────────────────────────
+  //
+  //  App open
+  //    │
+  //    ├─ app_installed_flag missing? ──► Fresh install / reinstall
+  //    │                                  → clearUser() → Onboarding
+  //    │
+  //    ├─ app_installed_flag present
+  //    │    │
+  //    │    ├─ onboarding_done missing? ──► Onboarding (edge case)
+  //    │    │
+  //    │    └─ onboarding_done present
+  //    │         │
+  //    │         ├─ userId + role + token valid? ──► Dashboard (role se)
+  //    │         │
+  //    │         └─ koi bhi missing/empty ──► Login screen
+
   Future<void> _handleNavigation() async {
-    final prefs = await SharedPreferences.getInstance();
+    final userVM = UserViewModel();
 
-    bool isFirstTime = prefs.getBool("isFirstTime") ?? true;
+    // ── STEP 1: Fresh install / reinstall detection ──────────────────────────
+    // Android uninstall karne pe SharedPreferences wipe hoti hai.
+    // 'app_installed_flag' missing hogi → fresh install confirm.
+    final isInstalled = await userVM.isAppPreviouslyInstalled();
 
-    if (isFirstTime) {
-      await prefs.setBool("isFirstTime", false);
-
-      Navigator.pushReplacementNamed(
-        context,
-        RoutesName.onboardingScreen,
-      );
+    if (!isInstalled) {
+      // Koi bhi stale data clear karo (safety net)
+      await userVM.clearUser();
+      debugPrint("🆕 Fresh install detected — showing onboarding");
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, RoutesName.onboardingScreen);
+      }
       return;
     }
 
-    await _checkSession();
-  }
-  // splash_screen.dart — _checkSession() mein yeh change karo
+    // ── STEP 2: Onboarding check ─────────────────────────────────────────────
+    final onboardingDone = await userVM.isOnboardingDone();
+    if (!onboardingDone) {
+      debugPrint("📖 Onboarding not done — showing onboarding");
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, RoutesName.onboardingScreen);
+      }
+      return;
+    }
 
-  Future<void> _checkSession() async {
+    // ── STEP 3: Session check ────────────────────────────────────────────────
+    await _checkSession(userVM);
+  }
+
+  Future<void> _checkSession(UserViewModel userVM) async {
     try {
-      final userViewModel = UserViewModel();
       PermissionManager.clear();
 
-      final int? userId  = await userViewModel.getUser();
-      final String? role = await userViewModel.getRole();
-      final String? token = await userViewModel.getToken();
+      // getUser() → String? (userId ab string form mein save hota hai)
+      final String? userId = await userVM.getUser();
+      final String? role   = await userVM.getRole();
+      final String? token  = await userVM.getToken();
 
-      if (userId != null && userId != 0 && role != null && role.isNotEmpty) {
-        await Provider.of<GetUserPermissionViewModel>(
-          context,
-          listen: false,
-        ).getUserPermissionApi(
-          context: context,
-          userId: userId,
-          role: role,
-          isCurrentUser: true,
-        );
-      }
+      debugPrint("SPLASH CHECK → userId=$userId | role=$role | token=${token != null ? 'present' : 'null'}");
 
-      if (userId != null &&
-          userId != 0 &&
-          role != null &&
-          role.isNotEmpty &&
-          token != null &&
-          token.isNotEmpty) {
+      final bool hasSession =
+          userId != null && userId.isNotEmpty && userId != "0" &&
+              role   != null && role.isNotEmpty &&
+              token  != null && token.isNotEmpty;
 
-        switch (role) {
-          case "school_admin":
-            Navigator.pushReplacement(
+      if (hasSession) {
+        try {
+          if (mounted) {
+            await Provider.of<GetUserPermissionViewModel>(
               context,
-              MaterialPageRoute(builder: (_) => SchoolManagementDashboardScreen()),
+              listen: false,
+            ).getUserPermissionApi(
+              context: context,
+              userId: int.tryParse(userId!) ?? 0,
+              role: role!,
+              isCurrentUser: true,
             );
-            break;
-          case "student":
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const StudentDashboardScreen()),
-            );
-            break;
-          case "teacher":
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => TeacherManagementDashBoardScreen()),
-            );
-            break;
-          case "accountant":
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => AccountantManagementDashBoardScreen()),
-            );
-            break;
-          default:
-            Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+          }
+        } catch (e) {
+          debugPrint("Permission reload (non-fatal): $e");
         }
+
+        if (mounted) _navigateByRole(role!);
       } else {
-        Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+        debugPrint("No valid session → Login");
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+        }
       }
     } catch (e) {
-      print("CHECK SESSION ERROR => $e");
-      Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+      debugPrint("CHECK SESSION ERROR => $e");
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+      }
     }
   }
+
+  void _navigateByRole(String role) {
+    switch (role) {
+      case "school_admin":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => SchoolManagementDashboardScreen()),
+        );
+        break;
+      case "student":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => StudentDashboardScreen()),
+        );
+        break;
+      case "teacher":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => TeacherManagementDashBoardScreen()),
+        );
+        break;
+      case "accountant":
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => AccountantManagementDashBoardScreen()),
+        );
+        break;
+      default:
+        Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -183,6 +223,7 @@ class _SplashScreenState extends State<SplashScreen>
         ),
         child: Stack(
           children: [
+            // Decorative background circles
             Positioned(
               top: -100,
               right: -100,
@@ -214,6 +255,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
 
+            // Main content
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

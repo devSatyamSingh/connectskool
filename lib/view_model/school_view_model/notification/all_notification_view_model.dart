@@ -18,6 +18,8 @@ class AllNotificationViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+
+
   void setModelData(AllNotificationModel value) {
     _allNotificationModel = value;
     notifyListeners();
@@ -42,14 +44,11 @@ class AllNotificationViewModel extends ChangeNotifier {
         case 200:
           final body = Map<String, dynamic>.from(response);
 
-          // Remove status_code as it's not part of the model
           body.remove('status_code');
 
-          // Parse data array and pagination
           final model = AllNotificationModel.fromJson(body);
           setModelData(model);
 
-          // print("✅ Teachers fetched: ${model.data?.length ?? 0}");
           break;
 
         case 401:

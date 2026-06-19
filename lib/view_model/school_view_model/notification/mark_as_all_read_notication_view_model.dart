@@ -5,47 +5,6 @@ import '../../../utils/permission_extensions.dart';
 import '../../../utils/permission_keys.dart';
 import '../../../utils/utils.dart';
 
-// class MarkAsAllReadNotificationViewModel with ChangeNotifier {
-//   final _repo = MarkAsAllReadNotificationRepository();
-//
-//   bool _loading = false;
-//   bool get loading => _loading;
-//
-//   setLoading(bool value) {
-//     _loading = value;
-//     notifyListeners();
-//   }
-//
-//   Future<bool> markAsAllReadNotificationApi(BuildContext context) async {
-//     setLoading(true);
-//
-//     try {
-//       final response =
-//       await _repo.markAsAllReadNotificationApi(null); // 👈 no body
-//
-//       setLoading(false);
-//
-//       final message = response['message'] ?? "Done";
-//
-//       if (response['success'] == true) {
-//         Utils.show(message, context);
-//         return true;
-//       } else {
-//         Utils.show(message, context);
-//         return false;
-//       }
-//     } catch (e) {
-//       setLoading(false);
-//
-//       if (kDebugMode) {
-//         print("API Error: $e");
-//       }
-//
-//       Utils.show("Network error", context);
-//       return false;
-//     }
-//   }
-// }
 class MarkAsAllReadNotificationViewModel with ChangeNotifier {
 
   final _loginRepo = MarkAsAllReadNotificationRepository();

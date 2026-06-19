@@ -120,11 +120,12 @@ import 'firebase_options.dart';
 import 'res/internet_popup.dart';
 import 'package:school_pro/view_model/school_view_model/exam/exam_management_view_model.dart';
 
+// ─── Globals ──────────────────────────────────────────────────────────────────
 
-//  Global variables
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin();
 
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel',
@@ -132,61 +133,77 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   importance: Importance.high,
   playSound: true,
 );
+
+// ─── Background Handler ───────────────────────────────────────────────────────
+// @pragma zaroori hai — warna release build mein tree-shaking se remove ho jaata hai
+
 @pragma('vm:entry-point')
 Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Note: background mein UI update mat karo, sirf data process karo
 }
+
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Background handler PEHLE register karo — Firebase init se bhi pehle
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
-  //  PEHLE Firebase initialize karo
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  //  AB Token refresh listener lagao
-  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-    print(" FCM Token Refreshed: $newToken");
-    await reSubscribeTopics();
+  // FCM token refresh listener — jab token change ho to re-login suggest karo
+  // ya backend ko naya token bhejo (optional enhancement)
+  FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
+    debugPrint("🔄 FCM Token Refreshed: $newToken");
+    // TODO: Agar backend mein device_token update karna ho to yahan API call karo
   });
 
+  // App notification se open hui — navigate to relevant screen
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    print(" App opened from notification: ${message.notification?.title}");
+    debugPrint("📲 App opened from notification: ${message.notification?.title}");
+    // TODO: message.data se specific screen pe navigate kar sakte ho
   });
 
-  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
-    if (message != null) {
-      print(" App launched from notification: ${message.notification?.title}");
-    }
-  });
+  // App completely closed thi aur notification se launch hui
+  final RemoteMessage? initialMessage =
+  await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    debugPrint("🚀 App launched from notification: ${initialMessage.notification?.title}");
+    // TODO: initialMessage.data se deep link handle karo
+  }
 
-  // Local notifications init
+  // Local notifications channel setup
   const AndroidInitializationSettings androidSettings =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-  const InitializationSettings initSettings = InitializationSettings(
-    android: androidSettings,
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(android: androidSettings),
   );
-  await flutterLocalNotificationsPlugin.initialize(initSettings);
 
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin
-      >()
+      AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
+  // Foreground notification options (iOS ke liye bhi kaam karta hai)
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
   );
 
-  await getFCMToken();
+  // Permission request + token fetch
+  await _initFCMPermission();
 
-  await reSubscribeTopics();
+  // App restart / kill pe saved session ke topics restore karo
+  // Yeh login_view_model ke _buildTopics() se SYNC mein hai
+  await _reSubscribeTopics();
 
+  // Foreground message — app khuli hui ho tab notification show karo
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print(" Message aaya: ${message.notification?.title}");
-    RemoteNotification? notification = message.notification;
+    debugPrint("📩 Foreground message: ${message.notification?.title}");
+    final notification = message.notification;
     if (notification != null) {
       flutterLocalNotificationsPlugin.show(
         notification.hashCode,
@@ -209,47 +226,88 @@ void main() async {
   runApp(const MyApp());
 }
 
-Future<void> getFCMToken() async {
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  NotificationSettings settings = await messaging.requestPermission(
+// ─── FCM Permission ───────────────────────────────────────────────────────────
+
+Future<void> _initFCMPermission() async {
+  final messaging = FirebaseMessaging.instance;
+  final settings = await messaging.requestPermission(
     alert: true,
     badge: true,
     sound: true,
   );
 
-  print(" Permission Status: ${settings.authorizationStatus}");
-
   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    String? token = await messaging.getToken();
-    print(" FCM Token: $token");
+    final token = await messaging.getToken();
+    debugPrint("✅ FCM Permission granted | Token: $token");
+  } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
+    debugPrint("⚠️ FCM Permission provisional (iOS quiet notifications)");
   } else {
-    print(" Permission denied - notification nahi aayegi");
+    debugPrint("❌ FCM Permission denied — notifications nahi aayengi");
   }
 }
 
-Future<void> reSubscribeTopics() async {
+// ─── Re-Subscribe on App Start ────────────────────────────────────────────────
+// App kill/restart ke baad saved session ke EXACT topics restore karta hai.
+// IMPORTANT: Yeh login_view_model.dart ke _buildTopics() se bilkul sync mein hai.
+// Dono jagah topics ka logic same hona chahiye — warna mismatch hoga.
+
+Future<void> _reSubscribeTopics() async {
   try {
     final userVM = UserViewModel();
-    final role = await userVM.getRole();
-    final schoolId = await userVM.getSchoolId();
 
-    if (role != null && schoolId != null) {
-      await FirebaseMessaging.instance.subscribeToTopic("school_$schoolId");
-      await FirebaseMessaging.instance.subscribeToTopic(
-        "school_${schoolId}_role_$role",
-      );
-      print(" Re-subscribed: school_$schoolId");
-      print(" Re-subscribed: school_${schoolId}_role_$role");
-    } else {
-      print(" No saved session — skipping re-subscribe");
+    // Subscribed session se exact topics padhte hain
+    // (wahi jo login ke waqt subscribe kiye the)
+    final session = await userVM.getSubscribedSession();
+
+    final schoolId  = session['schoolId'];
+    final role      = session['role'];
+    final userId    = session['userId'];
+    final classId   = session['classId'];
+    final sectionId = session['sectionId'];
+
+    if (schoolId == null || schoolId.isEmpty ||
+        role     == null || role.isEmpty) {
+      debugPrint("ℹ️ No saved session — skipping re-subscribe");
+      return;
     }
+
+    final messaging = FirebaseMessaging.instance;
+    final topics = <String>[
+      "school_$schoolId",                     // school-wide
+      "school_${schoolId}_role_$role",         // role-based
+    ];
+
+    if (userId != null && userId.isNotEmpty) {
+      topics.add("user_$userId");
+    }
+
+    if (role == "student") {
+      if (classId != null && classId.isNotEmpty) {
+        topics.add("school_${schoolId}_class_$classId");
+      }
+      if (classId != null && classId.isNotEmpty &&
+          sectionId != null && sectionId.isNotEmpty) {
+        topics.add("school_${schoolId}_class_${classId}_section_$sectionId");
+      }
+    }
+
+    await Future.wait(
+      topics.map((t) => messaging.subscribeToTopic(t)),
+      eagerError: false,
+    );
+
+    debugPrint("✅ Re-subscribed topics: $topics");
   } catch (e) {
-    print(" Re-subscribe error: $e");
+    debugPrint("❌ Re-subscribe error: $e");
   }
 }
+
+// ─── Screen Dimensions ────────────────────────────────────────────────────────
 
 double screenHeight = 0.0;
 double screenWidth = 0.0;
+
+// ─── App Root ─────────────────────────────────────────────────────────────────
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -262,12 +320,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    InternetChecker.init(); // ADD
+    InternetChecker.init();
   }
 
   @override
   void dispose() {
-    InternetChecker.dispose(); // ADD
+    InternetChecker.dispose();
     super.dispose();
   }
 
@@ -275,6 +333,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginViewModel()),
@@ -311,22 +370,18 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => AddTeachersViewModel()),
         ChangeNotifierProvider(create: (_) => AllHomeWorkViewModel()),
         ChangeNotifierProvider(
-          create: (_) => CreateAdminTeachersHomeworkViewModel(),
-        ),
+            create: (_) => CreateAdminTeachersHomeworkViewModel()),
         ChangeNotifierProvider(create: (_) => SchoolAdminProfileViewModel()),
         ChangeNotifierProvider(create: (_) => TeacherDetailViewModel()),
         ChangeNotifierProvider(create: (_) => SchoolStudentDetailViewModel()),
         ChangeNotifierProvider(
-          create: (_) => SchoolAccountantDetailViewModel(),
-        ),
+            create: (_) => SchoolAccountantDetailViewModel()),
         ChangeNotifierProvider(create: (_) => AllNotificationViewModel()),
         ChangeNotifierProvider(create: (_) => CreateNotificationViewModel()),
-        ChangeNotifierProvider(create: (_) => EditNotificationViewModel()),
+        // ChangeNotifierProvider(create: (_) => EditNotificationViewModel()),
         ChangeNotifierProvider(create: (_) => DeleteNotificationViewModel()),
         ChangeNotifierProvider(
-          create: (_) => MarkAsAllReadNotificationViewModel(),
-        ),
-        // ChangeNotifierProvider(create: (_) => TimeTableViewModel()),
+            create: (_) => MarkAsAllReadNotificationViewModel()),
         ChangeNotifierProvider(create: (_) => CreateTimetableViewModel()),
         ChangeNotifierProvider(create: (_) => AllRolePermissionViewModel()),
         ChangeNotifierProvider(create: (_) => SelectRoleViewModel()),
@@ -336,8 +391,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => AllAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => DeleteClassViewModel()),
         ChangeNotifierProvider(
-          create: (_) => AllStudentAdminAttendanceViewModel(),
-        ),
+            create: (_) => AllStudentAdminAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => CreateSectionViewModel()),
         ChangeNotifierProvider(create: (_) => UpdateSectionViewModel()),
         ChangeNotifierProvider(create: (_) => DeleteSectionViewModel()),
@@ -352,18 +406,15 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => SaveUserPermissionViewModel()),
         ChangeNotifierProvider(create: (_) => EditClassesTimeTableViewModel()),
         ChangeNotifierProvider(
-          create: (_) => DeleteClassesTimeTableViewModel(),
-        ),
+            create: (_) => DeleteClassesTimeTableViewModel()),
         ChangeNotifierProvider(create: (_) => StudentFeeViewModel()),
         ChangeNotifierProvider(create: (_) => CollectFeePaymentViewModel()),
         ChangeNotifierProvider(create: (_) => CreateAdminMarkSheetViewModel()),
         ChangeNotifierProvider(create: (_) => GetCoScholasticViewModel()),
         ChangeNotifierProvider(
-          create: (_) => UpdateSchoolAdminMarkSheetViewModel(),
-        ),
+            create: (_) => UpdateSchoolAdminMarkSheetViewModel()),
         ChangeNotifierProvider(
-          create: (_) => DeleteSchoolAdminMarkSheetViewModel(),
-        ),
+            create: (_) => DeleteSchoolAdminMarkSheetViewModel()),
         ChangeNotifierProvider(create: (_) => GenerateAdmitCardViewModel()),
         ChangeNotifierProvider(create: (_) => CreateRouteViewModel()),
         ChangeNotifierProvider(create: (_) => GetRouteViewModel()),
@@ -374,8 +425,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => UpdateStopViewModel()),
         ChangeNotifierProvider(create: (_) => DeleteStopViewModel()),
         ChangeNotifierProvider(
-          create: (_) => CreateStudentTransportFeeViewModel(),
-        ),
+            create: (_) => CreateStudentTransportFeeViewModel()),
         ChangeNotifierProvider(create: (_) => GetStudentTransportViewModel()),
         ChangeNotifierProvider(create: (_) => GetRouteStudentsViewModel()),
         ChangeNotifierProvider(create: (_) => DiscontinueStudentViewModel()),
@@ -386,25 +436,32 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => StudentHomeworkViewModel()),
         ChangeNotifierProvider(create: (_) => SubmitHomeworkViewModel()),
         ChangeNotifierProvider(create: (_) => StudentAttendanceViewModel()),
-        ChangeNotifierProvider(create: (_) => CreateStudentAttendanceViewModel(),),
+        ChangeNotifierProvider(
+            create: (_) => CreateStudentAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => AccountantAttendanceViewModel()),
-        ChangeNotifierProvider(create: (_) => CreateAccountantAttendanceViewModel(),),
+        ChangeNotifierProvider(
+            create: (_) => CreateAccountantAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => AccountantProfileViewModel()),
         ChangeNotifierProvider(create: (_) => TeacherAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => StudentNotificationViewModel()),
-        ChangeNotifierProvider(create: (_) => CreateTeacherAttendanceViewModel(),),
+        ChangeNotifierProvider(
+            create: (_) => CreateTeacherAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => TeacherProfileViewModel()),
-        ChangeNotifierProvider(create: (_) => UpdateAccountantAttendanceViewModel(),),
-        ChangeNotifierProvider(create: (_) => UpdateStudentAttendanceViewModel(),),
-        ChangeNotifierProvider(create: (_) => UpdateTeacherAttendanceViewModel(),),
+        ChangeNotifierProvider(
+            create: (_) => UpdateAccountantAttendanceViewModel()),
+        ChangeNotifierProvider(
+            create: (_) => UpdateStudentAttendanceViewModel()),
+        ChangeNotifierProvider(
+            create: (_) => UpdateTeacherAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => RemoveRoleViewModel()),
         ChangeNotifierProvider(create: (_) => SupportTicketViewModel()),
         ChangeNotifierProvider(create: (_) => CmsViewModel()),
         ChangeNotifierProvider(create: (_) => SchoolTimetableViewModel()),
-        ChangeNotifierProvider(create: (_) => HomeworkDetailsViewModel(),),
+        ChangeNotifierProvider(create: (_) => HomeworkDetailsViewModel()),
         ChangeNotifierProvider(create: (_) => GenerateMarksheetViewModel()),
-        ChangeNotifierProvider(create: (_) => CoScholasticGradeViewModel(),),
-        ChangeNotifierProvider(create: (_) => GetAllTransportStudentsViewModel(),),
+        ChangeNotifierProvider(create: (_) => CoScholasticGradeViewModel()),
+        ChangeNotifierProvider(
+            create: (_) => GetAllTransportStudentsViewModel()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
