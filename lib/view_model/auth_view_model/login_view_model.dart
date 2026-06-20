@@ -86,8 +86,10 @@ class LoginViewModel with ChangeNotifier {
       if (classId != null && classId.toString().isNotEmpty) {
         topics.add("school_${schoolId}_class_$classId");
       }
-      if (classId != null && classId.toString().isNotEmpty &&
-          sectionId != null && sectionId.toString().isNotEmpty) {
+      if (classId != null &&
+          classId.toString().isNotEmpty &&
+          sectionId != null &&
+          sectionId.toString().isNotEmpty) {
         topics.add("school_${schoolId}_class_${classId}_section_$sectionId");
       }
     }
@@ -105,11 +107,17 @@ class LoginViewModel with ChangeNotifier {
     dynamic sectionId,
   }) async {
     final topics = _buildTopics(
-      schoolId: schoolId, role: role,
-      userId: userId, classId: classId, sectionId: sectionId,
+      schoolId: schoolId,
+      role: role,
+      userId: userId,
+      classId: classId,
+      sectionId: sectionId,
     );
     final messaging = FirebaseMessaging.instance;
-    await Future.wait(topics.map((t) => messaging.subscribeToTopic(t)), eagerError: false);
+    await Future.wait(
+      topics.map((t) => messaging.subscribeToTopic(t)),
+      eagerError: false,
+    );
     debugPrint("✅ Subscribed: $topics");
   }
 
@@ -123,21 +131,27 @@ class LoginViewModel with ChangeNotifier {
     dynamic sectionId,
   }) async {
     final topics = _buildTopics(
-      schoolId: schoolId, role: role,
-      userId: userId, classId: classId, sectionId: sectionId,
+      schoolId: schoolId,
+      role: role,
+      userId: userId,
+      classId: classId,
+      sectionId: sectionId,
     );
     final messaging = FirebaseMessaging.instance;
-    await Future.wait(topics.map((t) => messaging.unsubscribeFromTopic(t)), eagerError: false);
+    await Future.wait(
+      topics.map((t) => messaging.unsubscribeFromTopic(t)),
+      eagerError: false,
+    );
     debugPrint("✅ Unsubscribed: $topics");
   }
 
   // ─── Login API ────────────────────────────────────────────────────────────
 
   Future<void> loginApi(
-      BuildContext context,
-      String email,
-      String password,
-      ) async {
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
     PermissionManager.clear();
     setLoading(true);
 
@@ -148,16 +162,20 @@ class LoginViewModel with ChangeNotifier {
       // STEP 1: Unsubscribe stale session from previous login (cross-school fix)
       final oldSession = await userVM.getSubscribedSession();
       final oldSchoolId = oldSession['schoolId'];
-      final oldRole     = oldSession['role'];
+      final oldRole = oldSession['role'];
 
-      if (oldSchoolId != null && oldSchoolId.isNotEmpty &&
-          oldRole     != null && oldRole.isNotEmpty) {
-        debugPrint("🧹 Cleaning stale session: school=$oldSchoolId role=$oldRole");
+      if (oldSchoolId != null &&
+          oldSchoolId.isNotEmpty &&
+          oldRole != null &&
+          oldRole.isNotEmpty) {
+        debugPrint(
+          "🧹 Cleaning stale session: school=$oldSchoolId role=$oldRole",
+        );
         await _unsubscribeFromTopics(
-          schoolId:  oldSchoolId,
-          role:      oldRole,
-          userId:    oldSession['userId'],
-          classId:   oldSession['classId'],
+          schoolId: oldSchoolId,
+          role: oldRole,
+          userId: oldSession['userId'],
+          classId: oldSession['classId'],
           sectionId: oldSession['sectionId'],
         );
         await userVM.clearSubscribedSession();
@@ -165,28 +183,27 @@ class LoginViewModel with ChangeNotifier {
 
       // STEP 2: Call login API
       final data = {
-        "user_email":   email,
-        "password":     password,
+        "user_email": email,
+        "password": password,
         "device_token": fcmToken ?? "",
-        "device_type":  Platform.isIOS ? "ios" : "android",
+        "device_type": Platform.isIOS ? "ios" : "android",
       };
 
       final response = await _repo.loginApi(data);
       debugPrint("LOGIN RESPONSE => $response");
 
       if (response['status_code'] == 200) {
-        final user        = response['data']['user'];
-        final role        = user['role'] as String;
-        final token       = response['data']['token'];
-        final schoolId    = user['school_id'];
-        final classId     = user['class_id'];
-        final sectionId   = user['section_id'];
-        final userId      = user['user_id'];
+        final user = response['data']['user'];
+        final role = user['role'] as String;
+        final token = response['data']['token'];
+        final schoolId = user['school_id'];
+        final classId = user['class_id'];
+        final sectionId = user['section_id'];
+        final userId = user['user_id'];
         final permissions = List<String>.from(user['permissions'] ?? []);
 
         debugPrint("LOGIN ROLE    => $role");
         debugPrint("LOGIN USER ID => $userId");
-
 
         PermissionManager.setRole(role);
         PermissionManager.setPermissions(permissions);
@@ -200,22 +217,30 @@ class LoginViewModel with ChangeNotifier {
           userVM.saveSectionId(sectionId),
           userVM.savePermissions(permissions),
           userVM.markAppInstalled(),
+          userVM.saveUserIdAsInt(userId),
         ]);
 
         await _subscribeToTopics(
-          schoolId: schoolId, role: role,
-          userId: userId, classId: classId, sectionId: sectionId,
+          schoolId: schoolId,
+          role: role,
+          userId: userId,
+          classId: classId,
+          sectionId: sectionId,
         );
 
         await userVM.saveSubscribedSession(
-          schoolId: schoolId, role: role,
-          userId: userId, classId: classId, sectionId: sectionId,
+          schoolId: schoolId,
+          role: role,
+          userId: userId,
+          classId: classId,
+          sectionId: sectionId,
         );
 
         if (!context.mounted) return;
 
         await Provider.of<GetUserPermissionViewModel>(
-          context, listen: false,
+          context,
+          listen: false,
         ).getUserPermissionApi(
           context: context,
           userId: int.tryParse(userId.toString()) ?? 0,
@@ -232,7 +257,8 @@ class LoginViewModel with ChangeNotifier {
       }
     } catch (e, s) {
       debugPrint("LOGIN ERROR => $e\n$s");
-      if (context.mounted) Utils.show("Login failed. Please try again.", context);
+      if (context.mounted)
+        Utils.show("Login failed. Please try again.", context);
     } finally {
       setLoading(false);
     }
@@ -240,85 +266,123 @@ class LoginViewModel with ChangeNotifier {
 
   // ─── Logout API ───────────────────────────────────────────────────────────
 
+  // ─── Logout API ───────────────────────────────────────────────────────────
+
   Future<void> logoutApi(BuildContext context) async {
     setLoading(true);
     final userVM = UserViewModel();
 
-    // STEP 1: Read subscribed session BEFORE clearing anything
+    // STEP 1: Subscribed session PEHLE padho — clearUser se pehle
+    // (clearUser ke baad ye data available nahi rahega)
     final session = await userVM.getSubscribedSession();
-
-    // STEP 2: Backend logout (best-effort)
-    try {
-      await _repo.logoutApi({"device_type": Platform.isIOS ? "ios" : "android"});
-    } catch (e) {
-      debugPrint("LOGOUT API ERROR => $e");
-    }
-
-    // STEP 3: Unsubscribe FCM topics BEFORE deleting token
     final schoolId = session['schoolId'];
-    final role     = session['role'];
-    if (schoolId != null && schoolId.isNotEmpty &&
-        role     != null && role.isNotEmpty) {
-      await _unsubscribeFromTopics(
-        schoolId:  schoolId,
-        role:      role,
-        userId:    session['userId'],
-        classId:   session['classId'],
-        sectionId: session['sectionId'],
-      );
-      debugPrint("UNSUBSCRIBE COMPLETED");
+    final role = session['role'];
+    final userId = session['userId'];
+    final classId = session['classId'];
+    final sectionId = session['sectionId'];
+
+    debugPrint(
+      "🔍 Logout session => school=$schoolId | role=$role | userId=$userId",
+    );
+
+    // STEP 2: FCM Topics se PEHLE unsubscribe karo — kuch bhi delete karne se pehle
+    if (schoolId != null &&
+        schoolId.isNotEmpty &&
+        role != null &&
+        role.isNotEmpty) {
+      try {
+        await _unsubscribeFromTopics(
+          schoolId: schoolId,
+          role: role,
+          userId: userId,
+          classId: classId,
+          sectionId: sectionId,
+        );
+        debugPrint("✅ FCM Topics unsubscribed successfully");
+      } catch (e) {
+        debugPrint("⚠️ Unsubscribe error (non-fatal): $e");
+      }
+    } else {
+      debugPrint("⚠️ No session found — skipping unsubscribe");
     }
 
-    // STEP 4: Delete FCM token
+    // STEP 3: FCM Token delete karo
     try {
       await FirebaseMessaging.instance.deleteToken();
-      // final freshToken =
-      // await FirebaseMessaging.instance.getToken();
-      //
-      // debugPrint("NEW TOKEN => $freshToken");
       debugPrint("✅ FCM Token deleted");
-      debugPrint("UNSUBSCRIBE COMPLETED");
     } catch (e) {
-      debugPrint("FCM Token delete error: $e");
+      debugPrint("⚠️ FCM Token delete error (non-fatal): $e");
     }
 
-    // STEP 5: Clear local data (app_installed_flag preserved inside clearUser)
+    // STEP 4: Backend logout API call (best-effort — fail hone pe bhi aage bado)
+    try {
+      await _repo.logoutApi({
+        "device_type": Platform.isIOS ? "ios" : "android",
+      });
+      debugPrint("✅ Backend logout done");
+    } catch (e) {
+      debugPrint("⚠️ Logout API error (non-fatal): $e");
+    }
+
+    // STEP 5: Subscribed session explicitly clear karo
+    try {
+      await userVM.clearSubscribedSession();
+      debugPrint("✅ Subscribed session cleared");
+    } catch (e) {
+      debugPrint("⚠️ Clear subscribed session error: $e");
+    }
+
+    // STEP 6: Baki sab local data clear karo (install/onboarding flags preserved)
     await userVM.clearUser();
     PermissionManager.clear();
 
     setLoading(false);
 
+    // STEP 7: Splash screen pe bhejo — pushNamedAndRemoveUntil se
+    // Splash screen se session check hoga aur login pe jayega
+    // UI bhi properly rebuild ho jayega
     if (context.mounted) {
       Navigator.pushNamedAndRemoveUntil(
-        context, RoutesName.dashboardScreen, (route) => false,
+        context,
+        RoutesName.splash, // ← SPLASH pe bhejo, dashboard nahi
+        (route) => false, // ← pura stack clear
       );
     }
   }
-
   // ─── Role Navigation ──────────────────────────────────────────────────────
 
   void _navigateFromRole(BuildContext context, String role) {
     switch (role) {
       case "school_admin":
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => SchoolManagementDashboardScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => SchoolManagementDashboardScreen()),
+        );
         break;
       case "student":
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => StudentDashboardScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => StudentDashboardScreen()),
+        );
         break;
       case "teacher":
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => TeacherManagementDashBoardScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => TeacherManagementDashBoardScreen()),
+        );
         break;
       case "accountant":
-        Navigator.push(context,
-            MaterialPageRoute(builder: (_) => AccountantManagementDashBoardScreen()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => AccountantManagementDashBoardScreen(),
+          ),
+        );
         break;
       default:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Coming Soon")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Coming Soon")));
     }
   }
 }

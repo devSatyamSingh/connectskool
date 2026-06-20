@@ -741,7 +741,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
             );
             return;
           }
-
           _showCreateSheet();
         },
         backgroundColor: AppColor.lightBlueColor,
@@ -926,6 +925,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
+                                dropdownColor: Colors.white,
                                 value:
                                     sections.any(
                                       (s) =>
@@ -1024,6 +1024,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
+                            dropdownColor: Colors.white,
                             value: selectedDay,
                             isExpanded: true,
 
@@ -1197,6 +1198,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
+          dropdownColor: Colors.white,
           value: value,
           isExpanded: true,
           hint: Text(
@@ -1967,84 +1969,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                     ],
                   ),
                   const SizedBox(height: 22),
-
-                  // ── Class & Section row ──────────────────────────
-                  // Row(children: [
-                  //   Expanded(child: _label('Class *',
-                  //     Consumer<AllClassesViewModel>(builder: (ctx, vm, _) =>
-                  //         _sheetDrop(
-                  //           hint: 'Select',
-                  //           value: _classId,
-                  //           items: (vm.allClassesModel?.data ?? [])
-                  //               .map((c) => DropdownMenuItem(
-                  //               value: c.classId?.toString(),
-                  //               child: Text(c.className ?? '')))
-                  //               .toList(),
-                  //           onChanged: (v) {
-                  //             setState(() {
-                  //               _classId   = v;
-                  //               _sectionId = null;
-                  //               _sectionError = null;
-                  //             });
-                  //             if (v != null) {
-                  //               Provider.of<AllSectionsViewModel>(context, listen: false)
-                  //                   .allSectionsApi(context, v);
-                  //             }
-                  //           },
-                  //         )),
-                  //   )),
-                  //   const SizedBox(width: 12),
-                  //   Expanded(child: _label('Section *',
-                  //     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  //       // ✅ Section empty hone par warning banner
-                  //       if (_classId != null && sections.isEmpty)
-                  //         Container(
-                  //           margin: const EdgeInsets.only(bottom: 6),
-                  //           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                  //           decoration: BoxDecoration(
-                  //             color: Colors.orange.shade50,
-                  //             borderRadius: BorderRadius.circular(8),
-                  //             border: Border.all(color: Colors.orange.shade200),
-                  //           ),
-                  //           child: Row(children: [
-                  //             Icon(Icons.warning_amber_rounded,
-                  //                 size: 14, color: Colors.orange.shade700),
-                  //             const SizedBox(width: 6),
-                  //             Flexible(child: Text(
-                  //               "No sections for this class",
-                  //               style: TextStyle(
-                  //                   fontSize: 11,
-                  //                   color: Colors.orange.shade800,
-                  //                   fontWeight: FontWeight.w500),
-                  //             )),
-                  //           ]),
-                  //         ),
-                  //       _sheetDrop(
-                  //         hint: 'Select',
-                  //         value: sections.any((s) => s.sectionId?.toString() == _sectionId)
-                  //             ? _sectionId : null,
-                  //         items: sections.map((s) => DropdownMenuItem(
-                  //             value: s.sectionId?.toString(),
-                  //             child: Text(s.sectionName ?? ''))).toList(),
-                  //         onChanged: sections.isEmpty
-                  //             ? null  // ✅ Section nahi hai toh disable
-                  //             : (v) => setState(() {
-                  //           _sectionId    = v;
-                  //           _sectionError = null;
-                  //         }),
-                  //         hasError: _sectionError != null,
-                  //       ),
-                  //       // ✅ Error text
-                  //       if (_sectionError != null)
-                  //         Padding(
-                  //           padding: const EdgeInsets.only(top: 4, left: 4),
-                  //           child: Text(_sectionError!,
-                  //               style: const TextStyle(fontSize: 11, color: Colors.red)),
-                  //         ),
-                  //     ]),
-                  //   )),
-                  // ]),
-                  // Sirf Class & Section Row replace karo — baaki sab same rahega
                   Row(
                     children: [
                       Expanded(
@@ -2445,6 +2369,7 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
     ),
     child: DropdownButtonHideUnderline(
       child: DropdownButton<String>(
+        dropdownColor: Colors.white,
         value: value,
         isExpanded: true,
         hint: Text(

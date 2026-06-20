@@ -312,7 +312,6 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
         .join(' ');
   }
   @override
-  @override
   Widget build(BuildContext context) {
     final profileVM = Provider.of<TeacherProfileViewModel>(context);
     final profile = profileVM.teacherProfileModel;
@@ -348,111 +347,113 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
 
 
 
-    return Scaffold(
-      backgroundColor: AppColor.bg,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
-              boxShadow: [BoxShadow(color: AppColor.blueShadow, blurRadius: 18, offset: const Offset(0, 10))],
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: AppColor.glassWhite, shape: BoxShape.circle),
-                    child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppText.customText("Teacher Profile", size: 19, weight: FontWeight.bold, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-
-          // ── Body: loader ya content ───────────────────────────
-          Expanded(
-            child: profileVM.loading || profile == null
-                ? const Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-              child: Column(
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.bg,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
+              decoration: BoxDecoration(
+                gradient: AppColor.primaryGradient,
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+                boxShadow: [BoxShadow(color: AppColor.blueShadow, blurRadius: 18, offset: const Offset(0, 10))],
+              ),
+              child: Row(
                 children: [
-
-                  // Profile Card
-                  Container(
-                    margin: const EdgeInsets.all(16),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColor.card,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: AppColor.cardShadow, blurRadius: 20, offset: const Offset(0, 4))],
-                    ),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: AppColor.primaryLight,
-                          backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                          child: photoUrl.isEmpty
-                              ? const Icon(Icons.person, size: 50, color: Colors.white)
-                              : null,
-                        ),
-                        const SizedBox(height: 16),
-                        AppText.customText(name, size: 22, weight: FontWeight.w700, color: AppColor.text),
-                        const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(color: AppColor.primaryLight, borderRadius: BorderRadius.circular(20)),
-                          child: AppText.customText("Emp ID: $employeeId", size: 13, weight: FontWeight.w500, color: AppColor.primary),
-                        ),
-                        const SizedBox(height: 8),
-                        AppText.customText(designation, size: 14, weight: FontWeight.w500, color: AppColor.sub),
-                      ],
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: AppColor.glassWhite, shape: BoxShape.circle),
+                      child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
                     ),
                   ),
-
-                  // Personal Information
-                  _buildInfoCard("Personal Information", [
-                    _InfoItem("Full Name",     name),
-                    _InfoItem("Gender",        gender),
-                    _InfoItem("Date of Birth", dob),
-                    _InfoItem("Father Name",   fatherName),
-                    _InfoItem("Mother Name",   motherName),
-                  ]),
-                  const SizedBox(height: 16),
-
-                  // Professional Information
-                  _buildInfoCard("Professional Information", [
-                    _InfoItem("Employee ID",      employeeId),
-                    _InfoItem("Designation",      designation),
-                    _InfoItem("Qualification",    qualification),
-                    _InfoItem("Employment Type",  employmentType),
-                    _InfoItem("Experience (yrs)", experienceYears),
-                    _InfoItem("Joining Date",     joiningDate),
-                  ]),
-                  const SizedBox(height: 16),
-
-                  // Contact Information
-                  _buildInfoCard("Contact Information", [
-                    _InfoItem("Email",   email),
-                    _InfoItem("Mobile",  mobile),
-                    _InfoItem("Address", address),
-                  ]),
-                  const SizedBox(height: 30),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AppText.customText("Teacher Profile", size: 19, weight: FontWeight.bold, color: Colors.white),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+
+            // ── Body: loader ya content ───────────────────────────
+            Expanded(
+              child: profileVM.loading || profile == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                child: Column(
+                  children: [
+
+                    // Profile Card
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColor.card,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [BoxShadow(color: AppColor.cardShadow, blurRadius: 20, offset: const Offset(0, 4))],
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundColor: AppColor.primaryLight,
+                            backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                            child: photoUrl.isEmpty
+                                ? const Icon(Icons.person, size: 50, color: Colors.white)
+                                : null,
+                          ),
+                          const SizedBox(height: 16),
+                          AppText.customText(name, size: 22, weight: FontWeight.w700, color: AppColor.text),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(color: AppColor.primaryLight, borderRadius: BorderRadius.circular(20)),
+                            child: AppText.customText("Emp ID: $employeeId", size: 13, weight: FontWeight.w500, color: AppColor.primary),
+                          ),
+                          const SizedBox(height: 8),
+                          AppText.customText(designation, size: 14, weight: FontWeight.w500, color: AppColor.sub),
+                        ],
+                      ),
+                    ),
+
+                    // Personal Information
+                    _buildInfoCard("Personal Information", [
+                      _InfoItem("Full Name",     name),
+                      _InfoItem("Gender",        gender),
+                      _InfoItem("Date of Birth", dob),
+                      _InfoItem("Father Name",   fatherName),
+                      _InfoItem("Mother Name",   motherName),
+                    ]),
+                    const SizedBox(height: 16),
+
+                    // Professional Information
+                    _buildInfoCard("Professional Information", [
+                      _InfoItem("Employee ID",      employeeId),
+                      _InfoItem("Designation",      designation),
+                      _InfoItem("Qualification",    qualification),
+                      _InfoItem("Employment Type",  employmentType),
+                      _InfoItem("Experience (yrs)", experienceYears),
+                      _InfoItem("Joining Date",     joiningDate),
+                    ]),
+                    const SizedBox(height: 16),
+
+                    // Contact Information
+                    _buildInfoCard("Contact Information", [
+                      _InfoItem("Email",   email),
+                      _InfoItem("Mobile",  mobile),
+                      _InfoItem("Address", address),
+                    ]),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

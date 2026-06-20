@@ -2,9 +2,11 @@ class HomeworkDetailsModel {
   bool? success;
   HomeworkDetailsData? data;
 
+
   HomeworkDetailsModel({
     this.success,
     this.data,
+
   });
 
   factory HomeworkDetailsModel.fromJson(
@@ -21,10 +23,17 @@ class HomeworkDetailsModel {
 
 class HomeworkDetailsData {
   int? homeworkId;
+
+  Attachment? attachment;
+
+  List<SubmittedPhoto>? attachmentPhotos;
+
   List<StudentSubmission>? students;
 
   HomeworkDetailsData({
     this.homeworkId,
+    this.attachment,
+    this.attachmentPhotos,
     this.students,
   });
 
@@ -33,7 +42,23 @@ class HomeworkDetailsData {
       ) {
     return HomeworkDetailsData(
       homeworkId: json["homework_id"],
-      students: (json["students"] as List?)
+
+      attachment: json["attachment"] != null
+          ? Attachment.fromJson(
+        json["attachment"],
+      )
+          : null,
+
+      attachmentPhotos:
+      (json["attachment_photos"] as List?)
+          ?.map(
+            (e) => SubmittedPhoto.fromJson(e),
+      )
+          .toList() ??
+          [],
+
+      students:
+      (json["students"] as List?)
           ?.map(
             (e) => StudentSubmission.fromJson(e),
       )
@@ -83,6 +108,25 @@ class StudentSubmission {
       )
           .toList() ??
           [],
+    );
+  }
+}
+
+class Attachment {
+  String? type;
+  String? url;
+
+  Attachment({
+    this.type,
+    this.url,
+  });
+
+  factory Attachment.fromJson(
+      Map<String, dynamic> json,
+      ) {
+    return Attachment(
+      type: json["type"],
+      url: json["url"],
     );
   }
 }

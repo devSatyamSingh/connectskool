@@ -2175,354 +2175,357 @@ class _AllStudentListState extends State<AllStudentList>
       return classMatch && sectionMatch;
     }).toList();
 
-    return Scaffold(
-      backgroundColor: AppColor.pageBgColor,
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColor.lightBlueColor,
-        onPressed: () {
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.pageBgColor,
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: AppColor.lightBlueColor,
+          onPressed: () {
 
-          if (!PermissionGuard.check(
-            context,
-            PermissionKeys.addStudent,
-            "Add Student",
-          )) {
-            return;
-          }
+            if (!PermissionGuard.check(
+              context,
+              PermissionKeys.addStudent,
+              "Add Student",
+            )) {
+              return;
+            }
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AddStudentPage(),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AddStudentPage(),
+              ),
+            );
+          },
+          icon: Icon(Icons.add_rounded, color: AppColor.white),
+          label: const Text(
+            'Add Student',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
             ),
-          );
-        },
-        icon: Icon(Icons.add_rounded, color: AppColor.white),
-        label: const Text(
-          'Add Student',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
           ),
         ),
-      ),
-      body: Column(
-        children: [
-          // ── Header ──
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(28)),
-              boxShadow: [
-                BoxShadow(
-                    color: AppColor.blueShadow,
-                    blurRadius: 18,
-                    offset: const Offset(0, 10)),
-              ],
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: AppColor.glassWhite, shape: BoxShape.circle),
-                    child: const Icon(Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white, size: 20),
+        body: Column(
+          children: [
+            // ── Header ──
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
+              decoration: BoxDecoration(
+                gradient: AppColor.primaryGradient,
+                borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(28)),
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColor.blueShadow,
+                      blurRadius: 18,
+                      offset: const Offset(0, 10)),
+                ],
+              ),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: AppColor.glassWhite, shape: BoxShape.circle),
+                      child: const Icon(Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white, size: 20),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppText.customText("All Students",
-                      size: 19, weight: FontWeight.bold, color: Colors.white),
-                ),
-                AppText.customText("${students.length}",
-                    size: 16, weight: FontWeight.w600, color: Colors.white70),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AppText.customText("All Students",
+                        size: 19, weight: FontWeight.bold, color: Colors.white),
+                  ),
+                  AppText.customText("${students.length}",
+                      size: 16, weight: FontWeight.w600, color: Colors.white70),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 12),
+            const SizedBox(height: 12),
 
-          // ── Class & Section Filter ──
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            child: Row(
-              children: [
-                Expanded(
-                  child: ValueListenableBuilder<List<Map<String, dynamic>>>(
-                    valueListenable: _classes,
-                    builder: (_, list, __) {
-                      return ValueListenableBuilder<String>(
-                        valueListenable: _selectedClassId,
-                        builder: (_, classVal, __) {
-                          return _buildFilterDropdown(
-                            label: "Class",
-                            value: classVal.isEmpty ? null : classVal,
-                            items: list
-                                .map((e) => DropdownMenuItem<String>(
-                              value: e["class_id"],
-                              child: Text(e["class_name"]),
-                            ))
-                                .toList(),
-                            onChanged: (val) async {
-                              _selectedClassId.value = val ?? "";
-                              _selectedSectionId.value = "";
-                              _sections.value = [];
+            // ── Class & Section Filter ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ValueListenableBuilder<List<Map<String, dynamic>>>(
+                      valueListenable: _classes,
+                      builder: (_, list, __) {
+                        return ValueListenableBuilder<String>(
+                          valueListenable: _selectedClassId,
+                          builder: (_, classVal, __) {
+                            return _buildFilterDropdown(
+                              label: "Class",
+                              value: classVal.isEmpty ? null : classVal,
+                              items: list
+                                  .map((e) => DropdownMenuItem<String>(
+                                value: e["class_id"],
+                                child: Text(e["class_name"]),
+                              ))
+                                  .toList(),
+                              onChanged: (val) async {
+                                _selectedClassId.value = val ?? "";
+                                _selectedSectionId.value = "";
+                                _sections.value = [];
 
-                              if (val != null) {
-                                setState(() => _sectionsLoading = true);
-                                final repo = AllSectionsRepository();
-                                final response =
-                                await repo.allSectionsApi(val);
-                                setState(() => _sectionsLoading = false);
+                                if (val != null) {
+                                  setState(() => _sectionsLoading = true);
+                                  final repo = AllSectionsRepository();
+                                  final response =
+                                  await repo.allSectionsApi(val);
+                                  setState(() => _sectionsLoading = false);
 
-                                if (response["success"] == true) {
-                                  _sections.value =
-                                  List<Map<String, dynamic>>.from(
-                                      response["data"]);
+                                  if (response["success"] == true) {
+                                    _sections.value =
+                                    List<Map<String, dynamic>>.from(
+                                        response["data"]);
+                                  } else {
+                                    _sections.value = [];
+                                  }
                                 } else {
+                                  setState(() => _sectionsLoading = false);
                                   _sections.value = [];
                                 }
-                              } else {
-                                setState(() => _sectionsLoading = false);
-                                _sections.value = [];
-                              }
-                              setState(() {});
-                            },
-                          );
-                        },
-                      );
-                    },
+                                setState(() {});
+                              },
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
-                ),
 
-                const SizedBox(width: 12),
+                  const SizedBox(width: 12),
 
-                Expanded(
-                  child: ValueListenableBuilder<List<Map<String, dynamic>>>(
-                    valueListenable: _sections,
-                    builder: (_, list, __) {
-                      return ValueListenableBuilder<String>(
-                        valueListenable: _selectedSectionId,
-                        builder: (_, secVal, __) {
-                          if (_sectionsLoading) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                border:
-                                Border.all(color: Colors.grey.shade200),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: AppColor.cardShadow,
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3))
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColor.lightBlueColor,
+                  Expanded(
+                    child: ValueListenableBuilder<List<Map<String, dynamic>>>(
+                      valueListenable: _sections,
+                      builder: (_, list, __) {
+                        return ValueListenableBuilder<String>(
+                          valueListenable: _selectedSectionId,
+                          builder: (_, secVal, __) {
+                            if (_sectionsLoading) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border:
+                                  Border.all(color: Colors.grey.shade200),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: AppColor.cardShadow,
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3))
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColor.lightBlueColor,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text("Loading...",
+                                    const SizedBox(width: 10),
+                                    Text("Loading...",
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.grey.shade500)),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            final classSelected =
+                                _selectedClassId.value.isNotEmpty;
+                            final noSections = classSelected && list.isEmpty;
+
+                            if (noSections) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 14),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color: Colors.orange.shade200),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        color: AppColor.cardShadow,
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3))
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.info_outline_rounded,
+                                        size: 18,
+                                        color: Colors.orange.shade400),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      "No Section",
                                       style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.grey.shade500)),
-                                ],
-                              ),
-                            );
-                          }
-
-                          final classSelected =
-                              _selectedClassId.value.isNotEmpty;
-                          final noSections = classSelected && list.isEmpty;
-
-                          if (noSections) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.shade50,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: Colors.orange.shade200),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: AppColor.cardShadow,
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3))
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.info_outline_rounded,
-                                      size: 18,
-                                      color: Colors.orange.shade400),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    "No Section",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.orange.shade700,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.orange.shade700,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            return _buildFilterDropdown(
+                              label: "Section",
+                              value: secVal.isEmpty ? null : secVal,
+                              items: list
+                                  .map((e) => DropdownMenuItem<String>(
+                                value: e["section_id"].toString(),
+                                child: Text(e["section_name"]),
+                              ))
+                                  .toList(),
+                              onChanged: (val) {
+                                setState(() {
+                                  _selectedSectionId.value = val ?? "";
+                                });
+                              },
                             );
-                          }
-
-                          return _buildFilterDropdown(
-                            label: "Section",
-                            value: secVal.isEmpty ? null : secVal,
-                            items: list
-                                .map((e) => DropdownMenuItem<String>(
-                              value: e["section_id"].toString(),
-                              child: Text(e["section_name"]),
-                            ))
-                                .toList(),
-                            onChanged: (val) {
-                              setState(() {
-                                _selectedSectionId.value = val ?? "";
-                              });
-                            },
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          Expanded(
-            child: viewModel.loading
-                ? _studentShimmer()
-                : filteredStudents.isEmpty
-                ? RefreshIndicator(
-              color: AppColor.lightBlueColor,
-              onRefresh: _onRefresh,
-              child: ListView(
-                children: [
-                  SizedBox(
-                    height:
-                    MediaQuery.of(context).size.height * 0.5,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.school_outlined,
-                            size: 80,
-                            color: Colors.grey.shade300),
-                        const SizedBox(height: 16),
-                        Text("No Students Found",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade500)),
-                        const SizedBox(height: 8),
-                        Text("Pull down to refresh",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey.shade400)),
-                      ],
+                          },
+                        );
+                      },
                     ),
                   ),
                 ],
               ),
-            )
-                : RefreshIndicator(
-              color: AppColor.lightBlueColor,
-              onRefresh: _onRefresh,
-              child: ListView.builder(
-                padding:
-                const EdgeInsets.fromLTRB(18, 8, 18, 20),
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: filteredStudents.length,
-                itemBuilder: (context, index) {
-                  final s = filteredStudents[index];
-                  final isMale =
-                      s.gender?.toLowerCase() == "male";
-                  return _animatedStudentCard(index, {
-                    "id": s.studentId,
-                    "name": s.name ?? "",
-                    "email": s.userEmail ?? "",
-                    "admission": s.admissionNo ?? "",
-                    "class": s.className ?? "",
-                    "section": s.sectionName ?? "",
-                    "class_id": s.classId?.toString() ?? "",
-                    "section_id":
-                    s.sectionId?.toString() ?? "",
-                    "gender": s.gender != null
-                        ? "${s.gender![0].toUpperCase()}${s.gender!.substring(1)}"
-                        : "Male",
-                    "roll_no": s.rollNo?.toString() ?? "",
-                    "dob": s.dob != null
-                        ? s.dob!.contains("T")
-                        ? s.dob!.split("T")[0]
-                        : s.dob!
-                        : "",
-                    "mobile_number": s.mobileNumber ?? "",
-                    "father_name": s.fatherName ?? "",
-                    "mother_name": s.motherName ?? "",
-                    "address": s.address ?? "",
-                    "religion": s.religion ?? "",
-                    "academic_year": s.academicYear ?? "",
-                    "passed_out":
-                    s.passedOut?.toString() ?? "",
-                    "transfer": s.transfer?.toString() ?? "",
-                    "blood_group": s.bloodGroup ?? "",
-                    "category": s.category ?? "",
-                    "aadhar_number": s.aadharNumber ?? "",
-                    "father_occupation":
-                    s.fatherOccupation ?? "",
-                    "father_mobile": s.fatherMobile ?? "",
-                    "mother_occupation":
-                    s.motherOccupation ?? "",
-                    "mother_mobile": s.motherMobile ?? "",
-                    "guardian_name": s.guardianName ?? "",
-                    "emergency_contact_number":
-                    s.emergencyContactNumber ?? "",
-                    "city": s.city ?? "",
-                    "state": s.state ?? "",
-                    "pincode": s.pincode ?? "",
-                    "selected_fee_heads": "",
-                    "student_photo_url":
-                    s.studentPhotoUrl ?? "",
-                    "aadhar_card_url": s.aadharCardUrl ?? "",
-                    "father_photo_url":
-                    s.fatherPhotoUrl ?? "",
-                    "mother_photo_url":
-                    s.motherPhotoUrl ?? "",
-                    "color": isMale
-                        ? AppColor.maleColor
-                        : AppColor.femaleColor,
-                    "gradient": isMale
-                        ? [AppColor.maleColor, AppColor.maleLight]
-                        : [
-                      AppColor.femaleColor,
-                      AppColor.femaleLight
-                    ],
-                  });
-                },
+            ),
+
+            const SizedBox(height: 12),
+
+            Expanded(
+              child: viewModel.loading
+                  ? _studentShimmer()
+                  : filteredStudents.isEmpty
+                  ? RefreshIndicator(
+                color: AppColor.lightBlueColor,
+                onRefresh: _onRefresh,
+                child: ListView(
+                  children: [
+                    SizedBox(
+                      height:
+                      MediaQuery.of(context).size.height * 0.5,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.school_outlined,
+                              size: 80,
+                              color: Colors.grey.shade300),
+                          const SizedBox(height: 16),
+                          Text("No Students Found",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade500)),
+                          const SizedBox(height: 8),
+                          Text("Pull down to refresh",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade400)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+                  : RefreshIndicator(
+                color: AppColor.lightBlueColor,
+                onRefresh: _onRefresh,
+                child: ListView.builder(
+                  padding:
+                  const EdgeInsets.fromLTRB(18, 8, 18, 20),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: filteredStudents.length,
+                  itemBuilder: (context, index) {
+                    final s = filteredStudents[index];
+                    final isMale =
+                        s.gender?.toLowerCase() == "male";
+                    return _animatedStudentCard(index, {
+                      "id": s.studentId,
+                      "name": s.name ?? "",
+                      "email": s.userEmail ?? "",
+                      "admission": s.admissionNo ?? "",
+                      "class": s.className ?? "",
+                      "section": s.sectionName ?? "",
+                      "class_id": s.classId?.toString() ?? "",
+                      "section_id":
+                      s.sectionId?.toString() ?? "",
+                      "gender": s.gender != null
+                          ? "${s.gender![0].toUpperCase()}${s.gender!.substring(1)}"
+                          : "Male",
+                      "roll_no": s.rollNo?.toString() ?? "",
+                      "dob": s.dob != null
+                          ? s.dob!.contains("T")
+                          ? s.dob!.split("T")[0]
+                          : s.dob!
+                          : "",
+                      "mobile_number": s.mobileNumber ?? "",
+                      "father_name": s.fatherName ?? "",
+                      "mother_name": s.motherName ?? "",
+                      "address": s.address ?? "",
+                      "religion": s.religion ?? "",
+                      "academic_year": s.academicYear ?? "",
+                      "passed_out":
+                      s.passedOut?.toString() ?? "",
+                      "transfer": s.transfer?.toString() ?? "",
+                      "blood_group": s.bloodGroup ?? "",
+                      "category": s.category ?? "",
+                      "aadhar_number": s.aadharNumber ?? "",
+                      "father_occupation":
+                      s.fatherOccupation ?? "",
+                      "father_mobile": s.fatherMobile ?? "",
+                      "mother_occupation":
+                      s.motherOccupation ?? "",
+                      "mother_mobile": s.motherMobile ?? "",
+                      "guardian_name": s.guardianName ?? "",
+                      "emergency_contact_number":
+                      s.emergencyContactNumber ?? "",
+                      "city": s.city ?? "",
+                      "state": s.state ?? "",
+                      "pincode": s.pincode ?? "",
+                      "selected_fee_heads": "",
+                      "student_photo_url":
+                      s.studentPhotoUrl ?? "",
+                      "aadhar_card_url": s.aadharCardUrl ?? "",
+                      "father_photo_url":
+                      s.fatherPhotoUrl ?? "",
+                      "mother_photo_url":
+                      s.motherPhotoUrl ?? "",
+                      "color": isMale
+                          ? AppColor.maleColor
+                          : AppColor.femaleColor,
+                      "gradient": isMale
+                          ? [AppColor.maleColor, AppColor.maleLight]
+                          : [
+                        AppColor.femaleColor,
+                        AppColor.femaleLight
+                      ],
+                    });
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2548,6 +2551,7 @@ class _AllStudentListState extends State<AllStudentList>
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
+          dropdownColor: Colors.white,
           isExpanded: true,
           hint: Text(label, style: const TextStyle(fontSize: 13)),
           value: value,
@@ -2837,9 +2841,7 @@ class _AllStudentListState extends State<AllStudentList>
     }
   }
 
-  // ════════════════════════════════════════════════════════
-  //  OPEN STUDENT SHEET
-  // ════════════════════════════════════════════════════════
+
   void _openStudentSheet({Map<String, dynamic>? student}) {
     final isEdit = student != null;
     final classes = ValueNotifier<List<Map<String, dynamic>>>([]);
@@ -3818,9 +3820,7 @@ class _AllStudentListState extends State<AllStudentList>
     );
   }
 
-  // ════════════════════════════════════════════════════════
-  //  IMAGE PICKER WITH EXISTING URL PREVIEW
-  // ════════════════════════════════════════════════════════
+
   Widget _buildImagePickerWithPreview({
     required String label,
     required IconData icon,
@@ -3829,7 +3829,6 @@ class _AllStudentListState extends State<AllStudentList>
     required Function setState,
   }) {
     final hasExisting = existingUrl.isNotEmpty && existingUrl != "null";
-
     return ValueListenableBuilder(
       valueListenable: imageNotifier,
       builder: (context, value, child) {
@@ -3967,7 +3966,6 @@ class _AllStudentListState extends State<AllStudentList>
     );
   }
 
-  // ─── Helper Widgets ───────────────────────────────────────
   Widget _sectionHeader(String title) => Text(
     title,
     style: TextStyle(
@@ -4110,9 +4108,7 @@ class _AllStudentListState extends State<AllStudentList>
   }
 }
 
-// ════════════════════════════════════════════════════════
-//  FULL-SCREEN IMAGE VIEWER
-// ════════════════════════════════════════════════════════
+
 class _ImageViewerScreen extends StatefulWidget {
   final String imageUrl;
   final String title;

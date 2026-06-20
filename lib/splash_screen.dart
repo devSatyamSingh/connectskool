@@ -79,22 +79,6 @@ class _SplashScreenState extends State<SplashScreen>
     });
   }
 
-  // ─── Navigation Decision Tree ─────────────────────────────────────────────
-  //
-  //  App open
-  //    │
-  //    ├─ app_installed_flag missing? ──► Fresh install / reinstall
-  //    │                                  → clearUser() → Onboarding
-  //    │
-  //    ├─ app_installed_flag present
-  //    │    │
-  //    │    ├─ onboarding_done missing? ──► Onboarding (edge case)
-  //    │    │
-  //    │    └─ onboarding_done present
-  //    │         │
-  //    │         ├─ userId + role + token valid? ──► Dashboard (role se)
-  //    │         │
-  //    │         └─ koi bhi missing/empty ──► Login screen
 
   Future<void> _handleNavigation() async {
     final userVM = UserViewModel();
@@ -132,7 +116,6 @@ class _SplashScreenState extends State<SplashScreen>
     try {
       PermissionManager.clear();
 
-      // getUser() → String? (userId ab string form mein save hota hai)
       final String? userId = await userVM.getUser();
       final String? role   = await userVM.getRole();
       final String? token  = await userVM.getToken();
@@ -145,6 +128,19 @@ class _SplashScreenState extends State<SplashScreen>
               token  != null && token.isNotEmpty;
 
       if (hasSession) {
+
+        // ✅ ROLE PEHLE SET KARO — yahi main fix hai
+        // Admin bypass tabhi kaam karega jab role set ho
+        PermissionManager.setRole(role!);
+
+        // ✅ Saved permissions restore karo
+        final savedPermissions = await userVM.getPermissions();
+        if (savedPermissions.isNotEmpty) {
+          PermissionManager.setPermissions(savedPermissions);
+          debugPrint("✅ Permissions restored: ${savedPermissions.length}");
+        }
+
+        // Backend se fresh permissions bhi lo
         try {
           if (mounted) {
             await Provider.of<GetUserPermissionViewModel>(
@@ -152,30 +148,31 @@ class _SplashScreenState extends State<SplashScreen>
               listen: false,
             ).getUserPermissionApi(
               context: context,
-              userId: int.tryParse(userId!) ?? 0,
-              role: role!,
+              userId: int.tryParse(userId) ?? 0,
+              role: role,
               isCurrentUser: true,
             );
           }
         } catch (e) {
           debugPrint("Permission reload (non-fatal): $e");
+          // Backend fail hone pe saved permissions se kaam chalega
         }
 
-        if (mounted) _navigateByRole(role!);
+        if (mounted) _navigateByRole(role);
+
       } else {
-        debugPrint("No valid session → Login");
+        debugPrint("No valid session → Onboarding");
         if (mounted) {
-          Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+          Navigator.pushReplacementNamed(context, RoutesName.onboardingScreen);
         }
       }
     } catch (e) {
       debugPrint("CHECK SESSION ERROR => $e");
       if (mounted) {
-        Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+        Navigator.pushReplacementNamed(context, RoutesName.onboardingScreen);
       }
     }
   }
-
   void _navigateByRole(String role) {
     switch (role) {
       case "school_admin":
@@ -203,7 +200,7 @@ class _SplashScreenState extends State<SplashScreen>
         );
         break;
       default:
-        Navigator.pushReplacementNamed(context, RoutesName.dashboardScreen);
+        Navigator.pushReplacementNamed(context, RoutesName.onboardingScreen);
     }
   }
 

@@ -4417,52 +4417,55 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     final pendingCount = _rows.length - alreadyCount;
     final hasPending   = _rows.any((r) => !r.alreadyMarked);
 
-    return Scaffold(
-      backgroundColor: AppColor.screenBg,
-      body: Column(children: [
-        _buildHeader(),
-        Expanded(child: _buildBody(alreadyCount, pendingCount)),
-      ]),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.screenBg,
+        body: Column(children: [
+          _buildHeader(),
+          Expanded(child: _buildBody(alreadyCount, pendingCount)),
+        ]),
 
-      // ── FABs ─────────────────────────────────────────────────────────────
-      floatingActionButton: (!_loading && hasPending)
-          ? Container(
-        width: double.infinity,
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(children: [
-          FloatingActionButton(
-            heroTag: 'mark_all_p',
-            onPressed: _saving ? null : _markAllPresent,
-            backgroundColor: const Color(0xFF22C55E),
-            tooltip: 'Mark All Present',
-            child: const Icon(Icons.done_all_rounded, color: Colors.white),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: FloatingActionButton.extended(
-              heroTag: 'save_all_btn',
-              onPressed: _saving ? null : _saveAll,
-              backgroundColor: AppColor.lightBlueColor,
-              elevation: 4,
-              icon: _saving
-                  ? const SizedBox(
-                  width: 18, height: 18,
-                  child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2))
-                  : const Icon(Icons.save_rounded, color: Colors.white),
-              label: Text(
-                _saving ? 'Saving...' : 'Save All Attendance',
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15),
+        // ── FABs ─────────────────────────────────────────────────────────────
+        floatingActionButton: (!_loading && hasPending)
+            ? Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(children: [
+            FloatingActionButton(
+              heroTag: 'mark_all_p',
+              onPressed: _saving ? null : _markAllPresent,
+              backgroundColor: const Color(0xFF22C55E),
+              tooltip: 'Mark All Present',
+              child: const Icon(Icons.done_all_rounded, color: Colors.white),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: FloatingActionButton.extended(
+                heroTag: 'save_all_btn',
+                onPressed: _saving ? null : _saveAll,
+                backgroundColor: AppColor.lightBlueColor,
+                elevation: 4,
+                icon: _saving
+                    ? const SizedBox(
+                    width: 18, height: 18,
+                    child: CircularProgressIndicator(
+                        color: Colors.white, strokeWidth: 2))
+                    : const Icon(Icons.save_rounded, color: Colors.white),
+                label: Text(
+                  _saving ? 'Saving...' : 'Save All Attendance',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15),
+                ),
               ),
             ),
-          ),
-        ]),
-      )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          ]),
+        )
+            : null,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      ),
     );
   }
 

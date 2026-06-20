@@ -530,104 +530,107 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.pageBgColor,
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.pageBgColor,
 
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColor.lightBlueColor,
-        onPressed: _showAddFeeHeadBottomSheet,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: Text(
-          "Add Fee Head",
-          style: GoogleFonts.poppins(color: Colors.white),
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: AppColor.lightBlueColor,
+          onPressed: _showAddFeeHeadBottomSheet,
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: Text(
+            "Add Fee Head",
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
         ),
-      ),
 
-      body: Consumer<FeesHeadManagementViewModel>(
-        builder: (context, vm, _) {
-          final feeHeads = vm.feesHeadManagementModel?.data?.feeHeads ?? [];
+        body: Consumer<FeesHeadManagementViewModel>(
+          builder: (context, vm, _) {
+            final feeHeads = vm.feesHeadManagementModel?.data?.feeHeads ?? [];
 
-          return Column(
-            children: [
-              /// ===== HEADER =====
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 50, 16, 22),
-                decoration: BoxDecoration(
-                  gradient: AppColor.primaryGradient,
-                  borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(28)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColor.blueShadow,
-                      blurRadius: 18,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColor.glassWhite,
-                          shape: BoxShape.circle,
+            return Column(
+              children: [
+                /// ===== HEADER =====
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 50, 16, 22),
+                  decoration: BoxDecoration(
+                    gradient: AppColor.primaryGradient,
+                    borderRadius:
+                    const BorderRadius.vertical(bottom: Radius.circular(28)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColor.blueShadow,
+                        blurRadius: 18,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColor.glassWhite,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            size: 18,
+                            color: Colors.white,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          size: 18,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppText.customText(
+                          "Fees Head Management",
+                          size: 19,
+                          weight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppText.customText(
-                        "Fees Head Management",
-                        size: 19,
-                        weight: FontWeight.bold,
-                        color: Colors.white,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColor.glassWhite,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: AppText.customText(
+                          feeHeads.length.toString(),
+                          size: 15,
+                          weight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: AppColor.glassWhite,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: AppText.customText(
-                        feeHeads.length.toString(),
-                        size: 15,
-                        weight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 14),
+                const SizedBox(height: 14),
 
-              Expanded(
-                child: vm.loading
-                    ? _shimmer()
-                    : feeHeads.isEmpty
-                    ? _emptyView()
-                    : ListView.builder(
-                  padding:
-                  const EdgeInsets.fromLTRB(18, 8, 18, 90),
-                  itemCount: feeHeads.length,
-                  itemBuilder: (context, index) {
-                    return _animatedCard(
-                        index, feeHeads[index]);
-                  },
+                Expanded(
+                  child: vm.loading
+                      ? _shimmer()
+                      : feeHeads.isEmpty
+                      ? _emptyView()
+                      : ListView.builder(
+                    padding:
+                    const EdgeInsets.fromLTRB(18, 8, 18, 90),
+                    itemCount: feeHeads.length,
+                    itemBuilder: (context, index) {
+                      return _animatedCard(
+                          index, feeHeads[index]);
+                    },
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

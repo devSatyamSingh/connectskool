@@ -8,6 +8,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
 import '../../model/school_model/exam_marks/exam_marks_model.dart';
+import '../../res/app_button.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
@@ -295,12 +296,14 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
 
         return Scaffold(
           backgroundColor: AppColor.pageBgColor,
-          floatingActionButton: FloatingActionButton.extended(
-            backgroundColor: AppColor.lightBlueColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-              onPressed: () {
+          floatingActionButton: SizedBox(
+            width: 180,
+            child: AppButton(
+              title: "Enter Marks",
+              icon: Icons.edit_rounded,
+              height: 50,
+              radius: 14,
+              onTap: () {
 
                 if (!PermissionExtensions.canAccess(
                     PermissionKeys.assignMarks)) {
@@ -321,13 +324,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
                   ),
                 );
               },
-            icon: const Icon(Icons.edit_rounded, color: Colors.white),
-            label: Text(
-              'Enter Marks',
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
             ),
           ),
           body: Column(
@@ -549,20 +545,12 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
           // ── Load Button ──
           SizedBox(
             width: double.infinity,
-            height: 46,
-            child: ElevatedButton.icon(
-              onPressed: _loadMarks,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColor.lightBlueColor,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-                elevation: 0,
-              ),
-              icon: const Icon(Icons.search_rounded,
-                  color: Colors.white, size: 18),
-              label: const Text('Load Marks',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
+            child: AppButton(
+              title: "Load Marks",
+              icon: Icons.search_rounded,
+              height: 46,
+              radius: 14,
+              onTap: _loadMarks,
             ),
           ),
         ],
@@ -613,6 +601,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
+          dropdownColor: Colors.white,
           isExpanded: true,
           value: value,
           hint: Row(children: [
@@ -822,9 +811,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 
-  // ────────────────────────────────────────────
-  // TABLE HEADER
-  // ────────────────────────────────────────────
   Widget _tableHeader() {
     return Container(
       width: 960,
@@ -865,9 +851,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 
-  // ────────────────────────────────────────────
-  // TABLE ROW
-  // ────────────────────────────────────────────
   Widget _tableRow(ExamMarksData s, int index) {
     final pct = _percentage(s);
     final pctColor = _percentageColor(pct);
@@ -1063,9 +1046,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 
-  // ────────────────────────────────────────────
-  // SHIMMER
-  // ────────────────────────────────────────────
   Widget _shimmer() {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
@@ -1084,9 +1064,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 
-  // ────────────────────────────────────────────
-  // ANIMATION
-  // ────────────────────────────────────────────
+
   Widget _animated(int i, Widget child) {
     return AnimatedBuilder(
       animation: _animController,
@@ -1106,9 +1084,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
   }
 }
 
-// ════════════════════════════════════════════
-// MARKS ENTRY SHEET
-// ════════════════════════════════════════════
+
 class _MarksEntrySheet extends StatefulWidget {
   final List<ExamMarksData> marks;
   final Map<int, TextEditingController> controllers;

@@ -97,6 +97,7 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
 
           /// Academic Year
           DropdownButtonFormField<String>(
+            dropdownColor: Colors.white,
             value: selectedAcademicYear,
             decoration: _inputDecoration("Academic Year"),
             items: academicVm.years.map(
@@ -118,6 +119,7 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
 
           /// Class
           DropdownButtonFormField<String>(
+            dropdownColor: Colors.white,
             value: selectedClassId,
             decoration: _inputDecoration("Class"),
             items: (classVm.allClassesModel?.data ?? [])
@@ -147,6 +149,7 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
 
           /// Section
           DropdownButtonFormField<String>(
+            dropdownColor: Colors.white,
             value: selectedSectionId,
             decoration: _inputDecoration("Section"),
             items: (sectionVm.allSectionsModel?.data ?? [])
@@ -168,6 +171,7 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
 
           /// Term
           DropdownButtonFormField<String>(
+            dropdownColor: Colors.white,
             value: selectedTerm,
             decoration: _inputDecoration("Term"),
             items: const [

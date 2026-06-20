@@ -116,6 +116,7 @@ import 'package:school_pro/view_model/teacher_view_model/create_teacher_attendan
 import 'package:school_pro/view_model/teacher_view_model/teacher_attendance_view_model.dart';
 import 'package:school_pro/view_model/teacher_view_model/teacher_profile_view_model.dart';
 import 'package:school_pro/view_model/auth_view_model/user_view_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'res/internet_popup.dart';
 import 'package:school_pro/view_model/school_view_model/exam/exam_management_view_model.dart';
@@ -134,13 +135,10 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   playSound: true,
 );
 
-// ─── Background Handler ───────────────────────────────────────────────────────
-// @pragma zaroori hai — warna release build mein tree-shaking se remove ho jaata hai
 
 @pragma('vm:entry-point')
 Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // Note: background mein UI update mat karo, sirf data process karo
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -148,33 +146,24 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Background handler PEHLE register karo — Firebase init se bhi pehle
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // FCM token refresh listener — jab token change ho to re-login suggest karo
-  // ya backend ko naya token bhejo (optional enhancement)
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
     debugPrint("🔄 FCM Token Refreshed: $newToken");
-    // TODO: Agar backend mein device_token update karna ho to yahan API call karo
   });
 
-  // App notification se open hui — navigate to relevant screen
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     debugPrint("📲 App opened from notification: ${message.notification?.title}");
-    // TODO: message.data se specific screen pe navigate kar sakte ho
   });
 
-  // App completely closed thi aur notification se launch hui
   final RemoteMessage? initialMessage =
   await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
     debugPrint("🚀 App launched from notification: ${initialMessage.notification?.title}");
-    // TODO: initialMessage.data se deep link handle karo
   }
 
-  // Local notifications channel setup
   const AndroidInitializationSettings androidSettings =
   AndroidInitializationSettings('@mipmap/ic_launcher');
   await flutterLocalNotificationsPlugin.initialize(
@@ -186,23 +175,34 @@ void main() async {
       AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
-  // Foreground notification options (iOS ke liye bhi kaam karta hai)
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
   );
 
-  // Permission request + token fetch
   await _initFCMPermission();
 
-  // App restart / kill pe saved session ke topics restore karo
-  // Yeh login_view_model ke _buildTopics() se SYNC mein hai
   await _reSubscribeTopics();
 
-  // Foreground message — app khuli hui ho tab notification show karo
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     debugPrint("📩 Foreground message: ${message.notification?.title}");
+    debugPrint("📦 Message data: ${message.data}");
+
+    final senderId = message.data['sender_id'];
+    if (senderId != null && senderId.toString().isNotEmpty) {
+
+      final myUserId = await UserViewModel().getUserIdFromToken();
+
+      debugPrint(" sender_id: $senderId | my user_id: $myUserId");
+
+      if (myUserId != null && senderId.toString() == myUserId) {
+        debugPrint(" Apni hi notification hai — block kar raha hai");
+        return;
+      }
+    }
+
     final notification = message.notification;
     if (notification != null) {
       flutterLocalNotificationsPlugin.show(
@@ -226,7 +226,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-// ─── FCM Permission ───────────────────────────────────────────────────────────
 
 Future<void> _initFCMPermission() async {
   final messaging = FirebaseMessaging.instance;

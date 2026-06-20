@@ -148,13 +148,10 @@ class _CmsScreenState extends State<CmsScreen> {
                                       color: AppColor.primary,
                                     ),
                                   ),
-
                                   const SizedBox(width: 12),
-
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         AppText.customText(
                                           "Last Updated",

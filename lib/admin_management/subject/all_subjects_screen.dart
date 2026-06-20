@@ -61,162 +61,165 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
     final viewModel = Provider.of<AllSubjectsVieModel>(context);
     final subjects = viewModel.allSubjectsModel?.data ?? [];
 
-    return Scaffold(
-      backgroundColor: AppColor.pageBgColor,
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColor.lightBlueColor,
-        onPressed: () {
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.pageBgColor,
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: AppColor.lightBlueColor,
+          onPressed: () {
 
-          if (!PermissionExtensions.canAccess(
-              PermissionKeys.addSubject)) {
+            if (!PermissionExtensions.canAccess(
+                PermissionKeys.addSubject)) {
 
-            Utils.show(
-              "You don't have permission to add subject",
-              context,
-            );
+              Utils.show(
+                "You don't have permission to add subject",
+                context,
+              );
 
-            return;
-          }
+              return;
+            }
 
-          _openSubjectSheet();
-        },
-        icon: Icon(Icons.add_rounded, color: AppColor.white),
-        label: const Text(
-          "Add Subject",
-          style: TextStyle(fontWeight: FontWeight.w600, color: AppColor.white),
-        ),
-      ),
-
-      body: Column(
-        children: [
-          /// ===== HEADER =====
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColor.blueShadow,
-                  blurRadius: 18,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColor.glassWhite,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppText.customText(
-                    "All Subjects",
-                    size: 19,
-                    weight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                AppText.customText(
-                  "${subjects.length}",
-                  size: 16,
-                  weight: FontWeight.w600,
-                  color: Colors.white70,
-                ),
-              ],
-            ),
+            _openSubjectSheet();
+          },
+          icon: Icon(Icons.add_rounded, color: AppColor.white),
+          label: const Text(
+            "Add Subject",
+            style: TextStyle(fontWeight: FontWeight.w600, color: AppColor.white),
           ),
+        ),
 
-          const SizedBox(height: 12),
-
-          /// ===== LIST =====
-          Expanded(
-            child: viewModel.loading
-                ? _subjectShimmer()
-                : subjects.isEmpty
-                ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.08),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.menu_book_outlined,
-                      size: 50,
-                      color: Colors.orange.shade300,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "No Subjects Found",
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    "Subjects will appear here once added",
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.grey.shade500,
-                    ),
+        body: Column(
+          children: [
+            /// ===== HEADER =====
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
+              decoration: BoxDecoration(
+                gradient: AppColor.primaryGradient,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColor.blueShadow,
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
-            )
-            // ✅ Pull to Refresh wrapped ListView
-                : RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: AppColor.primary,
-              backgroundColor: Colors.white,
-              strokeWidth: 2.5,
-              displacement: 60,
-              child: ListView.builder(
-                // ✅ Zaruri: list choti ho tab bhi pull kaam kare
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding:
-                const EdgeInsets.fromLTRB(18, 8, 18, 20),
-                itemCount: subjects.length,
-                itemBuilder: (context, index) {
-                  final s = subjects[index];
-                  return // ✅ FIX - type add karo
-                    _subjectCard(index, {
-                      "id": s.subjectId,
-                      "name": s.subjectName ?? "",
-                      "status": s.status,
-                      "type": s.assessmentModel ?? "scholastic", // 👈 YEH ADD KARO
-                    });
-                  //   _subjectCard(index, {
-                  //   "id": s.subjectId,
-                  //   "name": s.subjectName ?? "",
-                  //   "status": s.status,
-                  // });
-                },
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColor.glassWhite,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AppText.customText(
+                      "All Subjects",
+                      size: 19,
+                      weight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  AppText.customText(
+                    "${subjects.length}",
+                    size: 16,
+                    weight: FontWeight.w600,
+                    color: Colors.white70,
+                  ),
+                ],
               ),
             ),
-          ),
-          SizedBox(height: screenHeight * 0.05),
-        ],
+
+            const SizedBox(height: 12),
+
+            /// ===== LIST =====
+            Expanded(
+              child: viewModel.loading
+                  ? _subjectShimmer()
+                  : subjects.isEmpty
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.08),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.menu_book_outlined,
+                        size: 50,
+                        color: Colors.orange.shade300,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "No Subjects Found",
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "Subjects will appear here once added",
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              // ✅ Pull to Refresh wrapped ListView
+                  : RefreshIndicator(
+                onRefresh: _onRefresh,
+                color: AppColor.primary,
+                backgroundColor: Colors.white,
+                strokeWidth: 2.5,
+                displacement: 60,
+                child: ListView.builder(
+                  // ✅ Zaruri: list choti ho tab bhi pull kaam kare
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding:
+                  const EdgeInsets.fromLTRB(18, 8, 18, 20),
+                  itemCount: subjects.length,
+                  itemBuilder: (context, index) {
+                    final s = subjects[index];
+                    return // ✅ FIX - type add karo
+                      _subjectCard(index, {
+                        "id": s.subjectId,
+                        "name": s.subjectName ?? "",
+                        "status": s.status,
+                        "type": s.assessmentModel ?? "scholastic", // 👈 YEH ADD KARO
+                      });
+                    //   _subjectCard(index, {
+                    //   "id": s.subjectId,
+                    //   "name": s.subjectName ?? "",
+                    //   "status": s.status,
+                    // });
+                  },
+                ),
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.05),
+          ],
+        ),
       ),
     );
   }

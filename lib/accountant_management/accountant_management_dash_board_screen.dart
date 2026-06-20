@@ -8,6 +8,7 @@ import '../repo/auth_repo/auth_repo.dart';
 import '../utils/dashboard_module.dart';
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
+import '../utils/permission_manager.dart';
 import '../view_model/accountant/accountant_profile_view_model.dart';
 import '../view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
 import '../view_model/school_view_model/student/all_student_list_view_model.dart';
@@ -30,213 +31,6 @@ class _AccountantManagementDashBoardScreenState
   late AnimationController _animController;
   late List<Animation<double>> _tileAnimations;
 
-  // ─── Tile Data ───────────────────────────────────────────────────────────────
-  // static const List<_DashTile> _tiles = [
-  //   _DashTile(
-  //     'All Students',
-  //     Icons.people_alt_rounded,
-  //     Color(0xFF1976D2),
-  //     'Manage records',
-  //   ),
-  //   _DashTile(
-  //     'All Teachers',
-  //     Icons.school_rounded,
-  //     Color(0xFF00897B),
-  //     'Staff list',
-  //   ),
-  //   _DashTile(
-  //     'Classes',
-  //     Icons.layers_rounded,
-  //     Color(0xFF7B1FA2),
-  //     'View classes',
-  //   ),
-  //   _DashTile(
-  //     'Timetable',
-  //     Icons.schedule_rounded,
-  //     Color(0xFF2E7D32),
-  //     'Weekly schedule',
-  //   ),
-  //   _DashTile(
-  //     'Sections',
-  //     Icons.view_module_rounded,
-  //     Color(0xFF6A1B9A),
-  //     'Manage sections',
-  //   ),
-  //   _DashTile(
-  //     'Subject',
-  //     Icons.menu_book_rounded,
-  //     Color(0xFF00695C),
-  //     'All subjects',
-  //   ),
-  //   _DashTile(
-  //     'Fine',
-  //     Icons.currency_rupee_rounded,
-  //     Color(0xFF8E44AD),
-  //     'Fine records',
-  //   ),
-  //   _DashTile(
-  //     'Fees',
-  //     Icons.receipt_long_rounded,
-  //     Color(0xFF27AE60),
-  //     'Fee collection',
-  //   ),
-  //   _DashTile(
-  //     'Exams',
-  //     Icons.assignment_turned_in_rounded,
-  //     Color(0xFFD4A017),
-  //     'Exam schedule',
-  //   ),
-  //   _DashTile(
-  //     'Marksheet',
-  //     Icons.description_rounded,
-  //     Color(0xFF1565C0),
-  //     'View marks',
-  //   ),
-  //   _DashTile(
-  //     'Admit Card',
-  //     Icons.badge_rounded,
-  //     Color(0xFFC62828),
-  //     'Generate cards',
-  //   ),
-  //   _DashTile(
-  //     'Attendance',
-  //     Icons.fact_check_rounded,
-  //     Color(0xFF0288D1),
-  //     'Daily record',
-  //   ),
-  //   _DashTile(
-  //     'Homework',
-  //     Icons.auto_stories_rounded,
-  //     Color(0xFF00796B),
-  //     'Assignments',
-  //   ),
-  //   _DashTile(
-  //     'Notifications',
-  //     Icons.notifications_active_rounded,
-  //     Color(0xFFE65100),
-  //     'Alerts',
-  //   ),
-  //   _DashTile(
-  //     'Exam Marks',
-  //     Icons.grading_rounded,
-  //     Color(0xFF558B2F),
-  //     'Enter marks',
-  //   ),
-  // ];
-  // static const nahi chalega kyunki const constructor mein String permKey required hai
-  // final List<_DashTile> _tiles = [
-  //   _DashTile(
-  //     'All Students',
-  //     Icons.people_alt_rounded,
-  //     const Color(0xFF1976D2),
-  //     'Manage records',
-  //     'view_all_student',
-  //   ),
-  //
-  //   _DashTile(
-  //     'All Teachers',
-  //     Icons.school_rounded,
-  //     const Color(0xFF00897B),
-  //     'Staff list',
-  //     'view_all_teacher',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Classes',
-  //     Icons.layers_rounded,
-  //     const Color(0xFF7B1FA2),
-  //     'View classes',
-  //     'view_classes',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Timetable',
-  //     Icons.schedule_rounded,
-  //     const Color(0xFF2E7D32),
-  //     'Weekly schedule',
-  //     'view_timetable',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Sections',
-  //     Icons.view_module_rounded,
-  //     const Color(0xFF6A1B9A),
-  //     'Manage sections',
-  //     'view_sections',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Subject',
-  //     Icons.menu_book_rounded,
-  //     const Color(0xFF00695C),
-  //     'All subjects',
-  //     'view_subjects',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Fees',
-  //     Icons.receipt_long_rounded,
-  //     const Color(0xFF27AE60),
-  //     'Fee collection',
-  //     'view_fees',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Exams',
-  //     Icons.assignment_turned_in_rounded,
-  //     const Color(0xFFD4A017),
-  //     'Exam schedule',
-  //     'view_exam',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Marksheet',
-  //     Icons.description_rounded,
-  //     const Color(0xFF1565C0),
-  //     'View marks',
-  //     'view_marks',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Admit Card',
-  //     Icons.badge_rounded,
-  //     const Color(0xFFC62828),
-  //     'Generate cards',
-  //     'generate_admit_card',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Attendance',
-  //     Icons.fact_check_rounded,
-  //     const Color(0xFF0288D1),
-  //     'Daily record',
-  //     'mark_student_attendance',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Homework',
-  //     Icons.auto_stories_rounded,
-  //     const Color(0xFF00796B),
-  //     'Assignments',
-  //     'view_hw_from_student',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Notifications',
-  //     Icons.notifications_active_rounded,
-  //     const Color(0xFFE65100),
-  //     'Alerts',
-  //     'notification_view',
-  //   ),
-  //
-  //   _DashTile(
-  //     'Exam Marks',
-  //     Icons.grading_rounded,
-  //     const Color(0xFF558B2F),
-  //     'Enter marks',
-  //     'manage_exam_marks',
-  //   ),
-  // ];
   @override
   void initState() {
     super.initState();
@@ -326,57 +120,6 @@ class _AccountantManagementDashBoardScreenState
         false;
   }
 
-  // void _onTileTap(int index) {
-  //   switch (index) {
-  //     case 0:
-  //       Navigator.pushNamed(context, RoutesName.allStudentList);
-  //       break;
-  //     case 1:
-  //       Navigator.pushNamed(context, RoutesName.allTeacherListScreen);
-  //       break;
-  //     case 2:
-  //       Navigator.pushNamed(context, RoutesName.classesPage);
-  //       break;
-  //     case 3:
-  //       Navigator.pushNamed(context, RoutesName.schoolTimetableScreen);
-  //       break;
-  //     case 4:
-  //       Navigator.pushNamed(context, RoutesName.allSectionScreen);
-  //       break;
-  //     case 5:
-  //       Navigator.pushNamed(context, RoutesName.allSubjectsScreen);
-  //       break;
-  //     case 6:
-  //       Navigator.pushNamed(context, RoutesName.fineManagementScreen);
-  //       break;
-  //     case 7:
-  //       Navigator.pushNamed(context, RoutesName.feesManagementScreen);
-  //       break;
-  //     case 8:
-  //       Navigator.pushNamed(context, RoutesName.examScreen);
-  //       break;
-  //     case 9:
-  //       Navigator.pushNamed(context, RoutesName.marksheetScreen);
-  //       break;
-  //     case 10:
-  //       Navigator.pushNamed(context, RoutesName.schoolAdmitCardScreen);
-  //       break;
-  //     case 11:
-  //       Navigator.pushNamed(context, RoutesName.schoolAttendanceScreen);
-  //       break;
-  //     case 12:
-  //       Navigator.pushNamed(context, RoutesName.allHomeWorkScreen);
-  //       break;
-  //     case 13:
-  //       Navigator.pushNamed(context, RoutesName.notificationScreen);
-  //       break;
-  //     case 14:
-  //       Navigator.pushNamed(context, RoutesName.schoolExamMarksScreen);
-  //       break;
-  //   }
-  // }
-
-  // ─── BUILD ───────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -621,11 +364,8 @@ class _AccountantManagementDashBoardScreenState
     );
   }
 
-  // ─── GRID ────────────────────────────────────────────────────────────────────
 
   Widget _buildGrid() {
-    // ✅ Denied tiles hide (PermissionManager se driven, login ke effective
-    // permissions list ke hisaab se)
     final visibleModules = DashboardModules.modules
         .where(
           (e) =>
@@ -665,82 +405,6 @@ class _AccountantManagementDashBoardScreenState
     );
   }
 
-  // Widget _buildTile(_DashTile tile) {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       gradient: LinearGradient(
-  //         colors: [tile.color, tile.color.withValues(alpha: 0.78)],
-  //         begin: Alignment.topLeft,
-  //         end: Alignment.bottomRight,
-  //       ),
-  //       borderRadius: BorderRadius.circular(20),
-  //       boxShadow: [
-  //         BoxShadow(
-  //           color: tile.color.withValues(alpha: 0.30),
-  //           blurRadius: 12,
-  //           offset: const Offset(0, 5),
-  //         ),
-  //       ],
-  //     ),
-  //     child: Stack(
-  //       children: [
-  //         Positioned(
-  //           top: -14,
-  //           right: -14,
-  //           child: Container(
-  //             width: 56,
-  //             height: 56,
-  //             decoration: BoxDecoration(
-  //               color: Colors.white.withValues(alpha: 0.10),
-  //               shape: BoxShape.circle,
-  //             ),
-  //           ),
-  //         ),
-  //         Positioned(
-  //           bottom: -8,
-  //           left: 6,
-  //           child: Container(
-  //             width: 34,
-  //             height: 34,
-  //             decoration: BoxDecoration(
-  //               color: Colors.white.withValues(alpha: 0.07),
-  //               shape: BoxShape.circle,
-  //             ),
-  //           ),
-  //         ),
-  //         Padding(
-  //           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-  //           child: Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Container(
-  //                 padding: const EdgeInsets.all(9),
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.white.withValues(alpha: 0.22),
-  //                   borderRadius: BorderRadius.circular(13),
-  //                 ),
-  //                 child: Icon(tile.icon, color: Colors.white, size: 22),
-  //               ),
-  //               const SizedBox(height: 9),
-  //               Text(
-  //                 tile.label,
-  //                 textAlign: TextAlign.center,
-  //                 maxLines: 2,
-  //                 overflow: TextOverflow.ellipsis,
-  //                 style: const TextStyle(
-  //                   fontSize: 11,
-  //                   fontWeight: FontWeight.bold,
-  //                   color: Colors.white,
-  //                   height: 1.3,
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _buildModuleTile(
       DashboardModule module,
@@ -1045,230 +709,172 @@ class _AccountantManagementDashBoardScreenState
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.logout_rounded, color: Colors.red),
-            SizedBox(width: 10),
-            Text(
-              'Logout',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        content: const Text(
-          'Are you sure you want to logout?',
-          style: TextStyle(fontSize: 14, color: Colors.black54),
-        ),
-        actions: [
-          /// CANCEL
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool isLoggingOut = false;
 
-          /// LOGOUT
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
               ),
-            ),
+              title: const Row(
+                children: [
+                  Icon(Icons.logout_rounded, color: Colors.red),
+                  SizedBox(width: 10),
+                  Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              content: const Text(
+                'Are you sure you want to logout?',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              actions: [
+                // CANCEL — loading mein disable
+                TextButton(
+                  onPressed: isLoggingOut ? null : () => Navigator.pop(ctx),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
 
-            onPressed: () async {
-              // dialog close
-              Navigator.pop(ctx);
+                // LOGOUT
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    minimumSize: const Size(90, 40),
+                  ),
+                  onPressed: isLoggingOut
+                      ? null
+                      : () async {
+                    setDialogState(() => isLoggingOut = true);
 
-              try {
-                final repo = AuthRepository();
-                final userVM = UserViewModel();
+                    final userVM = UserViewModel();
 
-                // API logout
-                await repo.logoutApi({"device_type": "android"});
+                    try {
+                      // STEP 1: Subscribed session pehle padho
+                      final session =
+                      await userVM.getSubscribedSession();
+                      final schoolId = session['schoolId'];
+                      final role = session['role'];
+                      final userId = session['userId'];
+                      final classId = session['classId'];
+                      final sectionId = session['sectionId'];
 
-                // delete firebase token
-                await FirebaseMessaging.instance.deleteToken();
+                      debugPrint(
+                        "🔍 Accountant Logout => school=$schoolId | role=$role",
+                      );
 
-                // clear all local data
-                await userVM.clearUser();
+                      // STEP 2: FCM Topics unsubscribe
+                      if (schoolId != null &&
+                          schoolId.isNotEmpty &&
+                          role != null &&
+                          role.isNotEmpty) {
+                        final topics = <String>[
+                          "school_$schoolId",
+                          "school_${schoolId}_role_$role",
+                        ];
 
-                print("✅ USER LOGOUT SUCCESS");
+                        if (userId != null && userId.isNotEmpty) {
+                          topics.add("user_$userId");
+                        }
 
-                // go to login screen
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RoutesName.loginScreen,
-                  (route) => false,
-                );
-              } catch (e) {
-                print("Logout Error => $e");
+                        if (role == "student") {
+                          if (classId != null && classId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_$classId",
+                            );
+                          }
+                          if (classId != null &&
+                              classId.isNotEmpty &&
+                              sectionId != null &&
+                              sectionId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_${classId}_section_$sectionId",
+                            );
+                          }
+                        }
 
-                // error aaye tab bhi clear karo
-                await UserViewModel().clearUser();
+                        final messaging = FirebaseMessaging.instance;
+                        await Future.wait(
+                          topics.map(
+                                (t) => messaging.unsubscribeFromTopic(t),
+                          ),
+                          eagerError: false,
+                        );
+                        debugPrint(
+                          "✅ Accountant unsubscribed: $topics",
+                        );
+                      }
 
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RoutesName.loginScreen,
-                  (route) => false,
-                );
-              }
-            },
+                      // STEP 3: FCM Token delete
+                      await FirebaseMessaging.instance.deleteToken();
+                      debugPrint("✅ FCM Token deleted");
 
-            child: const Text("Logout", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+                      // STEP 4: Backend logout (best-effort)
+                      try {
+                        final repo = AuthRepository();
+                        await repo.logoutApi({
+                          "device_type": "android",
+                        });
+                        debugPrint("✅ Backend logout done");
+                      } catch (e) {
+                        debugPrint("⚠️ Backend logout error: $e");
+                      }
+
+                      await userVM.clearSubscribedSession();
+
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+
+                      debugPrint("✅ Accountant logout complete");
+                    } catch (e) {
+                      debugPrint("❌ Accountant logout error: $e");
+                      await userVM.clearSubscribedSession();
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+                    }
+
+                    // Dialog close
+                    if (ctx.mounted) Navigator.pop(ctx);
+
+                    // Splash pe jao — pura stack clear
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RoutesName.splash,
+                            (route) => false,
+                      );
+                    }
+                  },
+                  child: isLoggingOut
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                      : const Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
-  // void _showLogoutDialog(BuildContext context) {
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (ctx) => AlertDialog(
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-  //       title: const Row(
-  //         children: [
-  //           Icon(Icons.logout_rounded, color: Colors.red),
-  //           SizedBox(width: 10),
-  //           Text(
-  //             'Logout',
-  //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //           ),
-  //         ],
-  //       ),
-  //       content: const Text(
-  //         'Are you sure you want to logout?',
-  //         style: TextStyle(fontSize: 14, color: Colors.black54),
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(ctx),
-  //           child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-  //         ),
-  //         // ElevatedButton(
-  //         //   style: ElevatedButton.styleFrom(
-  //         //     backgroundColor: Colors.red,
-  //         //     shape: RoundedRectangleBorder(
-  //         //         borderRadius: BorderRadius.circular(10)),
-  //         //   ),
-  //         //   // onPressed: () async {
-  //         //   //   await UserViewModel().removeUser();
-  //         //   //   Navigator.pushNamedAndRemoveUntil(
-  //         //   //       context, RoutesName.splash, (route) => false);
-  //         //   // },
-  //         //   onPressed: () async {
-  //         //     final userVM = UserViewModel();
-  //         //
-  //         //     // ✅ FCM Unsubscribe
-  //         //     final role = await userVM.getRole();
-  //         //     final schoolId = await userVM.getSchoolId();
-  //         //     if (role != null && schoolId != null) {
-  //         //       await FirebaseMessaging.instance
-  //         //           .unsubscribeFromTopic("school_$schoolId");
-  //         //       await FirebaseMessaging.instance
-  //         //           .unsubscribeFromTopic("school_${schoolId}_role_$role");
-  //         //       print("✅ Unsubscribed: school_$schoolId");
-  //         //       print("✅ Unsubscribed: school_${schoolId}_role_$role");
-  //         //     }
-  //         //
-  //         //     // ✅ Sab clear karo
-  //         //     await userVM.removeUser();
-  //         //     await userVM.removeToken();
-  //         //     await userVM.removeRole();
-  //         //     await userVM.removeStudentId();
-  //         //     await userVM.removeSchoolId();
-  //         //
-  //         //     Navigator.pushNamedAndRemoveUntil(
-  //         //       context,
-  //         //       RoutesName.splash,
-  //         //           (route) => false,
-  //         //     );
-  //         //   },
-  //         //   child: const Text('Logout',
-  //         //       style: TextStyle(color: Colors.white)),
-  //         // ),
-  //         ElevatedButton(
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.red,
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(10),
-  //             ),
-  //           ),
-  //           onPressed: () async {
-  //             final userVM = UserViewModel();
-  //
-  //             final role = await userVM.getRole();
-  //             final schoolId = await userVM.getSchoolId();
-  //             final classId = await userVM.getClassId();
-  //             final sectionId = await userVM.getSectionId();
-  //
-  //             final messaging = FirebaseMessaging.instance;
-  //
-  //             // 🔥 1️⃣ Unsubscribe School Topic
-  //             if (schoolId != null) {
-  //               await messaging.unsubscribeFromTopic("school_$schoolId");
-  //               print("✅ Unsubscribed school_$schoolId");
-  //             }
-  //
-  //             // 🔥 2️⃣ Unsubscribe Role Topic
-  //             if (schoolId != null && role != null) {
-  //               await messaging.unsubscribeFromTopic(
-  //                 "school_${schoolId}_role_$role",
-  //               );
-  //               print("✅ Unsubscribed role topic");
-  //             }
-  //
-  //             // 🔥 3️⃣ Student Specific Topics
-  //             if (role == "student") {
-  //               if (schoolId != null && classId != null && classId.isNotEmpty) {
-  //                 await messaging.unsubscribeFromTopic(
-  //                   "school_${schoolId}_class_$classId",
-  //                 );
-  //               }
-  //
-  //               if (schoolId != null &&
-  //                   classId != null &&
-  //                   sectionId != null &&
-  //                   classId.isNotEmpty &&
-  //                   sectionId.isNotEmpty) {
-  //                 await messaging.unsubscribeFromTopic(
-  //                   "school_${schoolId}_class_${classId}_section_$sectionId",
-  //                 );
-  //               }
-  //             }
-  //
-  //             // 🔥 4️⃣ Delete FCM Token (VERY IMPORTANT)
-  //             await FirebaseMessaging.instance.deleteToken();
-  //             print("🔥 FCM Token Deleted");
-  //
-  //             // 🔥 5️⃣ Clear All Local Data
-  //             await userVM.clearUser();
-  //
-  //             // 🔥 6️⃣ Navigate to Splash
-  //             Navigator.pushNamedAndRemoveUntil(
-  //               context,
-  //               RoutesName.splash,
-  //               (route) => false,
-  //             );
-  //           },
-  //           child: const Text('Logout', style: TextStyle(color: Colors.white)),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
 
-// // ─── DATA MODELS ─────────────────────────────────────────────────────────────
-//
-// class _DashTile {
-//   final String label;
-//   final IconData icon;
-//   final Color color;
-//   final String sub;
-//   final String permKey; // new
-//
-//   const _DashTile(this.label, this.icon, this.color, this.sub, this.permKey);
-// }

@@ -29,6 +29,10 @@ class GetUserPermissionViewModel extends ChangeNotifier {
   }) async {
     _setLoading(true);
 
+    if (isCurrentUser) {
+      PermissionManager.setRole(role);
+    }
+
     try {
 
       final response = await _repo.getUserPermissionApi(
@@ -153,14 +157,8 @@ class GetUserPermissionViewModel extends ChangeNotifier {
 
       );
 
-      PermissionManager.setPermissions(
-        effectivePermissions,
-      );
-
-      // ✅ SharedPreferences me bhi save karo
-      UserViewModel().savePermissions(
-        effectivePermissions,
-      );
+      PermissionManager.setPermissions(effectivePermissions,);
+      UserViewModel().savePermissions(effectivePermissions,);
 
       print(
         "✅ EFFECTIVE PERMISSIONS => $effectivePermissions",

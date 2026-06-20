@@ -23,33 +23,46 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF5F7FA),
-      body: SingleChildScrollView(
-        child: Column(
-            children: [
-              _buildHeader(context),
-              CoScholasticFilterCard(
-                onLoad: ({
-                  required classId,
-                  required sectionId,
-                  required academicYear,
-                  required term,
-                }) async {
-                  final gradeVm = context.read<CoScholasticGradeViewModel>();
-                  gradeVm.currentAcademicYear = academicYear;
-                  gradeVm.currentTerm = term;
-                  // students + subjects load yahan karna hai
-                },
+      body: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                children: [
+
+                  CoScholasticFilterCard(
+                    onLoad: ({
+                      required classId,
+                      required sectionId,
+                      required academicYear,
+                      required term,
+                    }) async {
+                      final gradeVm =
+                      context.read<CoScholasticGradeViewModel>();
+
+                      gradeVm.currentAcademicYear =
+                          academicYear;
+
+                      gradeVm.currentTerm = term;
+
+                      // students + subjects load
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  const CoScholasticTable(),
+                  const SizedBox(height: 20),
+                  const SaveGradesButton(),
+                  const SizedBox(height: 20),
+                ],
               ),
-              const SizedBox(height: 16),
-              const CoScholasticTable(),
-              const SizedBox(height: 20),
-              const SaveGradesButton(),
-            ]
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
-
   Widget _buildHeader(BuildContext context) {
     final adminProfile = Provider.of<SchoolAdminProfileViewModel>(
       context,
@@ -112,27 +125,6 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                   ],
                 ),
               ),
-              // //
-              // // Container(
-              // //   padding: const EdgeInsets.symmetric(
-              // //     horizontal: 10,
-              // //     vertical: 5,
-              // //   ),
-              // //   decoration: BoxDecoration(
-              // //     color: _gold,
-              // //     borderRadius: BorderRadius.circular(20),
-              // //   ),
-              // //   child: const Text(
-              // //     'GRADE',
-              // //     style: TextStyle(
-              // //       color: Colors.white,
-              // //       fontSize: 10,
-              // //       fontWeight: FontWeight.bold,
-              // //       letterSpacing: 1,
-              // //     ),
-              // //   ),
-              // // ),
-              // SizedBox(width: 5,),
               InkWell(
                 onTap: () {
                   Navigator.push(
@@ -294,10 +286,8 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
     );
   }
 }
-
 class SaveGradesButton extends StatelessWidget {
   const SaveGradesButton({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Consumer<CoScholasticGradeViewModel>(
@@ -319,11 +309,8 @@ class SaveGradesButton extends StatelessWidget {
             title: vm.loading
                 ? "Saving Grades..."
                 : "Save All Grades",
-
             icon: Icons.save_rounded,
-
             loading: vm.loading,
-
             onTap: () async {
               await vm.saveAllGrades(context);
             },

@@ -114,22 +114,25 @@ class _NotificationScreenState extends State<NotificationScreen>
   @override
   Widget build(BuildContext context) {
     final markReadVM = Provider.of<MarkAsAllReadNotificationViewModel>(context);
-    return Scaffold(
-      backgroundColor: const Color(0xFFF4F6FB),
-      floatingActionButton:
-          PermissionExtensions.canAccess(PermissionKeys.notificationSend)
-          ? _buildFAB()
-          : null,
-      body: Column(
-        children: [
-          _buildHeader(markReadVM),
-          Expanded(
-            child: TabBarView(
-              controller: tabController,
-              children: [_buildInbox(), _buildSent()],
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF4F6FB),
+        floatingActionButton:
+            PermissionExtensions.canAccess(PermissionKeys.notificationSend)
+            ? _buildFAB()
+            : null,
+        body: Column(
+          children: [
+            _buildHeader(markReadVM),
+            Expanded(
+              child: TabBarView(
+                controller: tabController,
+                children: [_buildInbox(), _buildSent()],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -338,7 +341,7 @@ class _NotificationScreenState extends State<NotificationScreen>
       color: AppColor.primary,
       onRefresh: () => vm.allNotificationApi(context),
       child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 35),
         physics: const BouncingScrollPhysics(),
         itemCount: notifications.length,
         itemBuilder: (context, index) {
@@ -426,7 +429,7 @@ class _NotificationScreenState extends State<NotificationScreen>
       color: AppColor.primary,
       onRefresh: () => vm.getSendNotificationApi(context),
       child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 100),
+        padding: const EdgeInsets.fromLTRB(16, 20, 16, 35),
         physics: const BouncingScrollPhysics(),
         itemCount: notifications.length,
         itemBuilder: (context, index) {

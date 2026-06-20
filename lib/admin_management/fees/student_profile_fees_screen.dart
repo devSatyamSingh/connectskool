@@ -138,868 +138,871 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen> {
         ? (paidAmount / totalFee).clamp(0.0, 1.0)
         : 0.0;
 
-    return Scaffold(
-      backgroundColor: AppColor.pageBgColor,
-      body: Column(
-        children: [
-          // ── Header ──────────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 50, 16, 24),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.pageBgColor,
+        body: Column(
+          children: [
+            // ── Header ──────────────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 24),
+              decoration: BoxDecoration(
+                gradient: AppColor.primaryGradient,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(0.3),
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.blue.withOpacity(0.3),
-                  blurRadius: 18,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: const BoxDecoration(
-                      color: Colors.white24,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                      size: 20,
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: Colors.white24,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Student Fee Profile",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Fee details & payment history",
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.account_balance_wallet_rounded,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-          ),
-
-          // ── Body ────────────────────────────────────────────────────
-          Expanded(
-            child: vm.loading
-                ? const Center(child: CircularProgressIndicator())
-                : SingleChildScrollView(
-                    padding: const EdgeInsets.only(bottom: 30),
+                  const SizedBox(width: 12),
+                  Expanded(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 16),
-
-                        // ── Student Info Card ────────────────────────────
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
+                        const Text(
+                          "Student Fee Profile",
+                          style: TextStyle(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 54,
-                                    height: 54,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Colors.green.shade300,
-                                          Colors.green.shade600,
-                                        ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        (student?.name ?? 'S')
-                                            .toString()
-                                            .substring(0, 1)
-                                            .toUpperCase(),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 22,
-                                          color: Colors.white,
+                        ),
+                        Text(
+                          "Fee details & payment history",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.75),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.account_balance_wallet_rounded,
+                    color: Colors.white,
+                  ),
+                ],
+              ),
+            ),
+
+            // ── Body ────────────────────────────────────────────────────
+            Expanded(
+              child: vm.loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 30),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 16),
+
+                          // ── Student Info Card ────────────────────────────
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 54,
+                                      height: 54,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.green.shade300,
+                                            Colors.green.shade600,
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
                                         ),
+                                        shape: BoxShape.circle,
                                       ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          student?.name ?? "No Name",
+                                      child: Center(
+                                        child: Text(
+                                          (student?.name ?? 'S')
+                                              .toString()
+                                              .substring(0, 1)
+                                              .toUpperCase(),
                                           style: const TextStyle(
-                                            fontSize: 17,
                                             fontWeight: FontWeight.bold,
+                                            fontSize: 22,
+                                            color: Colors.white,
                                           ),
                                         ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.badge_rounded,
-                                              size: 13,
-                                              color: Colors.grey.shade500,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              student?.admissionNo ?? '',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey.shade600,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Icon(
-                                              Icons.class_rounded,
-                                              size: 13,
-                                              color: Colors.grey.shade500,
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              student?.className ?? '',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey.shade600,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 5,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: pending > 0
-                                          ? Colors.orange.shade50
-                                          : Colors.green.shade50,
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: pending > 0
-                                            ? Colors.orange.shade200
-                                            : Colors.green.shade200,
                                       ),
                                     ),
-                                    child: Text(
-                                      pending > 0 ? 'Due' : 'Cleared',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: pending > 0
-                                            ? Colors.orange.shade700
-                                            : Colors.green.shade700,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Payment Progress",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    "${(paidPercent * 100).toStringAsFixed(0)}% paid",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.green.shade600,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: LinearProgressIndicator(
-                                  value: paidPercent,
-                                  minHeight: 8,
-                                  backgroundColor: Colors.grey.shade100,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.green.shade400,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 14),
-
-                        // ── Summary Cards ────────────────────────────────
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              _summaryCard(
-                                title: 'TOTAL FEE',
-                                amount: '₹$totalFee',
-                                subtitle: 'Standard annual curriculum',
-                                bgColor: Colors.blue.shade50,
-                                accentColor: Colors.blue.shade600,
-                                icon: Icons.receipt_rounded,
-                              ),
-                              const SizedBox(width: 10),
-                              _summaryCard(
-                                title: 'PAID AMOUNT',
-                                amount: '₹$paidAmount',
-                                subtitle:
-                                    '${(paidPercent * 100).toStringAsFixed(0)}% of total',
-                                bgColor: Colors.green.shade50,
-                                accentColor: Colors.green.shade600,
-                                icon: Icons.check_circle_rounded,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Row(
-                            children: [
-                              _summaryCard(
-                                title: 'PENDING',
-                                amount: '₹$pending',
-                                subtitle: pending > 0
-                                    ? 'Next due: Soon'
-                                    : 'All clear!',
-                                bgColor: Colors.orange.shade50,
-                                accentColor: Colors.orange.shade600,
-                                icon: Icons.pending_actions_rounded,
-                              ),
-                              const SizedBox(width: 10),
-                              _summaryCard(
-                                title: 'LATE FINE',
-                                amount: '₹$fine',
-                                subtitle: fine > 0
-                                    ? 'Fine applicable'
-                                    : 'No fines',
-                                bgColor: Colors.red.shade50,
-                                accentColor: Colors.red.shade400,
-                                icon: Icons.warning_amber_rounded,
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // ── Fee Breakdown ────────────────────────────────
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  16,
-                                  16,
-                                  12,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "Fee Breakdown",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            student?.name ?? "No Name",
+                                            style: const TextStyle(
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.badge_rounded,
+                                                size: 13,
+                                                color: Colors.grey.shade500,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                student?.admissionNo ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(
+                                                Icons.class_rounded,
+                                                size: 13,
+                                                color: Colors.grey.shade500,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                student?.className ?? '',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.grey.shade600,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 10,
-                                        vertical: 4,
+                                        vertical: 5,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.orange.shade50,
-                                        borderRadius: BorderRadius.circular(12),
+                                        color: pending > 0
+                                            ? Colors.orange.shade50
+                                            : Colors.green.shade50,
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: pending > 0
+                                              ? Colors.orange.shade200
+                                              : Colors.green.shade200,
+                                        ),
                                       ),
                                       child: Text(
-                                        "${feeList.length} items",
+                                        pending > 0 ? 'Due' : 'Cleared',
                                         style: TextStyle(
                                           fontSize: 11,
-                                          color: Colors.orange.shade700,
                                           fontWeight: FontWeight.bold,
+                                          color: pending > 0
+                                              ? Colors.orange.shade700
+                                              : Colors.green.shade700,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-
-                              if (feeList.isEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 32,
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Icon(
-                                          Icons.receipt_long_rounded,
-                                          size: 46,
-                                          color: Colors.grey.shade300,
-                                        ),
-                                        const SizedBox(height: 12),
-                                        const Text(
-                                          "No fees assigned",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "No fee records found for this student",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey.shade500,
-                                          ),
-                                        ),
-                                      ],
+                                const SizedBox(height: 14),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Payment Progress",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey.shade600,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${(paidPercent * 100).toStringAsFixed(0)}% paid",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.green.shade600,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 6),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: LinearProgressIndicator(
+                                    value: paidPercent,
+                                    minHeight: 8,
+                                    backgroundColor: Colors.grey.shade100,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.green.shade400,
                                     ),
                                   ),
-                                )
-                              else
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 14),
+
+                          // ── Summary Cards ────────────────────────────────
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                _summaryCard(
+                                  title: 'TOTAL FEE',
+                                  amount: '₹$totalFee',
+                                  subtitle: 'Standard annual curriculum',
+                                  bgColor: Colors.blue.shade50,
+                                  accentColor: Colors.blue.shade600,
+                                  icon: Icons.receipt_rounded,
+                                ),
+                                const SizedBox(width: 10),
+                                _summaryCard(
+                                  title: 'PAID AMOUNT',
+                                  amount: '₹$paidAmount',
+                                  subtitle:
+                                      '${(paidPercent * 100).toStringAsFixed(0)}% of total',
+                                  bgColor: Colors.green.shade50,
+                                  accentColor: Colors.green.shade600,
+                                  icon: Icons.check_circle_rounded,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              children: [
+                                _summaryCard(
+                                  title: 'PENDING',
+                                  amount: '₹$pending',
+                                  subtitle: pending > 0
+                                      ? 'Next due: Soon'
+                                      : 'All clear!',
+                                  bgColor: Colors.orange.shade50,
+                                  accentColor: Colors.orange.shade600,
+                                  icon: Icons.pending_actions_rounded,
+                                ),
+                                const SizedBox(width: 10),
+                                _summaryCard(
+                                  title: 'LATE FINE',
+                                  amount: '₹$fine',
+                                  subtitle: fine > 0
+                                      ? 'Fine applicable'
+                                      : 'No fines',
+                                  bgColor: Colors.red.shade50,
+                                  accentColor: Colors.red.shade400,
+                                  icon: Icons.warning_amber_rounded,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          // ── Fee Breakdown ────────────────────────────────
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
                                   padding: const EdgeInsets.fromLTRB(
                                     16,
-                                    0,
                                     16,
                                     16,
+                                    12,
                                   ),
-                                  itemCount: feeList.length,
-                                  separatorBuilder: (_, __) => Divider(
-                                    height: 1,
-                                    color: Colors.grey.shade100,
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    final FeeBreakdown fee = feeList[index];
-                                    final isPaid = fee.status == "paid";
-                                    final isPartial = fee.status == "partial";
-                                    final feePending = fee.pendingAmount ?? 0;
-
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Fee Breakdown",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.orange.shade50,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          "${feeList.length} items",
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.orange.shade700,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                if (feeList.isEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 32,
+                                    ),
+                                    child: Center(
                                       child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
                                         children: [
-                                          // Row 1: icon + name + tags + buttons
-                                          Row(
-                                            children: [
-                                              Container(
-                                                width: 36,
-                                                height: 36,
-                                                decoration: BoxDecoration(
-                                                  color: isPaid
-                                                      ? Colors.green.shade50
-                                                      : isPartial
-                                                      ? Colors.orange.shade50
-                                                      : Colors.red.shade50,
-                                                  borderRadius:
-                                                      BorderRadius.circular(9),
+                                          Icon(
+                                            Icons.receipt_long_rounded,
+                                            size: 46,
+                                            color: Colors.grey.shade300,
+                                          ),
+                                          const SizedBox(height: 12),
+                                          const Text(
+                                            "No fees assigned",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "No fee records found for this student",
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey.shade500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      16,
+                                      0,
+                                      16,
+                                      16,
+                                    ),
+                                    itemCount: feeList.length,
+                                    separatorBuilder: (_, __) => Divider(
+                                      height: 1,
+                                      color: Colors.grey.shade100,
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      final FeeBreakdown fee = feeList[index];
+                                      final isPaid = fee.status == "paid";
+                                      final isPartial = fee.status == "partial";
+                                      final feePending = fee.pendingAmount ?? 0;
+
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Row 1: icon + name + tags + buttons
+                                            Row(
+                                              children: [
+                                                Container(
+                                                  width: 36,
+                                                  height: 36,
+                                                  decoration: BoxDecoration(
+                                                    color: isPaid
+                                                        ? Colors.green.shade50
+                                                        : isPartial
+                                                        ? Colors.orange.shade50
+                                                        : Colors.red.shade50,
+                                                    borderRadius:
+                                                        BorderRadius.circular(9),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.menu_book_rounded,
+                                                    size: 17,
+                                                    color: isPaid
+                                                        ? Colors.green
+                                                        : isPartial
+                                                        ? Colors.orange
+                                                        : Colors.red,
+                                                  ),
                                                 ),
-                                                child: Icon(
-                                                  Icons.menu_book_rounded,
-                                                  size: 17,
-                                                  color: isPaid
-                                                      ? Colors.green
-                                                      : isPartial
-                                                      ? Colors.orange
-                                                      : Colors.red,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Expanded(
-                                                child: Wrap(
-                                                  spacing: 6,
-                                                  crossAxisAlignment:
-                                                      WrapCrossAlignment.center,
-                                                  children: [
-                                                    Text(
-                                                      fee.feeHeadName ?? '',
-                                                      style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                    // Status chip
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 3,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color: isPaid
-                                                            ? Colors
-                                                                  .green
-                                                                  .shade100
-                                                            : isPartial
-                                                            ? Colors
-                                                                  .orange
-                                                                  .shade100
-                                                            : Colors
-                                                                  .red
-                                                                  .shade100,
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              6,
-                                                            ),
-                                                      ),
-                                                      child: Text(
-                                                        isPaid
-                                                            ? 'PAID'
-                                                            : isPartial
-                                                            ? 'PARTIAL'
-                                                            : 'PENDING',
-                                                        style: TextStyle(
-                                                          fontSize: 9,
+                                                const SizedBox(width: 10),
+                                                Expanded(
+                                                  child: Wrap(
+                                                    spacing: 6,
+                                                    crossAxisAlignment:
+                                                        WrapCrossAlignment.center,
+                                                    children: [
+                                                      Text(
+                                                        fee.feeHeadName ?? '',
+                                                        style: const TextStyle(
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          letterSpacing: 0.5,
-                                                          color: isPaid
-                                                              ? Colors
-                                                                    .green
-                                                                    .shade700
-                                                              : isPartial
-                                                              ? Colors
-                                                                    .orange
-                                                                    .shade700
-                                                              : Colors
-                                                                    .red
-                                                                    .shade600,
+                                                          fontSize: 14,
                                                         ),
                                                       ),
-                                                    ),
-                                                    if (fee.feeFrequency !=
-                                                        null)
+                                                      // Status chip
                                                       Container(
                                                         padding:
                                                             const EdgeInsets.symmetric(
-                                                              horizontal: 7,
+                                                              horizontal: 8,
                                                               vertical: 3,
                                                             ),
                                                         decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .grey
-                                                              .shade100,
+                                                          color: isPaid
+                                                              ? Colors
+                                                                    .green
+                                                                    .shade100
+                                                              : isPartial
+                                                              ? Colors
+                                                                    .orange
+                                                                    .shade100
+                                                              : Colors
+                                                                    .red
+                                                                    .shade100,
                                                           borderRadius:
                                                               BorderRadius.circular(
                                                                 6,
                                                               ),
                                                         ),
                                                         child: Text(
-                                                          fee.feeFrequency!,
+                                                          isPaid
+                                                              ? 'PAID'
+                                                              : isPartial
+                                                              ? 'PARTIAL'
+                                                              : 'PENDING',
                                                           style: TextStyle(
                                                             fontSize: 9,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            letterSpacing: 0.5,
+                                                            color: isPaid
+                                                                ? Colors
+                                                                      .green
+                                                                      .shade700
+                                                                : isPartial
+                                                                ? Colors
+                                                                      .orange
+                                                                      .shade700
+                                                                : Colors
+                                                                      .red
+                                                                      .shade600,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      if (fee.feeFrequency !=
+                                                          null)
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 7,
+                                                                vertical: 3,
+                                                              ),
+                                                          decoration: BoxDecoration(
                                                             color: Colors
                                                                 .grey
-                                                                .shade600,
+                                                                .shade100,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  6,
+                                                                ),
+                                                          ),
+                                                          child: Text(
+                                                            fee.feeFrequency!,
+                                                            style: TextStyle(
+                                                              fontSize: 9,
+                                                              color: Colors
+                                                                  .grey
+                                                                  .shade600,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
 
-                                              // ✅ Collect Payment + Discontinue buttons
-                                              if (!isPaid && feePending > 0)
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  children: [
-                                                    // Collect Payment button
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        if (!PermissionExtensions.canAccess(
-                                                          PermissionKeys.collectPayment,
-                                                        )) {
-                                                          Utils.show(
-                                                            "You don't have permission to perform this action.",
-                                                            context,
-                                                          );
-                                                          return;
-                                                        }
+                                                // ✅ Collect Payment + Discontinue buttons
+                                                if (!isPaid && feePending > 0)
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      // Collect Payment button
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          if (!PermissionExtensions.canAccess(
+                                                            PermissionKeys.collectPayment,
+                                                          )) {
+                                                            Utils.show(
+                                                              "You don't have permission to perform this action.",
+                                                              context,
+                                                            );
+                                                            return;
+                                                          }
 
-                                                        _showCollectPaymentSheet(
-                                                          fee,
-                                                        );
-                                                      },
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 12,
-                                                              vertical: 7,
-                                                            ),
-                                                        decoration: BoxDecoration(
-                                                          gradient: AppColor
-                                                              .primaryGradient,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                10,
-                                                              ),
-                                                          boxShadow: [
-                                                            BoxShadow(
-                                                              color: Colors.blue
-                                                                  .withOpacity(
-                                                                    0.25,
-                                                                  ),
-                                                              blurRadius: 8,
-                                                              offset:
-                                                                  const Offset(
-                                                                    0,
-                                                                    3,
-                                                                  ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        child: const Text(
-                                                          'Collect Payment',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 11,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 6),
-                                                    // ✅ Discontinue button
-                                                    GestureDetector(
-                                                      onTap: () =>
-                                                          _showDiscontinueDialog(
-                                                            context,
+                                                          _showCollectPaymentSheet(
                                                             fee,
-                                                          ),
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets.symmetric(
-                                                              horizontal: 12,
-                                                              vertical: 7,
-                                                            ),
-                                                        decoration: BoxDecoration(
-                                                          color: Colors
-                                                              .red
-                                                              .shade50,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                10,
+                                                          );
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 12,
+                                                                vertical: 7,
                                                               ),
-                                                          border: Border.all(
-                                                            color: Colors
-                                                                .red
-                                                                .shade300,
+                                                          decoration: BoxDecoration(
+                                                            gradient: AppColor
+                                                                .primaryGradient,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
+                                                                ),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors.blue
+                                                                    .withOpacity(
+                                                                      0.25,
+                                                                    ),
+                                                                blurRadius: 8,
+                                                                offset:
+                                                                    const Offset(
+                                                                      0,
+                                                                      3,
+                                                                    ),
+                                                              ),
+                                                            ],
                                                           ),
-                                                        ),
-                                                        child: Text(
-                                                          'Discontinue',
-                                                          style: TextStyle(
-                                                            color: Colors
-                                                                .red
-                                                                .shade600,
-                                                            fontSize: 11,
-                                                            fontWeight:
-                                                                FontWeight.bold,
+                                                          child: const Text(
+                                                            'Collect Payment',
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 11,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
+                                                      const SizedBox(height: 6),
+                                                      // ✅ Discontinue button
+                                                      GestureDetector(
+                                                        onTap: () =>
+                                                            _showDiscontinueDialog(
+                                                              context,
+                                                              fee,
+                                                            ),
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 12,
+                                                                vertical: 7,
+                                                              ),
+                                                          decoration: BoxDecoration(
+                                                            color: Colors
+                                                                .red
+                                                                .shade50,
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
+                                                                ),
+                                                            border: Border.all(
+                                                              color: Colors
+                                                                  .red
+                                                                  .shade300,
+                                                            ),
+                                                          ),
+                                                          child: Text(
+                                                            'Discontinue',
+                                                            style: TextStyle(
+                                                              color: Colors
+                                                                  .red
+                                                                  .shade600,
+                                                              fontSize: 11,
+                                                              fontWeight:
+                                                                  FontWeight.bold,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            ),
 
-                                          const SizedBox(height: 10),
+                                            const SizedBox(height: 10),
 
-                                          // Row 2: Total | Paid | Pending
-                                          Row(
-                                            children: [
-                                              _breakdownCell(
-                                                'Total',
-                                                '₹${fee.totalAmount ?? 0}',
-                                                Colors.black87,
-                                              ),
-                                              _breakdownCell(
-                                                'Paid',
-                                                '₹${fee.paidAmount ?? 0}',
-                                                Colors.green.shade600,
-                                              ),
-                                              _breakdownCell(
-                                                'Pending',
-                                                '₹$feePending',
-                                                feePending > 0
-                                                    ? Colors.red.shade500
-                                                    : Colors.grey.shade400,
-                                              ),
-                                              if ((fee.fineAmount ?? 0) > 0)
+                                            // Row 2: Total | Paid | Pending
+                                            Row(
+                                              children: [
                                                 _breakdownCell(
-                                                  'Fine',
-                                                  '₹${fee.fineAmount}',
-                                                  Colors.red.shade400,
+                                                  'Total',
+                                                  '₹${fee.totalAmount ?? 0}',
+                                                  Colors.black87,
                                                 ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                ),
-                            ],
+                                                _breakdownCell(
+                                                  'Paid',
+                                                  '₹${fee.paidAmount ?? 0}',
+                                                  Colors.green.shade600,
+                                                ),
+                                                _breakdownCell(
+                                                  'Pending',
+                                                  '₹$feePending',
+                                                  feePending > 0
+                                                      ? Colors.red.shade500
+                                                      : Colors.grey.shade400,
+                                                ),
+                                                if ((fee.fineAmount ?? 0) > 0)
+                                                  _breakdownCell(
+                                                    'Fine',
+                                                    '₹${fee.fineAmount}',
+                                                    Colors.red.shade400,
+                                                  ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
 
-                        const SizedBox(height: 20),
+                          const SizedBox(height: 20),
 
-                        // ── Payment History ──────────────────────────────
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                blurRadius: 12,
-                                offset: const Offset(0, 6),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                  16,
-                                  16,
-                                  16,
-                                  12,
+                          // ── Payment History ──────────────────────────────
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(18),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 6),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text(
-                                      "Payment History",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.shade50,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        "${history.length} records",
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(
+                                    16,
+                                    16,
+                                    16,
+                                    12,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text(
+                                        "Payment History",
                                         style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.green.shade700,
+                                          fontSize: 16,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              if (history.isEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 28,
-                                  ),
-                                  child: Center(
-                                    child: Column(
-                                      children: [
-                                        Icon(
-                                          Icons.history_rounded,
-                                          size: 42,
-                                          color: Colors.grey.shade300,
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
                                         ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          "No payment records",
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.shade50,
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          "${history.length} records",
                                           style: TextStyle(
-                                            fontSize: 13,
-                                            color: Colors.grey.shade500,
+                                            fontSize: 11,
+                                            color: Colors.green.shade700,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                )
-                              else
-                                ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.fromLTRB(
-                                    16,
-                                    0,
-                                    16,
-                                    16,
-                                  ),
-                                  itemCount: history.length,
-                                  separatorBuilder: (_, __) => Divider(
-                                    height: 1,
-                                    color: Colors.grey.shade100,
-                                  ),
-                                  itemBuilder: (context, index) {
-                                    final h = history[index];
-                                    final hMap = h is Map
-                                        ? Map<String, dynamic>.from(h)
-                                        : <String, dynamic>{};
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
                                       ),
-                                      child: Row(
+                                    ],
+                                  ),
+                                ),
+
+                                if (history.isEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 28,
+                                    ),
+                                    child: Center(
+                                      child: Column(
                                         children: [
-                                          Container(
-                                            width: 36,
-                                            height: 36,
-                                            decoration: BoxDecoration(
-                                              color: Colors.green.shade50,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Icon(
-                                              Icons.payments_rounded,
-                                              size: 17,
-                                              color: Colors.green.shade500,
-                                            ),
+                                          Icon(
+                                            Icons.history_rounded,
+                                            size: 42,
+                                            color: Colors.grey.shade300,
                                           ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  hMap['fee_head_name']
-                                                          ?.toString() ??
-                                                      hMap['feeHeadName']
-                                                          ?.toString() ??
-                                                      'Fee Payment',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 2),
-                                                Text(
-                                                  '${hMap['paid_on'] ?? hMap['date'] ?? 'N/A'}  ·  ${hMap['payment_mode'] ?? hMap['paymentMode'] ?? 'CASH'}',
-                                                  style: TextStyle(
-                                                    fontSize: 11,
-                                                    color: Colors.grey.shade500,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
+                                          const SizedBox(height: 10),
                                           Text(
-                                            '₹${hMap['amount'] ?? hMap['paid_amount'] ?? 0}',
+                                            "No payment records",
                                             style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.green.shade600,
+                                              fontSize: 13,
+                                              color: Colors.grey.shade500,
                                             ),
                                           ),
                                         ],
                                       ),
-                                    );
-                                  },
-                                ),
-                            ],
+                                    ),
+                                  )
+                                else
+                                  ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    padding: const EdgeInsets.fromLTRB(
+                                      16,
+                                      0,
+                                      16,
+                                      16,
+                                    ),
+                                    itemCount: history.length,
+                                    separatorBuilder: (_, __) => Divider(
+                                      height: 1,
+                                      color: Colors.grey.shade100,
+                                    ),
+                                    itemBuilder: (context, index) {
+                                      final h = history[index];
+                                      final hMap = h is Map
+                                          ? Map<String, dynamic>.from(h)
+                                          : <String, dynamic>{};
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 10,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 36,
+                                              height: 36,
+                                              decoration: BoxDecoration(
+                                                color: Colors.green.shade50,
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: Icon(
+                                                Icons.payments_rounded,
+                                                size: 17,
+                                                color: Colors.green.shade500,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    hMap['fee_head_name']
+                                                            ?.toString() ??
+                                                        hMap['feeHeadName']
+                                                            ?.toString() ??
+                                                        'Fee Payment',
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 2),
+                                                  Text(
+                                                    '${hMap['paid_on'] ?? hMap['date'] ?? 'N/A'}  ·  ${hMap['payment_mode'] ?? hMap['paymentMode'] ?? 'CASH'}',
+                                                    style: TextStyle(
+                                                      fontSize: 11,
+                                                      color: Colors.grey.shade500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Text(
+                                              '₹${hMap['amount'] ?? hMap['paid_amount'] ?? 0}',
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green.shade600,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                              ],
+                            ),
                           ),
-                        ),
 
-                        const SizedBox(height: 24),
-                      ],
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ),
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

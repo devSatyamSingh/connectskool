@@ -77,107 +77,110 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.bg,
-      body: Column(
-        children: [
-          /// 🔹 Header
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.bg,
+        body: Column(
+          children: [
+            /// 🔹 Header
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
+              decoration: BoxDecoration(
+                gradient: AppColor.primaryGradient,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColor.blueShadow,
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColor.blueShadow,
-                  blurRadius: 18,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColor.glassWhite,
-                      shape: BoxShape.circle,
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColor.glassWhite,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AppText.customText(
+                      "Home Work",
+                      size: 19,
+                      weight: FontWeight.bold,
                       color: Colors.white,
-                      size: 20,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppText.customText(
-                    "Home Work",
-                    size: 19,
-                    weight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
 
-          /// 🔹 Homework List
-          Expanded(
-            child: Consumer<StudentHomeworkViewModel>(
-              builder: (context, vm, child) {
-                if (vm.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+            /// 🔹 Homework List
+            Expanded(
+              child: Consumer<StudentHomeworkViewModel>(
+                builder: (context, vm, child) {
+                  if (vm.loading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (vm.homeworkList.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.assignment_outlined,
-                          size: 60,
-                          color: AppColor.sub.withOpacity(0.4),
-                        ),
-                        const SizedBox(height: 12),
-                        AppText.customText(
-                          "No Homework Found",
-                          size: 16,
-                          weight: FontWeight.w500,
-                          color: AppColor.sub,
-                        ),
-                      ],
+                  if (vm.homeworkList.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.assignment_outlined,
+                            size: 60,
+                            color: AppColor.sub.withOpacity(0.4),
+                          ),
+                          const SizedBox(height: 12),
+                          AppText.customText(
+                            "No Homework Found",
+                            size: 16,
+                            weight: FontWeight.w500,
+                            color: AppColor.sub,
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return RefreshIndicator(
+                    onRefresh: _refreshHomework,
+                    child: ListView.builder(
+                      physics:
+                      const AlwaysScrollableScrollPhysics(),
+                      padding:
+                      const EdgeInsets.symmetric(
+                        vertical: 10,
+                      ),
+                      itemCount: vm.homeworkList.length,
+                      itemBuilder: (context, index) {
+                        return _buildHomeworkCard(
+                          vm.homeworkList[index],
+                        );
+                      },
                     ),
                   );
-                }
-
-                return RefreshIndicator(
-                  onRefresh: _refreshHomework,
-                  child: ListView.builder(
-                    physics:
-                    const AlwaysScrollableScrollPhysics(),
-                    padding:
-                    const EdgeInsets.symmetric(
-                      vertical: 10,
-                    ),
-                    itemCount: vm.homeworkList.length,
-                    itemBuilder: (context, index) {
-                      return _buildHomeworkCard(
-                        vm.homeworkList[index],
-                      );
-                    },
-                  ),
-                );
-              },
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -454,6 +454,7 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
 
           // Academic Year
           DropdownButtonFormField<String>(
+            dropdownColor: Colors.white,
             value: selectedAcademicYear,
             decoration: _inputDecoration("Academic Year", Icons.calendar_month_rounded),
             items: academicVm.years
@@ -468,6 +469,7 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
+                  dropdownColor: Colors.white,
                   value: selectedClassId,
                   decoration: _inputDecoration("Class", Icons.school_rounded),
                   items: (classVm.allClassesModel?.data ?? [])
@@ -492,6 +494,7 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
               const SizedBox(width: 14),
               Expanded(
                 child: DropdownButtonFormField<String>(
+                  dropdownColor: Colors.white,
                   value: selectedSectionId,
                   decoration: _inputDecoration("Section", Icons.groups_rounded),
                   items: (sectionVm.allSectionsModel?.data ?? [])
@@ -522,6 +525,7 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
 
           // Student
           DropdownButtonFormField<int>(
+            dropdownColor: Colors.white,
             value: selectedStudentId,
             decoration: _inputDecoration("Student", Icons.person_rounded),
             disabledHint: const Text("Select Section First"),

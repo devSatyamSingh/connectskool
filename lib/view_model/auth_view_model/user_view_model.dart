@@ -1,28 +1,19 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// KEY NAMES — single source of truth, koi bhi magic string nahi
 class _Keys {
-  static const userId       = 'user_id';
-  static const accessToken  = 'access_token';
-  static const studentId    = 'student_id';
-  static const schoolId     = 'school_id';
-  static const role         = 'role';
-  static const classId      = 'class_id';
-  static const sectionId    = 'section_id';
-  static const permissions  = 'permissions';
-
-  /// Ye key KABHI clear() se nahi hati.
-  /// Android uninstall pe ye automatically delete ho jaati hai.
-  /// Next install pe missing hogi → fresh install detect → force login.
-  static const appInstalled = 'app_installed_flag';
-
-  /// Onboarding sirf pehli baar dikhta hai.
-  /// Uninstall pe ye bhi delete hogi → reinstall pe onboarding dobara dikhega.
-  static const onboardingDone = 'onboarding_done';
-
-  /// Jo FCM topics subscribe kiye unka snapshot.
-  /// Logout ya next login pe isi se exact unsubscribe hoga — cross-school bug fix.
+  static const userId              = 'user_id';
+  static const userIdInt           = 'user_id_int';
+  static const accessToken         = 'access_token';
+  static const studentId           = 'student_id';
+  static const schoolId            = 'school_id';
+  static const role                = 'role';
+  static const classId             = 'class_id';
+  static const sectionId           = 'section_id';
+  static const permissions         = 'permissions';
+  static const appInstalled        = 'app_installed_flag';
+  static const onboardingDone      = 'onboarding_done';
   static const subscribedSchoolId  = 'subscribed_school_id';
   static const subscribedRole      = 'subscribed_role';
   static const subscribedUserId    = 'subscribed_user_id';
@@ -32,9 +23,8 @@ class _Keys {
 
 class UserViewModel with ChangeNotifier {
 
-  // ─── Install / Onboarding Detection ──────────────────────────────────────
+  // ─── Install / Onboarding ─────────────────────────────────────────────────
 
-  /// false = fresh install (ya reinstall) → force login + onboarding
   Future<bool> isAppPreviouslyInstalled() async {
     final sp = await SharedPreferences.getInstance();
     return sp.getBool(_Keys.appInstalled) ?? false;
@@ -55,19 +45,32 @@ class UserViewModel with ChangeNotifier {
     await sp.setBool(_Keys.onboardingDone, true);
   }
 
-  // ─── User ID (String — consistent with saveUser dynamic) ─────────────────
+  // ─── User ID ──────────────────────────────────────────────────────────────
 
   Future<bool> saveUser(dynamic userId) async {
     final sp = await SharedPreferences.getInstance();
-    await sp.setString(_Keys.userId, userId.toString());
+    await sp.setString(_Keys.userId, userId.toString()); // string
     notifyListeners();
     return true;
   }
 
-  /// Returns String? — splash & login use int.tryParse() to convert if needed
   Future<String?> getUser() async {
     final sp = await SharedPreferences.getInstance();
     return sp.getString(_Keys.userId);
+  }
+
+  /// ALAG key pe int save — 'user_id' string key se koi conflict nahi
+  Future<void> saveUserIdAsInt(dynamic userId) async {
+    final sp = await SharedPreferences.getInstance();
+    final parsed = int.tryParse(userId.toString());
+    if (parsed != null) {
+      await sp.setInt(_Keys.userIdInt, parsed); // 'user_id_int' alag key
+    }
+  }
+
+  Future<int?> getUserIdAsInt() async {
+    final sp = await SharedPreferences.getInstance();
+    return sp.getInt(_Keys.userIdInt);
   }
 
   // ─── Token ────────────────────────────────────────────────────────────────
@@ -82,6 +85,33 @@ class UserViewModel with ChangeNotifier {
   Future<String?> getToken() async {
     final sp = await SharedPreferences.getInstance();
     return sp.getString(_Keys.accessToken);
+  }
+
+  // ─── JWT Token Decode → user_id ───────────────────────────────────────────
+  // Koi extra save nahi — token se real-time nikalta hai
+
+  Future<String?> getUserIdFromToken() async {
+    final sp = await SharedPreferences.getInstance();
+    final token = sp.getString(_Keys.accessToken);
+    if (token == null || token.isEmpty) return null;
+
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return null;
+
+      String payload = parts[1];
+      switch (payload.length % 4) {
+        case 2: payload += '=='; break;
+        case 3: payload += '=';  break;
+      }
+
+      final decoded = utf8.decode(base64Url.decode(payload));
+      final map = json.decode(decoded) as Map<String, dynamic>;
+      return map['user_id']?.toString();
+    } catch (e) {
+      debugPrint("❌ Token decode error: $e");
+      return null;
+    }
   }
 
   // ─── Student ID ───────────────────────────────────────────────────────────
@@ -164,8 +194,6 @@ class UserViewModel with ChangeNotifier {
   }
 
   // ─── Subscribed FCM Session ───────────────────────────────────────────────
-  // Login ke baad exactly jo topics subscribe kiye unka snapshot save karo.
-  // Logout ya next login pe isi snapshot se unsubscribe hoga — guaranteed match.
 
   Future<void> saveSubscribedSession({
     required dynamic schoolId,
@@ -206,22 +234,15 @@ class UserViewModel with ChangeNotifier {
     ]);
   }
 
-  // ─── Clear All (Logout) ───────────────────────────────────────────────────
-  // app_installed_flag aur onboarding_done intentionally preserved hain.
-  // Sirf uninstall hi inhe delete karega.
+
 
   Future<void> clearUser() async {
     final sp = await SharedPreferences.getInstance();
-
-    // Preserve install & onboarding flags
-    final installFlag     = sp.getBool(_Keys.appInstalled);
-    final onboardingFlag  = sp.getBool(_Keys.onboardingDone);
-
+    final installFlag = sp.getBool(_Keys.appInstalled);
     await sp.clear();
-
-    if (installFlag    != null) await sp.setBool(_Keys.appInstalled,   installFlag);
-    if (onboardingFlag != null) await sp.setBool(_Keys.onboardingDone, onboardingFlag);
-
+    if (installFlag != null) {
+      await sp.setBool(_Keys.appInstalled, installFlag);
+    }
     notifyListeners();
   }
 }

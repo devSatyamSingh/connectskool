@@ -8,6 +8,7 @@ import 'package:school_pro/view_model/school_view_model/transport_fee/delete_rou
 import 'package:school_pro/view_model/school_view_model/transport_fee/get_route_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/update_route_view_model.dart';
 
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../utils/permission_extensions.dart';
@@ -64,7 +65,6 @@ class _RouteScreenState extends State<RouteScreen> {
     );
   }
 
-  // ── Delete with confirmation dialog ──────────────────────────────────────
   void _confirmDelete(Data r) {
     showDialog(
       context: context,
@@ -205,29 +205,31 @@ class _RouteScreenState extends State<RouteScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
+      floatingActionButton: Container(
+        width: 150,
+        margin: const EdgeInsets.only(bottom: 10),
+        child: AppButton(
+          title: "Add Route",
+          icon: Icons.add_rounded,
+          height: 50,
+          radius: 10,
+          onTap: () {
 
-          if (!PermissionExtensions.canAccess(
-              PermissionKeys.manageTransport)) {
+            if (!PermissionExtensions.canAccess(
+                PermissionKeys.manageTransport)) {
 
-            Utils.show(
-              "You don't have permission to perform this action.",
-              context,
-            );
+              Utils.show(
+                "You don't have permission to perform this action.",
+                context,
+              );
 
-            return;
-          }
+              return;
+            }
 
-          _openSheet();
-        },
-        backgroundColor: const Color(0xFF3F72FF),
-        elevation: 6,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: AppText.customText('Add Route',
-            color: Colors.white, weight: FontWeight.bold, size: 14),
-      ),
-    );
+            _openSheet();
+          },
+        ),
+      ),    );
   }
 
   Widget _buildHeader() {
@@ -743,45 +745,18 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      flex: 2,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                              colors: [Color(0xFF3F72FF), Color(0xFF1A3FCC)]),
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                                color:
-                                const Color(0xFF3F72FF).withOpacity(0.35),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4))
-                          ],
-                        ),
-                        child: ElevatedButton(
-                          onPressed: loading ? null : _save,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shadowColor: Colors.transparent,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14)),
-                          ),
-                          child: loading
-                              ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2.2, color: Colors.white),
-                          )
-                              : AppText.customText(
-                              _isEdit ? 'Update Route' : 'Add Route',
-                              size: 14,
-                              weight: FontWeight.w800,
-                              color: Colors.white),
-                        ),
+                      flex: 1,
+                      child: AppButton(
+                        title: _isEdit ? "Update Route" : "Add Route",
+                        icon: _isEdit
+                            ? Icons.edit_rounded
+                            : Icons.add_rounded,
+                        loading: loading,
+                        height: 50,
+                        radius: 14,
+                        onTap: _save,
                       ),
-                    ),
-                  ],
+                    ),                  ],
                 ),
                 SizedBox(height: screenHeight * 0.05),
               ],

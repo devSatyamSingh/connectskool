@@ -389,35 +389,38 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
   // ── UI ─────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _surface,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        title: const Text('Exam Timetable',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildFilterCard(),
-            const SizedBox(height: 16),
-            Consumer<SchoolExamTimeTableViewModel>(
-              builder: (_, vm, __) {
-                if (vm.loading) return const _LoadingCard();
-                final data = vm.examTimeTableModel?.data;
-                if (data == null) return const SizedBox();
-                if (data.isEmpty) return const _EmptyCard();
-                return Column(children: [
-                  _buildStatsRow(data),
-                  const SizedBox(height: 16),
-                  _buildTableCard(data),
-                ]);
-              },
-            ),
-          ],
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: _surface,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black,
+          title: const Text('Exam Timetable',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              _buildFilterCard(),
+              const SizedBox(height: 16),
+              Consumer<SchoolExamTimeTableViewModel>(
+                builder: (_, vm, __) {
+                  if (vm.loading) return const _LoadingCard();
+                  final data = vm.examTimeTableModel?.data;
+                  if (data == null) return const SizedBox();
+                  if (data.isEmpty) return const _EmptyCard();
+                  return Column(children: [
+                    _buildStatsRow(data),
+                    const SizedBox(height: 16),
+                    _buildTableCard(data),
+                  ]);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

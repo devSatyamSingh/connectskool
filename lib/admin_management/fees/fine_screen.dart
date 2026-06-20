@@ -191,17 +191,12 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                 ),
                               ),
 
-                              dropdownMenuEntries: const [
+                              dropdownMenuEntries: [
                                 DropdownMenuEntry(
                                   value: "per_day",
                                   label: "Per Day Fine",
                                 ),
-                                // DropdownMenuEntry(
-                                //   value: "fixed",
-                                //   label: "Fixed Fine",
-                                // ),
                               ],
-
                               onSelected: (value) {
                                 if (value != null) {
                                   selectedType.value = value;
@@ -591,191 +586,194 @@ class _FineManagementScreenState extends State<FineManagementScreen>
       (sum, rule) => sum + (double.tryParse(rule.fineAmount.toString()) ?? 0),
     );
 
-    return Scaffold(
-      backgroundColor: AppColor.pageBgColor,
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColor.lightBlueColor,
-        onPressed: () {
-          if (!PermissionExtensions.canAccess(PermissionKeys.manageFees)) {
-            Utils.show(
-              "You don't have permission to perform this action.",
-              context,
-            );
-            return;
-          }
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.pageBgColor,
+        floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: AppColor.lightBlueColor,
+          onPressed: () {
+            if (!PermissionExtensions.canAccess(PermissionKeys.manageFees)) {
+              Utils.show(
+                "You don't have permission to perform this action.",
+                context,
+              );
+              return;
+            }
 
-          _openAddEditFineSheet();
-        },
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: Text(
-          "Add Rule",
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
-        ),
-      ),
-      body: Column(
-        children: [
-          // ── Header ────────────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColor.blueShadow,
-                  blurRadius: 18,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColor.glassWhite,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppText.customText(
-                    "Fine Rules",
-                    size: 19,
-                    weight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColor.glassWhite,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: AppText.customText(
-                    totalRules.toString(),
-                    size: 15,
-                    weight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
+            _openAddEditFineSheet();
+          },
+          icon: const Icon(Icons.add_rounded, color: Colors.white),
+          label: Text(
+            "Add Rule",
+            style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
           ),
-
-          // ── Total Amount Card ─────────────────────────────────────────
-          if (totalRules > 0)
+        ),
+        body: Column(
+          children: [
+            // ── Header ────────────────────────────────────────────────────
             Container(
-              margin: const EdgeInsets.fromLTRB(18, 12, 18, 8),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
               decoration: BoxDecoration(
-                color: AppColor.cardWhite,
-                borderRadius: BorderRadius.circular(16),
+                gradient: AppColor.primaryGradient,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColor.cardShadow,
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: AppColor.blueShadow,
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
               child: Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      gradient: AppColor.primaryGradient,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.account_balance_wallet,
-                      color: Colors.white,
-                      size: 24,
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColor.glassWhite,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText.customText(
-                        "Total Fine Amount",
-                        size: 12,
-                        color: AppColor.softGreyText,
-                      ),
-                      const SizedBox(height: 4),
-                      AppText.customText(
-                        "₹${totalAmount.toStringAsFixed(2)}",
-                        size: 20,
-                        weight: FontWeight.w500,
-                        color: AppColor.lightBlueColor,
-                      ),
-                    ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AppText.customText(
+                      "Fine Rules",
+                      size: 19,
+                      weight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColor.glassWhite,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: AppText.customText(
+                      totalRules.toString(),
+                      size: 15,
+                      weight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
             ),
 
-          // ── List ──────────────────────────────────────────────────────
-          Expanded(
-            child: loading
-                ? _fineShimmer()
-                : fineRules.isEmpty
-                ? _emptyView()
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(18, 12, 18, 90),
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: fineRules.length,
-                    itemBuilder: (context, index) {
-                      final f = fineRules[index];
-                      final isSpecific =
-                          f.applicableTo == "specific_fee" ||
-                          f.applicableTo == "specific_fee_head" ||
-                          (f.feeHeadId != null &&
-                              f.feeHeadId.toString().isNotEmpty &&
-                              f.feeHeadId.toString() != "null" &&
-                              f.feeHeadId.toString() != "0");
-                      final applicableText = isSpecific
-                          ? (f.feeHeadName != null &&
-                                    f.feeHeadName.toString().isNotEmpty
-                                ? f.feeHeadName.toString()
-                                : "Fee Head #${f.feeHeadId ?? '-'}")
-                          : "All Fees";
+            // ── Total Amount Card ─────────────────────────────────────────
+            if (totalRules > 0)
+              Container(
+                margin: const EdgeInsets.fromLTRB(18, 12, 18, 8),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColor.cardWhite,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColor.cardShadow,
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: AppColor.primaryGradient,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.account_balance_wallet,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText.customText(
+                          "Total Fine Amount",
+                          size: 12,
+                          color: AppColor.softGreyText,
+                        ),
+                        const SizedBox(height: 4),
+                        AppText.customText(
+                          "₹${totalAmount.toStringAsFixed(2)}",
+                          size: 20,
+                          weight: FontWeight.w500,
+                          color: AppColor.lightBlueColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
 
-                      // ✅ Debug — API se kya aa raha hai dekho
-                      debugPrint(
-                        "Rule: ${f.ruleName} | applicableTo: ${f.applicableTo} | feeHeadId: ${f.feeHeadId} | feeHeadName: ${f.feeHeadName}",
-                      );
+            // ── List ──────────────────────────────────────────────────────
+            Expanded(
+              child: loading
+                  ? _fineShimmer()
+                  : fineRules.isEmpty
+                  ? _emptyView()
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(18, 12, 18, 90),
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: fineRules.length,
+                      itemBuilder: (context, index) {
+                        final f = fineRules[index];
+                        final isSpecific =
+                            f.applicableTo == "specific_fee" ||
+                            f.applicableTo == "specific_fee_head" ||
+                            (f.feeHeadId != null &&
+                                f.feeHeadId.toString().isNotEmpty &&
+                                f.feeHeadId.toString() != "null" &&
+                                f.feeHeadId.toString() != "0");
+                        final applicableText = isSpecific
+                            ? (f.feeHeadName != null &&
+                                      f.feeHeadName.toString().isNotEmpty
+                                  ? f.feeHeadName.toString()
+                                  : "Fee Head #${f.feeHeadId ?? '-'}")
+                            : "All Fees";
 
-                      return _animatedFineCard(
-                        index,
-                        fineRuleId: f.fineRuleId,
-                        ruleName: f.ruleName ?? "-",
-                        fineType: f.fineType ?? "per_day",
-                        amount: f.fineAmount?.toString() ?? "0",
-                        grace: f.gracePeriodDays?.toString() ?? "0",
-                        applicable: applicableText,
-                        isSpecific: isSpecific,
-                        feeHeadId: f.feeHeadId?.toString(),
-                        maxFineCap: f.maxFineCap?.toString(),
-                        applicableTo: f.applicableTo?.toString(),
-                      );
-                    },
-                  ),
-          ),
-        ],
+                        // ✅ Debug — API se kya aa raha hai dekho
+                        debugPrint(
+                          "Rule: ${f.ruleName} | applicableTo: ${f.applicableTo} | feeHeadId: ${f.feeHeadId} | feeHeadName: ${f.feeHeadName}",
+                        );
+
+                        return _animatedFineCard(
+                          index,
+                          fineRuleId: f.fineRuleId,
+                          ruleName: f.ruleName ?? "-",
+                          fineType: f.fineType ?? "per_day",
+                          amount: f.fineAmount?.toString() ?? "0",
+                          grace: f.gracePeriodDays?.toString() ?? "0",
+                          applicable: applicableText,
+                          isSpecific: isSpecific,
+                          feeHeadId: f.feeHeadId?.toString(),
+                          maxFineCap: f.maxFineCap?.toString(),
+                          applicableTo: f.applicableTo?.toString(),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/student_management/student_fees_screen.dart';
 import 'package:school_pro/student_management/timetable_screen.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
+import '../admin_management/settings/cms_screen.dart';
 import '../admin_management/timetable/school_timetable_screen.dart';
 import '../repo/auth_repo/auth_repo.dart';
 import '../res/app_color.dart';
@@ -285,14 +286,17 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         SystemNavigator.pop();
         return false;
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF0F4FF),
-        drawer: _buildDrawer(context, studentName, studentEmail, studentClass),
-        body: Column(
-          children: [
-            _buildHeader(context, studentName, studentClass),
-            Expanded(child: _buildGrid()),
-          ],
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF0F4FF),
+          drawer: _buildDrawer(context, studentName, studentEmail, studentClass),
+          body: Column(
+            children: [
+              _buildHeader(context, studentName, studentClass),
+              Expanded(child: _buildGrid()),
+            ],
+          ),
         ),
       ),
     );
@@ -376,43 +380,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                   ],
                 ),
               ),
-              // Notification bell — ab real pending count
-              // Stack(
-              //   children: [
-              //     Container(
-              //       width: 44, height: 44,
-              //       decoration: BoxDecoration(
-              //         color: Colors.white.withValues(alpha: 0.13),
-              //         shape: BoxShape.circle,
-              //       ),
-              //       child: const Icon(Icons.notifications_outlined,
-              //           color: Colors.white, size: 22),
-              //     ),
-              //     Positioned(
-              //       top: 6, right: 6,
-              //       child: Container(
-              //         padding: const EdgeInsets.all(2),
-              //         constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-              //         decoration: BoxDecoration(
-              //           color: const Color(0xFFFFD54F),
-              //           shape: BoxShape.circle,
-              //           border: Border.all(
-              //               color: const Color(0xFF1565C0), width: 1.5),
-              //         ),
-              //         child: pendingCount > 0
-              //             ? Text(
-              //           pendingCount > 9 ? '9+' : '$pendingCount',
-              //           style: const TextStyle(
-              //               fontSize: 8,
-              //               fontWeight: FontWeight.bold,
-              //               color: Colors.black87),
-              //           textAlign: TextAlign.center,
-              //         )
-              //             : const SizedBox(width: 5, height: 5),
-              //       ),
-              //     ),
-              //   ],
-              // ),
             ],
           ),
           const SizedBox(height: 20),
@@ -680,24 +647,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                   ),
                 ),
                 const SizedBox(height: 12),
-                // Container(
-                //   padding: const EdgeInsets.symmetric(
-                //       horizontal: 12, vertical: 5),
-                //   decoration: BoxDecoration(
-                //     color: Colors.white.withOpacity(0.18),
-                //     borderRadius: BorderRadius.circular(20),
-                //     border: Border.all(
-                //         color: Colors.white.withOpacity(0.3)),
-                //   ),
-                //   child: Text(
-                //     '🎓  $studentClass',
-                //     style: const TextStyle(
-                //       fontSize: 11,
-                //       color: Colors.white,
-                //       fontWeight: FontWeight.w500,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -706,19 +655,64 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
               padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
                 _drawerItem(
-                  icon: Icons.settings_outlined,
-                  title: 'Settings',
-                  onTap: () => Navigator.pop(context),
+                  icon: Icons.shield_outlined,
+                  title: 'Privacy Policy',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "privacy_policy",
+                          title: "Privacy Policy",
+                        ),
+                      ),
+                    );
+                  },
                 ),
+
+                _drawerItem(
+                  icon: Icons.description_outlined,
+                  title: 'Terms & Conditions',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "terms_conditions",
+                          title: "Terms & Conditions",
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                _drawerItem(
+                  icon: Icons.info_outline_rounded,
+                  title: 'About Us',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CmsScreen(
+                          pageType: "about_us",
+                          title: "About Us",
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
                 _drawerItem(
                   icon: Icons.help_outline_rounded,
                   title: 'Help & Support',
-                  onTap: () => Navigator.pop(context),
-                ),
-                _drawerItem(
-                  icon: Icons.shield_outlined,
-                  title: 'Privacy Policy',
-                  onTap: () => Navigator.pop(context),
+                  onTap: () {
+                    Navigator.pop(context);
+
+                    Navigator.pushNamed(
+                      context,
+                      RoutesName.helpSupportScreen,
+                    );
+                  },
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -731,7 +725,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                   titleColor: Colors.red.shade700,
                   iconBg: Colors.red.shade50,
                   onTap: () {
-                    // Navigator.pop(context);
                     _showLogoutDialog(context);
                   },
                 ),
@@ -786,86 +779,175 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.logout_rounded, color: Colors.red),
-            SizedBox(width: 10),
-            Text(
-              'Logout',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        content: const Text(
-          'Are you sure you want to logout?',
-          style: TextStyle(fontSize: 14, color: Colors.black54),
-        ),
-        actions: [
-          /// CANCEL
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool isLoggingOut = false;
 
-          /// LOGOUT
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
               ),
-            ),
+              title: const Row(
+                children: [
+                  Icon(Icons.logout_rounded, color: Colors.red),
+                  SizedBox(width: 10),
+                  Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              content: const Text(
+                'Are you sure you want to logout?',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              actions: [
+                // CANCEL — loading mein disable
+                TextButton(
+                  onPressed: isLoggingOut ? null : () => Navigator.pop(ctx),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
 
-            onPressed: () async {
-              // dialog close
-              Navigator.pop(ctx);
+                // LOGOUT
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    minimumSize: const Size(90, 40),
+                  ),
+                  onPressed: isLoggingOut
+                      ? null
+                      : () async {
+                    setDialogState(() => isLoggingOut = true);
 
-              try {
-                final repo = AuthRepository();
-                final userVM = UserViewModel();
+                    final userVM = UserViewModel();
 
-                // API logout
-                await repo.logoutApi({"device_type": "android"});
+                    try {
+                      // STEP 1: Subscribed session pehle padho
+                      final session =
+                      await userVM.getSubscribedSession();
+                      final schoolId = session['schoolId'];
+                      final role = session['role'];
+                      final userId = session['userId'];
+                      final classId = session['classId'];
+                      final sectionId = session['sectionId'];
 
-                // delete firebase token
-                await FirebaseMessaging.instance.deleteToken();
+                      debugPrint(
+                        "🔍 Student Logout => school=$schoolId | role=$role",
+                      );
 
-                // clear all local data
-                await userVM.clearUser();
+                      // STEP 2: FCM Topics unsubscribe
+                      if (schoolId != null &&
+                          schoolId.isNotEmpty &&
+                          role != null &&
+                          role.isNotEmpty) {
+                        final topics = <String>[
+                          "school_$schoolId",
+                          "school_${schoolId}_role_$role",
+                        ];
 
-                PermissionManager.clear();
+                        if (userId != null && userId.isNotEmpty) {
+                          topics.add("user_$userId");
+                        }
 
-                print("✅ USER LOGOUT SUCCESS");
+                        // Student ke extra topics
+                        if (role == "student") {
+                          if (classId != null && classId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_$classId",
+                            );
+                          }
+                          if (classId != null &&
+                              classId.isNotEmpty &&
+                              sectionId != null &&
+                              sectionId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_${classId}_section_$sectionId",
+                            );
+                          }
+                        }
 
-                // go to login screen
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RoutesName.loginScreen,
-                  (route) => false,
-                );
-              } catch (e) {
-                print("Logout Error => $e");
+                        final messaging = FirebaseMessaging.instance;
+                        await Future.wait(
+                          topics.map(
+                                (t) => messaging.unsubscribeFromTopic(t),
+                          ),
+                          eagerError: false,
+                        );
+                        debugPrint("✅ Student unsubscribed: $topics");
+                      }
 
-                // error aaye tab bhi clear karo
-                await UserViewModel().clearUser();
-                PermissionManager.clear();
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RoutesName.loginScreen,
-                  (route) => false,
-                );
-              }
-            },
+                      // STEP 3: FCM Token delete
+                      await FirebaseMessaging.instance.deleteToken();
+                      debugPrint("✅ FCM Token deleted");
 
-            child: const Text("Logout", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+                      // STEP 4: Backend logout (best-effort)
+                      try {
+                        final repo = AuthRepository();
+                        await repo.logoutApi({
+                          "device_type": "android",
+                        });
+                        debugPrint("✅ Backend logout done");
+                      } catch (e) {
+                        debugPrint("⚠️ Backend logout error: $e");
+                      }
+
+                      // STEP 5: Subscribed session clear
+                      await userVM.clearSubscribedSession();
+
+                      // STEP 6: Sab local data clear
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+
+                      debugPrint("✅ Student logout complete");
+                    } catch (e) {
+                      debugPrint("❌ Student logout error: $e");
+                      // Error pe bhi clear karo
+                      await userVM.clearSubscribedSession();
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+                    }
+
+                    // Dialog close
+                    if (ctx.mounted) Navigator.pop(ctx);
+
+                    // Splash pe jao — pura stack clear
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RoutesName.splash,
+                            (route) => false,
+                      );
+                    }
+                  },
+                  child: isLoggingOut
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                      : const Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
-  }
-}
+  }}
 
 
 class _DashTile {

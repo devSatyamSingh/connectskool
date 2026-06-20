@@ -200,38 +200,7 @@ class _TeacherManagementDashBoardScreenState
         false;
   }
 
-  // void _onTileTap(BuildContext ctx, int index) {
-  //   switch (index) {
-  //     case 0:
-  //       Navigator.pushNamed(ctx, RoutesName.teacherProfileScreen);
-  //       break;
-  //
-  //     case 1:
-  //       Navigator.push(
-  //         ctx,
-  //         MaterialPageRoute(builder: (_) => AllStudentAdminAttendanceScreen()),
-  //       );
-  //       break;
-  //     case 2:
-  //       Navigator.pushNamed(ctx, RoutesName.marksheetScreen);
-  //       break;
-  //     case 3:
-  //       Navigator.push(
-  //         ctx,
-  //         MaterialPageRoute(builder: (_) => TeacherSchoolTimetableScreen()),
-  //       );
-  //       break;
-  //     case 4:
-  //       Navigator.pushNamed(ctx, RoutesName.examScreen);
-  //       break;
-  //     case 5:
-  //       Navigator.pushNamed(ctx, RoutesName.allHomeWorkScreen);
-  //       break;
-  //     case 6:
-  //       Navigator.pushNamed(ctx, RoutesName.notificationScreen);
-  //       break;
-  //   }
-  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -258,22 +227,25 @@ class _TeacherManagementDashBoardScreenState
         '...';
     return WillPopScope(
       onWillPop: () async => await _showExitPopup(),
-      child: Scaffold(
-        backgroundColor: const Color(0xFFF4F6FB),
-        drawer: _buildDrawer(context, teacherName, teacherEmail),
-        body: Column(
-          children: [
-            _buildHeader(
-              context,
-              teacherName,
-              studentTotal,
-              accountantTotal,
-              teacherTotal,
-            ),
-            SizedBox(height: 7,),
-            Expanded(child: _buildGrid(context)),
-            // _buildBottomNav(),
-          ],
+      child: SafeArea(
+        top: false,
+        child: Scaffold(
+          backgroundColor: const Color(0xFFF4F6FB),
+          drawer: _buildDrawer(context, teacherName, teacherEmail),
+          body: Column(
+            children: [
+              _buildHeader(
+                context,
+                teacherName,
+                studentTotal,
+                accountantTotal,
+                teacherTotal,
+              ),
+              SizedBox(height: 7,),
+              Expanded(child: _buildGrid(context)),
+              // _buildBottomNav(),
+            ],
+          ),
         ),
       ),
     );
@@ -509,178 +481,6 @@ class _TeacherManagementDashBoardScreenState
     );
   }
 
-  // Widget _normalCard(BuildContext ctx, _DashTile tile, int index) {
-  //   return GestureDetector(
-  //     onTap: () => _onTileTap(ctx, index),
-  //     child: Container(
-  //       decoration: BoxDecoration(
-  //         gradient: LinearGradient(
-  //           colors: [tile.color, tile.color.withOpacity(0.82)],
-  //           begin: Alignment.topLeft,
-  //           end: Alignment.bottomRight,
-  //         ),
-  //         borderRadius: BorderRadius.circular(22),
-  //         boxShadow: [
-  //           BoxShadow(
-  //             color: tile.color.withOpacity(0.38),
-  //             blurRadius: 16,
-  //             offset: const Offset(0, 8),
-  //           ),
-  //         ],
-  //       ),
-  //       child: Stack(
-  //         children: [
-  //           // Decorative circles
-  //           Positioned(
-  //             top: -16,
-  //             right: -16,
-  //             child: Container(
-  //               width: 72,
-  //               height: 72,
-  //               decoration: BoxDecoration(
-  //                 color: Colors.white.withOpacity(0.12),
-  //                 shape: BoxShape.circle,
-  //               ),
-  //             ),
-  //           ),
-  //           Positioned(
-  //             bottom: -12,
-  //             right: 12,
-  //             child: Container(
-  //               width: 44,
-  //               height: 44,
-  //               decoration: BoxDecoration(
-  //                 color: Colors.white.withOpacity(0.08),
-  //                 shape: BoxShape.circle,
-  //               ),
-  //             ),
-  //           ),
-  //           Padding(
-  //             padding: const EdgeInsets.all(18),
-  //             child: Column(
-  //               crossAxisAlignment: CrossAxisAlignment.start,
-  //               mainAxisAlignment: MainAxisAlignment.center,
-  //               children: [
-  //                 Container(
-  //                   padding: const EdgeInsets.all(10),
-  //                   decoration: BoxDecoration(
-  //                     color: Colors.white.withOpacity(0.22),
-  //                     borderRadius: BorderRadius.circular(14),
-  //                   ),
-  //                   child: Icon(tile.icon, color: Colors.white, size: 26),
-  //                 ),
-  //                 const SizedBox(height: 14),
-  //                 Text(
-  //                   tile.label,
-  //                   style: const TextStyle(
-  //                     fontSize: 14,
-  //                     fontWeight: FontWeight.bold,
-  //                     color: Colors.white,
-  //                   ),
-  //                 ),
-  //                 const SizedBox(height: 3),
-  //                 Text(
-  //                   tile.sub,
-  //                   style: TextStyle(
-  //                     fontSize: 11,
-  //                     color: Colors.white.withOpacity(0.65),
-  //                   ),
-  //                 ),
-  //               ],
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-  //
-  // Widget _wideCard(BuildContext ctx, _DashTile tile, int index) {
-  //   // Spans 2 columns — wrap in a SizedBox with full width
-  //   return SizedBox(
-  //     // GridView will size this; span is handled below via itemBuilder check
-  //     child: GestureDetector(
-  //       onTap: () => _onTileTap(ctx, index),
-  //       child: Container(
-  //         decoration: BoxDecoration(
-  //           gradient: LinearGradient(
-  //             colors: [tile.color, tile.color.withOpacity(0.82)],
-  //             begin: Alignment.topLeft,
-  //             end: Alignment.bottomRight,
-  //           ),
-  //           borderRadius: BorderRadius.circular(22),
-  //           boxShadow: [
-  //             BoxShadow(
-  //               color: tile.color.withOpacity(0.35),
-  //               blurRadius: 14,
-  //               offset: const Offset(0, 6),
-  //             ),
-  //           ],
-  //         ),
-  //         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-  //         child: Row(
-  //           children: [
-  //             Container(
-  //               padding: const EdgeInsets.all(10),
-  //               decoration: BoxDecoration(
-  //                 color: Colors.white.withOpacity(0.22),
-  //                 borderRadius: BorderRadius.circular(14),
-  //               ),
-  //               child: Icon(tile.icon, color: Colors.white, size: 26),
-  //             ),
-  //             const SizedBox(width: 14),
-  //             Expanded(
-  //               child: Column(
-  //                 crossAxisAlignment: CrossAxisAlignment.start,
-  //                 mainAxisAlignment: MainAxisAlignment.center,
-  //                 children: [
-  //                   Text(
-  //                     tile.label,
-  //                     style: const TextStyle(
-  //                       fontSize: 15,
-  //                       fontWeight: FontWeight.bold,
-  //                       color: Colors.white,
-  //                     ),
-  //                   ),
-  //                   Text(
-  //                     tile.sub,
-  //                     style: TextStyle(
-  //                       fontSize: 11,
-  //                       color: Colors.white.withOpacity(0.65),
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //             if (tile.badge != null)
-  //               Container(
-  //                 padding: const EdgeInsets.symmetric(
-  //                   horizontal: 10,
-  //                   vertical: 4,
-  //                 ),
-  //                 decoration: BoxDecoration(
-  //                   color: Colors.white.withOpacity(0.2),
-  //                   borderRadius: BorderRadius.circular(20),
-  //                   border: Border.all(
-  //                     color: Colors.white.withOpacity(0.3),
-  //                     width: 1,
-  //                   ),
-  //                 ),
-  //                 child: Text(
-  //                   tile.badge!,
-  //                   style: const TextStyle(
-  //                     fontSize: 11,
-  //                     color: Colors.white,
-  //                     fontWeight: FontWeight.w600,
-  //                   ),
-  //                 ),
-  //               ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
 
 
   Widget _buildModuleTile(
@@ -963,244 +763,174 @@ class _TeacherManagementDashBoardScreenState
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.logout_rounded, color: Colors.red),
-            SizedBox(width: 10),
-            Text(
-              'Logout',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        content: const Text(
-          'Are you sure you want to logout?',
-          style: TextStyle(fontSize: 14, color: Colors.black54),
-        ),
-        actions: [
-          /// CANCEL
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-          ),
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool isLoggingOut = false;
 
-          /// LOGOUT
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(20),
               ),
-            ),
+              title: const Row(
+                children: [
+                  Icon(Icons.logout_rounded, color: Colors.red),
+                  SizedBox(width: 10),
+                  Text(
+                    'Logout',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              content: const Text(
+                'Are you sure you want to logout?',
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              actions: [
+                // CANCEL — loading mein disable
+                TextButton(
+                  onPressed: isLoggingOut ? null : () => Navigator.pop(ctx),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
 
-            onPressed: () async {
-              // dialog close
-              Navigator.pop(ctx);
+                // LOGOUT
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    minimumSize: const Size(90, 40),
+                  ),
+                  onPressed: isLoggingOut
+                      ? null
+                      : () async {
+                    setDialogState(() => isLoggingOut = true);
 
-              try {
-                final repo = AuthRepository();
-                final userVM = UserViewModel();
+                    final userVM = UserViewModel();
 
-                // API logout
-                await repo.logoutApi({"device_type": "android"});
+                    try {
+                      // STEP 1: Subscribed session pehle padho
+                      final session =
+                      await userVM.getSubscribedSession();
+                      final schoolId = session['schoolId'];
+                      final role = session['role'];
+                      final userId = session['userId'];
+                      final classId = session['classId'];
+                      final sectionId = session['sectionId'];
 
-                // delete firebase token
-                await FirebaseMessaging.instance.deleteToken();
+                      debugPrint(
+                        "🔍 Teacher Logout => school=$schoolId | role=$role",
+                      );
 
-                // clear all local data
-                await userVM.clearUser();
+                      // STEP 2: FCM Topics unsubscribe
+                      if (schoolId != null &&
+                          schoolId.isNotEmpty &&
+                          role != null &&
+                          role.isNotEmpty) {
+                        final topics = <String>[
+                          "school_$schoolId",
+                          "school_${schoolId}_role_$role",
+                        ];
 
-                PermissionManager.clear();
+                        if (userId != null && userId.isNotEmpty) {
+                          topics.add("user_$userId");
+                        }
 
-                print("✅ USER LOGOUT SUCCESS");
+                        // Teacher role ke liye student topics nahi hote
+                        // lekin future-proof ke liye student check rakha
+                        if (role == "student") {
+                          if (classId != null && classId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_$classId",
+                            );
+                          }
+                          if (classId != null &&
+                              classId.isNotEmpty &&
+                              sectionId != null &&
+                              sectionId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_${classId}_section_$sectionId",
+                            );
+                          }
+                        }
 
-                // go to login screen
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RoutesName.loginScreen,
-                  (route) => false,
-                );
-              } catch (e) {
-                print("Logout Error => $e");
+                        final messaging = FirebaseMessaging.instance;
+                        await Future.wait(
+                          topics.map(
+                                (t) => messaging.unsubscribeFromTopic(t),
+                          ),
+                          eagerError: false,
+                        );
+                        debugPrint("✅ Teacher unsubscribed: $topics");
+                      }
 
-                // error aaye tab bhi clear karo
-                await UserViewModel().clearUser();
+                      // STEP 3: FCM Token delete
+                      await FirebaseMessaging.instance.deleteToken();
+                      debugPrint("✅ FCM Token deleted");
 
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  RoutesName.loginScreen,
-                  (route) => false,
-                );
-              }
-            },
+                      // STEP 4: Backend logout (best-effort)
+                      try {
+                        final repo = AuthRepository();
+                        await repo.logoutApi({
+                          "device_type": "android",
+                        });
+                        debugPrint("✅ Backend logout done");
+                      } catch (e) {
+                        debugPrint("⚠️ Backend logout error: $e");
+                      }
 
-            child: const Text("Logout", style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
+                      // STEP 5: Subscribed session clear
+                      await userVM.clearSubscribedSession();
+
+                      // STEP 6: Sab local data clear
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+
+                      debugPrint("✅ Teacher logout complete");
+                    } catch (e) {
+                      debugPrint("❌ Teacher logout error: $e");
+                      await userVM.clearSubscribedSession();
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+                    }
+
+                    // Dialog close
+                    if (ctx.mounted) Navigator.pop(ctx);
+
+                    // Splash pe jao — pura stack clear
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RoutesName.splash,
+                            (route) => false,
+                      );
+                    }
+                  },
+                  child: isLoggingOut
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
+                      : const Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
-  // void _showLogoutDialog(BuildContext context) {
-
-  //   showDialog(
-  //     context: context,
-  //     builder: (ctx) => AlertDialog(
-  //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-  //       title: Row(
-  //         children: const [
-  //           Icon(Icons.logout_rounded, color: Colors.red),
-  //           SizedBox(width: 10),
-  //           Text(
-  //             'Logout',
-  //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-  //           ),
-  //         ],
-  //       ),
-  //       content: const Text(
-  //         'Are you sure you want to logout?',
-  //         style: TextStyle(fontSize: 14, color: Colors.black54),
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => Navigator.pop(ctx),
-  //           child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
-  //         ),
-  //         // ElevatedButton(
-  //         //   style: ElevatedButton.styleFrom(
-  //         //     backgroundColor: Colors.red,
-  //         //     shape: RoundedRectangleBorder(
-  //         //       borderRadius: BorderRadius.circular(10),
-  //         //     ),
-  //         //   ),
-  //         //   // onPressed: () async {
-  //         //   //   await UserViewModel().removeUser();
-  //         //   //   Navigator.pushNamedAndRemoveUntil(
-  //         //   //     context,
-  //         //   //     RoutesName.splash,
-  //         //   //     (route) => false,
-  //         //   //   );
-  //         //   // },
-  //         //   onPressed: () async {
-  //         //     final userVM = UserViewModel();
-  //         //     final role = await userVM.getRole();
-  //         //     final schoolId = await userVM.getSchoolId();
-  //         //     if (role != null && schoolId != null) {
-  //         //       await FirebaseMessaging.instance
-  //         //           .unsubscribeFromTopic("school_$schoolId");
-  //         //       await FirebaseMessaging.instance
-  //         //           .unsubscribeFromTopic("school_${schoolId}_role_$role");
-  //         //       print("✅ Unsubscribed: school_$schoolId");
-  //         //       print("✅ Unsubscribed: school_${schoolId}_role_$role");
-  //         //     }
-  //         //
-  //         //     await userVM.removeUser();
-  //         //     await userVM.removeToken();
-  //         //     await userVM.removeRole();
-  //         //     await userVM.removeStudentId();
-  //         //     await userVM.removeSchoolId();
-  //         //
-  //         //     Navigator.pushNamedAndRemoveUntil(
-  //         //       context,
-  //         //       RoutesName.splash,
-  //         //           (route) => false,
-  //         //     );
-  //         //   },
-  //         //   child: const Text('Logout', style: TextStyle(color: Colors.white)),
-  //         // ),
-  //         ElevatedButton(
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.red,
-  //             shape: RoundedRectangleBorder(
-  //               borderRadius: BorderRadius.circular(10),
-  //             ),
-  //           ),
-  //           onPressed: () async {
-  //             final userVM = UserViewModel();
-  //
-  //             final role = await userVM.getRole();
-  //             final schoolId = await userVM.getSchoolId();
-  //             final classId = await userVM.getClassId();
-  //             final sectionId = await userVM.getSectionId();
-  //
-  //             final messaging = FirebaseMessaging.instance;
-  //
-  //             // 🔥 1️⃣ Unsubscribe School Topic
-  //             if (schoolId != null) {
-  //               await messaging.unsubscribeFromTopic("school_$schoolId");
-  //               print("✅ Unsubscribed school_$schoolId");
-  //             }
-  //
-  //             // 🔥 2️⃣ Unsubscribe Role Topic
-  //             if (schoolId != null && role != null) {
-  //               await messaging.unsubscribeFromTopic(
-  //                 "school_${schoolId}_role_$role",
-  //               );
-  //               print("✅ Unsubscribed role topic");
-  //             }
-  //
-  //             // 🔥 3️⃣ Student Specific Topics
-  //             if (role == "student") {
-  //               if (schoolId != null && classId != null && classId.isNotEmpty) {
-  //                 await messaging.unsubscribeFromTopic(
-  //                   "school_${schoolId}_class_$classId",
-  //                 );
-  //               }
-  //
-  //               if (schoolId != null &&
-  //                   classId != null &&
-  //                   sectionId != null &&
-  //                   classId.isNotEmpty &&
-  //                   sectionId.isNotEmpty) {
-  //                 await messaging.unsubscribeFromTopic(
-  //                   "school_${schoolId}_class_${classId}_section_$sectionId",
-  //                 );
-  //               }
-  //             }
-  //
-  //             // 🔥 4️⃣ Delete FCM Token (VERY IMPORTANT)
-  //             await FirebaseMessaging.instance.deleteToken();
-  //             print("🔥 FCM Token Deleted");
-  //
-  //             // 🔥 5️⃣ Clear All Local Data
-  //             await userVM.clearUser();
-  //
-  //             // 🔥 6️⃣ Navigate to Splash
-  //             Navigator.pushNamedAndRemoveUntil(
-  //               context,
-  //               RoutesName.splash,
-  //               (route) => false,
-  //             );
-  //           },
-  //           child: const Text('Logout', style: TextStyle(color: Colors.white)),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
 
-// ─── DATA MODELS ────────────────────────────────────────────────────────────────
-//
-// class _DashTile {
-//   final String label;
-//   final String sub;
-//   final IconData icon;
-//   final Color color;
-//   final String? route;
-//   final bool isWide;
-//   final String? badge;
-//   final String permKey; // ✅ new
-//
-//   const _DashTile({
-//     required this.label,
-//     required this.sub,
-//     required this.icon,
-//     required this.color,
-//     required this.route,
-//     required this.permKey, // ✅ new
-//     this.isWide = false,
-//     this.badge,
-//   });
-// }

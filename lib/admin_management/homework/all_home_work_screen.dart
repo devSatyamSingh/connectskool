@@ -982,6 +982,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     }
 
     final students = homeworkData.students ?? [];
+    final attachment = homeworkData.attachment;
+    final attachmentPhotos = homeworkData.attachmentPhotos ?? [];
 
     final submitted = students.where((e) {
       return (e.status ?? "").toLowerCase() == "submitted";
@@ -1009,253 +1011,404 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
           minChildSize: .40,
           maxChildSize: .95,
           builder: (_, scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-              ),
-              child: ListView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(20),
-                children: [
-                  Center(
-                    child: Container(
-                      width: 50,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(100),
+            return SafeArea(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                ),
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(20),
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 50,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
                       ),
                     ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          gradient: _DS.gradientHeader,
-                          borderRadius: BorderRadius.circular(14),
+              
+                    const SizedBox(height: 20),
+              
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            gradient: _DS.gradientHeader,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.menu_book_rounded,
+                            color: Colors.white,
+                          ),
                         ),
-                        child: const Icon(
-                          Icons.menu_book_rounded,
-                          color: Colors.white,
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              hw.subjectName ?? "",
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
+              
+                        const SizedBox(width: 12),
+              
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                hw.subjectName ?? "",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
+              
+                              Text(
+                                "${hw.className} • ${hw.sectionName}",
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+              
+                    const SizedBox(height: 20),
+              
+                    IntrinsicHeight(
+                      child: Row(
+                        children: [
+                          _detailStatTile(
+                            "Total",
+                            "$total",
+                            Icons.people,
+                            Colors.indigo,
+                          ),
+              
+                          const SizedBox(width: 10),
+              
+                          _detailStatTile(
+                            "Submitted",
+                            "$submitted",
+                            Icons.check_circle,
+                            Colors.green,
+                          ),
+              
+                          const SizedBox(width: 10),
+              
+                          _detailStatTile(
+                            "Pending",
+                            "$pending",
+                            Icons.hourglass_empty,
+                            Colors.orange,
+                          ),
+              
+                          const SizedBox(width: 10),
+              
+                          _detailStatTile(
+                            "Late",
+                            "$late",
+                            Icons.schedule,
+                            Colors.red,
+                          ),
+                        ],
+                      ),
+                    ),
+              
+                    const SizedBox(height: 20),
+              
+                    if (attachment != null ||
+                        attachmentPhotos.isNotEmpty)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 20),
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: Colors.blue.shade100,
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+              
+                            const Row(
+                              children: [
+                                Icon(
+                                  Icons.assignment,
+                                  color: Colors.blue,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Homework Attachment",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ],
                             ),
-
-                            Text(
-                              "${hw.className} • ${hw.sectionName}",
-                              style: const TextStyle(color: Colors.grey),
+                            const SizedBox(height: 14),
+                            Row(
+                              children: [
+                                if (attachment != null)
+                                  Expanded(
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(14),
+                                      onTap: () async {
+                                        await launchUrl(
+                                          Uri.parse(attachment.url!),
+                                          mode: LaunchMode.externalApplication,
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xFFE53935),
+                                              Color(0xFFD32F2F),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(14),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.red.withOpacity(.25),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.picture_as_pdf_rounded,
+                                              color: Colors.white,
+                                              size: 18,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "View PDF",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+              
+                                if (attachment != null &&
+                                    attachmentPhotos.isNotEmpty)
+                                  const SizedBox(width: 12),
+              
+                                if (attachmentPhotos.isNotEmpty)
+                                  Expanded(
+                                    child: InkWell(
+                                      borderRadius: BorderRadius.circular(14),
+                                      onTap: () {
+                                        _showImagePreview(
+                                          attachmentPhotos.first.url!,
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [
+                                              Color(0xFF00C853),
+                                              Color(0xFF00A152),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(14),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.green.withOpacity(.25),
+                                              blurRadius: 12,
+                                              offset: const Offset(0, 4),
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Row(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.image_rounded,
+                                              color: Colors.white,
+                                              size: 15,
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "View Image",
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 13,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        _detailStatTile(
-                          "Total",
-                          "$total",
-                          Icons.people,
-                          Colors.indigo,
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        _detailStatTile(
-                          "Submitted",
-                          "$submitted",
-                          Icons.check_circle,
-                          Colors.green,
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        _detailStatTile(
-                          "Pending",
-                          "$pending",
-                          Icons.hourglass_empty,
-                          Colors.orange,
-                        ),
-
-                        const SizedBox(width: 10),
-
-                        _detailStatTile(
-                          "Late",
-                          "$late",
-                          Icons.schedule,
-                          Colors.red,
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 10,
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  Text(
-                    "Student Submissions (${students.length})",
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-
-                  const SizedBox(height: 15),
-
-                  ...students.map((student) {
-                    final status = student.status ?? "";
-
-                    final isSubmitted = status.toLowerCase() == "submitted";
-
-                    final statusColor = isSubmitted
-                        ? Colors.green
-                        : Colors.orange;
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: Colors.grey.shade200),
+              
+                    const SizedBox(height: 15),
+              
+              
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 10,
                       ),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: AppColor.primaryLight,
-                                child: Text(
-                                  student.studentName
-                                          ?.substring(0, 1)
-                                          .toUpperCase() ??
-                                      "?",
+                    ),
+              
+                    const SizedBox(height: 24),
+              
+                    Text(
+                      "Student Submissions (${students.length})",
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+              
+                    const SizedBox(height: 15),
+              
+                    ...students.map((student) {
+                      final status = student.status ?? "";
+              
+                      final isSubmitted = status.toLowerCase() == "submitted";
+              
+                      final statusColor = isSubmitted
+                          ? Colors.green
+                          : Colors.orange;
+              
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: Colors.grey.shade200),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: AppColor.primaryLight,
+                                  child: Text(
+                                    student.studentName
+                                            ?.substring(0, 1)
+                                            .toUpperCase() ??
+                                        "?",
+                                  ),
                                 ),
-                              ),
-
-                              const SizedBox(width: 12),
-
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      student.studentName ?? "",
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w700,
+              
+                                const SizedBox(width: 12),
+              
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        student.studentName ?? "",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+              
+                                      Text("Roll No : ${student.rollNo ?? "-"}"),
+                                    ],
+                                  ),
+                                ),
+              
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withOpacity(.12),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    status,
+                                    style: TextStyle(
+                                      color: statusColor,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+              
+                            if (isSubmitted) ...[
+                              const SizedBox(height: 12),
+              
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: SizedBox(
+                                  height: 36,
+                                  child: OutlinedButton(
+                                    onPressed: () {
+                                      _showStudentHomeworkSheet(
+                                        student.studentId!,
+                                      );
+                                    },
+              
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: _DS.primary,
+                                      side: BorderSide(
+                                        color: AppColor.primary.withOpacity(.35),
+                                        width: 1.2,
+                                      ),
+                                      backgroundColor: AppColor.primaryLight,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 0,
                                       ),
                                     ),
-
-                                    Text("Roll No : ${student.rollNo ?? "-"}"),
-                                  ],
-                                ),
-                              ),
-
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 5,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: statusColor.withOpacity(.12),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  status,
-                                  style: TextStyle(
-                                    color: statusColor,
-                                    fontWeight: FontWeight.w700,
+              
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.visibility_outlined, size: 14),
+              
+                                        SizedBox(width: 5),
+              
+                                        Text(
+                                          "View Homework",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ],
-                          ),
-
-                          if (isSubmitted) ...[
-                            const SizedBox(height: 12),
-
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: SizedBox(
-                                height: 36,
-                                child: OutlinedButton(
-                                  onPressed: () {
-                                    _showStudentHomeworkSheet(
-                                      student.studentId!,
-                                    );
-                                  },
-
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: _DS.primary,
-                                    side: BorderSide(
-                                      color: AppColor.primary.withOpacity(.35),
-                                      width: 1.2,
-                                    ),
-                                    backgroundColor: AppColor.primaryLight,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 0,
-                                    ),
-                                  ),
-
-                                  child: const Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.visibility_outlined, size: 14),
-
-                                      SizedBox(width: 5),
-
-                                      Text(
-                                        "View Homework",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
                           ],
-                        ],
-                      ),
-                    );
-                  }),
-                ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
               ),
             );
           },
@@ -1281,138 +1434,140 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (_) {
-        return Container(
-          height: MediaQuery.of(context).size.height * .85,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-          ),
-          child: Column(
-            children: [
-              const SizedBox(height: 12),
-
-              Container(
-                width: 60,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(100),
+        return SafeArea(
+          child: Container(
+            height: MediaQuery.of(context).size.height * .85,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: 12),
+          
+                Container(
+                  width: 60,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
                 ),
-              ),
-
-              const SizedBox(height: 20),
-
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      /// Header
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundColor: AppColor.primaryLight,
-                            child: Text(
-                              student.studentName!
-                                  .substring(0, 1)
-                                  .toUpperCase(),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(width: 12),
-
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  student.studentName ?? "",
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-
-                                Text("Roll: ${student.rollNo ?? "-"}"),
-                              ],
-                            ),
-                          ),
-
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(Icons.close),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(.12),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
+          
+                const SizedBox(height: 20),
+          
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// Header
+                        Row(
                           children: [
-                            Icon(
-                              Icons.check_circle,
-                              color: Colors.green,
-                              size: 16,
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              "Submitted",
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.w700,
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundColor: AppColor.primaryLight,
+                              child: Text(
+                                student.studentName!
+                                    .substring(0, 1)
+                                    .toUpperCase(),
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
+                            ),
+          
+                            const SizedBox(width: 12),
+          
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    student.studentName ?? "",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+          
+                                  Text("Roll: ${student.rollNo ?? "-"}"),
+                                ],
+                              ),
+                            ),
+          
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.close),
                             ),
                           ],
                         ),
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      /// PDF SECTION
-                      if (student.submittedFile != null)
-                        _pdfCard(student.submittedFile!.url ?? ""),
-
-                      const SizedBox(height: 24),
-
-                      /// IMAGES
-                      if (student.submittedPhotos != null &&
-                          student.submittedPhotos!.isNotEmpty)
-                        _imageSection(student),
-                    ],
+          
+                        const SizedBox(height: 20),
+          
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(.12),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                color: Colors.green,
+                                size: 16,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                "Submitted",
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+          
+                        const SizedBox(height: 24),
+          
+                        /// PDF SECTION
+                        if (student.submittedFile != null)
+                          _pdfCard(student.submittedFile!.url ?? ""),
+          
+                        const SizedBox(height: 24),
+          
+                        /// IMAGES
+                        if (student.submittedPhotos != null &&
+                            student.submittedPhotos!.isNotEmpty)
+                          _imageSection(student),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: AppButton(
-                    title: "Close",
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
+          
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: AppButton(
+                      title: "Close",
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -1661,79 +1816,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     );
   }
 
-  // ✅ Detail stat tile (Image 2 ke 4 boxes jaisa)
-
-  //    Widget _detailStatTile(String label, String value, IconData icon, Color color) {
-  //     return Expanded(child: Container(
-  //       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-  //       decoration: BoxDecoration(
-  //         border: Border.all(color: color.withOpacity(0.2)),
-  //         borderRadius: BorderRadius.circular(14),
-  //         color: color.withOpacity(0.05),
-  //       ),
-  //       child: Column(children: [
-  //         Icon(icon, color: color, size: 22),
-  //         const SizedBox(height: 8),
-  //         Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: color)),
-  //         const SizedBox(height: 4),
-  //         Text(label, textAlign: TextAlign.center,
-  //             style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: _DS.textMid)),
-  //       ]),
-  //     ));
-  // //   }
-  // Widget _statCard({
-  //   required IconData icon,
-  //   required String label,
-  //   required String value,
-  //   required Color color,
-  //   required int total,
-  // }) {
-  //   final count = int.tryParse(value) ?? 0;
-  //   final pct = total > 0 ? (count / total * 100).round() : 0;
-  //   return Expanded(
-  //     child: Container(
-  //       padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
-  //       decoration: BoxDecoration(
-  //         color: color.withOpacity(0.07),
-  //         borderRadius: BorderRadius.circular(14),
-  //         border: Border.all(color: color.withOpacity(0.2)),
-  //       ),
-  //       child: Column(
-  //         children: [
-  //           Icon(icon, color: color, size: 24),
-  //           const SizedBox(height: 8),
-  //           Text(
-  //             value,
-  //             style: TextStyle(
-  //               fontSize: 20,
-  //               fontWeight: FontWeight.w900,
-  //               color: color,
-  //             ),
-  //           ),
-  //           const SizedBox(height: 2),
-  //           Text(
-  //             label,
-  //             style: const TextStyle(
-  //               fontSize: 10,
-  //               fontWeight: FontWeight.w600,
-  //               color: _DS.textMid,
-  //             ),
-  //           ),
-  //           const SizedBox(height: 4),
-  //           Text(
-  //             "$pct%",
-  //             style: TextStyle(
-  //               fontSize: 10,
-  //               fontWeight: FontWeight.w700,
-  //               color: color.withOpacity(0.7),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
   String? getClassNameById(String? id) {
     final classes =
         Provider.of<AllClassesViewModel>(
@@ -1794,29 +1876,32 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
 
       return matchClass && matchSubject && matchStatus;
     }).toList();
-    return Scaffold(
-      backgroundColor: _DS.bg,
-      floatingActionButton: _buildFAB(),
-      body: Column(
-        children: [
-          _buildHeader(filteredList.length),
-          _buildFilterRow(),
-          Expanded(
-            child: isLoading
-                ? _shimmer()
-                : filteredList.isEmpty
-                ? _emptyView()
-                : RefreshIndicator(
-                    color: _DS.primary,
-                    onRefresh: () async => homeworkVM.allHomeworkApi(context),
-                    child: ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                      itemCount: filteredList.length,
-                      itemBuilder: (_, i) => _animatedCard(i, filteredList[i]),
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: _DS.bg,
+        floatingActionButton: _buildFAB(),
+        body: Column(
+          children: [
+            _buildHeader(filteredList.length),
+            _buildFilterRow(),
+            Expanded(
+              child: isLoading
+                  ? _shimmer()
+                  : filteredList.isEmpty
+                  ? _emptyView()
+                  : RefreshIndicator(
+                      color: _DS.primary,
+                      onRefresh: () async => homeworkVM.allHomeworkApi(context),
+                      child: ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 35),
+                        itemCount: filteredList.length,
+                        itemBuilder: (_, i) => _animatedCard(i, filteredList[i]),
+                      ),
                     ),
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2406,25 +2491,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
       ),
     );
   }
-
-  // Widget _statusChip(String label, Color color) {
-  //   return Container(
-  //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-  //     decoration: BoxDecoration(
-  //       color: color.withOpacity(0.1),
-  //       borderRadius: BorderRadius.circular(20),
-  //       border: Border.all(color: color.withOpacity(0.2)),
-  //     ),
-  //     child: Text(
-  //       label,
-  //       style: TextStyle(
-  //         fontSize: 11,
-  //         color: color,
-  //         fontWeight: FontWeight.w600,
-  //       ),
-  //     ),
-  //   );
-  // }
+  
 
   Widget _emptyView() {
     return Center(
@@ -2561,29 +2628,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
       ),
     );
   }
-
-  // SnackBar _snackBar(String msg, {bool isError = false}) {
-  //   return SnackBar(
-  //     content: Row(
-  //       children: [
-  //         Icon(
-  //           isError ? Icons.error_outline : Icons.check_circle_outline,
-  //           color: Colors.white,
-  //           size: 18,
-  //         ),
-  //         const SizedBox(width: 10),
-  //         Text(
-  //           msg,
-  //           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-  //         ),
-  //       ],
-  //     ),
-  //     backgroundColor: isError ? _DS.red : _DS.green,
-  //     behavior: SnackBarBehavior.floating,
-  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  //     margin: const EdgeInsets.all(16),
-  //   );
-  // }
+  
 }
 
 class _FormLabel extends StatelessWidget {

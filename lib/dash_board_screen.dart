@@ -159,11 +159,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                                 children: [
                                   AppText.customText(
                                     "Welcome Back",
-                                    size: 13,
-                                    color: Colors.white.withOpacity(0.85),
-                                  ),
-                                  AppText.customText(
-                                    "Admin User",
                                     size: 18,
                                     weight: FontWeight.bold,
                                     color: Colors.white,

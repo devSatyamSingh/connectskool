@@ -17,6 +17,7 @@ import 'package:school_pro/utils/utils.dart';
 
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
+import 'create_class_screen.dart';
 
 class ClassesPage extends StatefulWidget {
   const ClassesPage({super.key});
@@ -168,180 +169,210 @@ class _ClassesPageState extends State<ClassesPage>
       "BUILD CLASSES => ${classVM.allClassesModel?.data?.length}",
     );
 
-    return Scaffold(
-      backgroundColor: AppColor.pageBgColor,
-      body: Column(
-        children: [
-          // ── Header ──
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(28)),
-              boxShadow: [
-                BoxShadow(
-                    color: AppColor.blueShadow,
-                    blurRadius: 18,
-                    offset: const Offset(0, 10)),
-              ],
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColor.glassWhite,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          AppText.customText(
-                            "Classes & Sections",
-                            size: 19,
-                            weight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                          AppText.customText(
-                            "Manage your school's classes and their sections",
-                            size: 11,
-                            color: Colors.white70,
-                          ),
-                        ],
-                      ),
-                    ),
-                    AppText.customText(
-                      "${filteredClasses.length}",
-                      size: 16,
-                      weight: FontWeight.w600,
-                      color: Colors.white70,
-                    ),
-                    const SizedBox(width: 12),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                // ── Search Bar ──
-                Container(
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.18),
-                    borderRadius: BorderRadius.circular(14),
-                    border:
-                    Border.all(color: Colors.white.withOpacity(0.3)),
-                  ),
-                  child: Row(
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.pageBgColor,
+        // floatingActionButton:
+        // PermissionExtensions.canAccess(
+        //   PermissionKeys.manageClasses,
+        // )
+        //     ? FloatingActionButton.extended(
+        //   onPressed: () {
+        //     Navigator.push(
+        //       context,
+        //       MaterialPageRoute(
+        //         builder: (_) => const CreateClassScreen(),
+        //       ),
+        //     );
+        //   },
+        //   backgroundColor: AppColor.primary,
+        //   icon: const Icon(
+        //     Icons.add,
+        //     color: Colors.white,
+        //   ),
+        //   label: const Text(
+        //     "Create Class",
+        //     style: TextStyle(
+        //       color: Colors.white,
+        //       fontWeight: FontWeight.w600,
+        //     ),
+        //   ),
+        // )
+        //     : null,
+        body: Column(
+          children: [
+            // ── Header ──
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
+              decoration: BoxDecoration(
+                gradient: AppColor.primaryGradient,
+                borderRadius:
+                const BorderRadius.vertical(bottom: Radius.circular(28)),
+                boxShadow: [
+                  BoxShadow(
+                      color: AppColor.blueShadow,
+                      blurRadius: 18,
+                      offset: const Offset(0, 10)),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Row(
                     children: [
-                      const Icon(Icons.search_rounded,
-                          color: Colors.white70, size: 20),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchCtrl,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 14),
-                          onChanged: (v) =>
-                              setState(() => _searchQuery = v),
-                          decoration: const InputDecoration(
-                            hintText: "Search classes...",
-                            hintStyle: TextStyle(
-                                color: Colors.white60, fontSize: 14),
-                            border: InputBorder.none,
-                            isDense: true,
-                            contentPadding:
-                            EdgeInsets.symmetric(vertical: 8),
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppColor.glassWhite,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Colors.white,
+                            size: 20,
                           ),
                         ),
                       ),
-                      if (_searchQuery.isNotEmpty)
-                        GestureDetector(
-                          onTap: () {
-                            _searchCtrl.clear();
-                            setState(() => _searchQuery = '');
-                          },
-                          child: const Icon(Icons.close_rounded,
-                              color: Colors.white70, size: 18),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppText.customText(
+                              "Classes & Sections",
+                              size: 19,
+                              weight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            AppText.customText(
+                              "Manage your school's classes and their sections",
+                              size: 11,
+                              color: Colors.white70,
+                            ),
+                          ],
                         ),
+                      ),
+                      AppText.customText(
+                        "${filteredClasses.length}",
+                        size: 16,
+                        weight: FontWeight.w600,
+                        color: Colors.white70,
+                      ),
+                      const SizedBox(width: 12),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
 
-          const SizedBox(height: 12),
+                  const SizedBox(height: 16),
 
-          // ── List ──
-          Expanded(
-            child: classVM.loading
-                ? _shimmer()
-                : filteredClasses.isEmpty
-                    ? ListView(
-                  physics:
-                  const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    SizedBox(
-                      height:
-                      MediaQuery.of(context).size.height *
-                          0.5,
-                      child: Column(
-                        mainAxisAlignment:
-                        MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.search_off,
-                              size: 60, color: Colors.grey),
-                          SizedBox(height: 10),
-                          Text("No classes found",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.grey,
-                                  fontWeight:
-                                  FontWeight.w500)),
-                        ],
-                      ),
+                  // ── Search Bar ──
+                  Container(
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(14),
+                      border:
+                      Border.all(color: Colors.white.withOpacity(0.3)),
                     ),
-                  ],
-                )
-                    : ListView.builder(
-                  physics:
-                  const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(
-                      18, 8, 18, 100),
-                  itemCount: filteredClasses.length,
-                  itemBuilder: (context, index) {
-                    final c = filteredClasses[index];
-                    final classId = c.classId ?? 0;
-                    final allSections =
-                        sectionVM.allSectionsModel?.data ??
-                            [];
-                    final classSections = allSections
-                        .where((s) =>
-                    s.classId.toString() ==
-                        classId.toString())
-                        .toList();
+                    child: Row(
+                      children: [
+                        const Icon(Icons.search_rounded,
+                            color: Colors.white70, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: _searchCtrl,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
+                            onChanged: (v) =>
+                                setState(() => _searchQuery = v),
+                            decoration: const InputDecoration(
+                              hintText: "Search classes...",
+                              hintStyle: TextStyle(
+                                  color: Colors.white60, fontSize: 14),
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding:
+                              EdgeInsets.symmetric(vertical: 8),
+                            ),
+                          ),
+                        ),
+                        if (_searchQuery.isNotEmpty)
+                          GestureDetector(
+                            onTap: () {
+                              _searchCtrl.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                            child: const Icon(Icons.close_rounded,
+                                color: Colors.white70, size: 18),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-                    return _animatedCard(
-                        index, c, classSections, sectionVM);
-                  },
-                ),
-          ),
-        ],
+            const SizedBox(height: 12),
+
+            // ── List ──
+            Expanded(
+              child: classVM.loading
+                  ? _shimmer()
+                  : filteredClasses.isEmpty
+                      ? ListView(
+                    physics:
+                    const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height:
+                        MediaQuery.of(context).size.height *
+                            0.5,
+                        child: Column(
+                          mainAxisAlignment:
+                          MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.search_off,
+                                size: 60, color: Colors.grey),
+                            SizedBox(height: 10),
+                            Text("No classes found",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                    fontWeight:
+                                    FontWeight.w500)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                      : ListView.builder(
+                    physics:
+                    const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(
+                        18, 8, 18, 40),
+                    itemCount: filteredClasses.length,
+                    itemBuilder: (context, index) {
+                      final c = filteredClasses[index];
+                      final classId = c.classId ?? 0;
+                      final allSections =
+                          sectionVM.allSectionsModel?.data ??
+                              [];
+                      final classSections = allSections
+                          .where((s) =>
+                      s.classId.toString() ==
+                          classId.toString())
+                          .toList();
+
+                      return _animatedCard(
+                          index, c, classSections, sectionVM);
+                    },
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -11,6 +11,7 @@ import 'package:school_pro/view_model/school_view_model/transport_fee/get_stop_v
 import 'package:school_pro/view_model/school_view_model/fees/fees_head_management_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/transport_fee/create_stop_view_model.dart';
 
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../utils/permission_extensions.dart';
@@ -304,40 +305,41 @@ class _StopScreenState extends State<StopScreen> {
       floatingActionButton:
       Consumer2<GetRouteViewModel, FeesHeadManagementViewModel>(
         builder: (context, routeVm, feeHeadVm, _) {
-          final routes   = routeVm.routeModel?.data ?? [];
+          final routes =
+              routeVm.routeModel?.data ?? [];
+
           final feeHeads =
-              feeHeadVm.feesHeadManagementModel?.data?.feeHeads ?? [];
+              feeHeadVm.feesHeadManagementModel
+                  ?.data
+                  ?.feeHeads ??
+                  [];
 
-          return FloatingActionButton.extended(
-            onPressed: () {
+          return SizedBox(
+            width: 150,
+            child: AppButton(
+              title: "Add Stop",
+              icon: Icons.add_rounded,
+              height: 50,
+              radius: 14,
+              onTap: () {
+                if (!PermissionExtensions.canAccess(
+                    PermissionKeys.manageTransport)) {
+                  Utils.show(
+                    "You don't have permission to add stops.",
+                    context,
+                  );
 
-              if (!PermissionExtensions.canAccess(
-                  PermissionKeys.manageTransport)) {
-
-                Utils.show(
-                  "You don't have permission to add stops.",
-                  context,
+                  return;
+                }
+                _openSheet(
+                  routes: routes,
+                  feeHeads: feeHeads,
                 );
-
-                return;
-              }
-
-              _openSheet(
-                routes: routes,
-                feeHeads: feeHeads,
-              );
-            },
-            backgroundColor: const Color(0xFF3F72FF),
-            elevation: 6,
-            icon: const Icon(Icons.add_rounded, color: Colors.white),
-            label: AppText.customText('Add Stop',
-                color: Colors.white,
-                weight: FontWeight.bold,
-                size: 14),
+              },
+            ),
           );
         },
-      ),
-    );
+      ),    );
   }
 
   // ── Route filter dropdown ─────────────────────────────────────────────────
@@ -1159,47 +1161,18 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        flex: 2,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [
-                              Color(0xFF00C9A7),
-                              Color(0xFF007A65),
-                            ]),
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: const Color(0xFF00C9A7)
-                                      .withOpacity(0.35),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4))
-                            ],
-                          ),
-                          child: ElevatedButton(
-                            onPressed: loading ? null : _save,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                  BorderRadius.circular(14)),
-                            ),
-                            child: loading
-                                ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2.2,
-                                  color: Colors.white),
-                            )
-                                : AppText.customText(
-                                _isEdit ? 'Update Stop' : 'Add Stop',
-                                size: 14,
-                                weight: FontWeight.w800,
-                                color: Colors.white),
-                          ),
+                        flex: 1,
+                        child: AppButton(
+                          title: _isEdit
+                              ? "Update Stop"
+                              : "Add Stop",
+                          icon: _isEdit
+                              ? Icons.edit_location_alt_rounded
+                              : Icons.add_location_alt_rounded,
+                          loading: loading,
+                          height: 50,
+                          radius: 14,
+                          onTap: _save,
                         ),
                       ),
                     ],

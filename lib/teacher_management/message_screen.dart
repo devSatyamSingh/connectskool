@@ -209,192 +209,195 @@ class _MessagesPageState extends State<MessagesPage>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Header Section
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppColor.lightBlueColor,
-                AppColor.lightBlueColor.withOpacity(0.8),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColor.lightBlueColor.withOpacity(0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
+    return SafeArea(
+      top: false,
+      child: Column(
+        children: [
+          // Header Section
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColor.lightBlueColor,
+                  AppColor.lightBlueColor.withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppText.customText(
-                        "Messages",
-                        size: 26,
-                        weight: FontWeight.bold,
-                        color: Colors.white,
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(30),
+                bottomRight: Radius.circular(30),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColor.lightBlueColor.withOpacity(0.3),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppText.customText(
+                          "Messages",
+                          size: 26,
+                          weight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(height: 4),
+                        AppText.customText(
+                          "$unreadCount unread messages",
+                          size: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1,
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      AppText.customText(
-                        "$unreadCount unread messages",
-                        size: 14,
+                      child: Stack(
+                        children: [
+                          const Icon(
+                            Icons.notifications_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          if (unreadCount > 0)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: AppText.customText(
+                                  "$unreadCount",
+                                  size: 8,
+                                  weight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                // Search bar
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.search_rounded,
                         color: Colors.white.withOpacity(0.9),
+                        size: 22,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppText.customText(
+                          "Search messages...",
+                          size: 14,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
                       ),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
-                        width: 1,
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        const Icon(
-                          Icons.notifications_rounded,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        if (unreadCount > 0)
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                              ),
-                              child: AppText.customText(
-                                "$unreadCount",
-                                size: 8,
-                                weight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Messages List Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AppText.customText(
+                  "All Messages",
+                  size: 18,
+                  weight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Search bar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.3),
-                    width: 1,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.filter_list_rounded,
+                        size: 16,
+                        color: Colors.grey[700],
+                      ),
+                      const SizedBox(width: 4),
+                      AppText.customText(
+                        "Filter",
+                        size: 12,
+                        color: Colors.grey[700]!,
+                        weight: FontWeight.w600,
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.search_rounded,
-                      color: Colors.white.withOpacity(0.9),
-                      size: 22,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: AppText.customText(
-                        "Search messages...",
-                        size: 14,
-                        color: Colors.white.withOpacity(0.9),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
-        // Messages List Header
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              AppText.customText(
-                "All Messages",
-                size: 18,
-                weight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.filter_list_rounded,
-                      size: 16,
-                      color: Colors.grey[700],
-                    ),
-                    const SizedBox(width: 4),
-                    AppText.customText(
-                      "Filter",
-                      size: 12,
-                      color: Colors.grey[700]!,
-                      weight: FontWeight.w600,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          // Messages List
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              physics: const BouncingScrollPhysics(),
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                return _buildAnimatedCard(index, messages[index]);
+              },
+            ),
           ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Messages List
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            physics: const BouncingScrollPhysics(),
-            itemCount: messages.length,
-            itemBuilder: (context, index) {
-              return _buildAnimatedCard(index, messages[index]);
-            },
-          ),
-        ),
-        const SizedBox(height: 12),
-      ],
+          const SizedBox(height: 12),
+        ],
+      ),
     );
   }
 

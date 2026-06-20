@@ -14,6 +14,7 @@ import 'package:school_pro/view_model/school_view_model/transport_fee/discontinu
 import 'package:flutter/material.dart';
 import '../../model/school_model/student/all_student_list_model.dart';
 import '../../../model/school_model/transport_model/student_transport_model.dart' hide Data;
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../utils/permission_extensions.dart';
@@ -671,30 +672,28 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
         ],
       ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          if (!PermissionExtensions.canAccess(PermissionKeys.manageTransport)) {
-            Utils.show(
-              "You don't have permission to perform this action.",
-              context,
-            );
+      floatingActionButton: SizedBox(
+        width: 200,
+        child: AppButton(
+          title: "Assign Transport",
+          icon: Icons.add_rounded,
+          height: 50,
+          radius: 14,
+          onTap: () {
+            if (!PermissionExtensions.canAccess(
+                PermissionKeys.manageTransport)) {
+              Utils.show(
+                "You don't have permission to perform this action.",
+                context,
+              );
 
-            return;
-          }
+              return;
+            }
 
-          _openAssignSheet();
-        },
-        backgroundColor: const Color(0xFF3F72FF),
-        elevation: 6,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: AppText.customText(
-          'Assign Transport',
-          color: Colors.white,
-          weight: FontWeight.bold,
-          size: 14,
+            _openAssignSheet();
+          },
         ),
-      ),
-    );
+      ),    );
   }
 
   String _initials(String name) {
@@ -1898,52 +1897,16 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        flex: 2,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF3F72FF), Color(0xFF1A50D9)],
-                            ),
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(
-                                  0xFF3F72FF,
-                                ).withOpacity(0.35),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton(
-                            onPressed: loading ? null : _save,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            child: loading
-                                ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2.2,
-                                color: Colors.white,
-                              ),
-                            )
-                                : AppText.customText(
-                              'Assign',
-                              size: 14,
-                              weight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
+                        flex: 1,
+                        child: AppButton(
+                          title: "Assign",
+                          icon: Icons.assignment_turned_in_rounded,
+                          loading: loading,
+                          height: 50,
+                          radius: 14,
+                          onTap: _save,
                         ),
-                      ),
-                    ],
+                      ),                    ],
                   ),
                   SizedBox(height: screenHeight * 0.05),
                 ],

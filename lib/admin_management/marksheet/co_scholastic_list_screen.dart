@@ -28,25 +28,28 @@ class _CoScholasticGradesListScreenState
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.screenBg,
-      body: Column(
-        children: [
-          const CoScholasticHeader(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              physics: const BouncingScrollPhysics(),
-              child: Column(
-                children: const [
-                  CoScholasticListFilterCard(),
-                  SizedBox(height: 20),
-                  CoScholasticGradeListTable(),
-                ],
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.screenBg,
+        body: Column(
+          children: [
+            const CoScholasticHeader(),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  children: const [
+                    CoScholasticListFilterCard(),
+                    SizedBox(height: 20),
+                    CoScholasticGradeListTable(),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

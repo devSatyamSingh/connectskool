@@ -1475,6 +1475,7 @@ class _AdminViewFeesStructureScreenState
   List<_Installment> _installments = [];
   bool _previewVisible = false;
   String _viewFilter = 'all';
+  int? _selectedViewClassId;
 
   @override
   void initState() {
@@ -1729,20 +1730,23 @@ class _AdminViewFeesStructureScreenState
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-      child: Scaffold(
-        backgroundColor: AppColor.pageBgColor,
-        body: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [_buildCreateTab(), _buildViewTab()],
+    return SafeArea(
+      top: false,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        child: Scaffold(
+          backgroundColor: AppColor.pageBgColor,
+          body: Column(
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [_buildCreateTab(), _buildViewTab()],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1901,6 +1905,7 @@ class _AdminViewFeesStructureScreenState
                 if (academicVM.loading)
                   return const Center(child: CircularProgressIndicator());
                 return DropdownButton<int>(
+                  dropdownColor: Colors.white,
                   value: selectedYear?.academicYearId,
                   hint: const Text("Select Academic Year"),
                   isExpanded: true,
@@ -1934,6 +1939,7 @@ class _AdminViewFeesStructureScreenState
               return _dropdownContainer(
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<int>(
+                    dropdownColor: Colors.white,
                     value: _selectedClassId,
                     isExpanded: true,
                     hint: _hint('Select Class', Icons.class_),
@@ -1996,6 +2002,7 @@ class _AdminViewFeesStructureScreenState
                       )
                     : DropdownButtonHideUnderline(
                         child: DropdownButton<int>(
+                          dropdownColor: Colors.white,
                           value: _selectedFeeHeadId,
                           isExpanded: true,
                           hint: _hint('Select Fee Head', Icons.category),
@@ -2566,17 +2573,29 @@ class _AdminViewFeesStructureScreenState
     return Consumer<FeesManagementViewModel>(
       builder: (ctx, vm, _) {
         final allFees = vm.feesManagementModel?.data?.fees ?? [];
-        final displayFees = _viewFilter == 'all'
-            ? allFees
-            : allFees
-                  .where((f) => f.feeFrequency?.toLowerCase() == _viewFilter)
-                  .toList();
+
+        var displayFees = allFees;
+
+        /// Class Filter
+        if (_selectedViewClassId != null) {
+          displayFees = displayFees.where((fee) {
+            return fee.classId == _selectedViewClassId;
+          }).toList();
+        }
+
+        /// Frequency Filter
+        if (_viewFilter != 'all') {
+          displayFees = displayFees.where((fee) {
+            return fee.feeFrequency?.toLowerCase() ==
+                _viewFilter.toLowerCase();
+          }).toList();
+        }
 
         return Column(
           children: [
             Container(
               height: screenHeight * 0.04,
-              margin: const EdgeInsets.fromLTRB(18, 6, 18, 4),
+              margin: const EdgeInsets.fromLTRB(18, 8, 18, 8),
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
@@ -2591,6 +2610,71 @@ class _AdminViewFeesStructureScreenState
                   _viewChip('Half Yearly', 'half_yearly'),
                 ],
               ),
+            ),
+            Consumer<AllClassesViewModel>(
+              builder: (context, classVm, child) {
+                final classes = classVm.allClassesModel?.data ?? [];
+                return Container(
+                  margin: const EdgeInsets.fromLTRB(18, 12, 18, 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.grey.shade200,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(.04),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      dropdownColor: Colors.white,
+                      value: _selectedViewClassId,
+                      isExpanded: true,
+                      hint: Row(
+                        children: [
+                          Icon(
+                            Icons.school,
+                            color: AppColor.lightBlueColor,
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            "All Classes",
+                          ),
+                        ],
+                      ),
+                      items: [
+                        const DropdownMenuItem<int>(
+                          value: -1,
+                          child: Text("All Classes"),
+                        ),
+
+                        ...classes.map(
+                              (e) => DropdownMenuItem<int>(
+                            value: e.classId,
+                            child: Text(
+                              e.className ?? '',
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedViewClassId =
+                          value == -1 ? null : value;
+                        });
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
             Expanded(
               child: vm.loading

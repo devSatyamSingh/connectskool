@@ -75,131 +75,134 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       }
     } catch (_) {}
 
-    return Scaffold(
-      backgroundColor: AppColor.bg,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        backgroundColor: AppColor.bg,
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
 
-          /// 🔹 Header
-          Container(
-            padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
-            decoration: BoxDecoration(
-              gradient: AppColor.primaryGradient,
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
-              boxShadow: [BoxShadow(color: AppColor.blueShadow, blurRadius: 18, offset: const Offset(0, 10))],
-            ),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: AppColor.glassWhite, shape: BoxShape.circle),
-                    child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: AppText.customText("Student Profile", size: 19, weight: FontWeight.bold, color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-
-          /// 🔹 Body
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
+            /// 🔹 Header
+            Container(
+              padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
+              decoration: BoxDecoration(
+                gradient: AppColor.primaryGradient,
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+                boxShadow: [BoxShadow(color: AppColor.blueShadow, blurRadius: 18, offset: const Offset(0, 10))],
+              ),
+              child: Row(
                 children: [
-
-                  /// Profile Card
-                  Container(
-                    margin: const EdgeInsets.all(16),
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: AppColor.card,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: AppColor.cardShadow, blurRadius: 20, offset: const Offset(0, 4))],
-                    ),
-                    child: Column(
-                      children: [
-                        CircleAvatar(
-                          radius: 50,
-                          backgroundColor: AppColor.primaryLight,
-                          backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                          child: photoUrl.isEmpty ? const Icon(Icons.person, size: 50, color: Colors.white) : null,
-                        ),
-                        const SizedBox(height: 16),
-                        AppText.customText(studentName, size: 22, weight: FontWeight.w700, color: AppColor.text),
-                        const SizedBox(height: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(color: AppColor.primaryLight, borderRadius: BorderRadius.circular(20)),
-                          child: AppText.customText("Admission No: $admissionNo", size: 13, weight: FontWeight.w500, color: AppColor.primary),
-                        ),
-                        const SizedBox(height: 8),
-                        AppText.customText(
-                          "$className * Section $sectionName",
-                          size: 14,
-                          weight: FontWeight.w500,
-                          color: AppColor.sub,
-                        ),
-                        // AppText.customText("Class $classId • Section $sectionId", size: 14, weight: FontWeight.w500, color: AppColor.sub),
-                      ],
+                  InkWell(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(color: AppColor.glassWhite, shape: BoxShape.circle),
+                      child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
                     ),
                   ),
-
-                  /// Personal Info
-                  _buildInfoCard("Personal Information", [
-                    _InfoItem("Full Name", studentName),
-                    _InfoItem("Gender", gender),
-                    _InfoItem("Date of Birth", dob),
-                    _InfoItem("Religion", religion),
-                    _InfoItem("Blood Group", bloodGroup),       // ✅ NEW
-                    _InfoItem("Category", category),             // ✅ NEW
-                    _InfoItem("Aadhar Number", aadharNumber),   // ✅ NEW
-                  ]),
-                  const SizedBox(height: 16),
-
-                  /// Academic Info
-                  _buildInfoCard("Academic Information", [
-                    // _InfoItem("Student ID", studentId),
-                    _InfoItem("Class", className),
-                    _InfoItem("Section", sectionName),
-                    _InfoItem("Academic Year", academicYear),   // ✅ NEW
-                  ]),
-                  const SizedBox(height: 16),
-
-                  /// Contact Info
-                  _buildInfoCard("Contact Information", [
-                    _InfoItem("Email", email),
-                    _InfoItem("Mobile Number", mobile),
-                    _InfoItem("Address", address),
-                    _InfoItem("City", city),                           // ✅ NEW
-                    _InfoItem("State", state),                         // ✅ NEW
-                    _InfoItem("Pincode", pincode),                     // ✅ NEW
-                    _InfoItem("Emergency Contact", emergencyContact),  // ✅ NEW
-                  ]),
-                  const SizedBox(height: 16),
-
-                  /// Guardian Info
-                  _buildInfoCard("Guardian Information", [
-                    _InfoItem("Father Name", fatherName),
-                    _InfoItem("Father Mobile", fatherMobile),         // ✅ NEW
-                    _InfoItem("Father Occupation", fatherOccupation), // ✅ NEW
-                    _InfoItem("Mother Name", motherName),
-                    _InfoItem("Mother Mobile", motherMobile),
-                    _InfoItem("Mother Occupation", motherOccupation),
-                    _InfoItem("Guardian Name", guardianName),
-                  ]),
-                  const SizedBox(height: 30),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: AppText.customText("Student Profile", size: 19, weight: FontWeight.bold, color: Colors.white),
+                  ),
                 ],
               ),
             ),
-          ),
-          SizedBox(height: screenHeight * 0.04),
-        ],
+
+            /// 🔹 Body
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+
+                    /// Profile Card
+                    Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: AppColor.card,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [BoxShadow(color: AppColor.cardShadow, blurRadius: 20, offset: const Offset(0, 4))],
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 50,
+                            backgroundColor: AppColor.primaryLight,
+                            backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                            child: photoUrl.isEmpty ? const Icon(Icons.person, size: 50, color: Colors.white) : null,
+                          ),
+                          const SizedBox(height: 16),
+                          AppText.customText(studentName, size: 22, weight: FontWeight.w700, color: AppColor.text),
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(color: AppColor.primaryLight, borderRadius: BorderRadius.circular(20)),
+                            child: AppText.customText("Admission No: $admissionNo", size: 13, weight: FontWeight.w500, color: AppColor.primary),
+                          ),
+                          const SizedBox(height: 8),
+                          AppText.customText(
+                            "$className * Section $sectionName",
+                            size: 14,
+                            weight: FontWeight.w500,
+                            color: AppColor.sub,
+                          ),
+                          // AppText.customText("Class $classId • Section $sectionId", size: 14, weight: FontWeight.w500, color: AppColor.sub),
+                        ],
+                      ),
+                    ),
+
+                    /// Personal Info
+                    _buildInfoCard("Personal Information", [
+                      _InfoItem("Full Name", studentName),
+                      _InfoItem("Gender", gender),
+                      _InfoItem("Date of Birth", dob),
+                      _InfoItem("Religion", religion),
+                      _InfoItem("Blood Group", bloodGroup),       // ✅ NEW
+                      _InfoItem("Category", category),             // ✅ NEW
+                      _InfoItem("Aadhar Number", aadharNumber),   // ✅ NEW
+                    ]),
+                    const SizedBox(height: 16),
+
+                    /// Academic Info
+                    _buildInfoCard("Academic Information", [
+                      // _InfoItem("Student ID", studentId),
+                      _InfoItem("Class", className),
+                      _InfoItem("Section", sectionName),
+                      _InfoItem("Academic Year", academicYear),   // ✅ NEW
+                    ]),
+                    const SizedBox(height: 16),
+
+                    /// Contact Info
+                    _buildInfoCard("Contact Information", [
+                      _InfoItem("Email", email),
+                      _InfoItem("Mobile Number", mobile),
+                      _InfoItem("Address", address),
+                      _InfoItem("City", city),                           // ✅ NEW
+                      _InfoItem("State", state),                         // ✅ NEW
+                      _InfoItem("Pincode", pincode),                     // ✅ NEW
+                      _InfoItem("Emergency Contact", emergencyContact),  // ✅ NEW
+                    ]),
+                    const SizedBox(height: 16),
+
+                    /// Guardian Info
+                    _buildInfoCard("Guardian Information", [
+                      _InfoItem("Father Name", fatherName),
+                      _InfoItem("Father Mobile", fatherMobile),         // ✅ NEW
+                      _InfoItem("Father Occupation", fatherOccupation), // ✅ NEW
+                      _InfoItem("Mother Name", motherName),
+                      _InfoItem("Mother Mobile", motherMobile),
+                      _InfoItem("Mother Occupation", motherOccupation),
+                      _InfoItem("Guardian Name", guardianName),
+                    ]),
+                    const SizedBox(height: 30),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: screenHeight * 0.04),
+          ],
+        ),
       ),
     );
   }
