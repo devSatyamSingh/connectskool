@@ -57,6 +57,8 @@ class Fees {
   dynamic totalAmount;
   dynamic academicYear;
   dynamic status;
+  dynamic startDueDate;
+  dynamic endDueDate;
   dynamic createdAt;
 
   Fees(
@@ -71,6 +73,8 @@ class Fees {
         this.totalAmount,
         this.academicYear,
         this.status,
+        this.startDueDate,
+        this.endDueDate,
         this.createdAt});
 
   Fees.fromJson(Map<String, dynamic> json) {
@@ -86,6 +90,8 @@ class Fees {
     academicYear = json['academic_year'];
     status = json['status'];
     createdAt = json['created_at'];
+    startDueDate = json['start_due_date'];
+    endDueDate = json['end_due_date'];
   }
 
   Map<String, dynamic> toJson() {
@@ -102,6 +108,8 @@ class Fees {
     data['academic_year'] = academicYear;
     data['status'] = status;
     data['created_at'] = createdAt;
+    data['start_due_date'] = startDueDate;
+    data['end_due_date'] = endDueDate;
     return data;
   }
 }

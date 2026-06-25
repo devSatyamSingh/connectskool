@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/accountant_management/accountant_management_dash_board_screen.dart';
 import 'package:school_pro/student_management/student_dash_board_screen.dart';
@@ -37,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 2200),
     );
 
     _scaleAnimation = Tween(begin: 0.0, end: 1.0).animate(
@@ -74,11 +76,10 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     // Splash animation ke baad navigation
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) _handleNavigation();
     });
   }
-
 
   Future<void> _handleNavigation() async {
     final userVM = UserViewModel();
@@ -108,7 +109,6 @@ class _SplashScreenState extends State<SplashScreen>
       return;
     }
 
-    // ── STEP 3: Session check ────────────────────────────────────────────────
     await _checkSession(userVM);
   }
 
@@ -173,6 +173,7 @@ class _SplashScreenState extends State<SplashScreen>
       }
     }
   }
+
   void _navigateByRole(String role) {
     switch (role) {
       case "school_admin":
@@ -220,7 +221,6 @@ class _SplashScreenState extends State<SplashScreen>
         ),
         child: Stack(
           children: [
-            // Decorative background circles
             Positioned(
               top: -100,
               right: -100,
@@ -251,8 +251,6 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
               ),
             ),
-
-            // Main content
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -273,7 +271,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.white.withOpacity(0.2),
+                                      color: Colors.white.withOpacity(0.20),
                                       blurRadius: 40,
                                       spreadRadius: 20,
                                     ),
@@ -281,25 +279,35 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                               ),
                               Container(
-                                padding: const EdgeInsets.all(40),
+                                width: 220,
+                                height: 220,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.15),
+                                  color: Colors.white.withOpacity(0.12),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.3),
+                                    color: Colors.white.withOpacity(0.25),
                                     width: 2,
                                   ),
                                 ),
+                              ),
+                              Container(
+                                width: 170,
+                                height: 170,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white.withOpacity(0.18),
+                                ),
+                              ),
+                              ClipOval(
                                 child: Container(
-                                  padding: const EdgeInsets.all(30),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white.withOpacity(0.2),
-                                  ),
-                                  child: const Icon(
-                                    Icons.school_rounded,
-                                    size: 100,
-                                    color: Colors.white,
+                                  width: 130,
+                                  height: 130,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Image.asset(
+                                      "assets/images/school_logo.png",
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -309,43 +317,49 @@ class _SplashScreenState extends State<SplashScreen>
                       );
                     },
                   ),
-
-                  SizedBox(height: screenHeight * 0.06),
-
+                  SizedBox(height: screenHeight * 0.04),
+                  /// App Name
                   SlideTransition(
                     position: _slideAnimation,
                     child: FadeTransition(
                       opacity: _fadeAnimation,
                       child: Column(
                         children: [
-                          AppText.customText(
+                           Text(
                             "ConnectSkool",
-                            size: 40,
-                            weight: FontWeight.w900,
-                            color: Colors.white,
+                            style: GoogleFonts.poppins(
+                              fontSize: 34,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 1,
+                            ),
                           ),
-                          SizedBox(height: screenHeight * 0.02),
-                          AppText.customText(
-                            "Smart School Management",
-                            size: 15,
-                            color: Colors.white.withOpacity(0.9),
+                          const SizedBox(height: 10),
+                          Text(
+                            "Empowering Learning & School Management",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.9),
+                              fontWeight: FontWeight.w400,
+                              letterSpacing: 0.5,
+                            ),
                           ),
                         ],
                       ),
                     ),
                   ),
-
-                  SizedBox(height: screenHeight * 0.08),
-
+                  SizedBox(height: screenHeight * 0.06),
                   FadeTransition(
                     opacity: _fadeAnimation,
-                    child: const CircularProgressIndicator(
+                    child: const SpinKitThreeBounce(
                       color: Colors.white,
+                      size: 22,
                     ),
                   ),
                 ],
               ),
-            ),
+            )
           ],
         ),
       ),

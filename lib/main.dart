@@ -12,6 +12,7 @@ import 'package:school_pro/view_model/auth_view_model/login_view_model.dart';
 import 'package:school_pro/view_model/auth_view_model/academic_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/accountant/add_accountant_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/exam_mark/create_exam_maerks_view_model.dart';
+import 'package:school_pro/view_model/school_view_model/fees/discontinue_student_fee_viewmodel.dart';
 import 'package:school_pro/view_model/school_view_model/student/add_student_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/subject/add_subject_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/teacher/add_teacher_view_model.dart';
@@ -461,6 +462,8 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => CoScholasticGradeViewModel()),
         ChangeNotifierProvider(
             create: (_) => GetAllTransportStudentsViewModel()),
+        ChangeNotifierProvider(create: (_) => DiscontinueStudentFeeViewModel()),
+
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,

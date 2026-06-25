@@ -51,6 +51,7 @@ class Data {
   dynamic state;
   dynamic pincode;
   dynamic aadharNumber;
+  List<String>? feeHeads;
 
   // ── Family ──
   dynamic fatherName;
@@ -101,6 +102,7 @@ class Data {
     this.city,
     this.state,
     this.pincode,
+    this.feeHeads,
     this.aadharNumber,
     this.fatherName,
     this.fatherOccupation,
@@ -166,6 +168,9 @@ class Data {
     fatherPhotoUrl         = map['father_photo_url'];
     motherPhotoUrl         = map['mother_photo_url'];
     aadharCardUrl          = map['aadhar_card_url'];
+    feeHeads = json["fee_heads"] != null
+        ? List<String>.from(json["fee_heads"])
+        : [];
   }
 
   Map<String, dynamic> toJson() {
@@ -211,6 +216,7 @@ class Data {
       'father_photo_url'         : fatherPhotoUrl,
       'mother_photo_url'         : motherPhotoUrl,
       'aadhar_card_url'          : aadharCardUrl,
+      'fee_heads': feeHeads,
     };
   }
 }

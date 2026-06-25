@@ -50,6 +50,7 @@ dependencies:
   googleapis_auth: ^1.6.0
   photo_view: ^0.15.0
   cached_network_image: ^3.4.1
+  flutter_spinkit: ^5.2.1
   syncfusion_flutter_pdfviewer: ^29.1.33
   device_info_plus: ^11.5.0
   permission_handler:
@@ -140,4 +141,5 @@ flutter:
   # see https://flutter.dev/to/font-from-package
   assets:
     - lib/model/school_model/
+    - assets/images/
 

@@ -2168,6 +2168,7 @@ import 'package:school_pro/view_model/school_view_model/classes/all_classes_view
 import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/create_student_attendance_view_model.dart';
 import '../../repo/school_repo/section/all_sections_repo.dart';
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../utils/permission_extensions.dart';
@@ -2176,33 +2177,7 @@ import '../../utils/utils.dart';
 import '../../view_model/school_view_model/attendance/all_student_attendance_view_model.dart';
 import '../../view_model/school_view_model/attendance/update_student_attendance_view_model.dart';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Model
-// ─────────────────────────────────────────────────────────────────────────────
-// class _StudentRow {
-//   final String id;
-//   final String name;
-//   final String admissionNo;
-//   final String fatherName;
-//   String? attendanceStatus;
-//   bool alreadyMarked;
-//   bool isEditing; // ← NEW: unlocked for edit
-//   String? markedStatus;
-//   final TextEditingController remarksCtrl;
-//
-//   _StudentRow({
-//     required this.id,
-//     required this.name,
-//     required this.admissionNo,
-//     required this.fatherName,
-//     this.attendanceStatus,
-//     this.alreadyMarked = false,
-//     this.isEditing = false,
-//     this.markedStatus,
-//   }) : remarksCtrl = TextEditingController();
-//
-//   void dispose() => remarksCtrl.dispose();
-// }
+
 class _StudentRow {
   final String id;
   final String name;
@@ -2726,39 +2701,29 @@ class _AllStudentAdminAttendanceScreenState
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: FloatingActionButton.extended(
-                      heroTag: 'save_all_btn',
-                      onPressed:
-                          !PermissionExtensions.canAccess(
-                            PermissionKeys.markStudentAttendance,
-                          )
-                          ? () {
-                              Utils.show(
-                                "You don't have permission to marks attendance",
-                                context,
-                              );
-                            }
-                          : (_saving ? null : _saveAll),
-                      backgroundColor: AppColor.lightBlueColor,
-                      elevation: 4,
+                    child: AppButton(
+                      title: _saving
+                          ? "Saving..."
+                          : "Save All Attendance",
                       icon: _saving
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Icon(Icons.save_rounded, color: Colors.white),
-                      label: Text(
-                        _saving ? 'Saving...' : 'Save All Attendance',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
+                          ? null
+                          : Icons.save_rounded,
+                      height: 56,
+                      radius: 16,
+                      loading: _saving,
+                      onTap: () {
+                        if (!PermissionExtensions.canAccess(
+                          PermissionKeys.markStudentAttendance,
+                        )) {
+                          Utils.show(
+                            "You don't have permission to marks attendance",
+                            context,
+                          );
+                          return;
+                        }
+
+                        _saveAll();
+                      },
                     ),
                   ),
                 ],

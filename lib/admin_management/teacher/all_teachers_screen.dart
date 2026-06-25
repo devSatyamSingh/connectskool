@@ -1036,45 +1036,29 @@ class _AllTeacherListScreenState extends State
 
     return Scaffold(
       backgroundColor: AppColor.screenBg,
-      // floatingActionButton: FloatingActionButton.extended(
-      //   backgroundColor: AppColor.lightBlueColor,
-      //   onPressed: _openAddAccountantSheet,
-      //   icon: const Icon(Icons.add_rounded, color: Colors.white),
-      //   label: const Text(
-      //     'Add Teachers',
-      //     style: TextStyle(
-      //         color: Colors.white, fontWeight: FontWeight.w600),
-      //   ),
-      // ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColor.lightBlueColor,
-        onPressed: () {
+      floatingActionButton: SizedBox(
+        width: 170,
+        child: AppButton(
+          title: "Add Teacher",
+          icon: Icons.add_rounded,
+          height: 50,
+          radius: 18,
+          onTap: () {
+            if (!PermissionGuard.check(
+              context,
+              PermissionKeys.addTeacher,
+              "Add Teacher",
+            )) {
+              return;
+            }
 
-          if (!PermissionGuard.check(
-            context,
-            PermissionKeys.addTeacher,
-            "Add Teacher",
-          )) {
-            return;
-          }
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const AddTeacherScreen(),
-            ),
-          );
-        },
-        icon: const Icon(
-          Icons.add_rounded,
-          color: Colors.white,
-        ),
-        label: const Text(
-          'Add Teacher',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AddTeacherScreen(),
+              ),
+            );
+          },
         ),
       ),
       body: Column(

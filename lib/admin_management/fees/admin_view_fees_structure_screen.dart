@@ -1423,6 +1423,7 @@ import 'package:school_pro/view_model/school_view_model/fees/fees_head_managemen
 import 'package:school_pro/view_model/school_view_model/fees/fees_management_view_model.dart';
 
 import '../../model/school_model/auth/academic_model.dart';
+import '../../res/app_button.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../view_model/auth_view_model/academic_view_model.dart';
@@ -1701,33 +1702,45 @@ class _AdminViewFeesStructureScreenState
       return;
     }
 
-    final success =
-        await Provider.of<CreateFeesViewModel>(
-          context,
-          listen: false,
-        ).createFeesApi(
-          _selectedClassId!,
-          _selectedFeeHeadId!,
-          double.parse(_baseAmountCtrl.text.trim()),
-          _selectedFrequency,
-          selectedYear!.yearName!,
-          _startDateCtrl.text.trim(),
-          _endDateCtrl.text.trim(),
-          context,
-        );
+    // ✅ FIX: Parse dd-MM-yyyy → convert to yyyy-MM-dd for API
+    final startParsed = _parseDate(_startDateCtrl.text.trim());
+    final endParsed   = _parseDate(_endDateCtrl.text.trim());
+
+    if (startParsed == null) {
+      Utils.show('Invalid start date', context);
+      return;
+    }
+
+    if (endParsed == null) {
+      Utils.show('Invalid end date', context);
+      return;
+    }
+
+    final apiStartDate = DateFormat('yyyy-MM-dd').format(startParsed);
+    final apiEndDate   = DateFormat('yyyy-MM-dd').format(endParsed);
+
+    final success = await Provider.of<CreateFeesViewModel>(
+      context,
+      listen: false,
+    ).createFeesApi(
+      _selectedClassId!,
+      _selectedFeeHeadId!,
+      double.parse(_baseAmountCtrl.text.trim()),
+      _selectedFrequency,
+      selectedYear!.yearName!,
+      apiStartDate,   
+      apiEndDate,
+      context,
+    );
 
     if (success) {
-      /// Preview reset
       setState(() {
         _previewVisible = false;
         _installments.clear();
       });
-
-      /// View All tab pe switch
       _tabController.animateTo(1);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -2262,50 +2275,29 @@ class _AdminViewFeesStructureScreenState
               builder: (ctx, vm, _) {
                 return SizedBox(
                   width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton.icon(
-                    onPressed: vm.loading
+                  child: AppButton(
+                    title: vm.loading
+                        ? "Creating..."
+                        : "Create Fee Structure",
+                    icon: vm.loading
                         ? null
-                        : () {
+                        : Icons.add_rounded,
+                    height: 52,
+                    radius: 16,
+                    loading: vm.loading,
+                    onTap: () {
                       if (!PermissionExtensions.canAccess(
-                          PermissionKeys.manageFees)) {
+                        PermissionKeys.manageFees,
+                      )) {
                         Utils.show(
                           "Permission denied",
                           context,
                         );
-
                         return;
                       }
 
                       _submit();
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.lightBlueColor,
-                      disabledBackgroundColor: AppColor.lightBlueColor
-                          .withOpacity(0.6),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 0,
-                    ),
-                    icon: vm.loading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Icon(Icons.add_rounded, color: Colors.white),
-                    label: Text(
-                      vm.loading ? 'Creating...' : 'Create Fee Structure',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
                 );
               },
@@ -2879,18 +2871,51 @@ class _AdminViewFeesStructureScreenState
             padding: const EdgeInsets.all(14),
             child: Column(
               children: [
-                Row(
+                Column(
                   children: [
-                    _infoChip(
-                      Icons.class_,
-                      fee.className ?? 'N/A',
-                      Colors.blue,
+
+                    Row(
+                      children: [
+                        _infoChip(
+                          Icons.class_,
+                          fee.className ?? 'N/A',
+                          Colors.blue,
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        _infoChip(
+                          Icons.calendar_month,
+                          fee.academicYear ?? 'N/A',
+                          Colors.purple,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    _infoChip(
-                      Icons.calendar_month,
-                      fee.academicYear ?? 'N/A',
-                      Colors.purple,
+
+                    const SizedBox(height: 12),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _dateCard(
+                            title: "Start Date",
+                            date: fee.startDueDate,
+                            color: Colors.green,
+                            icon: Icons.play_circle_fill,
+                          ),
+                        ),
+
+                        const SizedBox(width: 10),
+
+                        Expanded(
+                          child: _dateCard(
+                            title: "End Date",
+                            date: fee.endDueDate,
+                            color: Colors.red,
+                            icon: Icons.stop_circle,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -2950,6 +2975,70 @@ class _AdminViewFeesStructureScreenState
                       ),
                     ),
                   ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _dateCard({
+    required String title,
+    required dynamic date,
+    required Color color,
+    required IconData icon,
+  }) {
+    bool isInvalid =
+        date == null ||
+            date.toString().isEmpty ||
+            date.toString() == "0000-00-00";
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: color.withOpacity(0.2),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 18,
+            color: color,
+          ),
+          const SizedBox(width: 8),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+
+                const SizedBox(height: 3),
+
+                Text(
+                  isInvalid
+                      ? "N/A"
+                      : date.toString(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                 ),
               ],
             ),

@@ -14,15 +14,57 @@ class StudentHomeworkViewModel extends ChangeNotifier {
   bool get loading => _loading;
 
   StudentHomeworkModel? _studentHomeworkModel;
+
+  List<StudentProfileData> _filteredHomeworkList = [];
+
+  List<StudentProfileData> get filteredHomeworkList =>
+      List.unmodifiable(_filteredHomeworkList);
+
   StudentHomeworkModel? get studentHomeworkModel =>
       _studentHomeworkModel;
 
   List<StudentProfileData> _homeworkList = [];
+
   List<StudentProfileData> get homeworkList =>
       List.unmodifiable(_homeworkList);
 
+  String _selectedSubject = "All Subjects";
+  String get selectedSubject => _selectedSubject;
+
   void _setLoading(bool value) {
     _loading = value;
+    notifyListeners();
+  }
+
+
+  List<String> get subjects {
+    final subjects = _homeworkList
+        .map((e) => e.subjectName ?? "")
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList();
+
+    subjects.sort();
+
+    return [
+      "All Subjects",
+      ...subjects,
+    ];
+  }
+
+  void filterBySubject(String subject) {
+    _selectedSubject = subject;
+
+    if (subject == "All Subjects") {
+      _filteredHomeworkList = List.from(_homeworkList);
+    } else {
+      _filteredHomeworkList = _homeworkList
+          .where(
+            (e) => e.subjectName == subject,
+      )
+          .toList();
+    }
+
     notifyListeners();
   }
 
@@ -57,6 +99,9 @@ class StudentHomeworkViewModel extends ChangeNotifier {
 
         _homeworkList =
             _studentHomeworkModel?.data ?? [];
+
+        _filteredHomeworkList =
+            List.from(_homeworkList);
       } else {
         _handleError(
           statusCode,
@@ -80,12 +125,21 @@ class StudentHomeworkViewModel extends ChangeNotifier {
 
   Future<void> refreshHomework(
       BuildContext context) async {
+
     await studentHomeWorkApi(context);
+
+    _selectedSubject = "All Subjects";
+
+    _filteredHomeworkList =
+        List.from(_homeworkList);
+
+    notifyListeners();
   }
 
   void clearData() {
     _studentHomeworkModel = null;
     _homeworkList.clear();
+    _filteredHomeworkList.clear();
     notifyListeners();
   }
 

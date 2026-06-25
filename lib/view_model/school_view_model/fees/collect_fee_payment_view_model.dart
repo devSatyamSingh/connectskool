@@ -2,93 +2,92 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/repo/school_repo/fees/collect_fee_payment_repo.dart';
-import 'package:school_pro/repo/school_repo/classes/create_classes_repo.dart';
-import 'package:school_pro/utils/routes/routes_name.dart';
-import 'package:school_pro/view_model/school_view_model/classes/all_classes_view_model.dart';
-
 import '../../../utils/permission_extensions.dart';
 import '../../../utils/permission_keys.dart';
 import '../../../utils/utils.dart';
+import 'school_student_fee_view_model.dart';
 
 class CollectFeePaymentViewModel with ChangeNotifier {
-  final _loginRepo = CollectFeePaymentRepository();
+  final _repo = CollectFeePaymentRepository();
+
   bool _loading = false;
   bool get loading => _loading;
-  setLoading(bool value) {
-    _loading = value;
+
+  Map<String, dynamic>? _lastReceiptData;
+  Map<String, dynamic>? get lastReceiptData => _lastReceiptData;
+
+  void _setLoading(bool v) {
+    _loading = v;
     notifyListeners();
   }
 
-  Future<bool> collectFeePaymentApi(
-      dynamic student_id,
-      dynamic installment_ids,
-      dynamic payment_mode,
-      dynamic transaction_ref,
-      dynamic payment_gateway,
-      dynamic remarks,
-      context,
-      ) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.collectPayment)) {
-
-      Utils.show(
-        "You don't have permission to collect fees.",
-        context,
-      );
-
+  Future<bool> collectFeePaymentApi({
+    required dynamic studentId,
+    required List<dynamic> installmentIds,
+    List<dynamic>? transportInstallmentIds,
+    required String paymentMode,
+    String? transactionRef,
+    String? remarks,
+    required BuildContext context,
+  }) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.collectPayment)) {
+      Utils.show("You don't have permission to collect fees.", context);
       return false;
     }
-    setLoading(true);
 
-    Map data = {
-      "student_id": student_id,
-      "installment_ids": installment_ids,
-      "payment_mode": payment_mode,
-      "transaction_ref": transaction_ref,
-      "payment_gateway": payment_gateway,
-      "remarks": remarks,
+    _setLoading(true);
+
+    final Map<String, dynamic> data = {
+      'student_id': studentId,
+      'installment_ids': installmentIds,
+      if (transportInstallmentIds != null && transportInstallmentIds.isNotEmpty)
+        'transport_installment_ids': transportInstallmentIds,
+      'payment_mode': paymentMode.toLowerCase(),
+      'payment_gateway': paymentMode.toLowerCase() == 'cash' ? 'offline' : 'online',
+      if (transactionRef != null && transactionRef.isNotEmpty)
+        'transaction_ref': transactionRef,
+      if (remarks != null && remarks.isNotEmpty) 'remarks': remarks,
     };
 
     try {
-      final response = await _loginRepo.collectFeePaymentApi(data);
+      final response = await _repo.collectFeePaymentApi(data);
 
-      setLoading(false);
+      final int statusCode =
+          int.tryParse(response['status_code'].toString()) ?? 0;
 
-      final statusCode = response['status_code'];
-      final message = response['message'];
+      final String message =
+          response['message']?.toString() ??
+              response['error']?.toString() ??
+              response['msg']?.toString() ??
+              'Something went wrong';
+
+      _setLoading(false);
 
       if (statusCode == 200 || statusCode == 201) {
-        Utils.show(message ?? "Class created successfully", context);
+        if (response['data'] != null) {
+          _lastReceiptData = Map<String, dynamic>.from(response['data']);
+        }
 
-        Provider.of<AllClassesViewModel>(
-          context,
-          listen: false,
-        ).allClassesApi(context);
-        Navigator.pop(context);
-        // Navigator.pushReplacementNamed(
-        //   context,
-        //   RoutesName.classesPage,
-        // );
+        final feeVm =
+        Provider.of<StudentFeeViewModel>(context, listen: false);
 
+        final info = feeVm.studentInfo;
+        final year = feeVm.currentAcademicYear;
+
+        if (info?.studentId != null && year != null) {
+          await feeVm.refresh(info!.studentId!, year);
+        }
+
+        Utils.show(message, context);
         return true;
-      } else if (statusCode == 400) {
-        Utils.show(message ?? "Invalid data", context);
-        return false;
-      } else if (statusCode == 401) {
-        Utils.show("Unauthorized user", context);
-        return false;
-      } else if (statusCode == 500) {
-        Utils.show("Server error. Try again later", context);
-        return false;
-      } else {
-        Utils.show("Something went wrong", context);
-        return false;
       }
-    } catch (e) {
-      setLoading(false);
-      if (kDebugMode) print("API Error: $e");
 
-      Utils.show("Network error", context);
+      Utils.show(message, context);
+      return false;
+    } catch (e) {
+      _setLoading(false);
+      if (kDebugMode) print('CollectFeePayment Error: $e');
+      Utils.show('Network error', context);
       return false;
     }
   }

@@ -4048,6 +4048,7 @@ import 'package:school_pro/view_model/school_view_model/teacher/all_teachers_vie
 import 'package:school_pro/view_model/teacher_view_model/teacher_attendance_view_model.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../res/app_button.dart';
 import '../utils/permission_error_message.dart';
 import '../utils/permission_keys.dart';
 import '../view_model/school_view_model/attendance/update_teacher_attendance_view_model.dart';
@@ -4441,24 +4442,17 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: FloatingActionButton.extended(
-                heroTag: 'save_all_btn',
-                onPressed: _saving ? null : _saveAll,
-                backgroundColor: AppColor.lightBlueColor,
-                elevation: 4,
+              child: AppButton(
+                title: _saving
+                    ? "Saving..."
+                    : "Save All Attendance",
                 icon: _saving
-                    ? const SizedBox(
-                    width: 18, height: 18,
-                    child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2))
-                    : const Icon(Icons.save_rounded, color: Colors.white),
-                label: Text(
-                  _saving ? 'Saving...' : 'Save All Attendance',
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
-                ),
+                    ? null
+                    : Icons.save_rounded,
+                height: 56,
+                radius: 16,
+                loading: _saving,
+                onTap: _saveAll,
               ),
             ),
           ]),

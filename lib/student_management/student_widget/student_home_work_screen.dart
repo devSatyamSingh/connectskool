@@ -73,6 +73,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       context,
       listen: false,
     ).studentHomeWorkApi(context);
+
   }
 
   @override
@@ -129,6 +130,74 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
               ),
             ),
 
+            Consumer<StudentHomeworkViewModel>(
+              builder: (context, vm, child) {
+                if (vm.homeworkList.isEmpty) {
+                  return const SizedBox();
+                }
+
+                return Container(
+                  margin: const EdgeInsets.fromLTRB(
+                    16,
+                    14,
+                    16,
+                    0,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColor.primary.withOpacity(.15),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      dropdownColor: Colors.white,
+                      value: vm.selectedSubject,
+                      isExpanded: true,
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: AppColor.primary,
+                      ),
+                      items: vm.subjects.map((subject) {
+                        return DropdownMenuItem(
+                          value: subject,
+                          child: Row(
+                            children: [
+                              Icon(
+                                subject == "All Subjects"
+                                    ? Icons.apps_rounded
+                                    : Icons.menu_book_rounded,
+                                size: 18,
+                                color: AppColor.primary,
+                              ),
+                              const SizedBox(width: 10),
+                              Text(subject),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          vm.filterBySubject(value);
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+
             /// 🔹 Homework List
             Expanded(
               child: Consumer<StudentHomeworkViewModel>(
@@ -137,7 +206,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (vm.homeworkList.isEmpty) {
+                  if (vm.filteredHomeworkList.isEmpty){
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -168,10 +237,10 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                       const EdgeInsets.symmetric(
                         vertical: 10,
                       ),
-                      itemCount: vm.homeworkList.length,
+                      itemCount: vm.filteredHomeworkList.length,
                       itemBuilder: (context, index) {
                         return _buildHomeworkCard(
-                          vm.homeworkList[index],
+                            vm.filteredHomeworkList[index]
                         );
                       },
                     ),

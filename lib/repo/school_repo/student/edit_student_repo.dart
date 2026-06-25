@@ -1,99 +1,79 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../../../model/school_model/student/student_form_model.dart';
 import '../../../res/api_url.dart';
 import '../../../view_model/auth_view_model/user_view_model.dart';
 
 class EditStudentRepository {
   final Dio _dio = Dio();
 
-  Future<dynamic> editStudentApi({
+  Future<Map<String, dynamic>> editStudentApi({
     required String studentId,
-    required String name,
-    required String email,
-    required String password,
-    required String admission_no,
-    required String class_id,
-    required String section_id,
-    required String gender,
-    required String dob,
-    required String mobileNumber,
-    required String fatherName,
-    required String motherName,
-    required String address,
-    required String religion,
-    required String academicYear,
-    required String passedOut,
-    required String transfer,
-    required String bloodGroup,
-    required String category,
-    required String aadharNumber,
-    required String fatherOccupation,
-    required String fatherMobile,
-    required String motherOccupation,
-    required String motherMobile,
-    required String guardianName,
-    required String emergencyContactNumber,
-    required String city,
-    required String state,
-    required String pincode,
-    required String roll_no,
-    File? studentPhoto,
-    File? aadharCard,
-    File? fatherPhoto,
-    File? motherPhoto,
+    required StudentFormModel form,
   }) async {
     try {
-      final token = await UserViewModel().getToken(); // 🔥 IMPORTANT
+      final token = await UserViewModel().getToken();
 
-      FormData formData = FormData.fromMap({
+      final Map<String, dynamic> fields = {
         "student_id": studentId,
-        "name": name,
-        "user_email": email,
-        "password": password,
-        "admission_no": admission_no,
-        "gender": gender,
-        "class_id": class_id,
-        "section_id": section_id,
-        "dob":dob,
-        "mobile_number":mobileNumber,
-        "father_name":fatherName,
-        "mother_name":motherName,
-        "address":address,
-        "religion":religion,
-        "academic_year":academicYear,
-        "passed_out":passedOut,
-        "transfer":transfer,
-        "blood_group":bloodGroup,
-        "category":category,
-        "aadhar_number":aadharNumber,
-        "father_occupation":fatherOccupation,
-        "father_mobile":fatherMobile,
-        "mother_occupation":motherOccupation,
-        "mother_mobile":motherMobile,
-        "guardian_name":guardianName,
-        "emergency_contact_number":emergencyContactNumber,
-        "city":city,
-        "state":state,
-        "pincode":pincode,
-          "roll_no": roll_no,
+        "name": form.name,
+        "user_email": form.email,
+        "admission_no": form.admissionNo,
+        "gender": form.gender,
+        "class_id": form.classId,
+        "section_id": form.sectionId,
+        "dob": form.dob,
+        "mobile_number": form.mobileNumber,
+        "father_name": form.fatherName,
+        "mother_name": form.motherName,
+        "address": form.address,
+        "religion": form.religion,
+        "academic_year": form.academicYear,
+        "passed_out": form.passedOut,
+        "transfer": form.transfer,
+        "blood_group": form.bloodGroup,
+        "category": form.category,
+        "aadhar_number": form.aadharNumber,
+        "father_occupation": form.fatherOccupation,
+        "father_mobile": form.fatherMobile,
+        "mother_occupation": form.motherOccupation,
+        "mother_mobile": form.motherMobile,
+        "guardian_name": form.guardianName,
+        "emergency_contact_number": form.emergencyContactNumber,
+        "city": form.city,
+        "state": form.state,
+        "pincode": form.pincode,
+        "roll_no": form.rollNo,
+      };
 
-        if (studentPhoto != null)
-          "student_photo":
-          await MultipartFile.fromFile(studentPhoto.path),
+      // Only include password if admin explicitly set a new one
+      if (form.password.isNotEmpty) {
+        fields["password"] = form.password;
+      }
 
-        if (aadharCard != null)
-          "aadhar_card":
-          await MultipartFile.fromFile(aadharCard.path),
+      if (form.studentPhoto != null) {
+        fields["student_photo"] =
+        await MultipartFile.fromFile(form.studentPhoto!.path);
+      }
+      if (form.aadharCard != null) {
+        fields["aadhar_card"] =
+        await MultipartFile.fromFile(form.aadharCard!.path);
+      }
+      if (form.fatherPhoto != null) {
+        fields["father_photo"] =
+        await MultipartFile.fromFile(form.fatherPhoto!.path);
+      }
+      if (form.motherPhoto != null) {
+        fields["mother_photo"] =
+        await MultipartFile.fromFile(form.motherPhoto!.path);
+      }
 
-        if (fatherPhoto != null)
-          "father_photo":
-          await MultipartFile.fromFile(fatherPhoto.path),
+      final formData = FormData.fromMap(fields);
 
-        if (motherPhoto != null)
-          "mother_photo":
-          await MultipartFile.fromFile(motherPhoto.path),
-      });
+      if (kDebugMode) {
+        debugPrint("🔥 EditStudent FormData: ${formData.fields}");
+      }
 
       final response = await _dio.put(
         ApiUrl.editStudent,
@@ -101,16 +81,20 @@ class EditStudentRepository {
         options: Options(
           headers: {
             "Accept": "application/json",
-            "Authorization": "Bearer $token", // 🔥 FIX
+            "Authorization": "Bearer $token",
           },
           validateStatus: (status) => status != null && status < 500,
         ),
       );
 
-      debugPrint("✅ API Response: ${response.data}");
-      return response.data;
+      final data = response.data is Map
+          ? {...response.data as Map, "status_code": response.statusCode}
+          : {"status_code": response.statusCode, "message": "Unknown error"};
+
+      if (kDebugMode) debugPrint("✅ EditStudent Response: $data");
+      return Map<String, dynamic>.from(data);
     } catch (e) {
-      debugPrint("❌ EditStudent API Error: $e");
+      if (kDebugMode) debugPrint("❌ EditStudent Error: $e");
       rethrow;
     }
   }

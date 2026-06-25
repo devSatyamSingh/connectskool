@@ -98,6 +98,7 @@ class ApiUrl {
   static const String updateFeesHead = "$baseUrl/schooladmin/updateFeeHead";
   static const String deleteFeesHead = "$baseUrl/schooladmin/deleteFeeHead";
   static const String collectFee = "$baseUrl/schooladmin/collectFeePayment";
+  static const String discontinueFee = "$baseUrl/schooladmin/discontinueFee";
 
 
   // TRANSPORT--------------------------------------------

@@ -7,6 +7,7 @@ import 'package:school_pro/view_model/school_view_model/accountant/all_accountan
 import 'package:school_pro/view_model/accountant_attendance_view_model/accountant_attendance_view_model.dart';
 import 'package:school_pro/view_model/accountant_attendance_view_model/create_accountant_attendance_view_model.dart';
 
+import '../../res/app_button.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
@@ -419,25 +420,17 @@ class _SchoolAccountantAttendanceScreenState
           return Container(
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: FloatingActionButton.extended(
-              heroTag: 'save_all_btn',
-              onPressed: _saving ? null : _saveAll,
-              backgroundColor: AppColor.lightBlueColor,
-              elevation: 4,
+            child: AppButton(
+              title: _saving
+                  ? "Saving..."
+                  : "Save All Attendance",
               icon: _saving
-                  ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(
-                      color: Colors.white, strokeWidth: 2))
-                  : const Icon(Icons.save_rounded, color: Colors.white),
-              label: Text(
-                _saving ? 'Saving...' : 'Save All Attendance',
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15),
-              ),
+                  ? null
+                  : Icons.save_rounded,
+              height: 56,
+              radius: 16,
+              loading: _saving,
+              onTap: _saveAll,
             ),
           );
         },

@@ -10,6 +10,8 @@ import 'package:provider/provider.dart';
 import '../model/school_model/classes/all_classes_model.dart';
 import 'package:school_pro/model/school_model/exam/exam_management_model.dart';
 import '../model/school_model/timetable/get_school_exam_time_table_model.dart';
+import '../res/app_button.dart';
+import '../res/app_color.dart';
 import '../view_model/school_view_model/classes/all_classes_view_model.dart';
 import '../view_model/school_view_model/exam/exam_management_view_model.dart';
 import '../view_model/auth_view_model/school_admin_profile_view_model.dart';
@@ -393,12 +395,76 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
       top: false,
       child: Scaffold(
         backgroundColor: _surface,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          title: const Text('Exam Timetable',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(90),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: AppColor.primaryGradient,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(30),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.blue.withOpacity(.25),
+                  blurRadius: 8,
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                child: Row(
+                  children: [
+                    InkWell(
+                      onTap: () => Navigator.pop(context),
+                      borderRadius: BorderRadius.circular(30),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(.20),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 12),
+
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Exam Timetable",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+
+                          const SizedBox(height: 3),
+
+                          Text(
+                            "View exam schedule by day and period",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(.9),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -525,21 +591,17 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
       builder: (_, vm, __) {
         return SizedBox(
           width: double.infinity,
-          height: 52,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              elevation: 0,
-            ),
-            onPressed: vm.loading ? null : _loadTimetable,
+          child: AppButton(
+            title: vm.loading
+                ? "Loading..."
+                : "Load Timetable",
             icon: vm.loading
-                ? const SizedBox(width: 18, height: 18,
-                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Icon(Icons.search_rounded),
-            label: Text(vm.loading ? 'Loading...' : 'Load Timetable',
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                ? null
+                : Icons.search_rounded,
+            height: 52,
+            radius: 14,
+            loading: vm.loading,
+            onTap: _loadTimetable,
           ),
         );
       },

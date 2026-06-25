@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
+import '../res/app_button.dart';
 import '../view_model/auth_view_model/login_view_model.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -418,75 +419,24 @@ class _LoginScreenState extends State<LoginScreen>
           child: Opacity(opacity: animationValue, child: child),
         );
       },
-      child: Consumer<LoginViewModel>(
-        // ✅ Consumer use karo
+        child: Consumer<LoginViewModel>(
         builder: (context, loginViewModel, _) {
-          return Container(
-            width: double.infinity,
-            height: 55,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  AppColor.lightBlueColor,
-                  AppColor.lightBlueColor.withValues(alpha: 0.8),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColor.lightBlueColor.withOpacity(0.4),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(20),
-                onTap: loginViewModel.loading
-                    ? null
-                    : () {
-                        loginViewModel.loginApi(
-                          context,
-                          _emailController.text,
-                          _passwordController.text,
-                        );
-                      },
-                child: Center(
-                  child: loginViewModel.loading
-                      ? const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            AppText.customText(
-                              "Sign In",
-                              size: 18,
-                              weight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 10),
-                            const Icon(
-                              Icons.arrow_forward_rounded,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ],
-                        ),
-                ),
-              ),
-            ),
+      return AppButton(
+        title: "Sign In",
+        icon: Icons.arrow_forward_rounded,
+        height: 50,
+        radius: 20,
+        loading: loginViewModel.loading,
+        onTap: () {
+          loginViewModel.loginApi(
+            context,
+            _emailController.text,
+            _passwordController.text,
           );
         },
-      ),
+      );
+    },
+    ),
     );
   }
 

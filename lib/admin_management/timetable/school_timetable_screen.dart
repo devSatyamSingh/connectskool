@@ -13,6 +13,7 @@ import 'package:school_pro/view_model/school_view_model/subject/all_subjects_vie
 import 'package:school_pro/view_model/school_view_model/teacher/all_teachers_view_model.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../model/school_model/timetable/classes_time_table_model.dart';
+import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../utils/permission_extensions.dart';
@@ -57,7 +58,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
     'Friday',
     'Saturday',
   ];
-// ── Replace your _downloadTimetable method with this ──────────────────────────
 
   Future<void> _downloadTimetable(List<TimeTableData> data) async {
     if (_isDownloadingPdf) return;
@@ -458,7 +458,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
     }
   }
 
-// ── PDF Helper widgets ─────────────────────────────────────────────────────────
 
   pw.Widget _statChip(String label, String value, PdfColor bg, PdfColor fg) {
     return pw.Container(
@@ -732,27 +731,29 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColor.pageBgColor,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          if (!PermissionExtensions.canAccess(PermissionKeys.manageTimetable)) {
-            Utils.show(
-              "You don't have permission to manage timetable",
-              context,
-            );
-            return;
-          }
-          _showCreateSheet();
-        },
-        backgroundColor: AppColor.lightBlueColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text(
-          'Add Period',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-          ),
+      floatingActionButtonLocation:
+      FloatingActionButtonLocation.endFloat,
+
+      floatingActionButton: SizedBox(
+        width: 170,
+        child: AppButton(
+          title: "Add Period",
+          icon: Icons.add_rounded,
+          height: 56,
+          radius: 16,
+          onTap: () {
+            if (!PermissionExtensions.canAccess(
+              PermissionKeys.manageTimetable,
+            )) {
+              Utils.show(
+                "You don't have permission to manage timetable",
+                context,
+              );
+              return;
+            }
+
+            _showCreateSheet();
+          },
         ),
       ),
       body: Column(

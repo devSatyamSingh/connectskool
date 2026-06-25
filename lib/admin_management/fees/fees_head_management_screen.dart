@@ -535,16 +535,19 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
       child: Scaffold(
         backgroundColor: AppColor.pageBgColor,
 
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: AppColor.lightBlueColor,
-          onPressed: _showAddFeeHeadBottomSheet,
-          icon: const Icon(Icons.add, color: Colors.white),
-          label: Text(
-            "Add Fee Head",
-            style: GoogleFonts.poppins(color: Colors.white),
+        floatingActionButtonLocation:
+        FloatingActionButtonLocation.endFloat,
+
+        floatingActionButton: SizedBox(
+          width: 180,
+          child: AppButton(
+            title: "Add Fee Head",
+            icon: Icons.add_rounded,
+            height: 56,
+            radius: 18,
+            onTap: _showAddFeeHeadBottomSheet,
           ),
         ),
-
         body: Consumer<FeesHeadManagementViewModel>(
           builder: (context, vm, _) {
             final feeHeads = vm.feesHeadManagementModel?.data?.feeHeads ?? [];

@@ -6,6 +6,7 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/utils/utils.dart';
 import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart';
 import '../../repo/school_repo/section/all_sections_repo.dart';
+import '../../res/app_button.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../view_model/school_view_model/classes/all_classes_view_model.dart';
@@ -353,32 +354,17 @@ class _CardFilterFormState extends State<_CardFilterForm>
         const SizedBox(height: 14),
         SizedBox(
           width: double.infinity,
-          height: 48,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColor.lightBlueColor,
-              disabledBackgroundColor:
-              AppColor.lightBlueColor.withOpacity(0.6),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: widget.loading ? null : _handleGenerate,
+          child: AppButton(
+            title: widget.loading
+                ? "Generating..."
+                : widget.buttonLabel,
             icon: widget.loading
-                ? const SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(
-                  color: Colors.white, strokeWidth: 2),
-            )
-                : Icon(widget.buttonIcon,
-                color: Colors.white, size: 18),
-            label: Text(
-              widget.loading ? 'Generating...' : widget.buttonLabel,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600),
-            ),
+                ? null
+                : widget.buttonIcon,
+            height: 48,
+            radius: 12,
+            loading: widget.loading,
+            onTap: _handleGenerate,
           ),
         ),
       ],

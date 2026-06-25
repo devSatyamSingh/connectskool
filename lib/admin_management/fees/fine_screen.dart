@@ -590,23 +590,29 @@ class _FineManagementScreenState extends State<FineManagementScreen>
       top: false,
       child: Scaffold(
         backgroundColor: AppColor.pageBgColor,
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: AppColor.lightBlueColor,
-          onPressed: () {
-            if (!PermissionExtensions.canAccess(PermissionKeys.manageFees)) {
-              Utils.show(
-                "You don't have permission to perform this action.",
-                context,
-              );
-              return;
-            }
+        floatingActionButtonLocation:
+        FloatingActionButtonLocation.endFloat,
 
-            _openAddEditFineSheet();
-          },
-          icon: const Icon(Icons.add_rounded, color: Colors.white),
-          label: Text(
-            "Add Rule",
-            style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
+        floatingActionButton: SizedBox(
+          width: 160,
+          child: AppButton(
+            title: "Add Rule",
+            icon: Icons.add_rounded,
+            height: 56,
+            radius: 18,
+            onTap: () {
+              if (!PermissionExtensions.canAccess(
+                PermissionKeys.manageFees,
+              )) {
+                Utils.show(
+                  "You don't have permission to perform this action.",
+                  context,
+                );
+                return;
+              }
+
+              _openAddEditFineSheet();
+            },
           ),
         ),
         body: Column(

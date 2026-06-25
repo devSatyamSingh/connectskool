@@ -20,41 +20,46 @@ class CmsScreen extends StatefulWidget {
 }
 
 class _CmsScreenState extends State<CmsScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final vm = Provider.of<CmsViewModel>(context, listen: false);
+      if (vm.cmsModel == null) {
+        vm.getCmsPages();
+      }
+    });
+  }
+
   String cleanHtml(String html) {
     html = html.replaceAll(
       RegExp(r'<style[^>]*>.*?</style>', dotAll: true),
       '',
     );
-
     html = html.replaceAll(RegExp(r'<head[^>]*>.*?</head>', dotAll: true), '');
-
     return html;
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final width = media.size.width;
 
     return Consumer<CmsViewModel>(
       builder: (context, vm, child) {
         final CmsPage? page = vm.getPageByType(widget.pageType);
-        if (!PermissionExtensions.canAccess(
-            PermissionKeys.manageSchoolSettings)) {
 
+        // ✅ Permission check pehle
+        if (!PermissionExtensions.canAccess(PermissionKeys.manageSchoolSettings)) {
           return Scaffold(
             body: Center(
-              child: AppText.customText(
-                "You don't have permission",
-              ),
+              child: AppText.customText("You don't have permission"),
             ),
           );
         }
 
         return Scaffold(
           backgroundColor: AppColor.bg,
-
           body: Column(
             children: [
               /// HEADER
@@ -91,9 +96,7 @@ class _CmsScreenState extends State<CmsScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: AppText.customText(
                         widget.title,
@@ -106,169 +109,161 @@ class _CmsScreenState extends State<CmsScreen> {
                 ),
               ),
 
+              /// BODY
               Expanded(
                 child: vm.loading
-                    ? const _CmsLoadingView()
+                    ? const _CmsLoadingView()          // ✅ Shimmer loading
                     : page == null
-                    ? Center(
-                        child: AppText.customText(
-                          "Content not available",
-                          size: 15,
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          children: [
-                            /// UPDATED CARD
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(14),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(.03),
-                                    blurRadius: 10,
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                      color: AppColor.primaryLight,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: const Icon(
-                                      Icons.schedule,
-                                      color: AppColor.primary,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        AppText.customText(
-                                          "Last Updated",
-                                          size: 12,
-                                          color: AppColor.textGrey,
-                                        ),
-
-                                        AppText.customText(
-                                          page.updatedAt ?? "",
-                                          size: 13,
-                                          weight: FontWeight.w600,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            /// CONTENT CARD
-                            Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(.04),
-                                    blurRadius: 16,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(18),
-                                  child: Html(
-                                    data: cleanHtml(page.content ?? ""),
-
-                                    style: {
-                                      "html": Style(
-                                        margin: Margins.zero,
-                                        padding: HtmlPaddings.zero,
-                                      ),
-
-                                      "body": Style(
-                                        margin: Margins.zero,
-                                        padding: HtmlPaddings.zero,
-                                        fontSize: FontSize(14),
-                                        lineHeight: LineHeight(1.8),
-                                      ),
-
-                                      "header": Style(display: Display.none),
-
-                                      "footer": Style(display: Display.none),
-
-                                      "style": Style(display: Display.none),
-
-                                      "h1": Style(
-                                        color: AppColor.primary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: FontSize(22),
-                                      ),
-
-                                      "h2": Style(
-                                        color: AppColor.primary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: FontSize(18),
-                                      ),
-
-                                      "h3": Style(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: FontSize(16),
-                                      ),
-
-                                      "p": Style(
-                                        fontSize: FontSize(14),
-                                        lineHeight: LineHeight(1.8),
-                                        color: Colors.black87,
-                                      ),
-
-                                      "ul": Style(
-                                        padding: HtmlPaddings.only(left: 18),
-                                      ),
-
-                                      "li": Style(
-                                        lineHeight: LineHeight(1.8),
-                                        margin: Margins.only(bottom: 8),
-                                      ),
-
-                                      "a": Style(
-                                        color: AppColor.primary,
-                                        textDecoration:
-                                            TextDecoration.underline,
-                                      ),
-
-                                      "strong": Style(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 30),
-                          ],
-                        ),
-                      ),
+                    ? _buildEmpty()                // ✅ Graceful empty state
+                    : _buildContent(page),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget _buildEmpty() {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.article_outlined, size: 52, color: Colors.grey.shade300),
+          const SizedBox(height: 12),
+          AppText.customText(
+            "Content not available",
+            size: 15,
+            color: AppColor.textGrey,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContent(CmsPage page) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          /// LAST UPDATED CARD
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.03),
+                  blurRadius: 10,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  height: 40,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: AppColor.primaryLight,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.schedule, color: AppColor.primary),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppText.customText(
+                        "Last Updated",
+                        size: 12,
+                        color: AppColor.textGrey,
+                      ),
+                      AppText.customText(
+                        page.updatedAt ?? "",
+                        size: 13,
+                        weight: FontWeight.w600,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          /// CONTENT CARD
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.04),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding: const EdgeInsets.all(18),
+                child: Html(
+                  data: cleanHtml(page.content ?? ""),
+                  style: {
+                    "html": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
+                    "body": Style(
+                      margin: Margins.zero,
+                      padding: HtmlPaddings.zero,
+                      fontSize: FontSize(14),
+                      lineHeight: LineHeight(1.8),
+                    ),
+                    "header": Style(display: Display.none),
+                    "footer": Style(display: Display.none),
+                    "style": Style(display: Display.none),
+                    "h1": Style(
+                      color: AppColor.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: FontSize(22),
+                    ),
+                    "h2": Style(
+                      color: AppColor.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: FontSize(18),
+                    ),
+                    "h3": Style(
+                      fontWeight: FontWeight.w600,
+                      fontSize: FontSize(16),
+                    ),
+                    "p": Style(
+                      fontSize: FontSize(14),
+                      lineHeight: LineHeight(1.8),
+                      color: Colors.black87,
+                    ),
+                    "ul": Style(padding: HtmlPaddings.only(left: 18)),
+                    "li": Style(
+                      lineHeight: LineHeight(1.8),
+                      margin: Margins.only(bottom: 8),
+                    ),
+                    "a": Style(
+                      color: AppColor.primary,
+                      textDecoration: TextDecoration.underline,
+                    ),
+                    "strong": Style(fontWeight: FontWeight.bold),
+                  },
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 30),
+        ],
+      ),
     );
   }
 }

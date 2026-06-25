@@ -3353,40 +3353,44 @@ class _AllAccountantListScreenState extends State<AllAccountantListScreen>
     );
   }
 
-  // ════════════════════════════════════════════════════════
-  //  MAIN SCREEN BUILD
-  // ════════════════════════════════════════════════════════
+
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<AllAccountantListVieModel>(context);
-    final accountants =
-        viewModel.allAccountantListModel?.data ?? <AccountantData>[];
+    final accountants = viewModel.allAccountantListModel?.data ?? <AccountantData>[];
 
     return Scaffold(
       backgroundColor: AppColor.screenBg,
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColor.lightBlueColor,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text(
-          'Add Accountant',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-        ),
-        onPressed: () {
-          if (!PermissionExtensions.canAccess(PermissionKeys.addAccountant)) {
-            Utils.show(
-              "You don't have permission to add accountant",
-              context,
-            );
-            return;
-          }
+      floatingActionButtonLocation:
+      FloatingActionButtonLocation.endFloat,
 
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const AddAccountantScreen()),
-          );
-        },
-      ),
-      body: Column(
+      floatingActionButton: SizedBox(
+        width: 190,
+        child: AppButton(
+          title: "Add Accountant",
+          icon: Icons.add_rounded,
+          height: 56,
+          radius: 18,
+          onTap: () {
+            if (!PermissionExtensions.canAccess(
+              PermissionKeys.addAccountant,
+            )) {
+              Utils.show(
+                "You don't have permission to add accountant",
+                context,
+              );
+              return;
+            }
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const AddAccountantScreen(),
+              ),
+            );
+          },
+        ),
+      ),      body: Column(
         children: [
           // ── Header ──
           Container(

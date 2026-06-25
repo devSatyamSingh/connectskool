@@ -65,30 +65,31 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
       top: false,
       child: Scaffold(
         backgroundColor: AppColor.pageBgColor,
-        floatingActionButton: FloatingActionButton.extended(
-          backgroundColor: AppColor.lightBlueColor,
-          onPressed: () {
+        floatingActionButtonLocation:
+        FloatingActionButtonLocation.endFloat,
 
-            if (!PermissionExtensions.canAccess(
-                PermissionKeys.addSubject)) {
+        floatingActionButton: SizedBox(
+          width: 180,
+          child: AppButton(
+            title: "Add Subject",
+            icon: Icons.add_rounded,
+            height: 56,
+            radius: 18,
+            onTap: () {
+              if (!PermissionExtensions.canAccess(
+                PermissionKeys.addSubject,
+              )) {
+                Utils.show(
+                  "You don't have permission to add subject",
+                  context,
+                );
+                return;
+              }
 
-              Utils.show(
-                "You don't have permission to add subject",
-                context,
-              );
-
-              return;
-            }
-
-            _openSubjectSheet();
-          },
-          icon: Icon(Icons.add_rounded, color: AppColor.white),
-          label: const Text(
-            "Add Subject",
-            style: TextStyle(fontWeight: FontWeight.w600, color: AppColor.white),
+              _openSubjectSheet();
+            },
           ),
         ),
-
         body: Column(
           children: [
             /// ===== HEADER =====

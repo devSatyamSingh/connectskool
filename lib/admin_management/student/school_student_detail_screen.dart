@@ -395,6 +395,57 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                   ),
                 ]),
 
+                // ── Fee Heads ──────────────────────────────
+                if ((s.feeHeads ?? []).isNotEmpty)
+                  _buildSection(
+                    'Assigned Fee Heads',
+                    [
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: (s.feeHeads ?? []).map((fee) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColor.lightBlueColor.withOpacity(0.15),
+                                  AppColor.lightBlueColor.withOpacity(0.05),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: AppColor.lightBlueColor.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.payments_rounded,
+                                  color: AppColor.lightBlueColor,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  fee,
+                                  style: TextStyle(
+                                    color: AppColor.lightBlueColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+
                 // ── Documents ──────────────────────────────
                 _buildSection('Documents', [
                   _buildDocumentCard(

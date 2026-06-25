@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../../model/school_model/fees/school_student_fee_model.dart';
 import '../../../repo/school_repo/fees/school_student_fee_repo.dart';
 
 class StudentFeeViewModel extends ChangeNotifier {
-
   final StudentFeeRepository _repo = StudentFeeRepository();
 
   bool _loading = false;
@@ -13,48 +11,49 @@ class StudentFeeViewModel extends ChangeNotifier {
   StudentFeeModel? _feeModel;
   StudentFeeModel? get feeModel => _feeModel;
 
-  /// shortcut getters
+  // ── Shortcut getters ──────────────────────────────────────────────────────
   StudentInfo? get studentInfo => _feeModel?.data?.studentInfo;
   Summary? get summary => _feeModel?.data?.summary;
   List<FeeBreakdown> get feeBreakdown =>
       _feeModel?.data?.feeBreakdown ?? [];
+  List<TransportFeeBreakdown> get transportFeeBreakdown =>
+      _feeModel?.data?.transportFeeBreakdown ?? [];
+  List<dynamic> get paymentHistory =>
+      _feeModel?.data?.paymentHistory ?? [];
+  String? get currentAcademicYear =>
+      _feeModel?.data?.currentAcademicYear;
 
-  /// ================= FETCH STUDENT FEES =================
-
+  // ── Fetch ─────────────────────────────────────────────────────────────────
   Future<void> fetchStudentFees({
     required int studentId,
     required String academicYear,
   }) async {
-
     _loading = true;
     notifyListeners();
 
     try {
+      final response = await _repo.getStudentFees(studentId, academicYear);
 
-      final response = await _repo.getStudentFees(
-        studentId,
-        academicYear,
-      );
-
-      if (response != null && response["success"] == true) {
-
-        /// Fix for Map<dynamic,dynamic> error
-        final Map<String, dynamic> data =
-        Map<String, dynamic>.from(response);
-
-        _feeModel = StudentFeeModel.fromJson(data);
-
+      if (response != null && response['success'] == true) {
+        _feeModel = StudentFeeModel.fromJson(
+          Map<String, dynamic>.from(response),
+        );
       }
-
     } catch (e) {
-      debugPrint("Student Fee API Error: $e");
+      debugPrint('StudentFeeViewModel Error: $e');
     }
 
     _loading = false;
     notifyListeners();
   }
 
-  /// ================= CLEAR DATA =================
+  // ── Refresh after payment ─────────────────────────────────────────────────
+  Future<void> refresh(int studentId, String academicYear) async {
+    await fetchStudentFees(
+      studentId: studentId,
+      academicYear: academicYear,
+    );
+  }
 
   void clearData() {
     _feeModel = null;

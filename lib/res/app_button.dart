@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../res/app_color.dart';
 import '../res/const_text.dart';
 
@@ -56,14 +57,10 @@ class AppButton extends StatelessWidget {
           onTap: loading ? null : onTap,
           child: Container(
             alignment: Alignment.center,
-            child: loading
-                ? SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(finalTextColor),
-              ),
+              child: loading
+                  ? SpinKitThreeBounce(
+                color: finalTextColor,
+                size: 20,
             )
                 : Row(
               mainAxisAlignment: MainAxisAlignment.center,

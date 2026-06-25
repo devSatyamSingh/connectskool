@@ -9,6 +9,7 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import '../model/school_model/classes/all_classes_model.dart';
 import '../model/school_model/section/all_sections_model.dart';
 import '../../model/student_model/timetable_model.dart';
+import '../res/app_button.dart';
 import '../view_model/school_view_model/classes/all_classes_view_model.dart';
 import '../res/app_color.dart';
 import '../utils/permission_extensions.dart';
@@ -449,28 +450,12 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
           Row(
             children: [
               Expanded(
-                child: ElevatedButton(
-                  onPressed: _loadTimetable,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: const Color(0xFF1E88E5),
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.refresh_rounded, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        "Load Timetable",
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
+                child: AppButton(
+                  title: "Load Timetable",
+                  icon: Icons.refresh_rounded,
+                  height: 50,
+                  radius: 14,
+                  onTap: _loadTimetable,
                 ),
               ),
               if (hasData) ...[
