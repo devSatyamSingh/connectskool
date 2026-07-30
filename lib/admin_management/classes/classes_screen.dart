@@ -17,7 +17,6 @@ import 'package:school_pro/utils/utils.dart';
 
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
-import 'create_class_screen.dart';
 
 class ClassesPage extends StatefulWidget {
   const ClassesPage({super.key});
@@ -30,12 +29,12 @@ class _ClassesPageState extends State<ClassesPage>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
 
-  // Track which class cards are expanded
-  final Set<int> _expandedClassIds = {};
-
-  // Search query
   String _searchQuery = '';
   final TextEditingController _searchCtrl = TextEditingController();
+
+  // ✅ Track kaunsa sections sheet abhi open hai (exclusive close/open ke liye)
+  bool _sectionsSheetOpen = false;
+  int? _openSheetClassId;
 
   @override
   void initState() {
@@ -47,14 +46,17 @@ class _ClassesPageState extends State<ClassesPage>
     )..forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final classVM =
-      Provider.of<AllClassesViewModel>(context, listen: false);
+      if (!mounted) return;
+      final classVM = Provider.of<AllClassesViewModel>(context, listen: false);
       await classVM.allClassesApi(context);
 
-      // Load sections for all classes
+      if (!mounted) return;
+      // Sab classes ke section counts ek saath fetch karo (sirf badge count ke liye)
       final classes = classVM.allClassesModel?.data ?? [];
-      final sectionVM =
-      Provider.of<AllSectionsViewModel>(context, listen: false);
+      final sectionVM = Provider.of<AllSectionsViewModel>(
+        context,
+        listen: false,
+      );
       for (final c in classes) {
         sectionVM.allSectionsApi(context, c.classId.toString());
       }
@@ -68,59 +70,45 @@ class _ClassesPageState extends State<ClassesPage>
     super.dispose();
   }
 
-  // Future<void> _onRefresh() async {
-  //   _animationController.reset();
-  //   final classVM =
-  //   Provider.of<AllClassesViewModel>(context, listen: false);
-  //   await classVM.allClassesApi(context);
-  //
-  //   final classes = classVM.allClassesModel?.data ?? [];
-  //   final sectionVM =
-  //   Provider.of<AllSectionsViewModel>(context, listen: false);
-  //   for (final c in classes) {
-  //     await sectionVM.allSectionsApi(context, c.classId.toString());
-  //   }
-  //   _animationController.forward();
-  // }
   Future<void> _onRefresh() async {
     _animationController.reset();
-
 
     final classVM = Provider.of<AllClassesViewModel>(context, listen: false);
     final sectionVM = Provider.of<AllSectionsViewModel>(context, listen: false);
 
-    // ✅ Pehle classes fetch karo
     await classVM.allClassesApi(context);
 
-    // ✅ Sabhi classes ke sections ek saath fetch karo (parallel)
     final classes = classVM.allClassesModel?.data ?? [];
     await Future.wait(
-      classes.map((c) => sectionVM.allSectionsApi(context, c.classId.toString())),
+      classes.map(
+        (c) => sectionVM.allSectionsApi(context, c.classId.toString()),
+      ),
     );
-
-    print(
-      "REFRESH CLASSES => ${classes.length}",
-    );
-    // ✅ Expanded classes ke sections dobara explicitly fetch karo
-    for (final classId in _expandedClassIds) {
-      await sectionVM.allSectionsApi(context, classId.toString());
-    }
 
     if (!mounted) return;
-
     _animationController.forward();
-    setState(() {}); // ✅ Force rebuild
+    setState(() {});
   }
+
   void _snack(BuildContext ctx, String msg) {
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(
-        content: Row(children: [
-          const Icon(Icons.info_outline_rounded, color: Colors.white, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-              child: Text(msg,
-                  style: const TextStyle(fontWeight: FontWeight.w500))),
-        ]),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.info_outline_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                msg,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: AppColor.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -138,68 +126,34 @@ class _ClassesPageState extends State<ClassesPage>
     final sectionVM = Provider.of<AllSectionsViewModel>(context);
     final allClasses = classVM.allClassesModel?.data ?? [];
 
-    final canViewClasses =
-    PermissionExtensions.canAccess(
+    final canViewClasses = PermissionExtensions.canAccess(
       PermissionKeys.viewClasses,
     );
 
     final filteredClasses = _searchQuery.isEmpty
         ? allClasses
         : allClasses
-        .where((c) =>
-    (c.className ?? '')
-        .toLowerCase()
-        .contains(_searchQuery.toLowerCase()) ||
-        (c.classCode ?? '')
-            .toLowerCase()
-            .contains(_searchQuery.toLowerCase()))
-        .toList();
+              .where(
+                (c) =>
+                    (c.className ?? '').toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ) ||
+                    (c.classCode ?? '').toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ),
+              )
+              .toList();
 
     if (!canViewClasses) {
-      return Scaffold(
-        body: Center(
-          child: Text(
-            "You don't have permission to view classes",
-          ),
-        ),
+      return const Scaffold(
+        body: Center(child: Text("You don't have permission to view classes")),
       );
     }
-
-    print(
-      "BUILD CLASSES => ${classVM.allClassesModel?.data?.length}",
-    );
 
     return SafeArea(
       top: false,
       child: Scaffold(
         backgroundColor: AppColor.pageBgColor,
-        // floatingActionButton:
-        // PermissionExtensions.canAccess(
-        //   PermissionKeys.manageClasses,
-        // )
-        //     ? FloatingActionButton.extended(
-        //   onPressed: () {
-        //     Navigator.push(
-        //       context,
-        //       MaterialPageRoute(
-        //         builder: (_) => const CreateClassScreen(),
-        //       ),
-        //     );
-        //   },
-        //   backgroundColor: AppColor.primary,
-        //   icon: const Icon(
-        //     Icons.add,
-        //     color: Colors.white,
-        //   ),
-        //   label: const Text(
-        //     "Create Class",
-        //     style: TextStyle(
-        //       color: Colors.white,
-        //       fontWeight: FontWeight.w600,
-        //     ),
-        //   ),
-        // )
-        //     : null,
         body: Column(
           children: [
             // ── Header ──
@@ -207,13 +161,15 @@ class _ClassesPageState extends State<ClassesPage>
               padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
               decoration: BoxDecoration(
                 gradient: AppColor.primaryGradient,
-                borderRadius:
-                const BorderRadius.vertical(bottom: Radius.circular(28)),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(28),
+                ),
                 boxShadow: [
                   BoxShadow(
-                      color: AppColor.blueShadow,
-                      blurRadius: 18,
-                      offset: const Offset(0, 10)),
+                    color: AppColor.blueShadow,
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                  ),
                 ],
               ),
               child: Column(
@@ -263,39 +219,42 @@ class _ClassesPageState extends State<ClassesPage>
                       const SizedBox(width: 12),
                     ],
                   ),
-
                   const SizedBox(height: 16),
-
-                  // ── Search Bar ──
                   Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.18),
                       borderRadius: BorderRadius.circular(14),
-                      border:
-                      Border.all(color: Colors.white.withOpacity(0.3)),
+                      border: Border.all(color: Colors.white.withOpacity(0.3)),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.search_rounded,
-                            color: Colors.white70, size: 20),
+                        const Icon(
+                          Icons.search_rounded,
+                          color: Colors.white70,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: TextField(
                             controller: _searchCtrl,
                             style: const TextStyle(
-                                color: Colors.white, fontSize: 14),
-                            onChanged: (v) =>
-                                setState(() => _searchQuery = v),
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                            onChanged: (v) => setState(() => _searchQuery = v),
                             decoration: const InputDecoration(
                               hintText: "Search classes...",
                               hintStyle: TextStyle(
-                                  color: Colors.white60, fontSize: 14),
+                                color: Colors.white60,
+                                fontSize: 14,
+                              ),
                               border: InputBorder.none,
                               isDense: true,
-                              contentPadding:
-                              EdgeInsets.symmetric(vertical: 8),
+                              contentPadding: EdgeInsets.symmetric(vertical: 8),
                             ),
                           ),
                         ),
@@ -305,8 +264,11 @@ class _ClassesPageState extends State<ClassesPage>
                               _searchCtrl.clear();
                               setState(() => _searchQuery = '');
                             },
-                            child: const Icon(Icons.close_rounded,
-                                color: Colors.white70, size: 18),
+                            child: const Icon(
+                              Icons.close_rounded,
+                              color: Colors.white70,
+                              size: 18,
+                            ),
                           ),
                       ],
                     ),
@@ -322,54 +284,56 @@ class _ClassesPageState extends State<ClassesPage>
               child: classVM.loading
                   ? _shimmer()
                   : filteredClasses.isEmpty
-                      ? ListView(
-                    physics:
-                    const AlwaysScrollableScrollPhysics(),
-                    children: [
-                      SizedBox(
-                        height:
-                        MediaQuery.of(context).size.height *
-                            0.5,
-                        child: Column(
-                          mainAxisAlignment:
-                          MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.search_off,
-                                size: 60, color: Colors.grey),
-                            SizedBox(height: 10),
-                            Text("No classes found",
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.search_off,
+                                size: 60,
+                                color: Colors.grey,
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                "No classes found",
                                 style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                    fontWeight:
-                                    FontWeight.w500)),
-                          ],
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-                      : ListView.builder(
-                    physics:
-                    const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(
-                        18, 8, 18, 40),
-                    itemCount: filteredClasses.length,
-                    itemBuilder: (context, index) {
-                      final c = filteredClasses[index];
-                      final classId = c.classId ?? 0;
-                      final allSections =
-                          sectionVM.allSectionsModel?.data ??
-                              [];
-                      final classSections = allSections
-                          .where((s) =>
-                      s.classId.toString() ==
-                          classId.toString())
-                          .toList();
+                      ],
+                    )
+                  : RefreshIndicator(
+                      color: AppColor.lightBlueColor,
+                      onRefresh: _onRefresh,
+                      child: ListView.builder(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
+                        itemCount: filteredClasses.length,
+                        itemBuilder: (context, index) {
+                          final c = filteredClasses[index];
+                          final classId = c.classId ?? 0;
+                          final allSections =
+                              sectionVM.allSectionsModel?.data ?? [];
+                          final classSections = allSections
+                              .where(
+                                (s) =>
+                                    s.classId.toString() == classId.toString(),
+                              )
+                              .toList();
 
-                      return _animatedCard(
-                          index, c, classSections, sectionVM);
-                    },
-                  ),
+                          return _animatedCard(index, c, classSections);
+                        },
+                      ),
+                    ),
             ),
           ],
         ),
@@ -402,32 +366,28 @@ class _ClassesPageState extends State<ClassesPage>
   // ─────────────────────────────────────────────
   //  Animated wrapper
   // ─────────────────────────────────────────────
-  Widget _animatedCard(int index, dynamic c, List<dynamic> classSections,
-      AllSectionsViewModel sectionVM) {
+  Widget _animatedCard(int index, dynamic c, List<dynamic> classSections) {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        final delay = index * 0.08;
+        final delay = (index * 0.08).clamp(0.0, 0.9); // ✅ negative-safe
         final value = Curves.easeOut.transform(
-          (_animationController.value - delay).clamp(0.0, 1.0) /
-              (1 - delay),
+          (_animationController.value - delay).clamp(0.0, 1.0) / (1 - delay),
         );
         return Transform.translate(
           offset: Offset(0, 30 * (1 - value)),
           child: Opacity(opacity: value, child: child),
         );
       },
-      child: _classCard(c, classSections, sectionVM),
+      child: _classCard(c, classSections),
     );
   }
 
   // ─────────────────────────────────────────────
-  //  Class Card (expandable)
+  //  Class Card — sirf name, code, section count + View Sections button
   // ─────────────────────────────────────────────
-  Widget _classCard(
-      dynamic c, List<dynamic> classSections, AllSectionsViewModel sectionVM) {
+  Widget _classCard(dynamic c, List<dynamic> classSections) {
     final classId = c.classId ?? 0;
-    final isExpanded = _expandedClassIds.contains(classId);
     final color = Colors.primaries[classId % Colors.primaries.length];
 
     return Container(
@@ -443,304 +403,402 @@ class _ClassesPageState extends State<ClassesPage>
           ),
         ],
       ),
-      child: Column(
-        children: [
-          // ── Class Header Row ──
-          InkWell(
-            borderRadius: BorderRadius.circular(20),
-            // onTap: () {
-            //   setState(() {
-            //     if (isExpanded) {
-            //       _expandedClassIds.remove(classId);
-            //     } else {
-            //       _expandedClassIds.add(classId);
-            //       // Fetch sections for this class if not already
-            //       sectionVM.allSectionsApi(
-            //           context, classId.toString());
-            //     }
-            //   });
-            // },
-            onTap: () {
-              setState(() {
-                if (isExpanded) {
-                  _expandedClassIds.remove(classId);
-                } else {
-                  _expandedClassIds.add(classId);
-                  // ✅ Expand hone par fresh fetch karo
-                  Provider.of<AllSectionsViewModel>(context, listen: false)
-                      .allSectionsApi(context, classId.toString())
-                      .then((_) => setState(() {})); // ✅ Data aane par rebuild
-                }
-              });
-            },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-              child: Row(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(Icons.school_rounded, color: color, size: 24),
+            ),
+            const SizedBox(width: 12),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Icon
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(Icons.school_rounded,
-                        color: color, size: 24),
-                  ),
-                  const SizedBox(width: 12),
-
-                  // Name + Code
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            AppText.customText(
-                              c.className ?? "",
-                              size: 14,
-                              weight: FontWeight.bold,
-                            ),
-                            const SizedBox(width: 8),
-                            // Section count badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: AppColor.primary.withOpacity(0.12),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                "${classSections.length} Sections",
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColor.primary,
-                                ),
-                              ),
-                            ),
-                          ],
+                  Row(
+                    children: [
+                      Flexible(
+                        child: AppText.customText(
+                          c.className ?? "",
+                          size: 14,
+                          weight: FontWeight.bold,
                         ),
-                        const SizedBox(height: 3),
-                        AppText.customText(
-                          "Code: ${c.classCode ?? '—'}",
-                          size: 12,
-                          color: AppColor.softGreyText,
-                        ),
-                      ],
-                    ),
+                      ),
+                      // const SizedBox(width: 8),
+                      // Container(
+                      //   padding: const EdgeInsets.symmetric(
+                      //     horizontal: 8,
+                      //     vertical: 3,
+                      //   ),
+                      //   decoration: BoxDecoration(
+                      //     color: AppColor.primary.withOpacity(0.12),
+                      //     borderRadius: BorderRadius.circular(20),
+                      //   ),
+                      //   child: Text(
+                      //     "${classSections.length} Sections",
+                      //     style: TextStyle(
+                      //       fontSize: 9,
+                      //       fontWeight: FontWeight.w700,
+                      //       color: AppColor.primary,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
                   ),
-
-                  // Edit & Delete icons
-                  _cardIconBtn(
-                    icon: Icons.edit_note_rounded,
-                    color: color,
-                    bg: color.withOpacity(0.10),
-                    onTap: () {
-
-                      if (!PermissionExtensions.canAccess(
-                          PermissionKeys.manageClasses)) {
-
-                        Utils.show(
-                          "You don't have permission to edit classes",
-                          context,
-                        );
-
-                        return;
-                      }
-
-                      _openEditClassSheet(c, color);
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  _cardIconBtn(
-                    icon: Icons.delete_outline_rounded,
-                    color: AppColor.error,
-                    bg: AppColor.error.withOpacity(0.08),
-                    onTap: () async {
-                      if (!PermissionExtensions.canAccess(
-                          PermissionKeys.manageClasses)) {
-
-                        Utils.show(
-                          "You don't have permission to delete classes",
-                          context,
-                        );
-
-                        return;
-                      }
-
-                      final confirmed =
-                      await _showDeleteDialog(c.className ?? "", "Class");
-                      if (confirmed) {
-                        Provider.of<DeleteClassViewModel>(context,
-                            listen: false)
-                            .deleteClassApi(
-                            classId.toString(), context);
-                      }
-                    },
-                  ),
-                  const SizedBox(width: 6),
-                  Icon(
-                    isExpanded
-                        ? Icons.keyboard_arrow_up_rounded
-                        : Icons.keyboard_arrow_down_rounded,
+                  const SizedBox(height: 3),
+                  AppText.customText(
+                    "Code: ${c.classCode ?? '—'}",
+                    size: 12,
                     color: AppColor.softGreyText,
                   ),
                 ],
               ),
             ),
-          ),
 
-          // ── Expanded Sections ──
-          AnimatedCrossFade(
-            firstChild: const SizedBox.shrink(),
-            secondChild: _sectionsExpanded(classSections, c, color, sectionVM),
-            crossFadeState: isExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
-            duration: const Duration(milliseconds: 300),
-            sizeCurve: Curves.easeInOut,
-          ),
-        ],
-      ),
-    );
-  }
+            const SizedBox(width: 8),
 
-  // ─────────────────────────────────────────────
-  //  Expanded Sections panel
-  // ─────────────────────────────────────────────
-  Widget _sectionsExpanded(List<dynamic> sections, dynamic classData,
-      Color classColor, AllSectionsViewModel sectionVM) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColor.pageBgColor,
-        borderRadius:
-        const BorderRadius.vertical(bottom: Radius.circular(20)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header row
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-            child: Row(
-              children: [
-                const Text("SECTION",
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.softGreyText,
-                        letterSpacing: 0.8)),
-                const Spacer(),
-                const Text("STUDENTS / CAPACITY",
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.softGreyText,
-                        letterSpacing: 0.8)),
-                const SizedBox(width: 16),
-                const Text("ACTIONS",
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: AppColor.softGreyText,
-                        letterSpacing: 0.8)),
-              ],
-            ),
-          ),
-
-          const Divider(height: 1, thickness: 1),
-
-          // Section rows
-          if (sectionVM.loading && sections.isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(16),
-              child: Center(
-                  child: CircularProgressIndicator(strokeWidth: 2)),
-            )
-          else if (sections.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 20, horizontal: 16),
-              child: Center(
-                child: Column(
-                  children: [
-                    Icon(Icons.view_agenda_outlined,
-                        size: 36, color: Colors.grey.shade400),
-                    const SizedBox(height: 6),
-                    Text("No sections yet",
-                        style: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-            )
-          else
-            ...sections
-                .map((s) => _sectionRow(s, classColor, classData))
-                .toList(),
-
-          // Add Section button
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
-            child: GestureDetector(
+            // Edit & Delete icons
+            _cardIconBtn(
+              icon: Icons.edit_note_rounded,
+              color: color,
+              bg: color.withOpacity(0.10),
               onTap: () {
-
                 if (!PermissionExtensions.canAccess(
-                    PermissionKeys.manageSections)) {
-
+                  PermissionKeys.manageClasses,
+                )) {
                   Utils.show(
-                    "You don't have permission to add sections",
+                    "You don't have permission to edit classes",
                     context,
                   );
-
                   return;
                 }
-
-                _openAddSectionSheet(classData);
+                _openEditClassSheet(c, color);
               },
+            ),
+            const SizedBox(width: 6),
+            _cardIconBtn(
+              icon: Icons.delete_outline_rounded,
+              color: AppColor.error,
+              bg: AppColor.error.withOpacity(0.08),
+              onTap: () async {
+                if (!PermissionExtensions.canAccess(
+                  PermissionKeys.manageClasses,
+                )) {
+                  Utils.show(
+                    "You don't have permission to delete classes",
+                    context,
+                  );
+                  return;
+                }
+                final confirmed = await _showDeleteDialog(
+                  c.className ?? "",
+                  "Class",
+                );
+                if (confirmed && mounted) {
+                  Provider.of<DeleteClassViewModel>(
+                    context,
+                    listen: false,
+                  ).deleteClassApi(classId.toString(), context);
+                }
+              },
+            ),
+            const SizedBox(width: 8),
+
+            // ✅ View Sections button
+            GestureDetector(
+              onTap: () => _openSectionsSheet(c, color),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    vertical: 10, horizontal: 16),
+                  horizontal: 12,
+                  vertical: 9,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColor.primary.withOpacity(0.07),
+                  color: color.withOpacity(0.10),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                      color: AppColor.primary.withOpacity(0.2),
-                      width: 1.2),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.add_circle_outline_rounded,
-                        size: 18, color: AppColor.primary),
-                    const SizedBox(width: 6),
-                    Text("Add Section",
-                        style: TextStyle(
-                            color: AppColor.primary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13.5)),
+                    Icon(Icons.visibility_outlined, size: 16, color: color),
+                    const SizedBox(width: 5),
+                    Text(
+                      "Sections",
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: color,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _cardIconBtn({
+    required IconData icon,
+    required Color color,
+    required Color bg,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(7),
+        decoration: BoxDecoration(
+          color: bg,
+          borderRadius: BorderRadius.circular(9),
+        ),
+        child: Icon(icon, color: color, size: 18),
       ),
     );
   }
 
   // ─────────────────────────────────────────────
-  //  Section Row inside expanded card
+  //  ✅ View Sections Bottom Sheet (exclusive — pehle wala band karke naya kholta hai)
+  // ─────────────────────────────────────────────
+  Future<void> _openSectionsSheet(dynamic classData, Color color) async {
+    final classId = classData.classId ?? 0;
+
+    // Agar koi pehle se open hai to usse pehle band karo
+    if (_sectionsSheetOpen) {
+      Navigator.of(context, rootNavigator: true).maybePop();
+      // Ek frame wait karo taaki sheet properly close ho jaye
+      await Future.delayed(const Duration(milliseconds: 120));
+      if (!mounted) return;
+    }
+
+    _sectionsSheetOpen = true;
+    _openSheetClassId = classId;
+
+    // Fresh sections fetch karo is class ke liye
+    final sectionVM = Provider.of<AllSectionsViewModel>(context, listen: false);
+    sectionVM.allSectionsApi(context, classId.toString());
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) {
+        return SafeArea(
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.65,
+            minChildSize: 0.4,
+            maxChildSize: 0.92,
+            expand: false,
+            builder: (context, scrollController) {
+              return Container(
+                decoration: const BoxDecoration(
+                  color: AppColor.bg,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 44,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColor.border,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: color,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(
+                              Icons.view_agenda_rounded,
+                              color: Colors.white,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  classData.className ?? "",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColor.text,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "Code: ${classData.classCode ?? '—'}",
+                                  style: const TextStyle(
+                                    fontSize: 12.5,
+                                    color: AppColor.sub,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () => Navigator.pop(sheetCtx),
+                            child: const Icon(
+                              Icons.close_rounded,
+                              color: AppColor.sub,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const Divider(height: 1, thickness: 1),
+
+                    // Sections list
+                    Expanded(
+                      child: Consumer<AllSectionsViewModel>(
+                        builder: (context, sectionVM, _) {
+                          final allSections =
+                              sectionVM.allSectionsModel?.data ?? [];
+                          final sections = allSections
+                              .where(
+                                (s) =>
+                                    s.classId.toString() == classId.toString(),
+                              )
+                              .toList();
+
+                          if (sectionVM.loading && sections.isEmpty) {
+                            return const Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            );
+                          }
+
+                          if (sections.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.view_agenda_outlined,
+                                    size: 44,
+                                    color: Colors.grey.shade400,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "No sections yet",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          return ListView.builder(
+                            controller: scrollController,
+                            padding: const EdgeInsets.only(bottom: 8),
+                            itemCount: sections.length,
+                            itemBuilder: (_, i) =>
+                                _sectionRow(sections[i], color, classData),
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Add Section button
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (!PermissionExtensions.canAccess(
+                            PermissionKeys.manageSections,
+                          )) {
+                            Utils.show(
+                              "You don't have permission to add sections",
+                              context,
+                            );
+                            return;
+                          }
+                          _openAddSectionSheet(classData);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColor.primary.withOpacity(0.07),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: AppColor.primary.withOpacity(0.2),
+                              width: 1.2,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.add_circle_outline_rounded,
+                                size: 18,
+                                color: AppColor.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                "Add Section",
+                                style: TextStyle(
+                                  color: AppColor.primary,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+
+    // Sheet band hone ke baad state reset karo
+    _sectionsSheetOpen = false;
+    _openSheetClassId = null;
+  }
+
+  // ─────────────────────────────────────────────
+  //  Section Row inside sheet
   // ─────────────────────────────────────────────
   Widget _sectionRow(dynamic s, Color classColor, dynamic classData) {
     final bool isFull = (s.full ?? 0) == 1;
     final int current = s.currentStudents ?? 0;
     final int capacity = s.capacity ?? 0;
-    final double fillPercent =
-    capacity > 0 ? (current / capacity).clamp(0.0, 1.0) : 0.0;
+    final double fillPercent = capacity > 0
+        ? (current / capacity).clamp(0.0, 1.0)
+        : 0.0;
 
     final progressColor = isFull
         ? AppColor.error
@@ -751,10 +809,9 @@ class _ClassesPageState extends State<ClassesPage>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
           child: Row(
             children: [
-              // Blue dot + Section name
               Container(
                 width: 8,
                 height: 8,
@@ -771,10 +828,11 @@ class _ClassesPageState extends State<ClassesPage>
                     Text(
                       "Section - ${s.sectionName ?? '?'}",
                       style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 14),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(height: 4),
-                    // Progress bar
                     Row(
                       children: [
                         Expanded(
@@ -785,7 +843,8 @@ class _ClassesPageState extends State<ClassesPage>
                               minHeight: 5,
                               backgroundColor: Colors.grey.shade200,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                  progressColor),
+                                progressColor,
+                              ),
                             ),
                           ),
                         ),
@@ -793,9 +852,10 @@ class _ClassesPageState extends State<ClassesPage>
                         Text(
                           "${(fillPercent * 100).toInt()}%",
                           style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: progressColor),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: progressColor,
+                          ),
                         ),
                       ],
                     ),
@@ -803,81 +863,53 @@ class _ClassesPageState extends State<ClassesPage>
                 ),
               ),
               const SizedBox(width: 10),
-
-              // Students / capacity
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.people_outline_rounded,
-                          size: 13, color: AppColor.softGreyText),
+                      Icon(
+                        Icons.people_outline_rounded,
+                        size: 13,
+                        color: AppColor.softGreyText,
+                      ),
                       const SizedBox(width: 3),
-                      Text("$current / $capacity",
-                          style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColor.softGreyText)),
+                      Text(
+                        "$current / $capacity",
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColor.softGreyText,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isFull
-                          ? AppColor.error.withOpacity(0.1)
-                          : AppColor.success.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          "Cap - $capacity",
-                          style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color: isFull
-                                  ? AppColor.error
-                                  : AppColor.success),
-                        ),
-                      ],
+                  Text(
+                    isFull ? "Full" : "Vacant",
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: isFull ? AppColor.error : AppColor.success,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(width: 10),
-
-              // Vacant/Full badge
-              Text(
-                isFull ? "Full" : "Vacant",
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color:
-                    isFull ? AppColor.error : AppColor.success),
-              ),
               const SizedBox(width: 8),
-
-              // Edit & Delete
               _cardIconBtn(
                 icon: Icons.edit_note_rounded,
                 color: classColor,
                 bg: classColor.withOpacity(0.10),
                 onTap: () {
-
                   if (!PermissionExtensions.canAccess(
-                      PermissionKeys.manageSections)) {
-
+                    PermissionKeys.manageSections,
+                  )) {
                     Utils.show(
                       "You don't have permission to edit sections",
                       context,
                     );
-
                     return;
                   }
-
                   _openEditSectionSheet(s, classColor);
                 },
               ),
@@ -887,13 +919,24 @@ class _ClassesPageState extends State<ClassesPage>
                 color: AppColor.error,
                 bg: AppColor.error.withOpacity(0.08),
                 onTap: () async {
+                  if (!PermissionExtensions.canAccess(
+                    PermissionKeys.manageSections,
+                  )) {
+                    Utils.show(
+                      "You don't have permission to delete sections",
+                      context,
+                    );
+                    return;
+                  }
                   final confirmed = await _showDeleteDialog(
-                      s.sectionName ?? "", "Section");
-                  if (confirmed) {
-                    Provider.of<DeleteSectionViewModel>(context,
-                        listen: false)
-                        .deleteSectionApi(
-                        s.sectionId.toString(), context);
+                    s.sectionName ?? "",
+                    "Section",
+                  );
+                  if (confirmed && mounted) {
+                    Provider.of<DeleteSectionViewModel>(
+                      context,
+                      listen: false,
+                    ).deleteSectionApi(s.sectionId.toString(), context);
                   }
                 },
               ),
@@ -906,124 +949,118 @@ class _ClassesPageState extends State<ClassesPage>
   }
 
   // ─────────────────────────────────────────────
-  //  Icon Button
-  // ─────────────────────────────────────────────
-  Widget _cardIconBtn({
-    required IconData icon,
-    required Color color,
-    required Color bg,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(7),
-        decoration: BoxDecoration(
-            color: bg, borderRadius: BorderRadius.circular(9)),
-        child: Icon(icon, color: color, size: 18),
-      ),
-    );
-  }
-
-  // ─────────────────────────────────────────────
   //  Delete Dialog
   // ─────────────────────────────────────────────
   Future<bool> _showDeleteDialog(String name, String type) async {
     return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 20, vertical: 22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                height: 70,
-                width: 70,
-                decoration: BoxDecoration(
-                    color: AppColor.error.withOpacity(0.1),
-                    shape: BoxShape.circle),
-                child: const Icon(Icons.delete_outline,
-                    color: AppColor.error, size: 36),
-              ),
-              const SizedBox(height: 16),
-              Text("Delete $type",
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 10),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: const TextStyle(
-                      color: AppColor.sub,
-                      fontSize: 14,
-                      height: 1.5),
-                  children: [
-                    const TextSpan(
-                        text: "Are you sure you want to delete "),
-                    TextSpan(
-                        text: '"$name"',
-                        style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.text)),
-                    const TextSpan(
-                        text: "?\nThis action cannot be undone."),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () =>
-                          Navigator.pop(context, false),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12),
-                        side:
-                        const BorderSide(color: AppColor.sub),
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(12)),
-                      ),
-                      child: const Text("Cancel",
-                          style: TextStyle(
-                              color: AppColor.sub,
-                              fontWeight: FontWeight.w600)),
+                  Container(
+                    height: 70,
+                    width: 70,
+                    decoration: BoxDecoration(
+                      color: AppColor.error.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: AppColor.error,
+                      size: 36,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          Navigator.pop(context, true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColor.error,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(12)),
-                        elevation: 2,
-                      ),
-                      child: const Text("Delete",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Delete $type",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
                     ),
+                  ),
+                  const SizedBox(height: 10),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: const TextStyle(
+                        color: AppColor.sub,
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                      children: [
+                        const TextSpan(
+                          text: "Are you sure you want to delete ",
+                        ),
+                        TextSpan(
+                          text: '"$name"',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: AppColor.text,
+                          ),
+                        ),
+                        const TextSpan(
+                          text: "?\nThis action cannot be undone.",
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            side: const BorderSide(color: AppColor.sub),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "Cancel",
+                            style: TextStyle(
+                              color: AppColor.sub,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColor.error,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: const Text(
+                            "Delete",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    ) ??
+        ) ??
         false;
   }
 
@@ -1031,8 +1068,7 @@ class _ClassesPageState extends State<ClassesPage>
   //  Edit Class Bottom Sheet
   // ─────────────────────────────────────────────
   void _openEditClassSheet(dynamic c, Color accentColor) {
-    final nameCtrl =
-    TextEditingController(text: c.className ?? "");
+    final nameCtrl = TextEditingController(text: c.className ?? "");
     final String classId = c.classId.toString();
     bool isLoading = false;
 
@@ -1054,10 +1090,14 @@ class _ClassesPageState extends State<ClassesPage>
                 setSheetState(() => isLoading = true);
                 HapticFeedback.mediumImpact();
                 final editClasses = Provider.of<EditClassesViewModel>(
-                    context,
-                    listen: false);
+                  context,
+                  listen: false,
+                );
                 bool success = await editClasses.editClassApi(
-                    classId, nameCtrl.text.trim(), context);
+                  classId,
+                  nameCtrl.text.trim(),
+                  context,
+                );
                 setSheetState(() => isLoading = false);
                 if (success) Navigator.pop(ctx);
               }
@@ -1071,8 +1111,12 @@ class _ClassesPageState extends State<ClassesPage>
                 subtitle: "Update class name",
                 child: Column(
                   children: [
-                    _sheetField(nameCtrl, "Class Name", "e.g. Class 10",
-                        Icons.class_outlined),
+                    _sheetField(
+                      nameCtrl,
+                      "Class Name",
+                      "e.g. Class 10",
+                      Icons.class_outlined,
+                    ),
                     const SizedBox(height: 28),
                     _sheetButtons(
                       ctx: ctx,
@@ -1120,16 +1164,22 @@ class _ClassesPageState extends State<ClassesPage>
                 }
                 setSheetState(() => isLoading = true);
                 HapticFeedback.mediumImpact();
-                await Provider.of<CreateSectionViewModel>(context,
-                    listen: false)
-                    .createClassApi(classId,
-                    sectionNameCtrl.text.trim(),
-                    capacityCtrl.text.trim(), context);
-                Provider.of<AllSectionsViewModel>(context,
-                    listen: false)
-                    .allSectionsApi(context, classId);
+                await Provider.of<CreateSectionViewModel>(
+                  context,
+                  listen: false,
+                ).createClassApi(
+                  classId,
+                  sectionNameCtrl.text.trim(),
+                  capacityCtrl.text.trim(),
+                  context,
+                );
+                await Provider.of<AllSectionsViewModel>(
+                  context,
+                  listen: false,
+                ).allSectionsApi(context, classId);
                 setSheetState(() => isLoading = false);
-                // Navigator.pop(ctx);
+                sectionNameCtrl.clear();
+                capacityCtrl.clear();
               }
 
               return _bottomSheetContainer(
@@ -1138,22 +1188,24 @@ class _ClassesPageState extends State<ClassesPage>
                 icon: Icons.add_circle_outline_rounded,
                 iconBg: AppColor.primary,
                 title: "Add Section",
-                subtitle:
-                "For class: ${classData.className ?? ''}",
+                subtitle: "For class: ${classData.className ?? ''}",
                 child: Column(
                   children: [
                     _sheetField(
-                        sectionNameCtrl,
-                        "Section Name",
-                        "e.g. A, B, C or Rose",
-                        Icons.sort_by_alpha_rounded),
+                      sectionNameCtrl,
+                      "Section Name",
+                      "e.g. A, B, C or Rose",
+                      Icons.sort_by_alpha_rounded,
+                    ),
                     const SizedBox(height: 14),
-                    _sheetField(capacityCtrl, "Capacity", "e.g. 40",
-                        Icons.people_outline_rounded,
-                        keyboard: TextInputType.number,
-                        formatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ]),
+                    _sheetField(
+                      capacityCtrl,
+                      "Capacity",
+                      "e.g. 40",
+                      Icons.people_outline_rounded,
+                      keyboard: TextInputType.number,
+                      formatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                     const SizedBox(height: 28),
                     _sheetButtons(
                       ctx: ctx,
@@ -1175,15 +1227,14 @@ class _ClassesPageState extends State<ClassesPage>
   //  Edit Section Bottom Sheet
   // ─────────────────────────────────────────────
   void _openEditSectionSheet(dynamic s, Color accentColor) {
-    final classVM =
-    Provider.of<AllClassesViewModel>(context, listen: false);
+    final classVM = Provider.of<AllClassesViewModel>(context, listen: false);
     final classes = classVM.allClassesModel?.data ?? [];
 
     String? selectedClassId = s.classId?.toString();
-    final sectionNameCtrl =
-    TextEditingController(text: s.sectionName ?? '');
-    final capacityCtrl =
-    TextEditingController(text: s.capacity?.toString() ?? '');
+    final sectionNameCtrl = TextEditingController(text: s.sectionName ?? '');
+    final capacityCtrl = TextEditingController(
+      text: s.capacity?.toString() ?? '',
+    );
     bool isLoading = false;
 
     showModalBottomSheet(
@@ -1211,21 +1262,22 @@ class _ClassesPageState extends State<ClassesPage>
                 }
                 setSheetState(() => isLoading = true);
                 HapticFeedback.mediumImpact();
-                await Provider.of<UpdateSectionViewModel>(context,
-                    listen: false)
-                    .updateSectionApi(
+                await Provider.of<UpdateSectionViewModel>(
+                  context,
+                  listen: false,
+                ).updateSectionApi(
                   context,
                   UpdateSectionRequest(
                     classId: int.parse(selectedClassId!),
                     sectionId: s.sectionId,
                     sectionName: sectionNameCtrl.text.trim(),
-                    capacity:
-                    int.parse(capacityCtrl.text.trim()),
+                    capacity: int.parse(capacityCtrl.text.trim()),
                   ),
                 );
-                Provider.of<AllSectionsViewModel>(context,
-                    listen: false)
-                    .allSectionsApi(context, selectedClassId!);
+                await Provider.of<AllSectionsViewModel>(
+                  context,
+                  listen: false,
+                ).allSectionsApi(context, selectedClassId!);
                 setSheetState(() => isLoading = false);
                 Navigator.pop(ctx);
               }
@@ -1239,51 +1291,63 @@ class _ClassesPageState extends State<ClassesPage>
                 subtitle: "Editing: Section ${s.sectionName ?? ''}",
                 child: Column(
                   children: [
-                    // Class Dropdown
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Class",
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppColor.sub,
-                                letterSpacing: 0.3)),
+                        const Text(
+                          "Class",
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColor.sub,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
                         const SizedBox(height: 6),
                         DropdownButtonFormField<String>(
-                          value: classes.any((c) =>
-                          c.classId.toString() ==
-                              selectedClassId)
+                          value:
+                              classes.any(
+                                (c) => c.classId.toString() == selectedClassId,
+                              )
                               ? selectedClassId
                               : null,
-                          onChanged: (val) => setSheetState(
-                                  () => selectedClassId = val),
-                          hint: Text("Select Class",
-                              style: TextStyle(
-                                  fontSize: 13.5,
-                                  color: AppColor.sub
-                                      .withOpacity(0.6))),
+                          onChanged: (val) =>
+                              setSheetState(() => selectedClassId = val),
+                          hint: Text(
+                            "Select Class",
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              color: AppColor.sub.withOpacity(0.6),
+                            ),
+                          ),
                           items: classes
-                              .map((c) => DropdownMenuItem<String>(
-                            value: c.classId.toString(),
-                            child: Text(c.className ?? ""),
-                          ))
+                              .map(
+                                (c) => DropdownMenuItem<String>(
+                                  value: c.classId.toString(),
+                                  child: Text(c.className ?? ""),
+                                ),
+                              )
                               .toList(),
                           decoration: _dropdownDecoration(),
                         ),
                       ],
                     ),
                     const SizedBox(height: 14),
-                    _sheetField(sectionNameCtrl, "Section Name",
-                        "e.g. A, B, C or Rose",
-                        Icons.sort_by_alpha_rounded),
+                    _sheetField(
+                      sectionNameCtrl,
+                      "Section Name",
+                      "e.g. A, B, C or Rose",
+                      Icons.sort_by_alpha_rounded,
+                    ),
                     const SizedBox(height: 14),
-                    _sheetField(capacityCtrl, "Capacity", "e.g. 40",
-                        Icons.people_outline_rounded,
-                        keyboard: TextInputType.number,
-                        formatters: [
-                          FilteringTextInputFormatter.digitsOnly
-                        ]),
+                    _sheetField(
+                      capacityCtrl,
+                      "Capacity",
+                      "e.g. 40",
+                      Icons.people_outline_rounded,
+                      keyboard: TextInputType.number,
+                      formatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                     const SizedBox(height: 28),
                     _sheetButtons(
                       ctx: ctx,
@@ -1326,11 +1390,11 @@ class _ClassesPageState extends State<ClassesPage>
             width: 44,
             height: 4,
             decoration: BoxDecoration(
-                color: AppColor.border,
-                borderRadius: BorderRadius.circular(100)),
+              color: AppColor.border,
+              borderRadius: BorderRadius.circular(100),
+            ),
           ),
           const SizedBox(height: 10),
-          // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
             child: Row(
@@ -1338,31 +1402,37 @@ class _ClassesPageState extends State<ClassesPage>
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                      color: iconBg,
-                      borderRadius: BorderRadius.circular(14)),
-                  child:
-                  Icon(icon, color: Colors.white, size: 22),
+                    color: iconBg,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, color: Colors.white, size: 22),
                 ),
                 const SizedBox(width: 14),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title,
-                        style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColor.text)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColor.text,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(subtitle,
-                        style: const TextStyle(
-                            fontSize: 12.5, color: AppColor.sub)),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        fontSize: 12.5,
+                        color: AppColor.sub,
+                      ),
+                    ),
                   ],
                 ),
                 const Spacer(),
                 GestureDetector(
                   onTap: () => Navigator.pop(ctx),
-                  child: const Icon(Icons.close_rounded,
-                      color: AppColor.sub),
+                  child: const Icon(Icons.close_rounded, color: AppColor.sub),
                 ),
               ],
             ),
@@ -1378,9 +1448,6 @@ class _ClassesPageState extends State<ClassesPage>
     );
   }
 
-  // ─────────────────────────────────────────────
-  //  Sheet Buttons
-  // ─────────────────────────────────────────────
   Widget _sheetButtons({
     required BuildContext ctx,
     required bool isLoading,
@@ -1398,15 +1465,17 @@ class _ClassesPageState extends State<ClassesPage>
               decoration: BoxDecoration(
                 color: AppColor.border.withOpacity(0.4),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                    color: AppColor.border, width: 1.5),
+                border: Border.all(color: AppColor.border, width: 1.5),
               ),
               child: const Center(
-                child: Text("Cancel",
-                    style: TextStyle(
-                        color: AppColor.sub,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600)),
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(
+                    color: AppColor.sub,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
           ),
@@ -1428,27 +1497,27 @@ class _ClassesPageState extends State<ClassesPage>
     );
   }
 
-  // ─────────────────────────────────────────────
-  //  Sheet Text Field
-  // ─────────────────────────────────────────────
   Widget _sheetField(
-      TextEditingController ctrl,
-      String label,
-      String hint,
-      IconData icon, {
-        TextInputType keyboard = TextInputType.text,
-        List<TextInputFormatter>? formatters,
-        int maxLines = 1,
-      }) {
+    TextEditingController ctrl,
+    String label,
+    String hint,
+    IconData icon, {
+    TextInputType keyboard = TextInputType.text,
+    List<TextInputFormatter>? formatters,
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColor.sub,
-                letterSpacing: 0.3)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColor.sub,
+            letterSpacing: 0.3,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: ctrl,
@@ -1456,30 +1525,34 @@ class _ClassesPageState extends State<ClassesPage>
           inputFormatters: formatters,
           maxLines: maxLines,
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-                fontSize: 13.5,
-                color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon: Icon(icon,
-                size: 18,
-                color: AppColor.primary.withOpacity(0.7)),
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              icon,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                  color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                  color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -1489,21 +1562,21 @@ class _ClassesPageState extends State<ClassesPage>
 
   InputDecoration _dropdownDecoration() {
     return InputDecoration(
-      prefixIcon: Icon(Icons.class_outlined,
-          size: 18, color: AppColor.primary.withOpacity(0.7)),
+      prefixIcon: Icon(
+        Icons.class_outlined,
+        size: 18,
+        color: AppColor.primary.withOpacity(0.7),
+      ),
       filled: true,
       fillColor: AppColor.primaryLight.withOpacity(0.5),
-      contentPadding:
-      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide:
-        const BorderSide(color: AppColor.border, width: 1.2),
+        borderSide: const BorderSide(color: AppColor.border, width: 1.2),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide:
-        const BorderSide(color: AppColor.primary, width: 1.8),
+        borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
       ),
     );
   }

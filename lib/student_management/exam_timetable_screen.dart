@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
@@ -100,9 +101,16 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
 
     try {
       if (Platform.isAndroid) {
-        final status = await Permission.storage.request();
-        if (!status.isGranted && !status.isLimited) {
-          // Android 13+ doesn't need storage permission — proceed anyway
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt < 29) {
+          final status = await Permission.storage.request();
+          if (!status.isGranted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Storage permission denied')),
+            );
+            setState(() => _pdfLoading = false);
+            return;
+          }
         }
       }
 

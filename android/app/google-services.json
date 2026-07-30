@@ -26,6 +26,25 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:96268264420:android:2b66a7a5d74bf754f3ddf1",
+        "android_client_info": {
+          "package_name": "com.connectskool.schoolerp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLEk3lJcv2v8ioETGWeFY-R-_Bvj4gTx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:96268264420:android:ae14c0db23efc909f3ddf1",
         "android_client_info": {
           "package_name": "com.example.school_pro"

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -523,10 +524,10 @@ class ExamTimetablePdfService {
 
   static Future<int> _getAndroidSdk() async {
     try {
-      // device_info_plus use karo agar chahiye
-      return 33; // safe default
+      final info = await DeviceInfoPlugin().androidInfo;
+      return info.version.sdkInt;
     } catch (_) {
-      return 33;
+      return 30; // safe fallback — Android 11
     }
   }
 

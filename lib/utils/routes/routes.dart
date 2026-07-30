@@ -76,8 +76,8 @@ class Routers {
         return (context) => const ClassesPage();
       case RoutesName.createClassScreen:
         return (context) => const CreateClassScreen();
-      case RoutesName.allSectionScreen:
-        return (context) => const SectionsPage();
+      // case RoutesName.allSectionScreen:
+      //   return (context) => const SectionsPage();
       case RoutesName.allSubjectsScreen:
         return (context) => const AllSubjectsScreen();
       case RoutesName.fineManagementScreen:

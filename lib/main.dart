@@ -166,7 +166,7 @@ void main() async {
   }
 
   const AndroidInitializationSettings androidSettings =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
+  AndroidInitializationSettings('@drawable/ic_notification');
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(android: androidSettings),
   );
@@ -217,7 +217,7 @@ void main() async {
             importance: Importance.high,
             priority: Priority.high,
             playSound: true,
-            icon: '@mipmap/ic_launcher',
+            icon: '@drawable/ic_notification',
           ),
         ),
       );
@@ -444,15 +444,11 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => AccountantProfileViewModel()),
         ChangeNotifierProvider(create: (_) => TeacherAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => StudentNotificationViewModel()),
-        ChangeNotifierProvider(
-            create: (_) => CreateTeacherAttendanceViewModel()),
+        ChangeNotifierProvider(create: (_) => CreateTeacherAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => TeacherProfileViewModel()),
-        ChangeNotifierProvider(
-            create: (_) => UpdateAccountantAttendanceViewModel()),
-        ChangeNotifierProvider(
-            create: (_) => UpdateStudentAttendanceViewModel()),
-        ChangeNotifierProvider(
-            create: (_) => UpdateTeacherAttendanceViewModel()),
+        ChangeNotifierProvider(create: (_) => UpdateAccountantAttendanceViewModel()),
+        ChangeNotifierProvider(create: (_) => UpdateStudentAttendanceViewModel()),
+        ChangeNotifierProvider(create: (_) => UpdateTeacherAttendanceViewModel()),
         ChangeNotifierProvider(create: (_) => RemoveRoleViewModel()),
         ChangeNotifierProvider(create: (_) => SupportTicketViewModel()),
         ChangeNotifierProvider(create: (_) => CmsViewModel()),
@@ -460,8 +456,7 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => HomeworkDetailsViewModel()),
         ChangeNotifierProvider(create: (_) => GenerateMarksheetViewModel()),
         ChangeNotifierProvider(create: (_) => CoScholasticGradeViewModel()),
-        ChangeNotifierProvider(
-            create: (_) => GetAllTransportStudentsViewModel()),
+        ChangeNotifierProvider(create: (_) => GetAllTransportStudentsViewModel()),
         ChangeNotifierProvider(create: (_) => DiscontinueStudentFeeViewModel()),
 
       ],

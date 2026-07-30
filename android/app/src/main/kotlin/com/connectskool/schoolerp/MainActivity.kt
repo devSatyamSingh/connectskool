@@ -1,4 +1,4 @@
-package com.connectskool.erp
+package com.connectskool.schoolerp
 
 import io.flutter.embedding.android.FlutterActivity
 

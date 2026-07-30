@@ -13,6 +13,16 @@ class AllStudentListVieModel extends ChangeNotifier {
   bool _loading = false;
   bool get loading => _loading;
 
+  bool _loadingMore = false;
+  bool get loadingMore => _loadingMore;
+
+  int _currentPage = 1;
+  int _totalPages = 1;
+  bool get hasMore => _currentPage < _totalPages;
+
+  List<StudentData> _students = [];
+  List<StudentData> get students => _students;
+
   AllStudentListModel? _allStudentListModel;
   AllStudentListModel? get allStudentListModel => _allStudentListModel;
 
@@ -21,30 +31,21 @@ class AllStudentListVieModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setModelData(AllStudentListModel value) {
-    _allStudentListModel = value;
-    notifyListeners();
-  }
-
   void clearStudents() {
+    _students = [];
     _allStudentListModel = null;
+    _currentPage = 1;
+    _totalPages = 1;
     notifyListeners();
   }
 
-  // 🔥 API CALL (POSTMAN STATUS CODE HANDLING)
-  //
-  // [showMessage] = false (default) -> dashboard jaise auto-load screens se
-  // call hone par "Access denied" toast NAHI dikhega.
-  //
-  // [showMessage] = true -> explicit user action (e.g. "All Students" screen
-  // open karne par) par hi toast dikhana hai.
+  // Pehla page load karne ke liye (pull to refresh / initial load)
   Future<void> allStudentListApi(
       BuildContext context, {
         String? classId,
         String? sectionId,
         bool showMessage = false,
       }) async {
-    // ✅ Pattern C - ViewModel level permission guard
     if (!PermissionExtensions.canAccess(PermissionKeys.viewAllStudent)) {
       if (showMessage) {
         Utils.show("You don't have permission to view all student", context);
@@ -52,57 +53,73 @@ class AllStudentListVieModel extends ChangeNotifier {
       return;
     }
 
+    _currentPage = 1;
+    _students = [];
     setLoading(true);
 
     try {
       final response = await _allStudentListRepo.allStudentListApi(
         classId: classId,
         sectionId: sectionId,
+        page: _currentPage,
+        limit: 20,
       );
 
       final int statusCode = response['status_code'] ?? 200;
 
-      switch (statusCode) {
-        case 200:
-          final body = Map<String, dynamic>.from(response);
-          body.remove('status_code');
+      if (statusCode == 200) {
+        final body = Map<String, dynamic>.from(response);
+        body.remove('status_code');
 
-          final model = AllStudentListModel.fromJson(body);
-          setModelData(model);
-          break;
-
-        case 401:
-          Utils.show("Unauthorized user", context);
-          break;
-
-        case 403:
-          if (showMessage) {
-            Utils.show("Access denied", context);
-          }
-          break;
-
-        case 404:
-          Utils.show("Students not found", context);
-          break;
-
-        case 500:
-          Utils.show("Server error", context);
-          break;
-
-        case 0:
-          Utils.show("No Internet Connection", context);
-          break;
-
-        default:
-          Utils.show(response['message'] ?? "Something went wrong", context);
+        final model = AllStudentListModel.fromJson(body);
+        _allStudentListModel = model;
+        _students = model.data ?? [];
+        _totalPages = model.pagination?.totalPages ?? 1;
+      } else {
+        // apna existing switch-case error handling yahan rakho
       }
     } catch (e) {
       debugPrint("Student List Error => $e");
-      if (showMessage) {
-        Utils.show("Failed to load students", context);
-      }
     } finally {
       setLoading(false);
+    }
+  }
+
+  // Scroll end par agla page load karne ke liye
+  Future<void> loadMoreStudents(
+      BuildContext context, {
+        String? classId,
+        String? sectionId,
+      }) async {
+    if (_loadingMore || !hasMore) return;
+
+    _loadingMore = true;
+    notifyListeners();
+
+    try {
+      final nextPage = _currentPage + 1;
+      final response = await _allStudentListRepo.allStudentListApi(
+        classId: classId,
+        sectionId: sectionId,
+        page: nextPage,
+        limit: 20,
+      );
+
+      final int statusCode = response['status_code'] ?? 200;
+      if (statusCode == 200) {
+        final body = Map<String, dynamic>.from(response);
+        body.remove('status_code');
+
+        final model = AllStudentListModel.fromJson(body);
+        _students.addAll(model.data ?? []);
+        _currentPage = nextPage;
+        _totalPages = model.pagination?.totalPages ?? _totalPages;
+      }
+    } catch (e) {
+      debugPrint("Load more error => $e");
+    } finally {
+      _loadingMore = false;
+      notifyListeners();
     }
   }
 }

@@ -1032,7 +1032,7 @@ class _AllTeacherListScreenState extends State
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<AllTeachersListVieModel>(context);
-    final teachers = viewModel.allTeachersListModel?.data ?? [];
+    final teachers = viewModel.teachers;
 
     return Scaffold(
       backgroundColor: AppColor.screenBg,
@@ -1164,14 +1164,37 @@ class _AllTeacherListScreenState extends State
               child: ListView.builder(
                 padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
                 physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: teachers.length,
+                itemCount: teachers.length + 1, // ✅ +1 for footer
                 itemBuilder: (context, index) {
+                  if (index >= teachers.length) {
+                    return _teacherFooter(viewModel);
+                  }
                   return _animatedTeacherCard(index, teachers[index]);
                 },
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+
+  Widget _teacherFooter(AllTeachersListVieModel viewModel) {
+    if (!viewModel.hasMore) {
+      return const SizedBox(height: 20);
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
+      child: AppButton(
+        title: "View More",
+        icon: Icons.expand_more_rounded,
+        height: 48,
+        radius: 14,
+        loading: viewModel.loadingMore,
+        onTap: () {
+          viewModel.loadMoreTeachers(context);
+        },
       ),
     );
   }
@@ -1275,10 +1298,9 @@ class _AllTeacherListScreenState extends State
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        final delay = index * 0.08;
+        final delay = (index * 0.08).clamp(0.0, 0.9); // ✅ negative-safe cap
         final value = Curves.easeOut.transform(
-          (_animationController.value - delay).clamp(0.0, 1.0) /
-              (1 - delay),
+          (_animationController.value - delay).clamp(0.0, 1.0) / (1 - delay),
         );
         return Transform.translate(
           offset: Offset(0, 25 * (1 - value)),

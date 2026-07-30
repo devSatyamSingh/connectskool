@@ -14,14 +14,18 @@ class AllStudentListRepository {
   Future<dynamic> allStudentListApi({
     String? classId,
     String? sectionId,
+    int page = 1,
+    int limit = 20,
   }) async {
+    String url = "${ApiUrl.allStudentList}?page=$page&limit=$limit";
 
-    String url = ApiUrl.allStudentList;
-
-    if (classId != null && sectionId != null) {
-      url =
-      "${ApiUrl.allStudentList}?class_id=$classId&section_id=$sectionId";
+    if (classId != null && classId.isNotEmpty) {
+      url += "&class_id=$classId";
+    }
+    if (sectionId != null && sectionId.isNotEmpty) {
+      url += "&section_id=$sectionId";
     }
 
     return await _apiServices.getGetApiResponse(url);
-  }}
+  }
+}

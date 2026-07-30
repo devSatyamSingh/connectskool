@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:open_file/open_file.dart';
@@ -147,16 +148,18 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
       Directory directory;
 
       if (Platform.isAndroid) {
-
-        await Permission.storage.request();
-
-        directory =
-            Directory("/storage/emulated/0/Download");
-
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt < 29) {
+          final status = await Permission.storage.request();
+          if (!status.isGranted) {
+            Utils.show("Storage permission denied", context, type: "error");
+            setState(() => _isGeneratingPdf = false);
+            return;
+          }
+        }
+        directory = Directory("/storage/emulated/0/Download");
       } else {
-
-        directory =
-        await getApplicationDocumentsDirectory();
+        directory = await getApplicationDocumentsDirectory();
       }
 
       final fileName =
