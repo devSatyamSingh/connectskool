@@ -1,17 +1,14 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../view_model/school_view_model/accountant/school_accountant_detail_view_model.dart';
 
 class SchoolAccountantDetailScreen extends StatefulWidget {
   final int accountantId;
 
-  const SchoolAccountantDetailScreen({
-    super.key,
-    required this.accountantId,
-  });
+  const SchoolAccountantDetailScreen({super.key, required this.accountantId});
 
   @override
   State<SchoolAccountantDetailScreen> createState() =>
@@ -24,28 +21,45 @@ class _SchoolAccountantDetailScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SchoolAccountantDetailViewModel>(context, listen: false)
-          .schoolAccountantDetailApi(widget.accountantId, context);
+      Provider.of<SchoolAccountantDetailViewModel>(
+        context,
+        listen: false,
+      ).schoolAccountantDetailApi(widget.accountantId, context);
     });
   }
 
   // ─── Helpers ────────────────────────────────────────────
   String _formatDate(String? dateString) {
-    if (dateString == null || dateString.trim().isEmpty) return 'N/A';
+    if (dateString == null || dateString.trim().isEmpty) {
+      return 'accountant_detail.not_available'.tr();
+    }
     try {
       final date = DateTime.parse(dateString);
       return '${date.day.toString().padLeft(2, '0')}/'
           '${date.month.toString().padLeft(2, '0')}/'
           '${date.year}';
     } catch (_) {
-      return 'N/A';
+      return 'accountant_detail.not_available'.tr();
     }
   }
 
   String _capitalize(String? value) {
-    if (value == null || value.trim().isEmpty) return 'N/A';
+    if (value == null || value.trim().isEmpty) {
+      return 'accountant_detail.not_available'.tr();
+    }
     final v = value.trim();
     return v[0].toUpperCase() + v.substring(1);
+  }
+
+  String _formatEmploymentType(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'accountant_detail.not_available'.tr();
+    }
+    return value
+        .trim()
+        .split('_')
+        .map((w) => w[0].toUpperCase() + w.substring(1))
+        .join(' ');
   }
 
   void _showErrorSnack(String msg) {
@@ -62,9 +76,11 @@ class _SchoolAccountantDetailScreenState
   Future<void> _openUrl(String url) async {
     final uri = Uri.parse(url);
     try {
-      final launched =
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!launched) _showErrorSnack("Could not open document");
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (!launched) _showErrorSnack('accountant_detail.could_not_open'.tr());
     } catch (e) {
       _showErrorSnack("Error: $e");
     }
@@ -87,7 +103,7 @@ class _SchoolAccountantDetailScreenState
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Accountant Details'),
+        title: Text('accountant_detail.title'.tr()),
         backgroundColor: AppColor.lightBlueColor,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -101,7 +117,7 @@ class _SchoolAccountantDetailScreenState
           final a = viewModel.schoolAccountantDetailModel?.data;
 
           if (a == null) {
-            return const Center(child: Text('No data found'));
+            return Center(child: Text('accountant_detail.no_data'.tr()));
           }
 
           return SingleChildScrollView(
@@ -128,30 +144,34 @@ class _SchoolAccountantDetailScreenState
                           child: ClipOval(
                             child: a.accountantPhotoUrl != null
                                 ? Image.network(
-                              a.accountantPhotoUrl!,
-                              width: 124,
-                              height: 124,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (_, child, progress) =>
-                              progress == null
-                                  ? child
-                                  : const CircularProgressIndicator(
-                                  strokeWidth: 2),
-                              errorBuilder: (_, __, ___) => Icon(
-                                Icons.person,
-                                size: 70,
-                                color: AppColor.lightBlueColor,
-                              ),
-                            )
-                                : Icon(Icons.person,
-                                size: 70, color: AppColor.lightBlueColor),
+                                    a.accountantPhotoUrl!,
+                                    width: 124,
+                                    height: 124,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (_, child, progress) =>
+                                        progress == null
+                                        ? child
+                                        : const CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          ),
+                                    errorBuilder: (_, __, ___) => Icon(
+                                      Icons.person,
+                                      size: 70,
+                                      color: AppColor.lightBlueColor,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.person,
+                                    size: 70,
+                                    color: AppColor.lightBlueColor,
+                                  ),
                           ),
                         ),
                         const SizedBox(height: 14),
 
                         // Name
                         Text(
-                          a.name ?? 'N/A',
+                          a.name ?? 'accountant_detail.not_available'.tr(),
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -162,30 +182,14 @@ class _SchoolAccountantDetailScreenState
 
                         // Qualification
                         Text(
-                          a.qualification ?? 'N/A',
+                          a.qualification ??
+                              'accountant_detail.not_available'.tr(),
                           style: const TextStyle(
-                              fontSize: 13, color: Colors.white70),
+                            fontSize: 13,
+                            color: Colors.white70,
+                          ),
                         ),
                         const SizedBox(height: 12),
-
-                        // Status chip
-                        // Container(
-                        //   padding: const EdgeInsets.symmetric(
-                        //       horizontal: 14, vertical: 6),
-                        //   decoration: BoxDecoration(
-                        //     color:
-                        //     a.status == 1 ? Colors.green : Colors.red,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   child: Text(
-                        //     a.status == 1 ? 'Active' : 'Inactive',
-                        //     style: const TextStyle(
-                        //       color: Colors.white,
-                        //       fontWeight: FontWeight.bold,
-                        //       fontSize: 13,
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -194,65 +198,76 @@ class _SchoolAccountantDetailScreenState
                 const SizedBox(height: 20),
 
                 // ── Personal Information ────────────────────
-                _buildSection('Personal Information', [
+                _buildSection('accountant_detail.personal_information'.tr(), [
                   _buildInfoRow(
-                      Icons.person_outline, 'Full Name', a.name ?? 'N/A'),
+                    Icons.person_outline,
+                    'accountant_detail.full_name'.tr(),
+                    a.name ?? 'accountant_detail.not_available'.tr(),
+                  ),
                   _buildInfoRow(
-                      Icons.email_outlined, 'Email', a.userEmail ?? 'N/A'),
-                  _buildInfoRow(Icons.phone_outlined, 'Mobile',
-                      a.mobileNumber ?? 'N/A'),
+                    Icons.email_outlined,
+                    'accountant_detail.email'.tr(),
+                    a.userEmail ?? 'accountant_detail.not_available'.tr(),
+                  ),
                   _buildInfoRow(
-                      Icons.location_on_outlined, 'Address', a.address ?? 'N/A'),
+                    Icons.phone_outlined,
+                    'accountant_detail.mobile'.tr(),
+                    a.mobileNumber ?? 'accountant_detail.not_available'.tr(),
+                  ),
+                  _buildInfoRow(
+                    Icons.location_on_outlined,
+                    'accountant_detail.address'.tr(),
+                    a.address ?? 'accountant_detail.not_available'.tr(),
+                  ),
                 ]),
 
                 // ── Family Information ──────────────────────
-                _buildSection('Family Information', [
+                _buildSection('accountant_detail.family_information'.tr(), [
                   _buildInfoRow(
-                      Icons.person, "Father's Name", a.fatherName ?? 'N/A'),
+                    Icons.person,
+                    'accountant_detail.father_name'.tr(),
+                    a.fatherName ?? 'accountant_detail.not_available'.tr(),
+                  ),
                   _buildInfoRow(
-                      Icons.person, "Mother's Name", a.motherName ?? 'N/A'),
+                    Icons.person,
+                    'accountant_detail.mother_name'.tr(),
+                    a.motherName ?? 'accountant_detail.not_available'.tr(),
+                  ),
                 ]),
 
                 // ── Professional Information ────────────────
-                // _buildSection('Professional Information', [
-                //   _buildInfoRow(Icons.school_outlined, 'Qualification',
-                //       a.qualification ?? 'N/A'),
-                //   _buildInfoRow(Icons.star_outline, 'Experience',
-                //       '${a.experienceYears ?? 0} Years'),
-                //   _buildInfoRow(Icons.calendar_today_outlined, 'Joining Date',
-                //       _formatDate(a.createdAt?.toString())),
-                // ]),
-                _buildSection('Professional Information', [
-                  _buildInfoRow(Icons.school_outlined, 'Qualification',
-                      a.qualification ?? 'N/A'),
-                  _buildInfoRow(Icons.star_outline, 'Experience',
-                      '${a.experienceYears ?? 0} Years'),
-
-                  // ✅ DOB add karo
+                _buildSection('accountant_detail.professional_information'.tr(), [
+                  _buildInfoRow(
+                    Icons.school_outlined,
+                    'accountant_detail.qualification'.tr(),
+                    a.qualification ?? 'accountant_detail.not_available'.tr(),
+                  ),
+                  _buildInfoRow(
+                    Icons.star_outline,
+                    'accountant_detail.experience'.tr(),
+                    '${a.experienceYears ?? 0} ${'accountant_detail.years'.tr()}',
+                  ),
                   _buildInfoRow(
                     Icons.cake_outlined,
-                    'Date of Birth',
+                    'accountant_detail.date_of_birth'.tr(),
                     _formatDate(a.dob?.toString()),
                   ),
-
-                  // ✅ Employment Type add karo
                   _buildInfoRow(
                     Icons.work_outline_rounded,
-                    'Employment Type',
+                    'accountant_detail.employment_type'.tr(),
                     _formatEmploymentType(a.employmentType?.toString()),
                   ),
-
-                  // ✅ Joining Date (already tha but createdAt se tha — ab joiningDate se)
                   _buildInfoRow(
                     Icons.calendar_today_outlined,
-                    'Joining Date',
+                    'accountant_detail.joining_date'.tr(),
                     _formatDate(a.joiningDate?.toString()),
                   ),
                 ]),
+
                 // ── Documents ──────────────────────────────
-                _buildSection('Documents', [
+                _buildSection('accountant_detail.documents'.tr(), [
                   _buildDocumentCard(
-                    title: 'Aadhar Card',
+                    title: 'accountant_detail.aadhar_card'.tr(),
                     url: a.aadharCardUrl?.toString(),
                     icon: Icons.credit_card_rounded,
                   ),
@@ -266,15 +281,7 @@ class _SchoolAccountantDetailScreenState
       ),
     );
   }
-  String _formatEmploymentType(String? value) {
-    if (value == null || value.trim().isEmpty) return 'N/A';
-    // part_time → Part Time, full_time → Full Time
-    return value
-        .trim()
-        .split('_')
-        .map((w) => w[0].toUpperCase() + w.substring(1))
-        .join(' ');
-  }
+
   // ════════════════════════════════════════════════════════
   //  WIDGETS
   // ════════════════════════════════════════════════════════
@@ -328,20 +335,24 @@ class _SchoolAccountantDetailScreenState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                      letterSpacing: 0.2,
-                    )),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 11.5,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.2,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(value,
-                    style: const TextStyle(
-                      fontSize: 14.5,
-                      color: Colors.black87,
-                      fontWeight: FontWeight.w500,
-                    )),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 14.5,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
@@ -358,7 +369,8 @@ class _SchoolAccountantDetailScreenState
   }) {
     final bool hasDoc = url != null && url.trim().isNotEmpty;
 
-    final bool isImage = hasDoc &&
+    final bool isImage =
+        hasDoc &&
         (url!.toLowerCase().endsWith('.png') ||
             url.toLowerCase().endsWith('.jpg') ||
             url.toLowerCase().endsWith('.jpeg') ||
@@ -371,12 +383,12 @@ class _SchoolAccountantDetailScreenState
         InkWell(
           onTap: hasDoc
               ? () {
-            if (isImage) {
-              _openImageViewer(context, url!, title);
-            } else {
-              _openUrl(url!);
-            }
-          }
+                  if (isImage) {
+                    _openImageViewer(context, url!, title);
+                  } else {
+                    _openUrl(url!);
+                  }
+                }
               : null,
           borderRadius: BorderRadius.circular(12),
           child: Container(
@@ -439,13 +451,14 @@ class _SchoolAccountantDetailScreenState
                           Text(
                             hasDoc
                                 ? (isImage
-                                ? 'Uploaded • View image'
-                                : 'Uploaded • Tap to open')
-                                : 'Not Uploaded',
+                                      ? 'accountant_detail.uploaded_view_image'
+                                            .tr()
+                                      : 'accountant_detail.uploaded_tap_open'
+                                            .tr())
+                                : 'accountant_detail.not_uploaded'.tr(),
                             style: TextStyle(
                               fontSize: 12,
-                              color:
-                              hasDoc ? Colors.green[700] : Colors.grey,
+                              color: hasDoc ? Colors.green[700] : Colors.grey,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -463,9 +476,7 @@ class _SchoolAccountantDetailScreenState
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      isImage
-                          ? Icons.image_rounded
-                          : Icons.open_in_new_rounded,
+                      isImage ? Icons.image_rounded : Icons.open_in_new_rounded,
                       color: AppColor.lightBlueColor,
                       size: 16,
                     ),
@@ -502,7 +513,7 @@ class _SchoolAccountantDetailScreenState
                           child: CircularProgressIndicator(
                             value: progress.expectedTotalBytes != null
                                 ? progress.cumulativeBytesLoaded /
-                                progress.expectedTotalBytes!
+                                      progress.expectedTotalBytes!
                                 : null,
                             color: AppColor.lightBlueColor,
                             strokeWidth: 2,
@@ -517,15 +528,22 @@ class _SchoolAccountantDetailScreenState
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.broken_image_rounded,
-                              size: 40, color: Colors.grey),
-                          SizedBox(height: 8),
-                          Text('Image could not be loaded',
-                              style:
-                              TextStyle(color: Colors.grey, fontSize: 12)),
+                          const Icon(
+                            Icons.broken_image_rounded,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'accountant_detail.image_error'.tr(),
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -536,20 +554,29 @@ class _SchoolAccountantDetailScreenState
                     right: 8,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.zoom_out_map_rounded,
-                              color: Colors.white, size: 13),
-                          SizedBox(width: 4),
-                          Text('Tap to expand',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 11)),
+                          const Icon(
+                            Icons.zoom_out_map_rounded,
+                            color: Colors.white,
+                            size: 13,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'accountant_detail.tap_to_expand'.tr(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -571,10 +598,7 @@ class _ImageViewerScreen extends StatefulWidget {
   final String imageUrl;
   final String title;
 
-  const _ImageViewerScreen({
-    required this.imageUrl,
-    required this.title,
-  });
+  const _ImageViewerScreen({required this.imageUrl, required this.title});
 
   @override
   State<_ImageViewerScreen> createState() => _ImageViewerScreenState();
@@ -582,7 +606,7 @@ class _ImageViewerScreen extends StatefulWidget {
 
 class _ImageViewerScreenState extends State<_ImageViewerScreen> {
   final TransformationController _transformController =
-  TransformationController();
+      TransformationController();
 
   @override
   void dispose() {
@@ -601,13 +625,15 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Text(widget.title,
-            style: const TextStyle(fontSize: 16, color: Colors.white)),
+        title: Text(
+          widget.title,
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        ),
         actions: [
           IconButton(
             onPressed: _resetZoom,
             icon: const Icon(Icons.fit_screen_rounded, color: Colors.white),
-            tooltip: 'Reset Zoom',
+            tooltip: 'accountant_detail.reset_zoom'.tr(),
           ),
           IconButton(
             onPressed: () async {
@@ -615,7 +641,7 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
               await launchUrl(uri, mode: LaunchMode.externalApplication);
             },
             icon: const Icon(Icons.open_in_new_rounded, color: Colors.white),
-            tooltip: 'Open in browser',
+            tooltip: 'accountant_detail.open_in_browser'.tr(),
           ),
         ],
       ),
@@ -637,25 +663,31 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
                   CircularProgressIndicator(
                     value: progress.expectedTotalBytes != null
                         ? progress.cumulativeBytesLoaded /
-                        progress.expectedTotalBytes!
+                              progress.expectedTotalBytes!
                         : null,
                     color: Colors.white,
                   ),
                   const SizedBox(height: 12),
-                  const Text('Loading image...',
-                      style:
-                      TextStyle(color: Colors.white60, fontSize: 13)),
+                  Text(
+                    'accountant_detail.loading_image'.tr(),
+                    style: const TextStyle(color: Colors.white60, fontSize: 13),
+                  ),
                 ],
               );
             },
-            errorBuilder: (_, __, ___) => const Column(
+            errorBuilder: (_, __, ___) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.broken_image_rounded,
-                    size: 60, color: Colors.white54),
-                SizedBox(height: 12),
-                Text('Could not load image',
-                    style: TextStyle(color: Colors.white54)),
+                const Icon(
+                  Icons.broken_image_rounded,
+                  size: 60,
+                  color: Colors.white54,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'accountant_detail.image_error'.tr(),
+                  style: const TextStyle(color: Colors.white54),
+                ),
               ],
             ),
           ),

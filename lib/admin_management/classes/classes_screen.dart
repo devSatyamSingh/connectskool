@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,6 @@ import 'package:school_pro/view_model/school_view_model/section/update_section_v
 import 'package:school_pro/view_model/school_view_model/section/delete_section_view_model.dart';
 import 'package:school_pro/repo/school_repo/section/update_section_repo.dart';
 import 'package:school_pro/utils/utils.dart';
-
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 
@@ -32,7 +32,6 @@ class _ClassesPageState extends State<ClassesPage>
   String _searchQuery = '';
   final TextEditingController _searchCtrl = TextEditingController();
 
-  // ✅ Track kaunsa sections sheet abhi open hai (exclusive close/open ke liye)
   bool _sectionsSheetOpen = false;
   int? _openSheetClassId;
 
@@ -51,7 +50,6 @@ class _ClassesPageState extends State<ClassesPage>
       await classVM.allClassesApi(context);
 
       if (!mounted) return;
-      // Sab classes ke section counts ek saath fetch karo (sirf badge count ke liye)
       final classes = classVM.allClassesModel?.data ?? [];
       final sectionVM = Provider.of<AllSectionsViewModel>(
         context,
@@ -145,8 +143,8 @@ class _ClassesPageState extends State<ClassesPage>
               .toList();
 
     if (!canViewClasses) {
-      return const Scaffold(
-        body: Center(child: Text("You don't have permission to view classes")),
+      return Scaffold(
+        body: Center(child: Text('classes.no_permission_view'.tr())),
       );
     }
 
@@ -197,13 +195,13 @@ class _ClassesPageState extends State<ClassesPage>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AppText.customText(
-                              "Classes & Sections",
+                              'classes.title'.tr(),
                               size: 19,
                               weight: FontWeight.bold,
                               color: Colors.white,
                             ),
                             AppText.customText(
-                              "Manage your school's classes and their sections",
+                              'classes.subtitle'.tr(),
                               size: 11,
                               color: Colors.white70,
                             ),
@@ -246,15 +244,17 @@ class _ClassesPageState extends State<ClassesPage>
                               fontSize: 14,
                             ),
                             onChanged: (v) => setState(() => _searchQuery = v),
-                            decoration: const InputDecoration(
-                              hintText: "Search classes...",
-                              hintStyle: TextStyle(
+                            decoration: InputDecoration(
+                              hintText: 'classes.search_hint'.tr(),
+                              hintStyle: const TextStyle(
                                 color: Colors.white60,
                                 fontSize: 14,
                               ),
                               border: InputBorder.none,
                               isDense: true,
-                              contentPadding: EdgeInsets.symmetric(vertical: 8),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                              ),
                             ),
                           ),
                         ),
@@ -291,16 +291,16 @@ class _ClassesPageState extends State<ClassesPage>
                           height: MediaQuery.of(context).size.height * 0.5,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(
+                            children: [
+                              const Icon(
                                 Icons.search_off,
                                 size: 60,
                                 color: Colors.grey,
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Text(
-                                "No classes found",
-                                style: TextStyle(
+                                'classes.no_classes_found'.tr(),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   color: Colors.grey,
                                   fontWeight: FontWeight.w500,
@@ -370,7 +370,7 @@ class _ClassesPageState extends State<ClassesPage>
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        final delay = (index * 0.08).clamp(0.0, 0.9); // ✅ negative-safe
+        final delay = (index * 0.08).clamp(0.0, 0.9);
         final value = Curves.easeOut.transform(
           (_animationController.value - delay).clamp(0.0, 1.0) / (1 - delay),
         );
@@ -384,7 +384,7 @@ class _ClassesPageState extends State<ClassesPage>
   }
 
   // ─────────────────────────────────────────────
-  //  Class Card — sirf name, code, section count + View Sections button
+  //  Class Card
   // ─────────────────────────────────────────────
   Widget _classCard(dynamic c, List<dynamic> classSections) {
     final classId = c.classId ?? 0;
@@ -431,30 +431,11 @@ class _ClassesPageState extends State<ClassesPage>
                           weight: FontWeight.bold,
                         ),
                       ),
-                      // const SizedBox(width: 8),
-                      // Container(
-                      //   padding: const EdgeInsets.symmetric(
-                      //     horizontal: 8,
-                      //     vertical: 3,
-                      //   ),
-                      //   decoration: BoxDecoration(
-                      //     color: AppColor.primary.withOpacity(0.12),
-                      //     borderRadius: BorderRadius.circular(20),
-                      //   ),
-                      //   child: Text(
-                      //     "${classSections.length} Sections",
-                      //     style: TextStyle(
-                      //       fontSize: 9,
-                      //       fontWeight: FontWeight.w700,
-                      //       color: AppColor.primary,
-                      //     ),
-                      //   ),
-                      // ),
                     ],
                   ),
                   const SizedBox(height: 3),
                   AppText.customText(
-                    "Code: ${c.classCode ?? '—'}",
+                    '${'classes.code'.tr()}: ${c.classCode ?? '—'}',
                     size: 12,
                     color: AppColor.softGreyText,
                   ),
@@ -464,7 +445,6 @@ class _ClassesPageState extends State<ClassesPage>
 
             const SizedBox(width: 8),
 
-            // Edit & Delete icons
             _cardIconBtn(
               icon: Icons.edit_note_rounded,
               color: color,
@@ -473,10 +453,7 @@ class _ClassesPageState extends State<ClassesPage>
                 if (!PermissionExtensions.canAccess(
                   PermissionKeys.manageClasses,
                 )) {
-                  Utils.show(
-                    "You don't have permission to edit classes",
-                    context,
-                  );
+                  Utils.show('classes.no_permission_edit_class'.tr(), context);
                   return;
                 }
                 _openEditClassSheet(c, color);
@@ -492,14 +469,14 @@ class _ClassesPageState extends State<ClassesPage>
                   PermissionKeys.manageClasses,
                 )) {
                   Utils.show(
-                    "You don't have permission to delete classes",
+                    'classes.no_permission_delete_class'.tr(),
                     context,
                   );
                   return;
                 }
                 final confirmed = await _showDeleteDialog(
                   c.className ?? "",
-                  "Class",
+                  'classes.delete_class'.tr(),
                 );
                 if (confirmed && mounted) {
                   Provider.of<DeleteClassViewModel>(
@@ -511,7 +488,6 @@ class _ClassesPageState extends State<ClassesPage>
             ),
             const SizedBox(width: 8),
 
-            // ✅ View Sections button
             GestureDetector(
               onTap: () => _openSectionsSheet(c, color),
               child: Container(
@@ -529,7 +505,7 @@ class _ClassesPageState extends State<ClassesPage>
                     Icon(Icons.visibility_outlined, size: 16, color: color),
                     const SizedBox(width: 5),
                     Text(
-                      "Sections",
+                      'classes.sections'.tr(),
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
@@ -566,15 +542,13 @@ class _ClassesPageState extends State<ClassesPage>
   }
 
   // ─────────────────────────────────────────────
-  //  ✅ View Sections Bottom Sheet (exclusive — pehle wala band karke naya kholta hai)
+  //  View Sections Bottom Sheet
   // ─────────────────────────────────────────────
   Future<void> _openSectionsSheet(dynamic classData, Color color) async {
     final classId = classData.classId ?? 0;
 
-    // Agar koi pehle se open hai to usse pehle band karo
     if (_sectionsSheetOpen) {
       Navigator.of(context, rootNavigator: true).maybePop();
-      // Ek frame wait karo taaki sheet properly close ho jaye
       await Future.delayed(const Duration(milliseconds: 120));
       if (!mounted) return;
     }
@@ -582,7 +556,6 @@ class _ClassesPageState extends State<ClassesPage>
     _sectionsSheetOpen = true;
     _openSheetClassId = classId;
 
-    // Fresh sections fetch karo is class ke liye
     final sectionVM = Provider.of<AllSectionsViewModel>(context, listen: false);
     sectionVM.allSectionsApi(context, classId.toString());
 
@@ -616,7 +589,6 @@ class _ClassesPageState extends State<ClassesPage>
                     ),
                     const SizedBox(height: 10),
 
-                    // Header
                     Padding(
                       padding: const EdgeInsets.fromLTRB(20, 4, 20, 12),
                       child: Row(
@@ -648,7 +620,7 @@ class _ClassesPageState extends State<ClassesPage>
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  "Code: ${classData.classCode ?? '—'}",
+                                  '${'classes.code'.tr()}: ${classData.classCode ?? '—'}',
                                   style: const TextStyle(
                                     fontSize: 12.5,
                                     color: AppColor.sub,
@@ -670,7 +642,6 @@ class _ClassesPageState extends State<ClassesPage>
 
                     const Divider(height: 1, thickness: 1),
 
-                    // Sections list
                     Expanded(
                       child: Consumer<AllSectionsViewModel>(
                         builder: (context, sectionVM, _) {
@@ -701,7 +672,7 @@ class _ClassesPageState extends State<ClassesPage>
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    "No sections yet",
+                                    'classes.no_sections'.tr(),
                                     style: TextStyle(
                                       color: Colors.grey.shade500,
                                       fontWeight: FontWeight.w500,
@@ -723,7 +694,6 @@ class _ClassesPageState extends State<ClassesPage>
                       ),
                     ),
 
-                    // Add Section button
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
                       child: GestureDetector(
@@ -732,7 +702,7 @@ class _ClassesPageState extends State<ClassesPage>
                             PermissionKeys.manageSections,
                           )) {
                             Utils.show(
-                              "You don't have permission to add sections",
+                              'classes.no_permission_add_section'.tr(),
                               context,
                             );
                             return;
@@ -763,7 +733,7 @@ class _ClassesPageState extends State<ClassesPage>
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                "Add Section",
+                                'classes.add_section'.tr(),
                                 style: TextStyle(
                                   color: AppColor.primary,
                                   fontWeight: FontWeight.w600,
@@ -784,7 +754,6 @@ class _ClassesPageState extends State<ClassesPage>
       },
     );
 
-    // Sheet band hone ke baad state reset karo
     _sectionsSheetOpen = false;
     _openSheetClassId = null;
   }
@@ -826,7 +795,7 @@ class _ClassesPageState extends State<ClassesPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Section - ${s.sectionName ?? '?'}",
+                      '${'classes.section_prefix'.tr()}${s.sectionName ?? '?'}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
@@ -886,7 +855,9 @@ class _ClassesPageState extends State<ClassesPage>
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    isFull ? "Full" : "Vacant",
+                    isFull
+                        ? 'classes.section_full'.tr()
+                        : 'classes.section_vacant'.tr(),
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -905,7 +876,7 @@ class _ClassesPageState extends State<ClassesPage>
                     PermissionKeys.manageSections,
                   )) {
                     Utils.show(
-                      "You don't have permission to edit sections",
+                      'classes.no_permission_edit_section'.tr(),
                       context,
                     );
                     return;
@@ -923,14 +894,14 @@ class _ClassesPageState extends State<ClassesPage>
                     PermissionKeys.manageSections,
                   )) {
                     Utils.show(
-                      "You don't have permission to delete sections",
+                      'classes.no_permission_delete_section'.tr(),
                       context,
                     );
                     return;
                   }
                   final confirmed = await _showDeleteDialog(
                     s.sectionName ?? "",
-                    "Section",
+                    'classes.delete_section'.tr(),
                   );
                   if (confirmed && mounted) {
                     Provider.of<DeleteSectionViewModel>(
@@ -979,7 +950,7 @@ class _ClassesPageState extends State<ClassesPage>
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    "Delete $type",
+                    type,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -995,9 +966,7 @@ class _ClassesPageState extends State<ClassesPage>
                         height: 1.5,
                       ),
                       children: [
-                        const TextSpan(
-                          text: "Are you sure you want to delete ",
-                        ),
+                        TextSpan(text: 'classes.delete_confirmation'.tr()),
                         TextSpan(
                           text: '"$name"',
                           style: const TextStyle(
@@ -1005,9 +974,7 @@ class _ClassesPageState extends State<ClassesPage>
                             color: AppColor.text,
                           ),
                         ),
-                        const TextSpan(
-                          text: "?\nThis action cannot be undone.",
-                        ),
+                        TextSpan(text: 'classes.delete_undo'.tr()),
                       ],
                     ),
                   ),
@@ -1024,9 +991,9 @@ class _ClassesPageState extends State<ClassesPage>
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text(
-                            "Cancel",
-                            style: TextStyle(
+                          child: Text(
+                            'classes.cancel'.tr(),
+                            style: const TextStyle(
                               color: AppColor.sub,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1045,9 +1012,9 @@ class _ClassesPageState extends State<ClassesPage>
                             ),
                             elevation: 2,
                           ),
-                          child: const Text(
-                            "Delete",
-                            style: TextStyle(
+                          child: Text(
+                            'classes.delete'.tr(),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1084,7 +1051,7 @@ class _ClassesPageState extends State<ClassesPage>
 
               Future<void> handleUpdate() async {
                 if (nameCtrl.text.trim().isEmpty) {
-                  _snack(ctx, "Class name cannot be empty");
+                  _snack(ctx, 'classes.class_name_empty'.tr());
                   return;
                 }
                 setSheetState(() => isLoading = true);
@@ -1107,14 +1074,14 @@ class _ClassesPageState extends State<ClassesPage>
                 bottom: bottom,
                 icon: Icons.edit_note_rounded,
                 iconBg: accentColor,
-                title: "Edit Class",
-                subtitle: "Update class name",
+                title: 'classes.edit_class'.tr(),
+                subtitle: 'classes.edit_class_subtitle'.tr(),
                 child: Column(
                   children: [
                     _sheetField(
                       nameCtrl,
-                      "Class Name",
-                      "e.g. Class 10",
+                      'classes.class_name'.tr(),
+                      'classes.class_name_hint'.tr(),
                       Icons.class_outlined,
                     ),
                     const SizedBox(height: 28),
@@ -1122,7 +1089,7 @@ class _ClassesPageState extends State<ClassesPage>
                       ctx: ctx,
                       isLoading: isLoading,
                       onSave: handleUpdate,
-                      saveLabel: "Update Class",
+                      saveLabel: 'classes.update_class'.tr(),
                     ),
                   ],
                 ),
@@ -1155,11 +1122,11 @@ class _ClassesPageState extends State<ClassesPage>
 
               Future<void> handleAdd() async {
                 if (sectionNameCtrl.text.trim().isEmpty) {
-                  Utils.show("Please enter section name", context);
+                  Utils.show('classes.enter_section_name'.tr(), context);
                   return;
                 }
                 if (capacityCtrl.text.trim().isEmpty) {
-                  Utils.show("Please enter capacity", context);
+                  Utils.show('classes.enter_capacity'.tr(), context);
                   return;
                 }
                 setSheetState(() => isLoading = true);
@@ -1187,21 +1154,22 @@ class _ClassesPageState extends State<ClassesPage>
                 bottom: bottom,
                 icon: Icons.add_circle_outline_rounded,
                 iconBg: AppColor.primary,
-                title: "Add Section",
-                subtitle: "For class: ${classData.className ?? ''}",
+                title: 'classes.add_section_title'.tr(),
+                subtitle:
+                    '${'classes.add_section_subtitle'.tr()}${classData.className ?? ''}',
                 child: Column(
                   children: [
                     _sheetField(
                       sectionNameCtrl,
-                      "Section Name",
-                      "e.g. A, B, C or Rose",
+                      'classes.section_name'.tr(),
+                      'classes.section_name_hint'.tr(),
                       Icons.sort_by_alpha_rounded,
                     ),
                     const SizedBox(height: 14),
                     _sheetField(
                       capacityCtrl,
-                      "Capacity",
-                      "e.g. 40",
+                      'classes.capacity'.tr(),
+                      'classes.capacity_hint'.tr(),
                       Icons.people_outline_rounded,
                       keyboard: TextInputType.number,
                       formatters: [FilteringTextInputFormatter.digitsOnly],
@@ -1211,7 +1179,7 @@ class _ClassesPageState extends State<ClassesPage>
                       ctx: ctx,
                       isLoading: isLoading,
                       onSave: handleAdd,
-                      saveLabel: "Add Section",
+                      saveLabel: 'classes.add_section'.tr(),
                     ),
                   ],
                 ),
@@ -1249,15 +1217,15 @@ class _ClassesPageState extends State<ClassesPage>
 
               Future<void> handleUpdate() async {
                 if (selectedClassId == null) {
-                  _snack(ctx, "Please select a class");
+                  _snack(ctx, 'classes.select_class_error'.tr());
                   return;
                 }
                 if (sectionNameCtrl.text.trim().isEmpty) {
-                  _snack(ctx, "Please enter section name");
+                  _snack(ctx, 'classes.enter_section_name_error'.tr());
                   return;
                 }
                 if (capacityCtrl.text.trim().isEmpty) {
-                  _snack(ctx, "Please enter capacity");
+                  _snack(ctx, 'classes.enter_capacity_error'.tr());
                   return;
                 }
                 setSheetState(() => isLoading = true);
@@ -1287,16 +1255,17 @@ class _ClassesPageState extends State<ClassesPage>
                 bottom: bottom,
                 icon: Icons.edit_note_rounded,
                 iconBg: accentColor,
-                title: "Edit Section",
-                subtitle: "Editing: Section ${s.sectionName ?? ''}",
+                title: 'classes.edit_section'.tr(),
+                subtitle:
+                    '${'classes.edit_section_subtitle'.tr()}${s.sectionName ?? ''}',
                 child: Column(
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Class",
-                          style: TextStyle(
+                        Text(
+                          'classes.class_field'.tr(),
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: AppColor.sub,
@@ -1314,7 +1283,7 @@ class _ClassesPageState extends State<ClassesPage>
                           onChanged: (val) =>
                               setSheetState(() => selectedClassId = val),
                           hint: Text(
-                            "Select Class",
+                            'classes.select_class'.tr(),
                             style: TextStyle(
                               fontSize: 13.5,
                               color: AppColor.sub.withOpacity(0.6),
@@ -1335,15 +1304,15 @@ class _ClassesPageState extends State<ClassesPage>
                     const SizedBox(height: 14),
                     _sheetField(
                       sectionNameCtrl,
-                      "Section Name",
-                      "e.g. A, B, C or Rose",
+                      'classes.section_name'.tr(),
+                      'classes.section_name_hint'.tr(),
                       Icons.sort_by_alpha_rounded,
                     ),
                     const SizedBox(height: 14),
                     _sheetField(
                       capacityCtrl,
-                      "Capacity",
-                      "e.g. 40",
+                      'classes.capacity'.tr(),
+                      'classes.capacity_hint'.tr(),
                       Icons.people_outline_rounded,
                       keyboard: TextInputType.number,
                       formatters: [FilteringTextInputFormatter.digitsOnly],
@@ -1353,7 +1322,7 @@ class _ClassesPageState extends State<ClassesPage>
                       ctx: ctx,
                       isLoading: isLoading,
                       onSave: handleUpdate,
-                      saveLabel: "Save Changes",
+                      saveLabel: 'classes.save_changes'.tr(),
                     ),
                   ],
                 ),
@@ -1467,10 +1436,10 @@ class _ClassesPageState extends State<ClassesPage>
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColor.border, width: 1.5),
               ),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  "Cancel",
-                  style: TextStyle(
+                  'classes.cancel'.tr(),
+                  style: const TextStyle(
                     color: AppColor.sub,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -1484,7 +1453,7 @@ class _ClassesPageState extends State<ClassesPage>
         Expanded(
           flex: 3,
           child: AppButton(
-            title: isLoading ? "Please wait..." : saveLabel,
+            title: isLoading ? 'classes.please_wait'.tr() : saveLabel,
             onTap: onSave,
             height: 54,
             radius: 16,

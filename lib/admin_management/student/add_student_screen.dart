@@ -1375,7 +1375,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
           hintText: hint,
           prefixIcon: Icon(icon, color: AppColor.lightBlueColor),
           filled: true,
-          fillColor: Colors.white,
+             fillColor: Colors.white,
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none),

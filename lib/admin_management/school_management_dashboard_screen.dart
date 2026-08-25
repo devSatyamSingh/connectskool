@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,9 +7,10 @@ import 'package:school_pro/main.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/school_view_model/teacher/all_teachers_view_model.dart';
 import 'package:school_pro/view_model/auth_view_model/school_admin_profile_view_model.dart';
-import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart'; // ✅ added
+import 'package:school_pro/view_model/school_view_model/student/all_student_list_view_model.dart';
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
+import '../localization/language_selection_screen.dart';
 import '../repo/auth_repo/auth_repo.dart';
 import '../utils/dashboard_module.dart';
 import '../utils/permission_error_message.dart';
@@ -44,7 +46,6 @@ class _SchoolManagementDashboardScreenState
         context,
         listen: false,
       ).schoolAdminProfileApi(context);
-      // ✅ Fetch students to get total count
       Provider.of<AllStudentListVieModel>(
         context,
         listen: false,
@@ -67,19 +68,17 @@ class _SchoolManagementDashboardScreenState
     _tileAnimations = List.generate(
         DashboardModules.modules.length,
             (i) {
-      final start = (i * 0.05).clamp(0.0, 0.7);
-      final end = (start + 0.4).clamp(0.0, 1.0);
-      return CurvedAnimation(
-        parent: _animController,
-        curve: Interval(start, end, curve: Curves.easeOutBack),
-      );
-    });
+          final start = (i * 0.05).clamp(0.0, 0.7);
+          final end = (start + 0.4).clamp(0.0, 1.0);
+          return CurvedAnimation(
+            parent: _animController,
+            curve: Interval(start, end, curve: Curves.easeOutBack),
+          );
+        });
 
     _animController.forward();
     Future.microtask(() {
-      context
-          .read<CmsViewModel>()
-          .getCmsPages();
+      context.read<CmsViewModel>().getCmsPages();
     });
   }
 
@@ -96,38 +95,38 @@ class _SchoolManagementDashboardScreenState
 
   Future<bool> _showExitPopup() async {
     return await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Text(
-              'Exit App',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: const Text('Are you sure you want to exit?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1565C0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () => SystemNavigator.pop(),
-                child: const Text(
-                  'Exit',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          'common.exit_app'.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text('common.are_you_sure_exit'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('common.cancel'.tr()),
           ),
-        ) ??
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1565C0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () => SystemNavigator.pop(),
+            child: Text(
+              'common.exit'.tr(),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    ) ??
         false;
   }
 
@@ -139,21 +138,19 @@ class _SchoolManagementDashboardScreenState
     final String adminName = _capitalize(profile?.data?.name);
     final String adminEmail = profile?.data?.userEmail ?? 'admin@schoolpro.com';
 
-    //  Dynamic student total from pagination
     final studentTotal = Provider.of<AllStudentListVieModel>(
-          context,
-        ).allStudentListModel?.pagination?.total?.toString() ??
+      context,
+    ).allStudentListModel?.pagination?.total?.toString() ??
         '...';
-    final teacherTotal =
-        Provider.of<AllTeachersListVieModel>(
-          context,
-        ).allTeachersListModel?.pagination?.total?.toString() ??
+    final teacherTotal = Provider.of<AllTeachersListVieModel>(
+      context,
+    ).allTeachersListModel?.pagination?.total?.toString() ??
         '...';
-    final accountantTotal =
-        Provider.of<AllAccountantListVieModel>(
-          context,
-        ).allAccountantListModel?.pagination?.total?.toString() ??
+    final accountantTotal = Provider.of<AllAccountantListVieModel>(
+      context,
+    ).allAccountantListModel?.pagination?.total?.toString() ??
         '0';
+
     return WillPopScope(
       onWillPop: () async => await _showExitPopup(),
       child: SafeArea(
@@ -178,15 +175,15 @@ class _SchoolManagementDashboardScreenState
     );
   }
 
-  // ─── HEADER ──────────────────────────────────────────────────────────────────
+  // ─── HEADER ──────────────────────────────────────────────────────────────
 
   Widget _buildHeader(
-    BuildContext context,
-    String name,
-    String studentTotal,
-    String teacherTotal,
-    String accountantTotal,
-  ) {
+      BuildContext context,
+      String name,
+      String studentTotal,
+      String teacherTotal,
+      String accountantTotal,
+      ) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -205,7 +202,6 @@ class _SchoolManagementDashboardScreenState
       ),
       child: Column(
         children: [
-          // ── Top Row ──
           Row(
             children: [
               Builder(
@@ -236,7 +232,7 @@ class _SchoolManagementDashboardScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'SCHOOL ADMIN',
+                      'dashboard.school_admin'.tr(),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -246,7 +242,7 @@ class _SchoolManagementDashboardScreenState
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Hi, $name 👋',
+                      '${'dashboard.hi'.tr()}, $name 👋',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -258,30 +254,27 @@ class _SchoolManagementDashboardScreenState
               ),
             ],
           ),
-
           const SizedBox(height: 20),
-
-          // ── Stat Pills ──
           Row(
             children: [
               _statPill(
                 Icons.people_rounded,
                 studentTotal,
-                'Students',
+                'dashboard.students'.tr(),
                 const Color(0xFF6C5CE7),
               ),
               const SizedBox(width: 10),
               _statPill(
                 Icons.person_rounded,
                 teacherTotal,
-                'Teachers',
+                'dashboard.teachers'.tr(),
                 const Color(0xFF00B894),
               ),
               const SizedBox(width: 10),
               _statPill(
                 Icons.calculate_rounded,
                 accountantTotal,
-                'Accountants',
+                'dashboard.accountants'.tr(),
                 const Color(0xFFFF6B6B),
               ),
             ],
@@ -335,21 +328,12 @@ class _SchoolManagementDashboardScreenState
   }
 
   Widget _buildGrid() {
-    final permVm = Provider.of<GetUserPermissionViewModel>(
-      context,
-      listen: false,
-    );
-
     final visibleTiles = DashboardModules.modules
-        .where(
-          (e) => PermissionExtensions.canAccess(
-        e.permission,
-      ),
-    )
+        .where((e) => PermissionExtensions.canAccess(e.permission))
         .toList();
 
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 22, 16, 16, ),
+      padding: const EdgeInsets.fromLTRB(16, 22, 16, 16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 14,
@@ -359,53 +343,35 @@ class _SchoolManagementDashboardScreenState
       itemCount: visibleTiles.length,
       itemBuilder: (ctx, i) {
         final module = visibleTiles[i];
+        final animIdx = i.clamp(0, _tileAnimations.length - 1);
 
         return AnimatedBuilder(
-          animation: _tileAnimations[i.clamp(0, _tileAnimations.length - 1)],
+          animation: _tileAnimations[animIdx],
           builder: (_, child) => Transform.scale(
-            scale:
-                _tileAnimations[i.clamp(0, _tileAnimations.length - 1)].value,
+            scale: _tileAnimations[animIdx].value,
             child: Opacity(
-              opacity: _tileAnimations[i.clamp(0, _tileAnimations.length - 1)]
-                  .value
-                  .clamp(0.0, 1.0),
+              opacity: _tileAnimations[animIdx].value.clamp(0.0, 1.0),
               child: child,
             ),
           ),
-          child: _buildModuleTile(module), // ✅ original index pass
+          child: _buildModuleTile(module),
         );
       },
     );
   }
 
-  Widget _buildModuleTile(
-      DashboardModule module,
-      ) {
+  Widget _buildModuleTile(DashboardModule module) {
     return GestureDetector(
       onTap: () {
-
-        if (
-        !PermissionGuard.check(
-          context,
-          module.permission,
-          module.title,
-        )
-        ) {
+        if (!PermissionGuard.check(context, module.permission, module.title)) {
           return;
         }
-
-        Navigator.pushNamed(
-          context,
-          module.route,
-        );
+        Navigator.pushNamed(context, module.route);
       },
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              module.color,
-              module.color.withOpacity(0.78),
-            ],
+            colors: [module.color, module.color.withOpacity(0.78)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -433,10 +399,7 @@ class _SchoolManagementDashboardScreenState
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 14,
-                horizontal: 10,
-              ),
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -446,11 +409,7 @@ class _SchoolManagementDashboardScreenState
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: Icon(
-                      module.icon,
-                      color: Colors.white,
-                      size: 24,
-                    ),
+                    child: Icon(module.icon, color: Colors.white, size: 24),
                   ),
                   const SizedBox(height: 10),
                   Text(
@@ -473,7 +432,6 @@ class _SchoolManagementDashboardScreenState
       ),
     );
   }
-
 
   Widget _buildDrawer(BuildContext context, String name, String email) {
     return Drawer(
@@ -539,18 +497,15 @@ class _SchoolManagementDashboardScreenState
                 ),
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 5,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.18),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.white.withOpacity(0.3)),
                   ),
-                  child: const Text(
-                    '🏫  School Administrator',
-                    style: TextStyle(
+                  child: Text(
+                    '🏫  ${'dashboard.school_administrator'.tr()}',
+                    style: const TextStyle(
                       fontSize: 11,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
@@ -566,15 +521,14 @@ class _SchoolManagementDashboardScreenState
               children: [
                 _drawerItem(
                   icon: Icons.shield_outlined,
-                  title: 'Privacy Policy',
+                  title: 'common.privacy_policy'.tr(),
                   onTap: () {
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CmsScreen(
+                        builder: (_) => CmsScreen(
                           pageType: "privacy_policy",
-                          title: "Privacy Policy",
+                          title: 'common.privacy_policy'.tr(),
                         ),
                       ),
                     );
@@ -582,15 +536,14 @@ class _SchoolManagementDashboardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.description_outlined,
-                  title: 'Terms & Conditions',
+                  title: 'common.terms_conditions'.tr(),
                   onTap: () {
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CmsScreen(
+                        builder: (_) => CmsScreen(
                           pageType: "terms_conditions",
-                          title: "Terms & Conditions",
+                          title: 'common.terms_conditions'.tr(),
                         ),
                       ),
                     );
@@ -598,15 +551,14 @@ class _SchoolManagementDashboardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.info_outline_rounded,
-                  title: 'About Us',
+                  title: 'common.about_us'.tr(),
                   onTap: () {
-
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CmsScreen(
+                        builder: (_) => CmsScreen(
                           pageType: "about_us",
-                          title: "About Us",
+                          title: 'common.about_us'.tr(),
                         ),
                       ),
                     );
@@ -614,20 +566,27 @@ class _SchoolManagementDashboardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.help_outline_rounded,
-                  title: 'Help & Support',
+                  title: 'common.help_support'.tr(),
                   onTap: () {
                     Navigator.pop(context);
-
-                    Navigator.pushNamed(
-                      context,
-                      RoutesName.helpSupportScreen,
-                    );
+                    Navigator.pushNamed(context, RoutesName.helpSupportScreen);
                   },
                 ),
                 _drawerItem(
                   icon: Icons.settings_outlined,
-                  title: 'Settings',
-                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ManagePermission())),
+                  title: 'common.settings'.tr(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ManagePermission()),
+                  ),
+                ),
+                _drawerItem(
+                  icon: Icons.language_rounded,
+                  title: 'common.language'.tr(),
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LanguageSelectionScreen()),
+                  ),
                 ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -635,7 +594,7 @@ class _SchoolManagementDashboardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.logout_rounded,
-                  title: 'Logout',
+                  title: 'common.logout'.tr(),
                   iconColor: Colors.red.shade700,
                   titleColor: Colors.red.shade700,
                   iconBg: Colors.red.shade50,
@@ -670,11 +629,7 @@ class _SchoolManagementDashboardScreenState
           color: iconBg ?? const Color(0xFFE3EEFF),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: iconColor ?? const Color(0xFF1565C0),
-        ),
+        child: Icon(icon, size: 20, color: iconColor ?? const Color(0xFF1565C0)),
       ),
       title: Text(
         title,
@@ -702,65 +657,49 @@ class _SchoolManagementDashboardScreenState
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              title: const Row(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
                 children: [
-                  Icon(Icons.logout_rounded, color: Colors.red),
-                  SizedBox(width: 10),
+                  const Icon(Icons.logout_rounded, color: Colors.red),
+                  const SizedBox(width: 10),
                   Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'common.logout'.tr(),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              content: const Text(
-                'Are you sure you want to logout?',
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+              content: Text(
+                'common.are_you_sure_logout'.tr(),
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
               actions: [
-                // CANCEL — loading mein disable ho jaye
                 TextButton(
                   onPressed: isLoggingOut ? null : () => Navigator.pop(ctx),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  child: Text('common.cancel'.tr(), style: const TextStyle(color: Colors.grey)),
                 ),
-
-                // LOGOUT
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     minimumSize: const Size(90, 40),
                   ),
                   onPressed: isLoggingOut
-                      ? null // loading mein dobara tap na ho
+                      ? null
                       : () async {
-                    // Loading start
                     setDialogState(() => isLoggingOut = true);
 
                     final userVM = UserViewModel();
 
                     try {
-                      // STEP 1: Subscribed session pehle padho
-                      final session =
-                      await userVM.getSubscribedSession();
+                      final session = await userVM.getSubscribedSession();
                       final schoolId = session['schoolId'];
                       final role = session['role'];
                       final userId = session['userId'];
                       final classId = session['classId'];
                       final sectionId = session['sectionId'];
 
-                      debugPrint(
-                        "🔍 Logout => school=$schoolId | role=$role",
-                      );
+                      debugPrint("🔍 Logout => school=$schoolId | role=$role");
 
-                      // STEP 2: FCM Topics unsubscribe
                       if (schoolId != null &&
                           schoolId.isNotEmpty &&
                           role != null &&
@@ -776,9 +715,7 @@ class _SchoolManagementDashboardScreenState
 
                         if (role == "student") {
                           if (classId != null && classId.isNotEmpty) {
-                            topics.add(
-                              "school_${schoolId}_class_$classId",
-                            );
+                            topics.add("school_${schoolId}_class_$classId");
                           }
                           if (classId != null &&
                               classId.isNotEmpty &&
@@ -792,49 +729,37 @@ class _SchoolManagementDashboardScreenState
 
                         final messaging = FirebaseMessaging.instance;
                         await Future.wait(
-                          topics.map(
-                                (t) => messaging.unsubscribeFromTopic(t),
-                          ),
+                          topics.map((t) => messaging.unsubscribeFromTopic(t)),
                           eagerError: false,
                         );
                         debugPrint("✅ Unsubscribed: $topics");
                       }
 
-                      // STEP 3: FCM Token delete
                       await FirebaseMessaging.instance.deleteToken();
                       debugPrint("✅ FCM Token deleted");
 
-                      // STEP 4: Backend logout (best-effort)
                       try {
                         final repo = AuthRepository();
-                        await repo.logoutApi({
-                          "device_type": "android",
-                        });
+                        await repo.logoutApi({"device_type": "android"});
                         debugPrint("✅ Backend logout done");
                       } catch (e) {
                         debugPrint("⚠️ Backend logout error: $e");
                       }
 
-                      // STEP 5: Subscribed session clear
                       await userVM.clearSubscribedSession();
-
-                      // STEP 6: Sab local data clear
                       await userVM.clearUser();
                       PermissionManager.clear();
 
                       debugPrint("✅ Logout complete");
                     } catch (e) {
                       debugPrint("❌ Logout error: $e");
-                      // Error pe bhi clear karo
                       await userVM.clearSubscribedSession();
                       await userVM.clearUser();
                       PermissionManager.clear();
                     }
 
-                    // Dialog close
                     if (ctx.mounted) Navigator.pop(ctx);
 
-                    // Splash pe jao — pura stack clear
                     if (context.mounted) {
                       Navigator.pushNamedAndRemoveUntil(
                         context,
@@ -852,10 +777,7 @@ class _SchoolManagementDashboardScreenState
                       strokeWidth: 2.5,
                     ),
                   )
-                      : const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.white),
-                  ),
+                      : Text('common.logout'.tr(), style: const TextStyle(color: Colors.white)),
                 ),
               ],
             );
@@ -864,15 +786,4 @@ class _SchoolManagementDashboardScreenState
       },
     );
   }
-}
-
-
-class _DashTile {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final String sub;
-  final String permKey; // ✅ new
-
-  const _DashTile(this.label, this.icon, this.color, this.sub, this.permKey);
 }

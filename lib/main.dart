@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -119,6 +120,9 @@ import 'package:school_pro/view_model/teacher_view_model/teacher_profile_view_mo
 import 'package:school_pro/view_model/auth_view_model/user_view_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
+import 'localization/app_locals.dart';
+import 'localization/language_provider.dart';
+import 'localization/language_storage.dart';
 import 'res/internet_popup.dart';
 import 'package:school_pro/view_model/school_view_model/exam/exam_management_view_model.dart';
 
@@ -146,9 +150,10 @@ Future<void> _firebaseBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
+  await LanguageStorage.init();                     // ✅ NEW
 
   FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
@@ -159,8 +164,7 @@ void main() async {
     debugPrint("📲 App opened from notification: ${message.notification?.title}");
   });
 
-  final RemoteMessage? initialMessage =
-  await FirebaseMessaging.instance.getInitialMessage();
+  final RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
   if (initialMessage != null) {
     debugPrint("🚀 App launched from notification: ${initialMessage.notification?.title}");
   }
@@ -172,8 +176,7 @@ void main() async {
   );
 
   await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -183,9 +186,7 @@ void main() async {
   );
 
   await _initFCMPermission();
-
   await _reSubscribeTopics();
-
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
     debugPrint("📩 Foreground message: ${message.notification?.title}");
@@ -193,11 +194,8 @@ void main() async {
 
     final senderId = message.data['sender_id'];
     if (senderId != null && senderId.toString().isNotEmpty) {
-
       final myUserId = await UserViewModel().getUserIdFromToken();
-
       debugPrint(" sender_id: $senderId | my user_id: $myUserId");
-
       if (myUserId != null && senderId.toString() == myUserId) {
         debugPrint(" Apni hi notification hai — block kar raha hai");
         return;
@@ -224,7 +222,16 @@ void main() async {
     }
   });
 
-  runApp(const MyApp());
+  runApp(
+    EasyLocalization(                                // ✅ NEW — wraps MyApp
+      supportedLocales: AppLocales.supported,
+      path: 'assets/translations',
+      fallbackLocale: AppLocales.defaultLocale,
+      startLocale: Locale(LanguageStorage.getLanguageCode()),
+      saveLocale: false,
+      child: const MyApp(),
+    ),
+  );
 }
 
 
@@ -458,11 +465,14 @@ class _MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (_) => CoScholasticGradeViewModel()),
         ChangeNotifierProvider(create: (_) => GetAllTransportStudentsViewModel()),
         ChangeNotifierProvider(create: (_) => DiscontinueStudentFeeViewModel()),
-
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: context.localizationDelegates,   // ✅ NEW
+        supportedLocales: context.supportedLocales,               // ✅ NEW
+        locale: context.locale,                                   // ✅ NEW
         initialRoute: RoutesName.splash,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
