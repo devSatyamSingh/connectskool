@@ -1408,6 +1408,7 @@
 //     );
 //   }
 // }
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -1566,17 +1567,13 @@ class _AdminViewFeesStructureScreenState
 
     final list = <_Installment>[];
 
-    // End date ka day extract karo
     final int endDay = selectedEndDate.day;
 
-    // ─────────────────────────────
-    // ONE TIME
-    // ─────────────────────────────
     if (_selectedFrequency == 'one_time') {
       list.add(
         _Installment(
           index: 1,
-          label: 'One Time Payment',
+          label: 'fees_structure.one_time'.tr(),
           monthYear: DateFormat('MMM yyyy').format(start),
           amount: amt,
           dueDate: start,
@@ -1592,9 +1589,6 @@ class _AdminViewFeesStructureScreenState
       return;
     }
 
-    // ─────────────────────────────
-    // Frequency Config
-    // ─────────────────────────────
     late final int totalInstallments;
     late final int stepMonths;
     late final String labelPrefix;
@@ -1603,24 +1597,21 @@ class _AdminViewFeesStructureScreenState
       case 'Quarterly':
         totalInstallments = 4;
         stepMonths = 3;
-        labelPrefix = 'Quarterly Installment';
+        labelPrefix = 'fees_structure.quarterly'.tr();
         break;
 
       case 'half_yearly':
         totalInstallments = 2;
         stepMonths = 6;
-        labelPrefix = 'Half Yearly Installment';
+        labelPrefix = 'fees_structure.half_yearly'.tr();
         break;
 
       default:
         totalInstallments = 12;
         stepMonths = 1;
-        labelPrefix = 'Monthly Installment';
+        labelPrefix = 'fees_structure.monthly'.tr();
     }
 
-    // ─────────────────────────────
-    // Generate Installments
-    // ─────────────────────────────
     for (int i = 0; i < totalInstallments; i++) {
       final rawMonth = start.month + (i * stepMonths);
 
@@ -1628,14 +1619,12 @@ class _AdminViewFeesStructureScreenState
 
       final instMonth = ((rawMonth - 1) % 12) + 1;
 
-      // Start Date
       final instStart = DateTime(
         instYear,
         instMonth,
         start.day,
       );
 
-      // End Date (same day number as user selected)
       final daysInMonth = DateTime(
         instYear,
         instMonth + 1,
@@ -1673,51 +1662,50 @@ class _AdminViewFeesStructureScreenState
 
   Future<void> _submit() async {
     if (_selectedClassId == null) {
-      Utils.show('Please select class', context);
+      Utils.show('fees_structure.select_class_error'.tr(), context);
       return;
     }
 
     if (_selectedFeeHeadId == null) {
-      Utils.show('Please select fee head', context);
+      Utils.show('fees_structure.select_fee_head_error'.tr(), context);
       return;
     }
 
     if (_baseAmountCtrl.text.trim().isEmpty) {
-      Utils.show('Base amount cannot be empty', context);
+      Utils.show('fees_structure.base_amount_empty'.tr(), context);
       return;
     }
 
     if (selectedYear == null || selectedYear!.yearName == null) {
-      Utils.show('Please select academic year', context);
+      Utils.show('fees_structure.select_academic_year_error'.tr(), context);
       return;
     }
 
     if (_startDateCtrl.text.trim().isEmpty) {
-      Utils.show('Please select start date', context);
+      Utils.show('fees_structure.select_start_date'.tr(), context);
       return;
     }
 
     if (_endDateCtrl.text.trim().isEmpty) {
-      Utils.show('Please select end date', context);
+      Utils.show('fees_structure.select_end_date'.tr(), context);
       return;
     }
 
-    // ✅ FIX: Parse dd-MM-yyyy → convert to yyyy-MM-dd for API
     final startParsed = _parseDate(_startDateCtrl.text.trim());
-    final endParsed   = _parseDate(_endDateCtrl.text.trim());
+    final endParsed = _parseDate(_endDateCtrl.text.trim());
 
     if (startParsed == null) {
-      Utils.show('Invalid start date', context);
+      Utils.show('fees_structure.invalid_start_date'.tr(), context);
       return;
     }
 
     if (endParsed == null) {
-      Utils.show('Invalid end date', context);
+      Utils.show('fees_structure.invalid_end_date'.tr(), context);
       return;
     }
 
     final apiStartDate = DateFormat('yyyy-MM-dd').format(startParsed);
-    final apiEndDate   = DateFormat('yyyy-MM-dd').format(endParsed);
+    final apiEndDate = DateFormat('yyyy-MM-dd').format(endParsed);
 
     final success = await Provider.of<CreateFeesViewModel>(
       context,
@@ -1728,7 +1716,7 @@ class _AdminViewFeesStructureScreenState
       double.parse(_baseAmountCtrl.text.trim()),
       _selectedFrequency,
       selectedYear!.yearName!,
-      apiStartDate,   
+      apiStartDate,
       apiEndDate,
       context,
     );
@@ -1741,6 +1729,7 @@ class _AdminViewFeesStructureScreenState
       _tabController.animateTo(1);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -1800,13 +1789,13 @@ class _AdminViewFeesStructureScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     AppText.customText(
-                      'Fee Structure',
+                      'fees_structure.title'.tr(),
                       size: 18,
                       weight: FontWeight.bold,
                       color: Colors.white,
                     ),
                     AppText.customText(
-                      'Create & view fee structures',
+                      'fees_structure.subtitle'.tr(),
                       size: 11,
                       color: Colors.white70,
                     ),
@@ -1831,7 +1820,7 @@ class _AdminViewFeesStructureScreenState
                     ),
                     const SizedBox(width: 6),
                     AppText.customText(
-                      'Fees',
+                      'fees_structure.fees'.tr(),
                       size: 13,
                       weight: FontWeight.bold,
                       color: Colors.white,
@@ -1862,14 +1851,14 @@ class _AdminViewFeesStructureScreenState
               ),
               dividerColor: Colors.transparent,
               padding: const EdgeInsets.all(4),
-              tabs: const [
+              tabs: [
                 Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add_circle_outline, size: 16),
-                      SizedBox(width: 6),
-                      Text('Create'),
+                      const Icon(Icons.add_circle_outline, size: 16),
+                      const SizedBox(width: 6),
+                      Text('fees_structure.create'.tr()),
                     ],
                   ),
                 ),
@@ -1877,9 +1866,9 @@ class _AdminViewFeesStructureScreenState
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.list_alt, size: 16),
-                      SizedBox(width: 6),
-                      Text('View All'),
+                      const Icon(Icons.list_alt, size: 16),
+                      const SizedBox(width: 6),
+                      Text('fees_structure.view_all'.tr()),
                     ],
                   ),
                 ),
@@ -1900,12 +1889,12 @@ class _AdminViewFeesStructureScreenState
         children: [
           _sectionHeader(
             '1',
-            'Fee Configuration',
-            'Select academic year, class and fee head',
+            'fees_structure.fee_configuration'.tr(),
+            'fees_structure.fee_config_sub'.tr(),
           ),
           const SizedBox(height: 16),
 
-          _label('Academic Year *'),
+          _label('fees_structure.academic_year'.tr()),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -1920,21 +1909,21 @@ class _AdminViewFeesStructureScreenState
                 return DropdownButton<int>(
                   dropdownColor: Colors.white,
                   value: selectedYear?.academicYearId,
-                  hint: const Text("Select Academic Year"),
+                  hint: Text('fees_structure.select_academic_year'.tr()),
                   isExpanded: true,
                   underline: const SizedBox(),
                   items: academicVM.years
                       .map(
                         (year) => DropdownMenuItem<int>(
-                          value: year.academicYearId,
-                          child: Text(year.yearName ?? ''),
-                        ),
-                      )
+                      value: year.academicYearId,
+                      child: Text(year.yearName ?? ''),
+                    ),
+                  )
                       .toList(),
                   onChanged: (value) {
                     setState(() {
                       selectedYear = academicVM.years.firstWhere(
-                        (e) => e.academicYearId == value,
+                            (e) => e.academicYearId == value,
                       );
                     });
                   },
@@ -1944,7 +1933,7 @@ class _AdminViewFeesStructureScreenState
           ),
           const SizedBox(height: 14),
 
-          _label('Class / Grade *'),
+          _label('fees_structure.class_grade'.tr()),
           const SizedBox(height: 8),
           Consumer<AllClassesViewModel>(
             builder: (ctx, vm, _) {
@@ -1955,7 +1944,7 @@ class _AdminViewFeesStructureScreenState
                     dropdownColor: Colors.white,
                     value: _selectedClassId,
                     isExpanded: true,
-                    hint: _hint('Select Class', Icons.class_),
+                    hint: _hint('fees_structure.select_class'.tr(), Icons.class_),
                     icon: Icon(
                       Icons.keyboard_arrow_down,
                       color: AppColor.lightBlueColor,
@@ -1963,20 +1952,20 @@ class _AdminViewFeesStructureScreenState
                     items: classes
                         .map(
                           (c) => DropdownMenuItem(
-                            value: c.classId,
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.school,
-                                  size: 18,
-                                  color: AppColor.lightBlueColor,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(c.className ?? ''),
-                              ],
+                        value: c.classId,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.school,
+                              size: 18,
+                              color: AppColor.lightBlueColor,
                             ),
-                          ),
-                        )
+                            const SizedBox(width: 10),
+                            Text(c.className ?? ''),
+                          ],
+                        ),
+                      ),
+                    )
                         .toList(),
                     onChanged: (v) => setState(() => _selectedClassId = v),
                   ),
@@ -1986,7 +1975,7 @@ class _AdminViewFeesStructureScreenState
           ),
           const SizedBox(height: 14),
 
-          _label('Fee Head *'),
+          _label('fees_structure.fee_head'.tr()),
           const SizedBox(height: 8),
           Consumer<FeesHeadManagementViewModel>(
             builder: (ctx, vm, _) {
@@ -1994,63 +1983,63 @@ class _AdminViewFeesStructureScreenState
               return _dropdownContainer(
                 child: vm.loading
                     ? Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              height: 18,
-                              width: 18,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColor.lightBlueColor,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Loading fee heads...',
-                              style: TextStyle(color: Colors.grey.shade500),
-                            ),
-                          ],
-                        ),
-                      )
-                    : DropdownButtonHideUnderline(
-                        child: DropdownButton<int>(
-                          dropdownColor: Colors.white,
-                          value: _selectedFeeHeadId,
-                          isExpanded: true,
-                          hint: _hint('Select Fee Head', Icons.category),
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: AppColor.lightBlueColor,
-                          ),
-                          items: feeHeads
-                              .map(
-                                (h) => DropdownMenuItem(
-                                  value: h.feeHeadId,
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.category,
-                                        size: 18,
-                                        color: AppColor.lightBlueColor,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Expanded(child: Text(h.headName ?? '')),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (v) {
-                            setState(() {
-                              _selectedFeeHeadId = v;
-                              _selectedFeeHeadName = feeHeads
-                                  .firstWhere((h) => h.feeHeadId == v)
-                                  .headName;
-                            });
-                          },
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColor.lightBlueColor,
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'fees_structure.loading_fee_heads'.tr(),
+                        style: TextStyle(color: Colors.grey.shade500),
+                      ),
+                    ],
+                  ),
+                )
+                    : DropdownButtonHideUnderline(
+                  child: DropdownButton<int>(
+                    dropdownColor: Colors.white,
+                    value: _selectedFeeHeadId,
+                    isExpanded: true,
+                    hint: _hint('fees_structure.select_fee_head'.tr(), Icons.category),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down,
+                      color: AppColor.lightBlueColor,
+                    ),
+                    items: feeHeads
+                        .map(
+                          (h) => DropdownMenuItem(
+                        value: h.feeHeadId,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.category,
+                              size: 18,
+                              color: AppColor.lightBlueColor,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(h.headName ?? '')),
+                          ],
+                        ),
+                      ),
+                    )
+                        .toList(),
+                    onChanged: (v) {
+                      setState(() {
+                        _selectedFeeHeadId = v;
+                        _selectedFeeHeadName = feeHeads
+                            .firstWhere((h) => h.feeHeadId == v)
+                            .headName;
+                      });
+                    },
+                  ),
+                ),
               );
             },
           ),
@@ -2058,15 +2047,14 @@ class _AdminViewFeesStructureScreenState
 
           _sectionHeader(
             '2',
-            'Financial Details',
-            'Set payment frequency, base amount and due dates',
+            'fees_structure.financial_details'.tr(),
+            'fees_structure.financial_sub'.tr(),
           ),
           const SizedBox(height: 16),
 
-          _label('Payment Frequency *'),
+          _label('fees_structure.payment_frequency'.tr()),
           const SizedBox(height: 10),
 
-          // ✅ Frequency chips with installment count badge
           Wrap(
             spacing: 8,
             runSpacing: 8,
@@ -2079,6 +2067,13 @@ class _AdminViewFeesStructureScreenState
                   : f == 'half_yearly'
                   ? '2'
                   : '1';
+              final label = f == 'monthly'
+                  ? 'fees_structure.monthly'.tr()
+                  : f == 'Quarterly'
+                  ? 'fees_structure.quarterly'.tr()
+                  : f == 'half_yearly'
+                  ? 'fees_structure.half_yearly'.tr()
+                  : 'fees_structure.one_time'.tr();
               return GestureDetector(
                 onTap: () {
                   setState(() => _selectedFrequency = f);
@@ -2099,19 +2094,19 @@ class _AdminViewFeesStructureScreenState
                     ),
                     boxShadow: sel
                         ? [
-                            BoxShadow(
-                              color: AppColor.lightBlueColor.withOpacity(0.3),
-                              blurRadius: 8,
-                              offset: const Offset(0, 4),
-                            ),
-                          ]
+                      BoxShadow(
+                        color: AppColor.lightBlueColor.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
                         : [],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        f.replaceAll('_', ' ').toUpperCase(),
+                        label,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -2147,13 +2142,13 @@ class _AdminViewFeesStructureScreenState
           ),
           const SizedBox(height: 16),
 
-          _label('Base Amount (₹) *'),
+          _label('fees_structure.base_amount'.tr()),
           const SizedBox(height: 8),
           TextField(
             controller: _baseAmountCtrl,
             keyboardType: TextInputType.number,
             onChanged: (_) => setState(() {}),
-            decoration: _inputDeco('0.00', Icons.currency_rupee),
+            decoration: _inputDeco('fees_structure.base_amount_hint'.tr(), Icons.currency_rupee),
           ),
           const SizedBox(height: 8),
 
@@ -2176,7 +2171,7 @@ class _AdminViewFeesStructureScreenState
                   ),
                   const SizedBox(width: 8),
                   AppText.customText(
-                    'BASE AMOUNT PREVIEW',
+                    'fees_structure.base_amount_preview'.tr(),
                     size: 10,
                     color: AppColor.lightBlueColor,
                     weight: FontWeight.w600,
@@ -2199,14 +2194,14 @@ class _AdminViewFeesStructureScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _label('Start Due Date *'),
+                    _label('fees_structure.start_due_date'.tr()),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _startDateCtrl,
                       readOnly: true,
                       onTap: () => _pickDate(_startDateCtrl),
                       decoration: _inputDeco(
-                        'dd-mm-yyyy',
+                        'fees_structure.date_hint'.tr(),
                         Icons.calendar_today,
                       ),
                     ),
@@ -2218,13 +2213,13 @@ class _AdminViewFeesStructureScreenState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _label('End Due Date *'),
+                    _label('fees_structure.end_due_date'.tr()),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _endDateCtrl,
                       readOnly: true,
                       onTap: () => _pickDate(_endDateCtrl),
-                      decoration: _inputDeco('dd-mm-yyyy', Icons.event),
+                      decoration: _inputDeco('fees_structure.date_hint'.tr(), Icons.event),
                     ),
                   ],
                 ),
@@ -2252,7 +2247,7 @@ class _AdminViewFeesStructureScreenState
                   size: 18,
                 ),
                 label: Text(
-                  'Preview Installments  (${_installments.length})',
+                  'fees_structure.preview_installments'.tr() + ' (${_installments.length})',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 15,
@@ -2277,8 +2272,8 @@ class _AdminViewFeesStructureScreenState
                   width: double.infinity,
                   child: AppButton(
                     title: vm.loading
-                        ? "Creating..."
-                        : "Create Fee Structure",
+                        ? 'fees_structure.creating'.tr()
+                        : 'fees_structure.create_fee_structure'.tr(),
                     icon: vm.loading
                         ? null
                         : Icons.add_rounded,
@@ -2290,7 +2285,7 @@ class _AdminViewFeesStructureScreenState
                         PermissionKeys.manageFees,
                       )) {
                         Utils.show(
-                          "Permission denied",
+                          'fees_structure.permission_denied'.tr(),
                           context,
                         );
                         return;
@@ -2314,8 +2309,8 @@ class _AdminViewFeesStructureScreenState
       children: [
         _sectionHeader(
           '3',
-          'Preview Installment Schedule',
-          '${_installments.length} installments  *  Total: ₹${_totalAmount.toStringAsFixed(2)}',
+          'fees_structure.preview_schedule'.tr(),
+          '${_installments.length} ${'fees_structure.installments'.tr()}  *  ${'fees_structure.total_fee'.tr()}: ₹${_totalAmount.toStringAsFixed(2)}',
         ),
         const SizedBox(height: 16),
 
@@ -2337,9 +2332,9 @@ class _AdminViewFeesStructureScreenState
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Total Fee',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  Text(
+                    'fees_structure.total_fee'.tr(),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Container(
                     padding: const EdgeInsets.all(6),
@@ -2368,28 +2363,28 @@ class _AdminViewFeesStructureScreenState
                 ),
               ),
               const Divider(height: 20),
-              _summaryRow('Installments', '${_installments.length}'),
+              _summaryRow('fees_structure.installments'.tr(), '${_installments.length}'),
               _summaryRow(
-                'Frequency',
+                'fees_structure.frequency'.tr(),
                 _selectedFrequency.replaceAll('_', ' ').toUpperCase(),
               ),
               _summaryRow(
-                'Base Amount',
+                'fees_structure.base_amount_label'.tr(),
                 '₹${double.tryParse(_baseAmountCtrl.text)?.toStringAsFixed(2) ?? "0.00"}',
               ),
               if (selectedYear != null)
-                _summaryRow('Academic Year', selectedYear!.yearName ?? ''),
+                _summaryRow('fees_structure.academic_year'.tr(), selectedYear!.yearName ?? ''),
               if (_startDateCtrl.text.isNotEmpty)
-                _summaryRow('Start Date', _startDateCtrl.text),
+                _summaryRow('fees_structure.start_date'.tr(), _startDateCtrl.text),
               if (_endDateCtrl.text.isNotEmpty)
-                _summaryRow('End Date', _endDateCtrl.text),
+                _summaryRow('fees_structure.end_date'.tr(), _endDateCtrl.text),
               const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Remaining Balance',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  Text(
+                    'fees_structure.remaining_balance'.tr(),
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   Text(
                     '₹0.00',
@@ -2446,11 +2441,11 @@ class _AdminViewFeesStructureScreenState
                 child: Row(
                   children: [
                     _tableHeader('#', flex: 0),
-                    _tableHeader('INSTALLMENT', flex: 3),
-                    _tableHeader('MONTH', flex: 2),
-                    _tableHeader('AMOUNT', flex: 2),
-                    _tableHeader('START DATE', flex: 3),
-                    _tableHeader('END DATE', flex: 3),
+                    _tableHeader('fees_structure.installment'.tr(), flex: 3),
+                    _tableHeader('fees_structure.month'.tr(), flex: 2),
+                    _tableHeader('fees_structure.amount'.tr(), flex: 2),
+                    _tableHeader('fees_structure.start_date'.tr(), flex: 3),
+                    _tableHeader('fees_structure.end_date'.tr(), flex: 3),
                   ],
                 ),
               ),
@@ -2460,8 +2455,8 @@ class _AdminViewFeesStructureScreenState
                     color: i % 2 == 0 ? Colors.white : Colors.grey.shade50,
                     borderRadius: i == _installments.length - 1
                         ? const BorderRadius.vertical(
-                            bottom: Radius.circular(16),
-                          )
+                      bottom: Radius.circular(16),
+                    )
                         : null,
                   ),
                   child: _InstallmentRow(
@@ -2500,32 +2495,32 @@ class _AdminViewFeesStructureScreenState
                 ),
                 child: vm.loading
                     ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
                     : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Text(
-                            'Confirm & Assign Fee',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            color: Colors.white,
-                            size: 18,
-                          ),
-                        ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'fees_structure.confirm_assign'.tr(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
+                    ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -2539,7 +2534,7 @@ class _AdminViewFeesStructureScreenState
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(label.tr(), style: const TextStyle(fontSize: 12, color: Colors.grey)),
         Text(
           value,
           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
@@ -2568,14 +2563,12 @@ class _AdminViewFeesStructureScreenState
 
         var displayFees = allFees;
 
-        /// Class Filter
         if (_selectedViewClassId != null) {
           displayFees = displayFees.where((fee) {
             return fee.classId == _selectedViewClassId;
           }).toList();
         }
 
-        /// Frequency Filter
         if (_viewFilter != 'all') {
           displayFees = displayFees.where((fee) {
             return fee.feeFrequency?.toLowerCase() ==
@@ -2591,15 +2584,15 @@ class _AdminViewFeesStructureScreenState
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: [
-                  _viewChip('All', 'all'),
+                  _viewChip('fees_structure.all_classes'.tr(), 'all'),
                   const SizedBox(width: 8),
-                  _viewChip('Monthly', 'monthly'),
+                  _viewChip('fees_structure.monthly'.tr(), 'monthly'),
                   const SizedBox(width: 8),
-                  _viewChip('Quarterly', 'Quarterly'),
+                  _viewChip('fees_structure.quarterly'.tr(), 'Quarterly'),
                   const SizedBox(width: 8),
-                  _viewChip('One Time', 'one_time'),
+                  _viewChip('fees_structure.one_time'.tr(), 'one_time'),
                   const SizedBox(width: 8),
-                  _viewChip('Half Yearly', 'half_yearly'),
+                  _viewChip('fees_structure.half_yearly'.tr(), 'half_yearly'),
                 ],
               ),
             ),
@@ -2637,17 +2630,14 @@ class _AdminViewFeesStructureScreenState
                             color: AppColor.lightBlueColor,
                           ),
                           const SizedBox(width: 10),
-                          const Text(
-                            "All Classes",
-                          ),
+                          Text('fees_structure.all_classes'.tr()),
                         ],
                       ),
                       items: [
-                        const DropdownMenuItem<int>(
+                        DropdownMenuItem<int>(
                           value: -1,
-                          child: Text("All Classes"),
+                          child: Text('fees_structure.all_classes'.tr()),
                         ),
-
                         ...classes.map(
                               (e) => DropdownMenuItem<int>(
                             value: e.classId,
@@ -2674,25 +2664,22 @@ class _AdminViewFeesStructureScreenState
                   : displayFees.isEmpty
                   ? _emptyView()
                   : RefreshIndicator(
-                      onRefresh: () async {
-                        await Provider.of<FeesManagementViewModel>(
-                          context,
-                          listen: false,
-                        ).feesManagementApi(context);
-                      },
-                      color: AppColor.lightBlueColor,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(18, 8, 18, 30),
-
-                        physics: const AlwaysScrollableScrollPhysics(
-                          parent: BouncingScrollPhysics(),
-                        ),
-
-                        itemCount: displayFees.length,
-
-                        itemBuilder: (_, i) => _feeCard(displayFees[i]),
-                      ),
-                    ),
+                onRefresh: () async {
+                  await Provider.of<FeesManagementViewModel>(
+                    context,
+                    listen: false,
+                  ).feesManagementApi(context);
+                },
+                color: AppColor.lightBlueColor,
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 30),
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  itemCount: displayFees.length,
+                  itemBuilder: (_, i) => _feeCard(displayFees[i]),
+                ),
+              ),
             ),
           ],
         );
@@ -2803,15 +2790,12 @@ class _AdminViewFeesStructureScreenState
                 ),
                 InkWell(
                   onTap: () {
-
                     if (!PermissionExtensions.canAccess(
                         PermissionKeys.manageFees)) {
-
                       Utils.show(
-                        "Permission denied",
+                        'fees_structure.permission_denied'.tr(),
                         context,
                       );
-
                       return;
                     }
 
@@ -2833,9 +2817,9 @@ class _AdminViewFeesStructureScreenState
                       children: [
                         Icon(Icons.delete_outline, color: Colors.red, size: 14),
                         const SizedBox(width: 6),
-                        const Text(
-                          "Delete",
-                          style: TextStyle(
+                        Text(
+                          'fees_structure.delete'.tr(),
+                          style: const TextStyle(
                             color: Colors.red,
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
@@ -2845,7 +2829,7 @@ class _AdminViewFeesStructureScreenState
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,
@@ -2873,7 +2857,6 @@ class _AdminViewFeesStructureScreenState
               children: [
                 Column(
                   children: [
-
                     Row(
                       children: [
                         _infoChip(
@@ -2881,9 +2864,7 @@ class _AdminViewFeesStructureScreenState
                           fee.className ?? 'N/A',
                           Colors.blue,
                         ),
-
                         const SizedBox(width: 10),
-
                         _infoChip(
                           Icons.calendar_month,
                           fee.academicYear ?? 'N/A',
@@ -2891,25 +2872,21 @@ class _AdminViewFeesStructureScreenState
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 12),
-
                     Row(
                       children: [
                         Expanded(
                           child: _dateCard(
-                            title: "Start Date",
+                            title: 'fees_structure.start_date'.tr(),
                             date: fee.startDueDate,
                             color: Colors.green,
                             icon: Icons.play_circle_fill,
                           ),
                         ),
-
                         const SizedBox(width: 10),
-
                         Expanded(
                           child: _dateCard(
-                            title: "End Date",
+                            title: 'fees_structure.end_date'.tr(),
                             date: fee.endDueDate,
                             color: Colors.red,
                             icon: Icons.stop_circle,
@@ -2933,7 +2910,7 @@ class _AdminViewFeesStructureScreenState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AppText.customText(
-                              'Base Amount',
+                              'fees_structure.base_amount_label'.tr(),
                               size: 10,
                               color: AppColor.softGreyText,
                             ),
@@ -2959,7 +2936,7 @@ class _AdminViewFeesStructureScreenState
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AppText.customText(
-                              'Total Amount',
+                              'fees_structure.total_amount_label'.tr(),
                               size: 10,
                               color: AppColor.lightBlueColor,
                             ),
@@ -3025,12 +3002,10 @@ class _AdminViewFeesStructureScreenState
                     color: Colors.grey.shade600,
                   ),
                 ),
-
                 const SizedBox(height: 3),
-
                 Text(
                   isInvalid
-                      ? "N/A"
+                      ? 'fees_structure.not_available'.tr()
                       : date.toString(),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -3094,15 +3069,15 @@ class _AdminViewFeesStructureScreenState
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Delete Fee Structure",
+                                  'fees_structure.delete_fee_structure'.tr(),
                                   style: GoogleFonts.poppins(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
-                                  "This action cannot be undone",
+                                  'fees_structure.action_undo'.tr(),
                                   style: GoogleFonts.poppins(
                                     color: Colors.grey,
                                     fontSize: 13,
@@ -3135,15 +3110,8 @@ class _AdminViewFeesStructureScreenState
                                   fontSize: 14,
                                 ),
                                 children: [
-                                  const TextSpan(
-                                    text:
-                                        "Are you sure you want to delete the fee structure for ",
-                                  ),
                                   TextSpan(
-                                    text: "${fee.className}?",
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    text: 'fees_structure.delete_confirm'.tr().replaceAll('{class}', fee.className ?? ''),
                                   ),
                                 ],
                               ),
@@ -3152,21 +3120,21 @@ class _AdminViewFeesStructureScreenState
                             const SizedBox(height: 18),
 
                             Text(
-                              "Fee Head: ${fee.feeHeadName}",
+                              'fees_structure.fee_head_label'.tr().replaceAll('{head}', fee.feeHeadName ?? ''),
                               style: GoogleFonts.poppins(fontSize: 16),
                             ),
 
                             const SizedBox(height: 8),
 
                             Text(
-                              "Amount: ₹${fee.totalAmount}",
+                              'fees_structure.amount_label'.tr().replaceAll('{amount}', '${fee.totalAmount}'),
                               style: GoogleFonts.poppins(fontSize: 16),
                             ),
 
                             const SizedBox(height: 8),
 
                             Text(
-                              "Academic Year: ${fee.academicYear}",
+                              'fees_structure.academic_year_label'.tr().replaceAll('{year}', fee.academicYear ?? ''),
                               style: GoogleFonts.poppins(fontSize: 16),
                             ),
                           ],
@@ -3202,9 +3170,7 @@ class _AdminViewFeesStructureScreenState
                                     : Colors.red,
                                 size: 32,
                               ),
-
                               const SizedBox(height: 10),
-
                               Text(
                                 apiMessage!,
                                 textAlign: TextAlign.center,
@@ -3216,12 +3182,11 @@ class _AdminViewFeesStructureScreenState
                                       : Colors.red,
                                 ),
                               ),
-
                               if (apiSuccess == true)
                                 Padding(
                                   padding: EdgeInsets.only(top: 8),
                                   child: Text(
-                                    "Dialog will close automatically...",
+                                    'fees_structure.dialog_close_auto'.tr(),
                                     textAlign: TextAlign.center,
                                     style: GoogleFonts.poppins(
                                       color: Colors.green,
@@ -3242,11 +3207,11 @@ class _AdminViewFeesStructureScreenState
                                 onPressed: loading
                                     ? null
                                     : () {
-                                        Navigator.pop(context);
-                                      },
-                                icon: Icon(Icons.close_rounded, size: 18),
+                                  Navigator.pop(context);
+                                },
+                                icon: const Icon(Icons.close_rounded, size: 18),
                                 label: Text(
-                                  "Cancel",
+                                  'fees_structure.cancel'.tr(),
                                   style: GoogleFonts.poppins(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
@@ -3263,9 +3228,7 @@ class _AdminViewFeesStructureScreenState
                               ),
                             ),
                           ),
-
                           const SizedBox(width: 14),
-
                           Expanded(
                             child: SizedBox(
                               height: 52,
@@ -3273,70 +3236,66 @@ class _AdminViewFeesStructureScreenState
                                 onPressed: loading
                                     ? null
                                     : () async {
-                                        setStateDialog(() {
-                                          loading = true;
-                                        });
+                                  setStateDialog(() {
+                                    loading = true;
+                                  });
 
-                                        final result =
-                                            await Provider.of<
-                                                  FeesManagementViewModel
-                                                >(context, listen: false)
-                                                .deleteFee(fee.feeId, context);
+                                  final result =
+                                  await Provider.of<
+                                      FeesManagementViewModel
+                                  >(context, listen: false)
+                                      .deleteFee(fee.feeId, context);
 
-                                        setStateDialog(() {
-                                          loading = false;
-                                          apiSuccess = result["success"];
-                                          apiMessage = result["message"];
-                                        });
+                                  setStateDialog(() {
+                                    loading = false;
+                                    apiSuccess = result["success"];
+                                    apiMessage = result["message"];
+                                  });
 
-                                        if (result["success"] == true) {
-                                          await Provider.of<
-                                                FeesManagementViewModel
-                                              >(context, listen: false)
-                                              .feesManagementApi(context);
+                                  if (result["success"] == true) {
+                                    await Provider.of<
+                                        FeesManagementViewModel
+                                    >(context, listen: false)
+                                        .feesManagementApi(context);
 
-                                          Future.delayed(
-                                            const Duration(seconds: 2),
-                                            () {
-                                              if (mounted) {
-                                                Navigator.pop(context);
-                                              }
-                                            },
-                                          );
+                                    Future.delayed(
+                                      const Duration(seconds: 2),
+                                          () {
+                                        if (mounted) {
+                                          Navigator.pop(context);
                                         }
                                       },
-
+                                    );
+                                  }
+                                },
                                 icon: loading
                                     ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
-                                        ),
-                                      )
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
                                     : const Icon(
-                                        Icons.delete_forever_rounded,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-
+                                  Icons.delete_forever_rounded,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
                                 label: Text(
-                                  loading ? "Deleting..." : "Delete",
+                                  loading ? 'fees_structure.deleting'.tr() : 'fees_structure.delete'.tr(),
                                   style: GoogleFonts.poppins(
                                     color: Colors.white,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-
                                 style: ElevatedButton.styleFrom(
                                   elevation: 0,
                                   backgroundColor: const Color(0xFFDC2626),
                                   disabledBackgroundColor: const Color(
                                     0xFFDC2626,
                                   ),
-
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(14),
                                   ),
@@ -3384,13 +3343,13 @@ class _AdminViewFeesStructureScreenState
         ),
         const SizedBox(height: 16),
         AppText.customText(
-          'No fee structures found',
+          'fees_structure.no_fee_structures'.tr(),
           size: 16,
           weight: FontWeight.bold,
         ),
         const SizedBox(height: 8),
         AppText.customText(
-          'Switch to Create tab to add one',
+          'fees_structure.switch_to_create'.tr(),
           size: 13,
           color: AppColor.softGreyText,
         ),
@@ -3404,9 +3363,9 @@ class _AdminViewFeesStructureScreenState
             ),
           ),
           icon: const Icon(Icons.add, color: Colors.white, size: 16),
-          label: const Text(
-            'Create Now',
-            style: TextStyle(color: Colors.white),
+          label: Text(
+            'fees_structure.create_now'.tr(),
+            style: const TextStyle(color: Colors.white),
           ),
         ),
       ],

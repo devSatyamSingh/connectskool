@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -91,14 +92,22 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
   void _snack(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Row(children: [
-          const Icon(Icons.info_outline_rounded, color: Colors.white, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(msg,
-                style: const TextStyle(fontWeight: FontWeight.w500)),
-          ),
-        ]),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.info_outline_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                msg,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: AppColor.error,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -148,7 +157,7 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
               const SizedBox(height: 16),
               ListTile(
                 leading: const Icon(Icons.camera_alt_outlined),
-                title: const Text("Take Photo"),
+                title: Text('add_teacher.take_photo'.tr()),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.camera, isTeacherPhoto);
@@ -156,7 +165,7 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
               ),
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined),
-                title: const Text("Choose from Gallery"),
+                title: Text('add_teacher.choose_gallery'.tr()),
                 onTap: () {
                   Navigator.pop(context);
                   _pickImage(ImageSource.gallery, isTeacherPhoto);
@@ -175,97 +184,74 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     switch (step) {
       case 0:
         if (_nameCtrl.text.trim().isEmpty) {
-          // _snack("Please enter full name");
-          Utils.show("Please enter full name", context);
+          Utils.show('add_teacher.errors.enter_full_name'.tr(), context);
           return false;
         }
         final email = _emailCtrl.text.trim();
         if (email.isEmpty) {
-          Utils.show("Please enter email", context);
-          // _snack("Please enter email");
+          Utils.show('add_teacher.errors.enter_email'.tr(), context);
           return false;
         }
         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email)) {
-          Utils.show("Please enter a valid email", context);
-          // _snack("Please enter a valid email");
+          Utils.show('add_teacher.errors.valid_email'.tr(), context);
           return false;
         }
         if (_passwordCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter password", context);
-          // _snack("Please enter password");
+          Utils.show('add_teacher.errors.enter_password'.tr(), context);
           return false;
         }
         return true;
 
       case 1:
         if (_employeeIdCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter employee ID", context);
-          // _snack("Please enter employee ID");
+          Utils.show('add_teacher.errors.enter_employee_id'.tr(), context);
           return false;
         }
         if (_selectedGender == null) {
-          Utils.show("Please Select gender", context);
-          // _snack("Please select gender");
+          Utils.show('add_teacher.errors.select_gender'.tr(), context);
           return false;
         }
         if (_selectedEmploymentType == null) {
-          Utils.show("Please select employment type", context);
-
-          // _snack("Please select employment type");
+          Utils.show('add_teacher.errors.select_employment'.tr(), context);
           return false;
         }
         if (_designationCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter designation", context);
-          // _snack("Please enter designation");
+          Utils.show('add_teacher.errors.enter_designation'.tr(), context);
           return false;
         }
         if (_qualificationCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter qualification", context);
-          // _snack("Please enter qualification");
+          Utils.show('add_teacher.errors.enter_qualification'.tr(), context);
           return false;
         }
         if (_experienceCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter experience years", context);
-          // _snack("Please enter experience years");
+          Utils.show('add_teacher.errors.enter_experience'.tr(), context);
           return false;
         }
         if (_joiningDateCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter joining date", context);
-          // _snack("Please enter joining date");
+          Utils.show('add_teacher.errors.enter_joining_date'.tr(), context);
           return false;
         }
         return true;
 
       case 2:
         if (_dobCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter date of birth", context);
-          // _snack("Please enter date of birth");
+          Utils.show('add_teacher.errors.enter_dob'.tr(), context);
           return false;
         }
         if (_mobileCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter mobile number", context);
-
-          // Utils.show("Please enter mobile number", context);
-
-          // _snack("Please enter mobile number");
+          Utils.show('add_teacher.errors.enter_mobile'.tr(), context);
           return false;
         }
         if (_addressCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter address", context);
-
-          // _snack("Please enter address");
+          Utils.show('add_teacher.errors.enter_address'.tr(), context);
           return false;
         }
         if (_fatherNameCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter father's name", context);
-
-          // _snack("Please enter father's name");
+          Utils.show('add_teacher.errors.enter_father_name'.tr(), context);
           return false;
         }
         if (_motherNameCtrl.text.trim().isEmpty) {
-          Utils.show("Please enter mother's name", context);
-
-          // _snack("Please enter mother's name");
+          Utils.show('add_teacher.errors.enter_mother_name'.tr(), context);
           return false;
         }
         return true;
@@ -283,71 +269,41 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     HapticFeedback.mediumImpact();
 
     final success =
-    await Provider.of<AddTeachersViewModel>(context, listen: false)
-        .addTeachersApi(
-      context: context,
-      name: _nameCtrl.text.trim(),
-      userEmail: _emailCtrl.text.trim(),
-      password: _passwordCtrl.text.trim(),
-      qualification: _qualificationCtrl.text.trim(),
-      experienceYears: _experienceCtrl.text.trim(),
-      joiningDate: _joiningDateCtrl.text.trim(),
-      mobileNumber: _mobileCtrl.text.trim(),
-      address: _addressCtrl.text.trim(),
-      fatherName: _fatherNameCtrl.text.trim(),
-      motherName: _motherNameCtrl.text.trim(),
-      employeeId: _employeeIdCtrl.text.trim(),
-      gender: _selectedGender ?? '',
-      employmentType: _selectedEmploymentType ?? '',
-      designation: _designationCtrl.text.trim(),
-      dob: _dobCtrl.text.trim(),
-      teacher_photo: _teacherPhoto,
-      aadharCard: _aadharCard,
-    );
+        await Provider.of<AddTeachersViewModel>(
+          context,
+          listen: false,
+        ).addTeachersApi(
+          context: context,
+          name: _nameCtrl.text.trim(),
+          userEmail: _emailCtrl.text.trim(),
+          password: _passwordCtrl.text.trim(),
+          qualification: _qualificationCtrl.text.trim(),
+          experienceYears: _experienceCtrl.text.trim(),
+          joiningDate: _joiningDateCtrl.text.trim(),
+          mobileNumber: _mobileCtrl.text.trim(),
+          address: _addressCtrl.text.trim(),
+          fatherName: _fatherNameCtrl.text.trim(),
+          motherName: _motherNameCtrl.text.trim(),
+          employeeId: _employeeIdCtrl.text.trim(),
+          gender: _selectedGender ?? '',
+          employmentType: _selectedEmploymentType ?? '',
+          designation: _designationCtrl.text.trim(),
+          dob: _dobCtrl.text.trim(),
+          teacher_photo: _teacherPhoto,
+          aadharCard: _aadharCard,
+        );
 
     setState(() => _isLoading = false);
 
     if (success && context.mounted) {
-      Provider.of<AllTeachersListVieModel>(context, listen: false)
-          .allTeachersListApi(context);
+      Provider.of<AllTeachersListVieModel>(
+        context,
+        listen: false,
+      ).allTeachersListApi(context);
 
       Navigator.pop(context);
     }
   }
-  // Future<void> _handleSubmit() async {
-  //   if (!_validateStep(0) || !_validateStep(1) || !_validateStep(2)) return;
-  //
-  //   setState(() => _isLoading = true);
-  //   HapticFeedback.mediumImpact();
-  //
-  //   await Provider.of<AddTeachersViewModel>(context, listen: false)
-  //       .addTeachersApi(
-  //     context: context,
-  //     name: _nameCtrl.text.trim(),
-  //     userEmail: _emailCtrl.text.trim(),
-  //     password: _passwordCtrl.text.trim(),
-  //     qualification: _qualificationCtrl.text.trim(),
-  //     experienceYears: _experienceCtrl.text.trim(),
-  //     joiningDate: _joiningDateCtrl.text.trim(),
-  //     mobileNumber: _mobileCtrl.text.trim(),
-  //     address: _addressCtrl.text.trim(),
-  //     fatherName: _fatherNameCtrl.text.trim(),
-  //     motherName: _motherNameCtrl.text.trim(),
-  //     employeeId: _employeeIdCtrl.text.trim(),
-  //     gender: _selectedGender ?? '',
-  //     employmentType: _selectedEmploymentType ?? '',
-  //     designation: _designationCtrl.text.trim(),
-  //     dob: _dobCtrl.text.trim(),
-  //     teacher_photo: _teacherPhoto,
-  //     aadharCard: _aadharCard,
-  //   );
-  //
-  //   Provider.of<AllTeachersListVieModel>(context, listen: false)
-  //       .allTeachersListApi(context);
-  //
-  //   setState(() => _isLoading = false);
-  //   Navigator.pop(context);
-  // }
 
   // ─────────────────────────────────────────────
   // BUILD
@@ -420,8 +376,11 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
                 color: Colors.white.withOpacity(0.22),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.arrow_back_ios_new_rounded,
-                  color: Colors.white, size: 18),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
           ),
           const SizedBox(width: 14),
@@ -429,9 +388,9 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Add New Teacher",
-                  style: TextStyle(
+                Text(
+                  'add_teacher.title'.tr(),
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
@@ -440,7 +399,7 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  "Fill all 4 sections to register",
+                  'add_teacher.subtitle'.tr(),
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.white.withOpacity(0.78),
@@ -449,24 +408,28 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
               ],
             ),
           ),
-          // Progress pill
           Container(
-            padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: Colors.white.withOpacity(0.22),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.person_add_alt_1_rounded,
-                    color: Colors.white, size: 16),
-                SizedBox(width: 5),
-                Text("New",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700)),
+                const Icon(
+                  Icons.person_add_alt_1_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  'add_teacher.new'.tr(),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ],
             ),
           ),
@@ -478,10 +441,10 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
   // ── Step Indicator ──
   Widget _buildStepIndicator() {
     final steps = [
-      ("Account", Icons.manage_accounts_rounded),
-      ("Professional", Icons.work_outline_rounded),
-      ("Personal", Icons.badge_outlined),
-      ("Documents", Icons.photo_library_outlined),
+      ('add_teacher.step_account'.tr(), Icons.manage_accounts_rounded),
+      ('add_teacher.step_professional'.tr(), Icons.work_outline_rounded),
+      ('add_teacher.step_personal'.tr(), Icons.badge_outlined),
+      ('add_teacher.step_documents'.tr(), Icons.photo_library_outlined),
     ];
 
     return Container(
@@ -536,16 +499,24 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     return _sectionCard(
       index: 1,
       icon: Icons.manage_accounts_rounded,
-      title: "Account Info",
+      title: 'add_teacher.account_info'.tr(),
       color: AppColor.lightBlueColor,
       onTap: () => setState(() => _currentStep = 0),
       children: [
-        _sheetField(_nameCtrl, "Full Name", "e.g. Rahul Sharma",
-            Icons.person_outline_rounded),
+        _sheetField(
+          _nameCtrl,
+          'add_teacher.full_name'.tr(),
+          'add_teacher.full_name_hint'.tr(),
+          Icons.person_outline_rounded,
+        ),
         const SizedBox(height: 14),
-        _sheetField(_emailCtrl, "Email Address", "e.g. rahul@school.com",
-            Icons.email_outlined,
-            keyboard: TextInputType.emailAddress),
+        _sheetField(
+          _emailCtrl,
+          'add_teacher.email_address'.tr(),
+          'add_teacher.email_hint'.tr(),
+          Icons.email_outlined,
+          keyboard: TextInputType.emailAddress,
+        ),
         const SizedBox(height: 14),
         _passwordField(),
       ],
@@ -557,49 +528,67 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     return _sectionCard(
       index: 2,
       icon: Icons.work_outline_rounded,
-      title: "Professional Details",
+      title: 'add_teacher.professional_details'.tr(),
       color: AppColor.success,
       onTap: () => setState(() => _currentStep = 1),
       children: [
-        _sheetField(_employeeIdCtrl, "Employee ID", "e.g. EMP001",
-            Icons.badge_outlined),
+        _sheetField(
+          _employeeIdCtrl,
+          'add_teacher.employee_id'.tr(),
+          'add_teacher.employee_id_hint'.tr(),
+          Icons.badge_outlined,
+        ),
         const SizedBox(height: 14),
         _dropdownField(
-          label: "Gender",
+          label: 'add_teacher.gender'.tr(),
           icon: Icons.wc_outlined,
-          value: _genderOptions.contains(_selectedGender) ? _selectedGender : null,
-          hint: "Select Gender",
+          value: _genderOptions.contains(_selectedGender)
+              ? _selectedGender
+              : null,
+          hint: 'add_teacher.select_gender'.tr(),
           items: _genderOptions,
           onChanged: (val) => setState(() => _selectedGender = val),
         ),
         const SizedBox(height: 14),
         _dropdownField(
-          label: "Employment Type",
+          label: 'add_teacher.employment_type'.tr(),
           icon: Icons.work_history_outlined,
           value: _employmentOptions.contains(_selectedEmploymentType)
               ? _selectedEmploymentType
               : null,
-          hint: "Select Employment Type",
+          hint: 'add_teacher.select_employment'.tr(),
           items: _employmentOptions,
           onChanged: (val) => setState(() => _selectedEmploymentType = val),
         ),
         const SizedBox(height: 14),
-        _sheetField(_designationCtrl, "Designation", "e.g. Senior Teacher",
-            Icons.military_tech_outlined),
+        _sheetField(
+          _designationCtrl,
+          'add_teacher.designation'.tr(),
+          'add_teacher.designation_hint'.tr(),
+          Icons.military_tech_outlined,
+        ),
         const SizedBox(height: 14),
-        _sheetField(_qualificationCtrl, "Qualification", "e.g. B.Ed, M.Sc",
-            Icons.school_outlined),
+        _sheetField(
+          _qualificationCtrl,
+          'add_teacher.qualification'.tr(),
+          'add_teacher.qualification_hint'.tr(),
+          Icons.school_outlined,
+        ),
         const SizedBox(height: 14),
         _sheetField(
           _experienceCtrl,
-          "Experience (Years)",
-          "e.g. 5",
+          'add_teacher.experience'.tr(),
+          'add_teacher.experience_hint'.tr(),
           Icons.timeline_outlined,
           keyboard: TextInputType.number,
           formatters: [FilteringTextInputFormatter.digitsOnly],
         ),
         const SizedBox(height: 14),
-        _dateField(_joiningDateCtrl, "Joining Date", Icons.calendar_today_outlined),
+        _dateField(
+          _joiningDateCtrl,
+          'add_teacher.joining_date'.tr(),
+          Icons.calendar_today_outlined,
+        ),
       ],
     );
   }
@@ -609,17 +598,21 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     return _sectionCard(
       index: 3,
       icon: Icons.badge_outlined,
-      title: "Personal Info",
+      title: 'add_teacher.personal_info'.tr(),
       color: const Color(0xFFF77F00),
       onTap: () => setState(() => _currentStep = 2),
       children: [
-        _dateField(_dobCtrl, "Date of Birth", Icons.cake_outlined,
-            isDoB: true),
+        _dateField(
+          _dobCtrl,
+          'add_teacher.date_of_birth'.tr(),
+          Icons.cake_outlined,
+          isDoB: true,
+        ),
         const SizedBox(height: 14),
         _sheetField(
           _mobileCtrl,
-          "Mobile Number",
-          "e.g. 9876543210",
+          'add_teacher.mobile_number'.tr(),
+          'add_teacher.mobile_hint'.tr(),
           Icons.phone_outlined,
           keyboard: TextInputType.phone,
           formatters: [
@@ -630,17 +623,25 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
         const SizedBox(height: 14),
         _sheetField(
           _addressCtrl,
-          "Address",
-          "Full residential address",
+          'add_teacher.address'.tr(),
+          'add_teacher.address_hint'.tr(),
           Icons.location_on_outlined,
           maxLines: 2,
         ),
         const SizedBox(height: 14),
-        _sheetField(_fatherNameCtrl, "Father's Name", "e.g. Suresh Sharma",
-            Icons.family_restroom_outlined),
+        _sheetField(
+          _fatherNameCtrl,
+          'add_teacher.father_name'.tr(),
+          'add_teacher.father_hint'.tr(),
+          Icons.family_restroom_outlined,
+        ),
         const SizedBox(height: 14),
-        _sheetField(_motherNameCtrl, "Mother's Name", "e.g. Sunita Sharma",
-            Icons.woman_outlined),
+        _sheetField(
+          _motherNameCtrl,
+          'add_teacher.mother_name'.tr(),
+          'add_teacher.mother_hint'.tr(),
+          Icons.woman_outlined,
+        ),
       ],
     );
   }
@@ -650,19 +651,19 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     return _sectionCard(
       index: 4,
       icon: Icons.photo_library_outlined,
-      title: "Documents & Photo",
+      title: 'add_teacher.documents_photo'.tr(),
       color: const Color(0xFF7B2FBE),
       onTap: () => setState(() => _currentStep = 3),
       children: [
         _imagePickerField(
-          label: "Teacher Photo",
+          label: 'add_teacher.teacher_photo'.tr(),
           icon: Icons.person_pin_outlined,
           file: _teacherPhoto,
           isTeacherPhoto: true,
         ),
         const SizedBox(height: 14),
         _imagePickerField(
-          label: "Aadhar Card",
+          label: 'add_teacher.aadhar_card'.tr(),
           icon: Icons.credit_card_outlined,
           file: _aadharCard,
           isTeacherPhoto: false,
@@ -675,7 +676,11 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
   Widget _buildBottomBar() {
     return Container(
       padding: EdgeInsets.fromLTRB(
-          18, 12, 18, MediaQuery.of(context).padding.bottom + 12),
+        18,
+        12,
+        18,
+        MediaQuery.of(context).padding.bottom + 12,
+      ),
       decoration: BoxDecoration(
         color: AppColor.bg,
         boxShadow: [
@@ -699,15 +704,22 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColor.border, width: 1.5),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.close_rounded, size: 18, color: AppColor.sub),
-                  SizedBox(width: 6),
-                  Text("Cancel",
-                      style: TextStyle(
-                          color: AppColor.sub,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600)),
+                  const Icon(
+                    Icons.close_rounded,
+                    size: 18,
+                    color: AppColor.sub,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'add_teacher.cancel'.tr(),
+                    style: const TextStyle(
+                      color: AppColor.sub,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -716,7 +728,9 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
           // Submit
           Expanded(
             child: AppButton(
-              title: _isLoading ? "Adding Teacher..." : "Add Teacher",
+              title: _isLoading
+                  ? 'add_teacher.adding_teacher'.tr()
+                  : 'add_teacher.add_teacher_btn'.tr(),
               onTap: _handleSubmit,
               height: 54,
               radius: 16,
@@ -764,10 +778,12 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.06),
-                borderRadius:
-                const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
                 border: Border(
-                    bottom: BorderSide(color: color.withOpacity(0.12))),
+                  bottom: BorderSide(color: color.withOpacity(0.12)),
+                ),
               ),
               child: Row(
                 children: [
@@ -818,23 +834,26 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
   }
 
   Widget _sheetField(
-      TextEditingController ctrl,
-      String label,
-      String hint,
-      IconData icon, {
-        TextInputType keyboard = TextInputType.text,
-        List<TextInputFormatter>? formatters,
-        int maxLines = 1,
-      }) {
+    TextEditingController ctrl,
+    String label,
+    String hint,
+    IconData icon, {
+    TextInputType keyboard = TextInputType.text,
+    List<TextInputFormatter>? formatters,
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColor.sub,
-                letterSpacing: 0.3)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColor.sub,
+            letterSpacing: 0.3,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: ctrl,
@@ -842,28 +861,34 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
           inputFormatters: formatters,
           maxLines: maxLines,
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-                fontSize: 13.5, color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon: Icon(icon,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              icon,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -875,26 +900,35 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Password",
-            style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColor.sub,
-                letterSpacing: 0.3)),
+        Text(
+          'add_teacher.password'.tr(),
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColor.sub,
+            letterSpacing: 0.3,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: _passwordCtrl,
           obscureText: _obscurePassword,
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
-            hintText: "Create a strong password",
+            hintText: 'add_teacher.password_hint'.tr(),
             hintStyle: TextStyle(
-                fontSize: 13, color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon: Icon(Icons.lock_outline_rounded,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
+              fontSize: 13,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              Icons.lock_outline_rounded,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
             suffixIcon: IconButton(
               onPressed: () =>
                   setState(() => _obscurePassword = !_obscurePassword),
@@ -908,17 +942,17 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
             ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -937,46 +971,59 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColor.sub,
-                letterSpacing: 0.3)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColor.sub,
+            letterSpacing: 0.3,
+          ),
+        ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           value: value,
           onChanged: onChanged,
-          hint: Text(hint,
-              style: TextStyle(
-                  fontSize: 13.5, color: AppColor.sub.withOpacity(0.6))),
+          hint: Text(
+            hint,
+            style: TextStyle(
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+          ),
           items: items
-              .map((item) =>
-              DropdownMenuItem(value: item, child: Text(item)))
+              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
               .toList(),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded,
-              color: AppColor.sub, size: 20),
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppColor.sub,
+            size: 20,
+          ),
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           dropdownColor: Colors.white,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
+            prefixIcon: Icon(
+              icon,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -985,28 +1032,32 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
   }
 
   Widget _dateField(
-      TextEditingController ctrl,
-      String label,
-      IconData icon, {
-        bool isDoB = false,
-      }) {
+    TextEditingController ctrl,
+    String label,
+    IconData icon, {
+    bool isDoB = false,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColor.sub,
-                letterSpacing: 0.3)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColor.sub,
+            letterSpacing: 0.3,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: ctrl,
           readOnly: true,
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           onTap: () async {
             DateTime initial = isDoB ? DateTime(2000) : DateTime.now();
             try {
@@ -1031,30 +1082,40 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
             );
             if (picked != null) {
               ctrl.text =
-              "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+                  "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
             }
           },
           decoration: InputDecoration(
-            hintText: "Select ${label.toLowerCase()}",
+            hintText: 'add_teacher.select_date'.tr().replaceAll(
+              '{label}',
+              label.toLowerCase(),
+            ),
             hintStyle: TextStyle(
-                fontSize: 13.5, color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon:
-            Icon(icon, size: 18, color: AppColor.primary.withOpacity(0.7)),
-            suffixIcon: const Icon(Icons.arrow_drop_down_rounded,
-                color: AppColor.sub),
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              icon,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
+            suffixIcon: const Icon(
+              Icons.arrow_drop_down_rounded,
+              color: AppColor.sub,
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
-            contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -1106,72 +1167,83 @@ class _AddTeacherScreenState extends State<AddTeacherScreen>
             ),
             child: hasFile
                 ? ClipRRect(
-              borderRadius: BorderRadius.circular(13),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.file(file, fit: BoxFit.cover),
-                  Positioned(
-                    top: 6,
-                    right: 6,
-                    child: Container(
-                      width: screenWidth,
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: AppColor.success,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.check_rounded,
-                          color: Colors.white, size: 14),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      width: screenWidth,
-
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.4),
-                        borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(13)),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.edit_outlined,
-                              color: Colors.white, size: 12),
-                          SizedBox(width: 4),
-                          Text("Tap to change",
-                              style: TextStyle(
+                    borderRadius: BorderRadius.circular(13),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.file(file, fit: BoxFit.cover),
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            width: screenWidth,
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColor.success,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.check_rounded,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            width: screenWidth,
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.4),
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(13),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.edit_outlined,
                                   color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
+                                  size: 12,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'add_teacher.tap_to_change'.tr(),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            )
+                  )
                 : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.add_photo_alternate_outlined,
-                    size: 28,
-                    color: AppColor.sub.withOpacity(0.6)),
-                const SizedBox(height: 6),
-                Text(
-                  "Tap to upload",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColor.sub.withOpacity(0.7),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_photo_alternate_outlined,
+                        size: 28,
+                        color: AppColor.sub.withOpacity(0.6),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'add_teacher.tap_to_upload'.tr(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColor.sub.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         ),
       ],

@@ -1,4 +1,4 @@
-
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
@@ -48,8 +48,9 @@ class _SchoolAdmitCardScreenState extends State<SchoolAdmitCardScreen>
             padding: const EdgeInsets.fromLTRB(16, 50, 16, 0),
             decoration: BoxDecoration(
               gradient: AppColor.primaryGradient,
-              borderRadius:
-              const BorderRadius.vertical(bottom: Radius.circular(28)),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(28),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +74,7 @@ class _SchoolAdmitCardScreenState extends State<SchoolAdmitCardScreen>
                     ),
                     const SizedBox(width: 12),
                     AppText.customText(
-                      'Admit & ID Card',
+                      'admit_card.title'.tr(),
                       size: 20,
                       weight: FontWeight.bold,
                       color: Colors.white,
@@ -88,23 +89,26 @@ class _SchoolAdmitCardScreenState extends State<SchoolAdmitCardScreen>
                   labelColor: Colors.white,
                   unselectedLabelColor: Colors.white54,
                   labelStyle: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 13),
-                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
-                  tabs: const [
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.normal,
+                  ),
+                  tabs: [
                     Tab(
-                      icon: Icon(Icons.picture_as_pdf_rounded, size: 18),
-                      text: 'Admit Card',
+                      icon: const Icon(Icons.picture_as_pdf_rounded, size: 18),
+                      text: 'admit_card.admit_card'.tr(),
                     ),
                     Tab(
-                      icon: Icon(Icons.badge_rounded, size: 18),
-                      text: 'ID Card',
+                      icon: const Icon(Icons.badge_rounded, size: 18),
+                      text: 'admit_card.id_card'.tr(),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -119,11 +123,12 @@ class _SchoolAdmitCardScreenState extends State<SchoolAdmitCardScreen>
 
 class _CardFilterForm extends StatefulWidget {
   final Future<void> Function(
-      String examId,
-      String classId,
-      String sectionId,
-      String studentId,
-      ) onGenerate;
+    String examId,
+    String classId,
+    String sectionId,
+    String studentId,
+  )
+  onGenerate;
   final String buttonLabel;
   final IconData buttonIcon;
   final bool loading;
@@ -144,9 +149,9 @@ class _CardFilterFormState extends State<_CardFilterForm>
   @override
   bool get wantKeepAlive => true;
 
-  final _classes  = <Map<String, dynamic>>[];
+  final _classes = <Map<String, dynamic>>[];
   final _sections = <Map<String, dynamic>>[];
-  final _exams    = <Map<String, dynamic>>[];
+  final _exams = <Map<String, dynamic>>[];
   final _students = <Map<String, dynamic>>[];
 
   bool _sectionsLoading = false;
@@ -164,8 +169,7 @@ class _CardFilterFormState extends State<_CardFilterForm>
   }
 
   Future<void> _loadInitialData() async {
-    final classVm =
-    Provider.of<AllClassesViewModel>(context, listen: false);
+    final classVm = Provider.of<AllClassesViewModel>(context, listen: false);
     await classVm.allClassesApi(context);
     if (!mounted) return;
     setState(() {
@@ -173,7 +177,7 @@ class _CardFilterFormState extends State<_CardFilterForm>
         ..clear()
         ..addAll(
           (classVm.allClassesModel?.data ?? []).map(
-                (e) => {
+            (e) => {
               'class_id': e.classId.toString(),
               'class_name': e.className,
             },
@@ -181,8 +185,7 @@ class _CardFilterFormState extends State<_CardFilterForm>
         );
     });
 
-    final examVm =
-    Provider.of<ExamManagementViewModel>(context, listen: false);
+    final examVm = Provider.of<ExamManagementViewModel>(context, listen: false);
     await examVm.examManagementApi(context);
     if (!mounted) return;
     setState(() {
@@ -190,10 +193,7 @@ class _CardFilterFormState extends State<_CardFilterForm>
         ..clear()
         ..addAll(
           (examVm.examManagementModel?.data ?? []).map(
-                (e) => {
-              'exam_id': e.examId.toString(),
-              'exam_name': e.examName,
-            },
+            (e) => {'exam_id': e.examId.toString(), 'exam_name': e.examName},
           ),
         );
     });
@@ -201,10 +201,10 @@ class _CardFilterFormState extends State<_CardFilterForm>
 
   Future<void> _loadSections(String classId) async {
     setState(() {
-      _sectionsLoading    = true;
+      _sectionsLoading = true;
       _sections.clear();
-      _selectedSectionId  = null;
-      _selectedStudentId  = null;
+      _selectedSectionId = null;
+      _selectedStudentId = null;
       _students.clear();
     });
 
@@ -219,13 +219,15 @@ class _CardFilterFormState extends State<_CardFilterForm>
 
   Future<void> _loadStudents(String classId, String sectionId) async {
     setState(() {
-      _studentsLoading   = true;
+      _studentsLoading = true;
       _students.clear();
       _selectedStudentId = null;
     });
 
-    final studentVm =
-    Provider.of<AllStudentListVieModel>(context, listen: false);
+    final studentVm = Provider.of<AllStudentListVieModel>(
+      context,
+      listen: false,
+    );
     await studentVm.allStudentListApi(
       context,
       classId: classId,
@@ -238,10 +240,7 @@ class _CardFilterFormState extends State<_CardFilterForm>
         ..clear()
         ..addAll(
           (studentVm.allStudentListModel?.data ?? []).map(
-                (e) => {
-              'student_id': e.studentId.toString(),
-              'name': e.name,
-            },
+            (e) => {'student_id': e.studentId.toString(), 'name': e.name},
           ),
         );
       _studentsLoading = false;
@@ -254,7 +253,7 @@ class _CardFilterFormState extends State<_CardFilterForm>
         _selectedExamId == null ||
         _selectedStudentId == null) {
       Utils.show(
-        'Please select all filters',
+        'admit_card.select_all_filters'.tr(),
         context,
         type: 'warning',
       );
@@ -274,19 +273,19 @@ class _CardFilterFormState extends State<_CardFilterForm>
     return Column(
       children: [
         _Dropdown(
-          hint: 'Class',
+          hint: 'admit_card.class'.tr(),
           value: _selectedClassId,
           items: _classes
               .map<DropdownMenuItem<String>>(
                 (e) => DropdownMenuItem(
-              value: e['class_id'].toString(),
-              child: Text(e['class_name']),
-            ),
-          )
+                  value: e['class_id'].toString(),
+                  child: Text(e['class_name']),
+                ),
+              )
               .toList(),
           onChanged: (v) async {
             setState(() {
-              _selectedClassId   = v;
+              _selectedClassId = v;
               _selectedSectionId = null;
               _selectedStudentId = null;
               _sections.clear();
@@ -297,16 +296,16 @@ class _CardFilterFormState extends State<_CardFilterForm>
         ),
         const SizedBox(height: 10),
         _Dropdown(
-          hint: 'Section',
+          hint: 'admit_card.section'.tr(),
           value: _selectedSectionId,
           loading: _sectionsLoading,
           items: _sections
               .map<DropdownMenuItem<String>>(
                 (e) => DropdownMenuItem(
-              value: e['section_id'].toString(),
-              child: Text(e['section_name']),
-            ),
-          )
+                  value: e['section_id'].toString(),
+                  child: Text(e['section_name']),
+                ),
+              )
               .toList(),
           onChanged: (v) {
             setState(() {
@@ -321,33 +320,35 @@ class _CardFilterFormState extends State<_CardFilterForm>
         ),
         const SizedBox(height: 10),
         _Dropdown(
-          hint: 'Exam',
+          hint: 'admit_card.exam'.tr(),
           value: _selectedExamId,
           items: _exams
               .map<DropdownMenuItem<String>>(
                 (e) => DropdownMenuItem(
-              value: e['exam_id'].toString(),
-              child: Text(e['exam_name']),
-            ),
-          )
+                  value: e['exam_id'].toString(),
+                  child: Text(e['exam_name']),
+                ),
+              )
               .toList(),
           onChanged: (v) => setState(() => _selectedExamId = v),
         ),
         const SizedBox(height: 10),
         _Dropdown(
-          hint: 'Student',
+          hint: 'admit_card.student'.tr(),
           loading: _studentsLoading,
-          value: _students.any(
-                  (e) => e['student_id'].toString() == _selectedStudentId)
+          value:
+              _students.any(
+                (e) => e['student_id'].toString() == _selectedStudentId,
+              )
               ? _selectedStudentId
               : null,
           items: _students
               .map<DropdownMenuItem<String>>(
                 (e) => DropdownMenuItem(
-              value: e['student_id'].toString(),
-              child: Text(e['name']),
-            ),
-          )
+                  value: e['student_id'].toString(),
+                  child: Text(e['name']),
+                ),
+              )
               .toList(),
           onChanged: (v) => setState(() => _selectedStudentId = v),
         ),
@@ -356,11 +357,9 @@ class _CardFilterFormState extends State<_CardFilterForm>
           width: double.infinity,
           child: AppButton(
             title: widget.loading
-                ? "Generating..."
+                ? "admit_card.generating".tr()
                 : widget.buttonLabel,
-            icon: widget.loading
-                ? null
-                : widget.buttonIcon,
+            icon: widget.loading ? null : widget.buttonIcon,
             height: 48,
             radius: 12,
             loading: widget.loading,
@@ -371,7 +370,6 @@ class _CardFilterFormState extends State<_CardFilterForm>
     );
   }
 }
-
 
 class _Dropdown extends StatelessWidget {
   final String hint;
@@ -395,37 +393,39 @@ class _Dropdown extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: AppColor.cardShadow, blurRadius: 6)
-        ],
+        boxShadow: [BoxShadow(color: AppColor.cardShadow, blurRadius: 6)],
       ),
       child: loading
           ? const SizedBox(
-        height: 48,
-        child: Row(
-          children: [
-            SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            SizedBox(width: 10),
-            Text('Loading...',
-                style: TextStyle(fontSize: 13, color: Colors.grey)),
-          ],
-        ),
-      )
+              height: 48,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'Loading...',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                ],
+              ),
+            )
           : DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          dropdownColor: Colors.white,
-          isExpanded: true,
-          hint: Text(hint,
-              style: const TextStyle(fontSize: 13, color: Colors.grey)),
-          value: value,
-          items: items,
-          onChanged: onChanged,
-        ),
-      ),
+              child: DropdownButton<String>(
+                dropdownColor: Colors.white,
+                isExpanded: true,
+                hint: Text(
+                  hint,
+                  style: const TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+                value: value,
+                items: items,
+                onChanged: onChanged,
+              ),
+            ),
     );
   }
 }
@@ -443,40 +443,35 @@ class _AdmitCardTabState extends State<_AdmitCardTab>
   bool get wantKeepAlive => true;
 
   Future<void> _generate(
-      String examId,
-      String classId,
-      String sectionId,
-      String studentId,
-      ) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.generateAdmitCard)) {
-
-      Utils.show(
-        "You don't have permission to perform this action",
-        context,
-      );
-
+    String examId,
+    String classId,
+    String sectionId,
+    String studentId,
+  ) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.generateAdmitCard)) {
+      Utils.show('admit_card.you_dont_have_permission'.tr(), context);
       return;
     }
-    final vm =
-    Provider.of<GenerateAdmitCardViewModel>(context, listen: false);
+    final vm = Provider.of<GenerateAdmitCardViewModel>(context, listen: false);
     await vm.getAdmitCard(
       int.parse(examId),
       int.parse(classId),
       int.parse(sectionId),
       int.parse(studentId),
-      context
+      context,
     );
     if (!mounted) return;
 
     if (vm.admitCardModel == null ||
         (vm.admitCardModel!.data?.students?.isEmpty ?? true)) {
-      Utils.show('No admit card data received', context, type: 'error');
+      Utils.show('admit_card.no_admit_card_data'.tr(), context, type: 'error');
       return;
     }
 
     AdmitCardPdfService.showOptions(
-        context: context, model: vm.admitCardModel!);
+      context: context,
+      model: vm.admitCardModel!,
+    );
   }
 
   @override
@@ -489,12 +484,11 @@ class _AdmitCardTabState extends State<_AdmitCardTab>
       child: Column(
         children: [
           _CardFilterForm(
-            buttonLabel: 'Generate Admit Card',
+            buttonLabel: 'admit_card.generate_admit_card'.tr(),
             buttonIcon: Icons.picture_as_pdf_rounded,
             loading: vm.loading,
             onGenerate: _generate,
           ),
-
           const SizedBox(height: 20),
           if (vm.admitCardModel?.data?.students?.isNotEmpty == true)
             _AdmitCardPreview(
@@ -503,7 +497,9 @@ class _AdmitCardTabState extends State<_AdmitCardTab>
                 final s = vm.admitCardModel?.data?.students?.firstOrNull;
                 if (s == null) return;
                 AdmitCardPdfService.showOptions(
-                    context: context, model: vm.admitCardModel!);
+                  context: context,
+                  model: vm.admitCardModel!,
+                );
               },
             ),
         ],
@@ -513,18 +509,18 @@ class _AdmitCardTabState extends State<_AdmitCardTab>
 }
 
 class _AdmitCardPreview extends StatelessWidget {
-  final dynamic model; // GenerateAdmitCardModel
+  final dynamic model;
   final VoidCallback onAction;
 
   const _AdmitCardPreview({required this.model, required this.onAction});
 
   @override
   Widget build(BuildContext context) {
-    final data      = model.data;
-    final student   = data?.students?[0];
-    final examInfo  = data?.examInfo;
+    final data = model.data;
+    final student = data?.students?[0];
+    final examInfo = data?.examInfo;
     final classInfo = data?.classInfo;
-    final school    = data?.schoolInfo;
+    final school = data?.schoolInfo;
 
     String dob = student?.dob ?? '—';
     if (dob.contains('T')) dob = dob.split('T').first;
@@ -534,8 +530,7 @@ class _AdmitCardPreview extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.06), blurRadius: 12)
+          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12),
         ],
       ),
       child: Column(
@@ -545,13 +540,15 @@ class _AdmitCardPreview extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
             decoration: BoxDecoration(
               gradient: AppColor.primaryGradient,
-              borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 44, height: 44,
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
@@ -586,7 +583,9 @@ class _AdmitCardPreview extends StatelessWidget {
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 4),
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.green.shade500,
                     borderRadius: BorderRadius.circular(20),
@@ -594,20 +593,24 @@ class _AdmitCardPreview extends StatelessWidget {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.check_circle_rounded,
-                          color: Colors.white, size: 12),
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        color: Colors.white,
+                        size: 12,
+                      ),
                       const SizedBox(width: 4),
-                      AppText.customText('Ready',
-                          size: 10,
-                          weight: FontWeight.bold,
-                          color: Colors.white),
+                      AppText.customText(
+                        'admit_card.ready'.tr(),
+                        size: 10,
+                        weight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(14),
             child: Row(
@@ -615,7 +618,6 @@ class _AdmitCardPreview extends StatelessWidget {
               children: [
                 _StudentPhoto(photoUrl: student?.studentPhoto, size: 72),
                 const SizedBox(width: 12),
-                // Fields
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -627,20 +629,23 @@ class _AdmitCardPreview extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       _InfoRow(
-                          label: 'Class',
-                          value:
-                          '${classInfo?.className ?? ''} ${classInfo?.sectionName ?? ''}'),
+                        label: 'admit_card.class'.tr(),
+                        value:
+                            '${classInfo?.className ?? ''} ${classInfo?.sectionName ?? ''}',
+                      ),
                       _InfoRow(
-                          label: 'Roll No',
-                          value: '${student?.rollNo ?? '—'}'),
+                        label: 'admit_card.roll_no'.tr(),
+                        value: '${student?.rollNo ?? '—'}',
+                      ),
                       _InfoRow(
-                          label: 'Reg. No',
-                          value: student?.regNo ?? '—'),
-                      _InfoRow(label: 'D.O.B.', value: dob),
+                        label: 'admit_card.reg_no'.tr(),
+                        value: student?.regNo ?? '—',
+                      ),
+                      _InfoRow(label: 'admit_card.dob'.tr(), value: dob),
                       _InfoRow(
-                          label: 'Subjects',
-                          value:
-                          '${student?.examSchedule?.length ?? 0}'),
+                        label: 'admit_card.subjects'.tr(),
+                        value: '${student?.examSchedule?.length ?? 0}',
+                      ),
                     ],
                   ),
                 ),
@@ -655,10 +660,12 @@ class _AdmitCardPreview extends StatelessWidget {
                 children: [
                   Divider(color: Colors.grey.shade200),
                   const SizedBox(height: 4),
-                  AppText.customText('Exam Schedule',
-                      size: 11,
-                      weight: FontWeight.bold,
-                      color: Colors.grey.shade600),
+                  AppText.customText(
+                    'admit_card.exam_schedule'.tr(),
+                    size: 11,
+                    weight: FontWeight.bold,
+                    color: Colors.grey.shade600,
+                  ),
                   const SizedBox(height: 6),
                   ...((student?.examSchedule ?? [])
                       .take(3)
@@ -667,7 +674,7 @@ class _AdmitCardPreview extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 4),
                       child: AppText.customText(
-                        '+ ${(student?.examSchedule?.length ?? 0) - 3} more subjects',
+                        '+ ${(student?.examSchedule?.length ?? 0) - 3} ${'admit_card.more_subjects'.tr()}',
                         size: 10,
                         color: Colors.grey.shade500,
                       ),
@@ -683,14 +690,14 @@ class _AdmitCardPreview extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: onAction,
                     icon: const Icon(Icons.download_rounded, size: 16),
-                    label: const Text('Download'),
+                    label: Text('admit_card.download'.tr()),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColor.lightBlueColor,
                       side: BorderSide(color: AppColor.lightBlueColor),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -698,16 +705,21 @@ class _AdmitCardPreview extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: onAction,
-                    icon: const Icon(Icons.share_rounded,
-                        size: 16, color: Colors.white),
-                    label: const Text('Share / Print',
-                        style: TextStyle(color: Colors.white)),
+                    icon: const Icon(
+                      Icons.share_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'admit_card.share_print'.tr(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColor.lightBlueColor,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -734,41 +746,33 @@ class _IdCardTabState extends State<_IdCardTab>
   dynamic _idCardModel;
 
   Future<void> _generate(
-      String examId,
-      String classId,
-      String sectionId,
-      String studentId,
-      ) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.generateAdmitCard)) {
-
-      Utils.show(
-        "You don't have permission to perform this action",
-        context,
-      );
-
+    String examId,
+    String classId,
+    String sectionId,
+    String studentId,
+  ) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.generateAdmitCard)) {
+      Utils.show('admit_card.you_dont_have_permission'.tr(), context);
       return;
     }
-    final vm =
-    Provider.of<GenerateAdmitCardViewModel>(context, listen: false);
+    final vm = Provider.of<GenerateAdmitCardViewModel>(context, listen: false);
     await vm.getAdmitCard(
       int.parse(examId),
       int.parse(classId),
       int.parse(sectionId),
       int.parse(studentId),
-      context
+      context,
     );
     if (!mounted) return;
 
     if (vm.admitCardModel == null ||
         (vm.admitCardModel!.data?.students?.isEmpty ?? true)) {
-      Utils.show('No ID card data received', context, type: 'error');
+      Utils.show('admit_card.no_id_card_data'.tr(), context, type: 'error');
       return;
     }
     setState(() => _idCardModel = vm.admitCardModel);
 
-    IdCardPdfService.showOptions(
-        context: context, model: vm.admitCardModel!);
+    IdCardPdfService.showOptions(context: context, model: vm.admitCardModel!);
   }
 
   @override
@@ -781,19 +785,20 @@ class _IdCardTabState extends State<_IdCardTab>
       child: Column(
         children: [
           _CardFilterForm(
-            buttonLabel: 'Generate ID Card',
+            buttonLabel: 'admit_card.generate_id_card'.tr(),
             buttonIcon: Icons.badge_rounded,
             loading: vm.loading,
             onGenerate: _generate,
           ),
-
           const SizedBox(height: 20),
           if (_idCardModel != null)
             _IdCardPreview(
               model: _idCardModel!,
               onAction: () {
                 IdCardPdfService.showOptions(
-                    context: context, model: _idCardModel!);
+                  context: context,
+                  model: _idCardModel!,
+                );
               },
             ),
         ],
@@ -810,11 +815,11 @@ class _IdCardPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data      = model.data;
-    final student   = data?.students?[0];
+    final data = model.data;
+    final student = data?.students?[0];
     final classInfo = data?.classInfo;
-    final school    = data?.schoolInfo;
-    final examInfo  = data?.examInfo;
+    final school = data?.schoolInfo;
+    final examInfo = data?.examInfo;
 
     String dob = student?.dob ?? '—';
     if (dob.contains('T')) dob = dob.split('T').first;
@@ -824,8 +829,7 @@ class _IdCardPreview extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.06), blurRadius: 12)
+          BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12),
         ],
       ),
       child: Column(
@@ -839,25 +843,30 @@ class _IdCardPreview extends StatelessWidget {
               border: Border.all(color: Colors.grey.shade200),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3)),
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
               ],
             ),
             child: Column(
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: const BoxDecoration(
                     color: Color(0xFFCC0000),
-                    borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(14)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(14),
+                    ),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        width: 36, height: 36,
+                        width: 36,
+                        height: 36,
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(6),
@@ -892,15 +901,19 @@ class _IdCardPreview extends StatelessWidget {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 3),
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white24,
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: AppText.customText('ID CARD',
-                            size: 8,
-                            weight: FontWeight.bold,
-                            color: Colors.white),
+                        child: AppText.customText(
+                          'admit_card.id_card_label'.tr(),
+                          size: 8,
+                          weight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
@@ -909,8 +922,7 @@ class _IdCardPreview extends StatelessWidget {
                   padding: const EdgeInsets.all(12),
                   child: Column(
                     children: [
-                      _StudentPhoto(
-                          photoUrl: student?.studentPhoto, size: 80),
+                      _StudentPhoto(photoUrl: student?.studentPhoto, size: 80),
                       const SizedBox(height: 10),
                       AppText.customText(
                         (student?.name ?? '').toUpperCase(),
@@ -926,8 +938,7 @@ class _IdCardPreview extends StatelessWidget {
                         ),
                       ],
                       const SizedBox(height: 10),
-                      Divider(
-                          color: Colors.grey.shade200, height: 1),
+                      Divider(color: Colors.grey.shade200, height: 1),
                       const SizedBox(height: 10),
                       Row(
                         children: [
@@ -935,11 +946,14 @@ class _IdCardPreview extends StatelessWidget {
                             child: Column(
                               children: [
                                 _InfoRow(
-                                    label: 'Class-Sec',
-                                    value:
-                                    '${classInfo?.className ?? ''} ${classInfo?.sectionName ?? ''}'),
+                                  label: 'admit_card.class_sec'.tr(),
+                                  value:
+                                      '${classInfo?.className ?? ''} ${classInfo?.sectionName ?? ''}',
+                                ),
                                 _InfoRow(
-                                    label: 'D.O.B.', value: dob),
+                                  label: 'admit_card.dob'.tr(),
+                                  value: dob,
+                                ),
                               ],
                             ),
                           ),
@@ -948,12 +962,13 @@ class _IdCardPreview extends StatelessWidget {
                             child: Column(
                               children: [
                                 _InfoRow(
-                                    label: 'Roll No',
-                                    value:
-                                    '${student?.rollNo ?? '—'}'),
+                                  label: 'admit_card.roll_no'.tr(),
+                                  value: '${student?.rollNo ?? '—'}',
+                                ),
                                 _InfoRow(
-                                    label: 'Reg. No',
-                                    value: student?.regNo ?? '—'),
+                                  label: 'admit_card.reg_no'.tr(),
+                                  value: student?.regNo ?? '—',
+                                ),
                               ],
                             ),
                           ),
@@ -961,25 +976,29 @@ class _IdCardPreview extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       _InfoRow(
-                          label: 'Father',
-                          value: student?.fatherName ?? '—'),
+                        label: 'admit_card.father'.tr(),
+                        value: student?.fatherName ?? '—',
+                      ),
                       _InfoRow(
-                          label: 'Mother',
-                          value: student?.motherName ?? '—'),
+                        label: 'admit_card.mother'.tr(),
+                        value: student?.motherName ?? '—',
+                      ),
                       _InfoRow(
-                          label: 'Address',
-                          value: student?.address ?? '—'),
+                        label: 'admit_card.address'.tr(),
+                        value: student?.address ?? '—',
+                      ),
                       const SizedBox(height: 10),
-                      Divider(
-                          color: Colors.grey.shade200, height: 1),
+                      Divider(color: Colors.grey.shade200, height: 1),
                       const SizedBox(height: 8),
                       Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _SignatureBox(label: 'Student Signature'),
                           _SignatureBox(
-                              label: 'Principal Signature'),
+                            label: 'admit_card.student_signature'.tr(),
+                          ),
+                          _SignatureBox(
+                            label: 'admit_card.principal_signature'.tr(),
+                          ),
                         ],
                       ),
                     ],
@@ -991,12 +1010,16 @@ class _IdCardPreview extends StatelessWidget {
                   decoration: const BoxDecoration(
                     color: Color(0xFFCC0000),
                     borderRadius: BorderRadius.vertical(
-                        bottom: Radius.circular(14)),
+                      bottom: Radius.circular(14),
+                    ),
                   ),
                   child: Center(
                     child: AppText.customText(
                       (school?.phone ?? '').isNotEmpty
-                          ? 'School Contact # ${school?.phone}'
+                          ? 'admit_card.school_contact'.tr().replaceAll(
+                              '{phone}',
+                              school?.phone ?? '',
+                            )
                           : school?.schoolName ?? '',
                       size: 10,
                       weight: FontWeight.bold,
@@ -1015,14 +1038,14 @@ class _IdCardPreview extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: onAction,
                     icon: const Icon(Icons.download_rounded, size: 16),
-                    label: const Text('Download'),
+                    label: Text('admit_card.download'.tr()),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: const Color(0xFFCC0000),
                       side: const BorderSide(color: Color(0xFFCC0000)),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -1030,16 +1053,21 @@ class _IdCardPreview extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: onAction,
-                    icon: const Icon(Icons.share_rounded,
-                        size: 16, color: Colors.white),
-                    label: const Text('Share / Print',
-                        style: TextStyle(color: Colors.white)),
+                    icon: const Icon(
+                      Icons.share_rounded,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      'admit_card.share_print'.tr(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFCC0000),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -1072,32 +1100,36 @@ class _StudentPhoto extends StatelessWidget {
       ),
       child: hasPhoto
           ? ClipRRect(
-        borderRadius: BorderRadius.circular(9),
-        child: Image.network(
-          photoUrl!,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholderIcon(),
-          loadingBuilder: (_, child, progress) {
-            if (progress == null) return child;
-            return Center(
-              child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: Colors.grey.shade400),
+              borderRadius: BorderRadius.circular(9),
+              child: Image.network(
+                photoUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _placeholderIcon(),
+                loadingBuilder: (_, child, progress) {
+                  if (progress == null) return child;
+                  return Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.grey.shade400,
+                      ),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      )
+            )
           : _placeholderIcon(),
     );
   }
 
   Widget _placeholderIcon() => Center(
-    child: Icon(Icons.person_rounded,
-        size: size * 0.52, color: Colors.grey.shade400),
+    child: Icon(
+      Icons.person_rounded,
+      size: size * 0.52,
+      color: Colors.grey.shade400,
+    ),
   );
 }
 
@@ -1116,14 +1148,19 @@ class _InfoRow extends StatelessWidget {
         children: [
           SizedBox(
             width: 56,
-            child: AppText.customText(label,
-                size: 9.5, color: Colors.red.shade600),
+            child: AppText.customText(
+              label,
+              size: 9.5,
+              color: Colors.red.shade600,
+            ),
           ),
-          AppText.customText(' : ',
-              size: 9.5, color: Colors.grey.shade500),
+          AppText.customText(' : ', size: 9.5, color: Colors.grey.shade500),
           Expanded(
-            child: AppText.customText(value,
-                size: 9.5, weight: FontWeight.w600),
+            child: AppText.customText(
+              value,
+              size: 9.5,
+              weight: FontWeight.w600,
+            ),
           ),
         ],
       ),
@@ -1144,13 +1181,15 @@ class _ScheduleChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColor.lightBlueColor.withOpacity(0.07),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-            color: AppColor.lightBlueColor.withOpacity(0.2)),
+        border: Border.all(color: AppColor.lightBlueColor.withOpacity(0.2)),
       ),
       child: Row(
         children: [
-          Icon(Icons.calendar_today_rounded,
-              size: 11, color: AppColor.lightBlueColor),
+          Icon(
+            Icons.calendar_today_rounded,
+            size: 11,
+            color: AppColor.lightBlueColor,
+          ),
           const SizedBox(width: 6),
           Expanded(
             child: AppText.customText(
@@ -1184,8 +1223,8 @@ class _SignatureBox extends StatelessWidget {
           height: 28,
           decoration: BoxDecoration(
             border: Border(
-                bottom: BorderSide(
-                    color: Colors.grey.shade400, width: 0.8)),
+              bottom: BorderSide(color: Colors.grey.shade400, width: 0.8),
+            ),
           ),
         ),
         const SizedBox(height: 4),

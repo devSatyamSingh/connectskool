@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +54,7 @@ class _CmsScreenState extends State<CmsScreen> {
         if (!PermissionExtensions.canAccess(PermissionKeys.manageSchoolSettings)) {
           return Scaffold(
             body: Center(
-              child: AppText.customText("You don't have permission"),
+              child: AppText.customText('cms.you_dont_have_permission'.tr()),
             ),
           );
         }
@@ -112,9 +113,9 @@ class _CmsScreenState extends State<CmsScreen> {
               /// BODY
               Expanded(
                 child: vm.loading
-                    ? const _CmsLoadingView()          // ✅ Shimmer loading
+                    ? const _CmsLoadingView()
                     : page == null
-                    ? _buildEmpty()                // ✅ Graceful empty state
+                    ? _buildEmpty()
                     : _buildContent(page),
               ),
             ],
@@ -132,7 +133,7 @@ class _CmsScreenState extends State<CmsScreen> {
           Icon(Icons.article_outlined, size: 52, color: Colors.grey.shade300),
           const SizedBox(height: 12),
           AppText.customText(
-            "Content not available",
+            'cms.content_not_available'.tr(),
             size: 15,
             color: AppColor.textGrey,
           ),
@@ -177,7 +178,7 @@ class _CmsScreenState extends State<CmsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppText.customText(
-                        "Last Updated",
+                        'cms.last_updated'.tr(),
                         size: 12,
                         color: AppColor.textGrey,
                       ),

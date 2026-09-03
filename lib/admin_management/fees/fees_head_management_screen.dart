@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,6 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
-  // Controllers for bottom sheet
   final TextEditingController _headNameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
@@ -32,8 +32,10 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<FeesHeadManagementViewModel>(context, listen: false)
-          .feesHeadManagementApi(context);
+      Provider.of<FeesHeadManagementViewModel>(
+        context,
+        listen: false,
+      ).feesHeadManagementApi(context);
     });
 
     _controller = AnimationController(
@@ -49,6 +51,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
     _descriptionController.dispose();
     super.dispose();
   }
+
   void _showEditFeeHeadBottomSheet(dynamic head) {
     _headNameController.text = head.headName ?? "";
     _descriptionController.text = head.description ?? "";
@@ -76,8 +79,6 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                  /// HEADER
                   Row(
                     children: [
                       Container(
@@ -86,15 +87,12 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                           gradient: AppColor.primaryGradient,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(
-                          Icons.edit,
-                          color: Colors.white,
-                        ),
+                        child: const Icon(Icons.edit, color: Colors.white),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: AppText.customText(
-                          "Edit Fee Head",
+                          'fees_head.edit_fee_head'.tr(),
                           size: 18,
                           weight: FontWeight.bold,
                         ),
@@ -108,9 +106,11 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
 
                   const SizedBox(height: 24),
 
-                  /// HEAD NAME
-                  AppText.customText("Head Name",
-                      size: 14, weight: FontWeight.w600),
+                  AppText.customText(
+                    'fees_head.head_name'.tr(),
+                    size: 14,
+                    weight: FontWeight.w600,
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _headNameController,
@@ -126,9 +126,11 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
 
                   const SizedBox(height: 16),
 
-                  /// DESCRIPTION
-                  AppText.customText("Description",
-                      size: 14, weight: FontWeight.w600),
+                  AppText.customText(
+                    'fees_head.description'.tr(),
+                    size: 14,
+                    weight: FontWeight.w600,
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _descriptionController,
@@ -145,32 +147,36 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
 
                   const SizedBox(height: 24),
 
-                  /// UPDATE BUTTON
                   SizedBox(
                     width: double.infinity,
                     child: AppButton(
-                      title: "Update Fee Head",
+                      title: 'fees_head.update_fee_head'.tr(),
                       onTap: () {
                         if (_headNameController.text.trim().isEmpty) {
-                          Utils.show("Head name required", context);
+                          Utils.show(
+                            'fees_head.head_name_required_edit'.tr(),
+                            context,
+                          );
                           return;
                         }
 
                         Provider.of<EditFeesHeadViewModel>(
-                          context,
-                          listen: false,
-                        ).editFeesHeadApi(
-                           head. feeHeadId,
-                          _headNameController.text.trim(),
-                          _descriptionController.text.trim(),
-                          context,
-                        ).then((_) {
-                          Navigator.pop(context);
-                          Provider.of<FeesHeadManagementViewModel>(
-                            context,
-                            listen: false,
-                          ).feesHeadManagementApi(context);
-                        });
+                              context,
+                              listen: false,
+                            )
+                            .editFeesHeadApi(
+                              head.feeHeadId,
+                              _headNameController.text.trim(),
+                              _descriptionController.text.trim(),
+                              context,
+                            )
+                            .then((_) {
+                              Navigator.pop(context);
+                              Provider.of<FeesHeadManagementViewModel>(
+                                context,
+                                listen: false,
+                              ).feesHeadManagementApi(context);
+                            });
                       },
                     ),
                   ),
@@ -182,6 +188,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
       },
     );
   }
+
   void _showDeleteDialog(dynamic head) {
     showDialog(
       context: context,
@@ -210,20 +217,19 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                     color: Colors.red.shade600,
                   ),
                 ),
-
                 const SizedBox(height: 16),
                 Text(
-                  "Delete Fee Head",
+                  'fees_head.delete_fee_head'.tr(),
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 Text(
-                  "Are you sure you want to delete this fee head?\n\nThis action cannot be undone.",
+                  'fees_head.confirm_delete'.tr() +
+                      '\n\n' +
+                      'fees_head.action_undo'.tr(),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
@@ -231,10 +237,8 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                     height: 1.5,
                   ),
                 ),
-
                 if ((head.headName ?? "").isNotEmpty) ...[
                   const SizedBox(height: 16),
-
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -244,9 +248,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                     decoration: BoxDecoration(
                       color: Colors.red.shade50,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: Colors.red.shade100,
-                      ),
+                      border: Border.all(color: Colors.red.shade100),
                     ),
                     child: Row(
                       children: [
@@ -269,38 +271,29 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                     ),
                   ),
                 ],
-
                 const SizedBox(height: 28),
-
                 Row(
                   children: [
-
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
                           Navigator.pop(dialogContext);
                         },
                         style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(
-                            double.infinity,
-                            52,
-                          ),
+                          minimumSize: const Size(double.infinity, 52),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
                         child: Text(
-                          "Cancel",
+                          'fees_head.cancel'.tr(),
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: Consumer<DeleteFeesHeadViewModel>(
                         builder: (_, vm, __) {
@@ -308,66 +301,48 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                             onPressed: vm.loading
                                 ? null
                                 : () async {
-
-                              final result =
-                              await vm.deleteFeesHeadApi(
-                                head.feeHeadId,
-                                context,
-                              );
-
-                              if (!mounted) return;
-
-                              Navigator.pop(
-                                  dialogContext);
-
-                              Utils.show(
-                                result["message"] ??
-                                    "Something went wrong",
-                                context,
-                              );
-
-                              if (result["success"] ==
-                                  true) {
-                                await Provider.of<
-                                    FeesHeadManagementViewModel>(
-                                  context,
-                                  listen: false,
-                                ).feesHeadManagementApi(
-                                  context,
-                                );
-                              }
-                            },
+                                    final result = await vm.deleteFeesHeadApi(
+                                      head.feeHeadId,
+                                      context,
+                                    );
+                                    if (!mounted) return;
+                                    Navigator.pop(dialogContext);
+                                    Utils.show(
+                                      result["message"] ??
+                                          'fees_head.something_wrong'.tr(),
+                                      context,
+                                    );
+                                    if (result["success"] == true) {
+                                      await Provider.of<
+                                            FeesHeadManagementViewModel
+                                          >(context, listen: false)
+                                          .feesHeadManagementApi(context);
+                                    }
+                                  },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                              Colors.red.shade600,
+                              backgroundColor: Colors.red.shade600,
                               foregroundColor: Colors.white,
-                              minimumSize: const Size(
-                                double.infinity,
-                                52,
-                              ),
+                              minimumSize: const Size(double.infinity, 52),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(14),
                               ),
                             ),
                             child: vm.loading
                                 ? const SizedBox(
-                              height: 22,
-                              width: 22,
-                              child:
-                              CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
-                            )
+                                    height: 22,
+                                    width: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
                                 : Text(
-                              "Delete",
-                              style: GoogleFonts.poppins(
-                                fontWeight:
-                                FontWeight.w600,
-                              ),
-                            ),
+                                    'fees_head.delete'.tr(),
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           );
                         },
                       ),
@@ -381,14 +356,18 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
       },
     );
   }
+
   void _showAddFeeHeadBottomSheet() {
+    _headNameController.clear();
+    _descriptionController.clear();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
         return SafeArea(
-          top: false, // 👈 important for bottom sheet
+          top: false,
           child: Container(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -405,7 +384,6 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// Header
                   Row(
                     children: [
                       Container(
@@ -423,7 +401,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: AppText.customText(
-                          "Add New Fee Head",
+                          'fees_head.add_new_fee_head'.tr(),
                           size: 18,
                           weight: FontWeight.bold,
                         ),
@@ -434,12 +412,10 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 24),
 
-                  /// Head Name
                   AppText.customText(
-                    "Head Name",
+                    'fees_head.head_name'.tr(),
                     size: 14,
                     weight: FontWeight.w600,
                   ),
@@ -447,7 +423,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                   TextField(
                     controller: _headNameController,
                     decoration: InputDecoration(
-                      hintText: "e.g., Transport Fee",
+                      hintText: 'fees_head.head_name_hint'.tr(),
                       hintStyle: TextStyle(color: AppColor.softGreyText),
                       filled: true,
                       fillColor: AppColor.pageBgColor,
@@ -461,12 +437,10 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 16),
 
-                  /// Description
                   AppText.customText(
-                    "Description",
+                    'fees_head.description'.tr(),
                     size: 14,
                     weight: FontWeight.w600,
                   ),
@@ -475,7 +449,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                     controller: _descriptionController,
                     maxLines: 3,
                     decoration: InputDecoration(
-                      hintText: "e.g., Monthly transport fee",
+                      hintText: 'fees_head.description_hint'.tr(),
                       hintStyle: TextStyle(color: AppColor.softGreyText),
                       filled: true,
                       fillColor: AppColor.pageBgColor,
@@ -489,32 +463,30 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 24),
 
-                  /// Submit
                   SizedBox(
                     width: double.infinity,
                     child: AppButton(
-                      title: 'Add Fee Head',
+                      title: 'fees_head.add_fee_head_btn'.tr(),
                       onTap: () {
-                        final createHead = Provider.of<CreateFeesHeadViewModel>(context,listen: false);
+                        final createHead = Provider.of<CreateFeesHeadViewModel>(
+                          context,
+                          listen: false,
+                        );
                         if (_headNameController.text.trim().isEmpty) {
-                          Utils.show("Please enter head name", context);
+                          Utils.show(
+                            'fees_head.head_name_required'.tr(),
+                            context,
+                          );
                           return;
                         }
 
-                        // final body = {
-                        //   "head_name": _headNameController.text.trim(),
-                        //   "description":
-                        //   _descriptionController.text.trim(),
-                        // };
                         createHead.createFeesHeadApi(
-                            _headNameController.text.trim(),
-                            _descriptionController.text.trim(),
-                            context);
-
-                        // API call yahin se
+                          _headNameController.text.trim(),
+                          _descriptionController.text.trim(),
+                          context,
+                        );
                       },
                     ),
                   ),
@@ -527,7 +499,6 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -535,13 +506,12 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
       child: Scaffold(
         backgroundColor: AppColor.pageBgColor,
 
-        floatingActionButtonLocation:
-        FloatingActionButtonLocation.endFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
 
         floatingActionButton: SizedBox(
           width: 180,
           child: AppButton(
-            title: "Add Fee Head",
+            title: 'fees_head.add_fee_head'.tr(),
             icon: Icons.add_rounded,
             height: 56,
             radius: 18,
@@ -554,13 +524,13 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
 
             return Column(
               children: [
-                /// ===== HEADER =====
                 Container(
                   padding: const EdgeInsets.fromLTRB(16, 50, 16, 22),
                   decoration: BoxDecoration(
                     gradient: AppColor.primaryGradient,
-                    borderRadius:
-                    const BorderRadius.vertical(bottom: Radius.circular(28)),
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(28),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: AppColor.blueShadow,
@@ -589,7 +559,7 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: AppText.customText(
-                          "Fees Head Management",
+                          'fees_head.title'.tr(),
                           size: 19,
                           weight: FontWeight.bold,
                           color: Colors.white,
@@ -597,7 +567,9 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 6),
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColor.glassWhite,
                           borderRadius: BorderRadius.circular(20),
@@ -612,7 +584,6 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 14),
 
                 Expanded(
@@ -621,14 +592,12 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                       : feeHeads.isEmpty
                       ? _emptyView()
                       : ListView.builder(
-                    padding:
-                    const EdgeInsets.fromLTRB(18, 8, 18, 90),
-                    itemCount: feeHeads.length,
-                    itemBuilder: (context, index) {
-                      return _animatedCard(
-                          index, feeHeads[index]);
-                    },
-                  ),
+                          padding: const EdgeInsets.fromLTRB(18, 8, 18, 90),
+                          itemCount: feeHeads.length,
+                          itemBuilder: (context, index) {
+                            return _animatedCard(index, feeHeads[index]);
+                          },
+                        ),
                 ),
               ],
             );
@@ -639,8 +608,6 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
   }
 
   Widget _feeHeadCard(dynamic head) {
-    final isActive = head.status == 1;
-
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -664,12 +631,10 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                 gradient: AppColor.primaryGradient,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Icon(Icons.category,
-                  color: Colors.white, size: 22),
+              child: const Icon(Icons.category, color: Colors.white, size: 22),
             ),
             const SizedBox(width: 14),
 
-            /// CONTENT
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -681,72 +646,36 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
                   ),
                   const SizedBox(height: 6),
                   AppText.customText(
-                    head.description ?? "No description available",
+                    head.description ?? 'fees_head.no_description'.tr(),
                     size: 12,
                     color: AppColor.softGreyText,
                   ),
-                  const SizedBox(height: 10),
-
-                  // /// STATUS
-                  // Container(
-                  //   padding:
-                  //   const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  //   decoration: BoxDecoration(
-                  //     color: isActive
-                  //         ? Colors.green.withOpacity(0.15)
-                  //         : Colors.red.withOpacity(0.15),
-                  //     borderRadius: BorderRadius.circular(12),
-                  //   ),
-                  //   child: AppText.customText(
-                  //     isActive ? "ACTIVE" : "INACTIVE",
-                  //     size: 10,
-                  //     weight: FontWeight.bold,
-                  //     color: isActive ? Colors.green : Colors.red,
-                  //   ),
-                  // ),
                 ],
               ),
             ),
 
-            /// ACTION
-            /// ACTION
             Column(
               children: [
                 IconButton(
                   onPressed: () {
                     _showEditFeeHeadBottomSheet(head);
                   },
-                  icon: const Icon(
-                    Icons.edit_rounded,
-                    color: Colors.blue,
-                  ),
+                  icon: const Icon(Icons.edit_rounded, color: Colors.blue),
                 ),
                 IconButton(
                   onPressed: () {
                     _showDeleteDialog(head);
                   },
-                  icon: const Icon(
-                    Icons.delete_rounded,
-                    color: Colors.red,
-                  ),
+                  icon: const Icon(Icons.delete_rounded, color: Colors.red),
                 ),
               ],
             ),
-
-            // IconButton(
-            //   onPressed: () {
-            //     _showEditFeeHeadBottomSheet(head);
-            //   },
-            //   icon: const Icon(Icons.edit_rounded,
-            //       color: Colors.blue),
-            // ),
           ],
         ),
       ),
     );
   }
 
-  /// ===== ANIMATION =====
   Widget _animatedCard(int index, dynamic head) {
     return AnimatedBuilder(
       animation: _controller,
@@ -764,17 +693,15 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
     );
   }
 
-  /// ===== EMPTY =====
   Widget _emptyView() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.category,
-              size: 60, color: AppColor.lightBlueColor),
+          Icon(Icons.category, size: 60, color: AppColor.lightBlueColor),
           const SizedBox(height: 16),
           AppText.customText(
-            "No Fee Heads Found",
+            'fees_head.no_fee_heads'.tr(),
             size: 16,
             weight: FontWeight.bold,
           ),
@@ -783,7 +710,6 @@ class _FeesHeadManagementScreenState extends State<FeesHeadManagementScreen>
     );
   }
 
-  /// ===== SHIMMER =====
   Widget _shimmer() {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../res/app_color.dart';
@@ -36,17 +37,17 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
     final description = _descriptionController.text.trim();
 
     if (title.isEmpty) {
-      Utils.show("Please enter issue title", context, type: "warning");
+      Utils.show('help_support.enter_title'.tr(), context, type: "warning");
       return;
     }
 
     if (description.isEmpty) {
-      Utils.show("Please enter description", context, type: "warning");
+      Utils.show('help_support.enter_description'.tr(), context, type: "warning");
       return;
     }
 
     if (description.length < 10) {
-      Utils.show("Description is too short", context, type: "warning");
+      Utils.show('help_support.description_too_short'.tr(), context, type: "warning");
       return;
     }
 
@@ -67,7 +68,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
       });
 
       Utils.show(
-        "Support ticket submitted successfully",
+        'help_support.ticket_submitted'.tr(),
         context,
         type: "success",
       );
@@ -118,9 +119,9 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 13),
+                        const SizedBox(width: 13),
                         AppText.customText(
-                          "Help & Support",
+                          'help_support.title'.tr(),
                           color: Colors.white,
                           size: 16,
                           weight: FontWeight.w600,
@@ -143,14 +144,14 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                     ),
                     const SizedBox(height: 13),
                     AppText.customText(
-                      "Need Help?",
+                      'help_support.need_help'.tr(),
                       color: Colors.white,
                       size: 20,
                       weight: FontWeight.w500,
                     ),
                     const SizedBox(height: 8),
                     AppText.customText(
-                      "Facing an issue?\nCreate a ticket and our team will assist you.",
+                      'help_support.subtitle'.tr(),
                       color: Colors.white70,
                       size: 12,
                       align: TextAlign.center,
@@ -186,8 +187,8 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
 
                               AppTextField(
                                 controller: _titleController,
-                                label: "Issue Title",
-                                hint: "e.g. Attendance not updating",
+                                label: 'help_support.issue_title'.tr(),
+                                hint: 'help_support.issue_hint'.tr(),
                                 prefix: const Icon(Icons.title_rounded),
                               ),
 
@@ -195,8 +196,8 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
 
                               AppTextField(
                                 controller: _descriptionController,
-                                label: "Description",
-                                hint: "Please describe your issue in detail...",
+                                label: 'help_support.description'.tr(),
+                                hint: 'help_support.description_hint'.tr(),
                                 minLines: 5,
                                 prefix: const Padding(
                                   padding: EdgeInsets.only(bottom: 95),
@@ -207,7 +208,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                               const SizedBox(height: 20),
 
                               AppButton(
-                                title: "Submit Ticket",
+                                title: 'help_support.submit_ticket'.tr(),
                                 icon: Icons.send_rounded,
                                 loading: vm.loading,
                                 onTap: _submitTicket,
@@ -256,7 +257,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                                 children: [
 
                                   AppText.customText(
-                                    "Response Time",
+                                    'help_support.response_time'.tr(),
                                     weight:
                                     FontWeight.w600,
                                     size: 14,
@@ -265,7 +266,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                                   const SizedBox(height: 4),
 
                                   AppText.customText(
-                                    "Most support requests are resolved within 24 business hours.",
+                                    'help_support.response_time_desc'.tr(),
                                     size: 12,
                                     color:
                                     AppColor.textGrey,
@@ -339,7 +340,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
               BorderRadius.circular(12),
             ),
             child: AppText.customText(
-              "Ticket ID #${vm.ticketModel?.data?.supportTicketId ?? ''}",
+              'help_support.ticket_id'.tr() + " #${vm.ticketModel?.data?.supportTicketId ?? ''}",
               color: Colors.green,
               weight: FontWeight.w600,
               size: 14,
@@ -349,7 +350,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           const SizedBox(height: 20),
 
           AppText.customText(
-            "Thank You!",
+            'help_support.thank_you'.tr(),
             size: 28,
             weight: FontWeight.bold,
             align: TextAlign.center,
@@ -358,7 +359,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           const SizedBox(height: 14),
 
           AppText.customText(
-            "Your support ticket has been created successfully.\n\nOur support team will review your issue and get back to you within 24 business hours.",
+            'help_support.ticket_success'.tr(),
             align: TextAlign.center,
             size: 14,
             color: AppColor.textGrey,
@@ -367,7 +368,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
           const SizedBox(height: 30),
 
           AppButton(
-            title: "Submit Another Ticket",
+            title: 'help_support.submit_another'.tr(),
             icon: Icons.refresh_rounded,
             onTap: () {
               setState(() {

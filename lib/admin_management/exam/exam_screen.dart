@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -30,11 +31,11 @@ class ExamScreen extends StatefulWidget {
   @override
   State<ExamScreen> createState() => _ExamScreenState();
 }
+
 class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
   late AnimationController _animController;
   late TabController _tabController;
   final _ttExamDateCtrl = TextEditingController();
-
 
   // ── Exam form controllers ──
   final _examNameCtrl = TextEditingController();
@@ -79,7 +80,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
   String? _selectedTeacherId;
   String? _selectedSubjectId;
 
-
   @override
   void initState() {
     super.initState();
@@ -103,11 +103,11 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
       Provider.of<ExamManagementViewModel>(context, listen: false)
           .examManagementApi(context);
 
-      // ✅ Academic years load karo
       Provider.of<AcademicViewModel>(context, listen: false)
           .academicApi(context);
     });
   }
+
   @override
   void dispose() {
     _animController.dispose();
@@ -192,7 +192,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     return map[d] ?? const Color(0xFF607D8B);
   }
 
-
   void _showExamBottomSheet({dynamic exam}) {
     final isEdit = exam != null;
     if (isEdit) {
@@ -227,8 +226,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
             ),
             decoration: BoxDecoration(
               color: AppColor.cardWhite,
-              borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(28)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: SingleChildScrollView(
               child: Padding(
@@ -238,19 +236,19 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _sheetHeader(
-                      isEdit ? 'Edit Exam' : 'Add New Exam',
+                      isEdit ? 'exam.edit_exam'.tr() : 'exam.add_new_exam'.tr(),
                       isEdit ? Icons.edit : Icons.add_circle_outline,
                       ctx,
                     ),
                     const SizedBox(height: 16),
                     _labeledField(
-                      'Exam Name',
+                      'exam.exam_name'.tr(),
                       _examNameCtrl,
                       Icons.school,
-                      'e.g., Mid Term Examination',
+                      'exam.exam_name_hint'.tr(),
                     ),
                     const SizedBox(height: 16),
-                    AppText.customText('Academic Year', size: 14, weight: FontWeight.w600),
+                    AppText.customText('exam.academic_year'.tr(), size: 14, weight: FontWeight.w600),
                     const SizedBox(height: 8),
                     Consumer<AcademicViewModel>(
                       builder: (context, academicVm, _) {
@@ -265,15 +263,14 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                             child: const Center(child: LinearProgressIndicator()),
                           );
                         }
-                        // ✅ Pre-fill controller bhi set karo jab year change ho
                         return DropdownButtonFormField<String>(
-                            dropdownColor: Colors.white,
+                          dropdownColor: Colors.white,
                           value: years.any((y) => y.yearName == _academicYearCtrl.text)
                               ? _academicYearCtrl.text
                               : (years.isNotEmpty
                               ? (academicVm.currentYear?.yearName ?? years.first.yearName)
                               : null),
-                          decoration: _inputDeco('Select Academic Year', Icons.calendar_view_month),
+                          decoration: _inputDeco('exam.select_academic_year'.tr(), Icons.calendar_view_month),
                           items: years
                               .map((y) => DropdownMenuItem(
                             value: y.yearName,
@@ -288,21 +285,14 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                         );
                       },
                     ),
-                    // _labeledField(
-                    //   'Academic Year',
-                    //   _academicYearCtrl,
-                    //   Icons.calendar_view_month,
-                    //   'e.g., 2025-2026',
-                    // ),
                     const SizedBox(height: 16),
-                    AppText.customText('Term',
+                    AppText.customText('exam.term'.tr(),
                         size: 14, weight: FontWeight.w600),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       dropdownColor: Colors.white,
                       value: _selectedTerm,
-                      decoration:
-                      _inputDeco('Select term', Icons.timeline),
+                      decoration: _inputDeco('exam.select_term'.tr(), Icons.timeline),
                       items: const [
                         DropdownMenuItem(
                             value: 'term1', child: Text('Term 1')),
@@ -312,20 +302,20 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                       onChanged: (v) => setSheet(() => _selectedTerm = v),
                     ),
                     const SizedBox(height: 16),
-                    _labeledDateField(ctx, 'Start Date',
+                    _labeledDateField(ctx, 'exam.start_date'.tr(),
                         _examStartDateCtrl, Icons.calendar_today),
                     const SizedBox(height: 16),
                     _labeledDateField(
-                        ctx, 'End Date', _examEndDateCtrl, Icons.event),
+                        ctx, 'exam.end_date'.tr(), _examEndDateCtrl, Icons.event),
                     const SizedBox(height: 16),
                     _labeledDateField(
                         ctx,
-                        'Result Date (Optional)',
+                        'exam.result_date_optional'.tr(),
                         _resultDateCtrl,
                         Icons.assessment),
                     const SizedBox(height: 24),
                     _submitButton(
-                      label: isEdit ? 'Update Exam' : 'Add Exam',
+                      label: isEdit ? 'exam.update_exam'.tr() : 'exam.add_exam_btn'.tr(),
                       onPressed: () async {
                         final academicVm = Provider.of<AcademicViewModel>(context, listen: false);
                         if (!isEdit) {
@@ -333,8 +323,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                               _academicYearCtrl.text.trim().isEmpty ||
                               _examStartDateCtrl.text.trim().isEmpty ||
                               _examEndDateCtrl.text.trim().isEmpty) {
-                            Utils.show(
-                                'Please fill all required fields', context);
+                            Utils.show('exam.fill_required_fields'.tr(), context);
                             return;
                           }
                         }
@@ -371,11 +360,8 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                             _examNameCtrl.text.trim().isEmpty
                                 ? (exam.examName ?? '')
                                 : _examNameCtrl.text.trim(),
-                          _academicYearCtrl.text = academicVm.currentYear?.yearName
-                              ?? (academicVm.years.isNotEmpty ? academicVm.years.first.yearName ?? '' : ''),
-                            // _academicYearCtrl.text.trim().isEmpty
-                            //     ? (exam.academicYear ?? '')
-                            //     : _academicYearCtrl.text.trim(),
+                            _academicYearCtrl.text = academicVm.currentYear?.yearName
+                                ?? (academicVm.years.isNotEmpty ? academicVm.years.first.yearName ?? '' : ''),
                             _examStartDateCtrl.text.trim().isEmpty
                                 ? _isoToDateOnly(exam.startDate)
                                 : _examStartDateCtrl.text.trim(),
@@ -404,13 +390,11 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     );
   }
 
-
   void _showDeleteExamDialog(dynamic exam) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -423,21 +407,20 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                   color: Colors.red, size: 28),
             ),
             const SizedBox(width: 12),
-            const Expanded(
-              child: Text('Delete Exam?',
-                  style:
-                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text('exam.delete_exam'.tr(),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
         content: Text(
-          "Are you sure you want to delete '${exam.examName}'?",
+          'exam.delete_exam_confirmation'.tr().replaceAll('{examName}', exam.examName ?? ''),
           style: TextStyle(color: AppColor.softGreyText),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text('exam.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -451,11 +434,9 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child:
-            const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text('exam.delete'.tr(), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -468,8 +449,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
             Container(
@@ -482,10 +462,9 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                   color: Colors.red, size: 28),
             ),
             const SizedBox(width: 12),
-            const Expanded(
-              child: Text('Delete Entry?',
-                  style:
-                  TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text('exam.delete_entry'.tr(),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -501,7 +480,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
               ),
               const TextSpan(text: ' on '),
               TextSpan(
-                // ✅ Data model mein examDate use karo (dayOfWeek nahi hai)
                 text: entry.examDate ?? '',
                 style: const TextStyle(
                     fontWeight: FontWeight.bold, color: Colors.black87),
@@ -513,7 +491,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
+            child: Text('exam.cancel'.tr()),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -525,7 +503,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                 entry.timetableId,
                 context,
               );
-              // ✅ SchoolExamTimeTableViewModel se refresh karo
               if (_viewExamId != null &&
                   _viewClassId != null &&
                   _viewSectionId != null) {
@@ -541,11 +518,9 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child:
-            const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text('exam.delete'.tr(), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -557,24 +532,21 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
   void _showTimetableBottomSheet({ExamTimetableData? entry}) {
     final isEdit = entry != null;
 
-    // ── Pre-fill controllers ──
     _ttStartTimeCtrl.text = isEdit ? (entry.startTime ?? '') : '';
     _ttEndTimeCtrl.text = isEdit ? (entry.endTime ?? '') : '';
     _ttExamDateCtrl.text = isEdit ? (entry.examDate ?? '') : '';
     _ttRoomNoCtrl.text = isEdit ? (entry.roomNo ?? '') : '';
     _ttMaxMarksCtrl.text = isEdit ? (entry.maxMarks ?? '') : '';
-    _ttMinPassingMarksCtrl.text =
-    isEdit ? (entry.minPassingMarks ?? '') : '';
+    _ttMinPassingMarksCtrl.text = isEdit ? (entry.minPassingMarks ?? '') : '';
     _ttInstructionsCtrl.text = isEdit ? (entry.instructions ?? '') : '';
 
-    _selectedTTDay = null; // Data model mein dayOfWeek nahi hai
+    _selectedTTDay = null;
     _addClassId = isEdit ? entry.classId?.toString() : null;
     _addSectionId = isEdit ? entry.sectionId?.toString() : null;
-    _selectedTeacherId = null; // Data model mein teacherId nahi hai
+    _selectedTeacherId = null;
     _selectedSubjectId = isEdit ? entry.subjectId?.toString() : null;
 
-    String? _sheetExamId =
-    isEdit ? entry.examId?.toString() : _viewExamId;
+    String? _sheetExamId = isEdit ? entry.examId?.toString() : _viewExamId;
 
     Provider.of<AllTeachersListVieModel>(context, listen: false)
         .allTeachersListApi(context);
@@ -596,7 +568,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.90,),
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.90),
       backgroundColor: Colors.transparent,
       builder: (_) => StatefulBuilder(
         builder: (ctx, setSheet) => SafeArea(
@@ -606,8 +578,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
             ),
             decoration: BoxDecoration(
               color: AppColor.cardWhite,
-              borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(28)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             child: SingleChildScrollView(
               child: Padding(
@@ -616,11 +587,10 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Header ──
                     _sheetHeader(
                       isEdit
-                          ? 'Edit Timetable Entry'
-                          : 'Add Timetable Entry',
+                          ? 'exam.edit_timetable_entry'.tr()
+                          : 'exam.add_timetable_entry'.tr(),
                       isEdit
                           ? Icons.edit_note_rounded
                           : Icons.add_box_outlined,
@@ -628,7 +598,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(height: 24),
 
-                    // ── Edit badge ──
                     if (isEdit)
                       Container(
                         margin: const EdgeInsets.only(bottom: 16),
@@ -647,7 +616,9 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'Editing: ${entry.subjectName ?? ""} — ${entry.examDate ?? ""}',
+                                'exam.editing'.tr()
+                                    .replaceAll('{subject}', entry.subjectName ?? "")
+                                    .replaceAll('{date}', entry.examDate ?? ""),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.blue.shade700,
@@ -659,8 +630,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                         ),
                       ),
 
-                    // ── EXAM DROPDOWN ──
-                    AppText.customText('Select Exam',
+                    AppText.customText('exam.select_exam'.tr(),
                         size: 14, weight: FontWeight.w600),
                     const SizedBox(height: 8),
                     Container(
@@ -685,8 +655,8 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                             color: AppColor.lightBlueColor),
                         decoration: InputDecoration(
                           hintText: exams.isEmpty
-                              ? 'No exams available'
-                              : 'Choose an exam',
+                              ? 'exam.no_exams_available'.tr()
+                              : 'exam.choose_exam'.tr(),
                           hintStyle: TextStyle(
                               color: AppColor.softGreyText, fontSize: 13),
                           filled: true,
@@ -774,15 +744,14 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
 
                     const SizedBox(height: 20),
 
-                    // ── EXAM DATE ──
-                    AppText.customText('Exam Date',
+                    AppText.customText('exam.exam_date'.tr(),
                         size: 14, weight: FontWeight.w600),
                     const SizedBox(height: 8),
                     TextField(
                       controller: _ttExamDateCtrl,
                       readOnly: true,
                       decoration: _inputDeco(
-                          'Select exam date', Icons.calendar_today),
+                          'exam.select_exam_date'.tr(), Icons.calendar_today),
                       onTap: () async {
                         final picked = await showDatePicker(
                           context: ctx,
@@ -807,14 +776,12 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Class & Section ──
                     Row(
                       children: [
                         Flexible(
                           child: Consumer<AllClassesViewModel>(
                             builder: (context, vm, _) {
-                              final list =
-                                  vm.allClassesModel?.data ?? [];
+                              final list = vm.allClassesModel?.data ?? [];
                               final safeClassId = list.any((e) =>
                               e.classId.toString() == _addClassId)
                                   ? _addClassId
@@ -824,7 +791,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                                 isExpanded: true,
                                 value: safeClassId,
                                 decoration:
-                                _inputDeco('Class', Icons.class_),
+                                _inputDeco('exam.class'.tr(), Icons.class_),
                                 items: list
                                     .map((e) => DropdownMenuItem(
                                   value: e.classId.toString(),
@@ -851,8 +818,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                         Flexible(
                           child: Consumer<AllSectionsViewModel>(
                             builder: (context, vm, _) {
-                              final list =
-                                  vm.allSectionsModel?.data ?? [];
+                              final list = vm.allSectionsModel?.data ?? [];
                               final safeSectionId = list.any((e) =>
                               e.sectionId.toString() ==
                                   _addSectionId)
@@ -863,7 +829,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                                 isExpanded: true,
                                 value: safeSectionId,
                                 decoration:
-                                _inputDeco('Section', Icons.group),
+                                _inputDeco('exam.section'.tr(), Icons.group),
                                 items: list
                                     .map((e) => DropdownMenuItem(
                                   value:
@@ -882,8 +848,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Subject ──
-                    AppText.customText('Subject',
+                    AppText.customText('exam.subject'.tr(),
                         size: 14, weight: FontWeight.w600),
                     const SizedBox(height: 8),
                     Consumer<AllSubjectsVieModel>(
@@ -899,7 +864,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                           isExpanded: true,
                           value: safeSubjectId,
                           decoration:
-                          _inputDeco('Select Subject', Icons.book),
+                          _inputDeco('exam.select_subject'.tr(), Icons.book),
                           items: list
                               .map((e) => DropdownMenuItem(
                             value: e.subjectId.toString(),
@@ -914,14 +879,12 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Teacher ──
-                    AppText.customText('Teacher',
+                    AppText.customText('exam.teacher'.tr(),
                         size: 14, weight: FontWeight.w600),
                     const SizedBox(height: 8),
                     Consumer<AllTeachersListVieModel>(
                       builder: (context, vm, _) {
-                        final list =
-                            vm.allTeachersListModel?.data ?? [];
+                        final list = vm.allTeachersListModel?.data ?? [];
                         final safeTeacherId = list.any((e) =>
                         e.teacherId.toString() ==
                             _selectedTeacherId)
@@ -931,7 +894,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                           isExpanded: true,
                           value: safeTeacherId,
                           decoration: _inputDeco(
-                              'Select Teacher', Icons.person),
+                              'exam.select_teacher'.tr(), Icons.person),
                           items: list
                               .map((e) => DropdownMenuItem(
                             value: e.teacherId.toString(),
@@ -945,18 +908,17 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Start & End Time ──
                     Row(
                       children: [
                         Expanded(
-                          child: _labeledTimeField(ctx, 'Start Time',
+                          child: _labeledTimeField(ctx, 'exam.start_time'.tr(),
                               _ttStartTimeCtrl, Icons.access_time),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: _labeledTimeField(
                               ctx,
-                              'End Time',
+                              'exam.end_time'.tr(),
                               _ttEndTimeCtrl,
                               Icons.access_time_filled),
                         ),
@@ -964,59 +926,53 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Room No & Max Marks ──
                     Row(
                       children: [
                         Expanded(
-                          child: _labeledField('Room No', _ttRoomNoCtrl,
-                              Icons.meeting_room, 'e.g., A-12'),
+                          child: _labeledField('exam.room_no'.tr(), _ttRoomNoCtrl,
+                              Icons.meeting_room, 'exam.room_no_hint'.tr()),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: _labeledField(
-                              'Max Marks',
+                              'exam.max_marks'.tr(),
                               _ttMaxMarksCtrl,
                               Icons.score,
-                              'e.g., 100',
+                              'exam.max_marks_hint'.tr(),
                               keyboardType: TextInputType.number),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Min Passing Marks ──
                     _labeledField(
-                      'Min Passing Marks',
+                      'exam.min_passing_marks'.tr(),
                       _ttMinPassingMarksCtrl,
                       Icons.check_circle_outline,
-                      'e.g., 33',
+                      'exam.min_passing_marks_hint'.tr(),
                       keyboardType: TextInputType.number,
                     ),
                     const SizedBox(height: 16),
 
-                    // ── Instructions ──
                     _labeledField(
-                      'Instructions',
+                      'exam.instructions'.tr(),
                       _ttInstructionsCtrl,
                       Icons.info_outline,
-                      'e.g., Answer all questions',
+                      'exam.instructions_hint'.tr(),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 24),
 
-                    // ── Submit ──
                     _submitButton(
-                      label: isEdit ? 'Update Entry' : 'Add Entry',
+                      label: isEdit ? 'exam.update_entry'.tr() : 'exam.add_entry'.tr(),
                       onPressed: () {
                         if (!isEdit) {
                           if (_sheetExamId == null) {
-                            Utils.show(
-                                'Please select an exam', context);
+                            Utils.show('exam.select_exam_error'.tr(), context);
                             return;
                           }
                           if (_ttExamDateCtrl.text.trim().isEmpty) {
-                            Utils.show(
-                                'Please select exam date', context);
+                            Utils.show('exam.select_exam_date_error'.tr(), context);
                             return;
                           }
                           if (_addClassId == null ||
@@ -1024,24 +980,19 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                               _selectedSubjectId == null ||
                               _ttStartTimeCtrl.text.trim().isEmpty ||
                               _ttEndTimeCtrl.text.trim().isEmpty) {
-                            Utils.show(
-                                'Please fill all required fields',
-                                context);
+                            Utils.show('exam.fill_required_fields_tt'.tr(), context);
                             return;
                           }
                         }
 
                         final nav = Navigator.of(ctx);
-                        final ttVm =
-                        Provider.of<SchoolExamTimeTableViewModel>(
+                        final ttVm = Provider.of<SchoolExamTimeTableViewModel>(
                             context,
                             listen: false);
                         final outerCtx = context;
 
-                        final finalExamId =
-                            _sheetExamId ?? _viewExamId;
-                        final finalClassId =
-                            _addClassId ?? entry?.classId?.toString();
+                        final finalExamId = _sheetExamId ?? _viewExamId;
+                        final finalClassId = _addClassId ?? entry?.classId?.toString();
                         final finalSectionId = _addSectionId ??
                             entry?.sectionId?.toString();
                         final finalSubjectId = _selectedSubjectId ??
@@ -1063,28 +1014,20 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                             finalClassId == null ||
                             finalSectionId == null ||
                             finalSubjectId == null) {
-                          Utils.show(
-                              'Some required fields are missing',
-                              context);
+                          Utils.show('exam.some_fields_missing'.tr(), context);
                           return;
                         }
 
-                        final int? examIdInt =
-                        int.tryParse(finalExamId);
-                        final int? classIdInt =
-                        int.tryParse(finalClassId);
-                        final int? sectionIdInt =
-                        int.tryParse(finalSectionId);
-                        final int? subjectIdInt =
-                        int.tryParse(finalSubjectId);
+                        final int? examIdInt = int.tryParse(finalExamId);
+                        final int? classIdInt = int.tryParse(finalClassId);
+                        final int? sectionIdInt = int.tryParse(finalSectionId);
+                        final int? subjectIdInt = int.tryParse(finalSubjectId);
 
                         if (examIdInt == null ||
                             classIdInt == null ||
                             sectionIdInt == null ||
                             subjectIdInt == null) {
-                          Utils.show(
-                              'Invalid ID values, please reselect',
-                              context);
+                          Utils.show('exam.invalid_ids'.tr(), context);
                           return;
                         }
 
@@ -1100,8 +1043,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                           finalEndTime,
                           _ttRoomNoCtrl.text.trim(),
                           int.tryParse(_ttMaxMarksCtrl.text.trim()),
-                          int.tryParse(
-                              _ttMinPassingMarksCtrl.text.trim()),
+                          int.tryParse(_ttMinPassingMarksCtrl.text.trim()),
                           _ttInstructionsCtrl.text.trim(),
                           context,
                         ).then((_) {
@@ -1144,35 +1086,29 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
             width: 170,
             child: AppButton(
               title: _tabController.index == 0
-                  ? "Add Exam"
-                  : "Add Timetable",
+                  ? "exam.add_exam".tr()
+                  : "exam.add_timetable".tr(),
               icon: Icons.add_rounded,
               height: 50,
               radius: 15,
               onTap: () {
-
                 if (_tabController.index == 0) {
-
                   if (!PermissionGuard.check(
                     context,
                     PermissionKeys.createExam,
-                    "Create Exam",
+                    "exam.add_exam".tr(),
                   )) {
                     return;
                   }
-
                   _showExamBottomSheet();
-
                 } else {
-
                   if (!PermissionGuard.check(
                     context,
                     PermissionKeys.createExamTimetable,
-                    "Create Exam Timetable",
+                    "exam.add_timetable".tr(),
                   )) {
                     return;
                   }
-
                   _showTimetableBottomSheet();
                 }
               },
@@ -1204,14 +1140,12 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     );
   }
 
-
   Widget _buildHeader(List exams) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 50, 16, 0),
       decoration: BoxDecoration(
         gradient: AppColor.primaryGradient,
-        borderRadius:
-        const BorderRadius.vertical(bottom: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
               color: AppColor.blueShadow,
@@ -1237,7 +1171,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: AppText.customText('Exam Management',
+                child: AppText.customText('exam.title'.tr(),
                     size: 20,
                     weight: FontWeight.bold,
                     color: Colors.white),
@@ -1261,11 +1195,11 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
           const SizedBox(height: 20),
           Row(
             children: [
-              _statCard('Total', exams.length.toString(),
+              _statCard('exam.total'.tr(), exams.length.toString(),
                   Icons.assignment, Colors.purple),
               const SizedBox(width: 10),
               _statCard(
-                  'Scheduled',
+                  'exam.scheduled'.tr(),
                   exams
                       .where((e) => e.status == 'scheduled')
                       .length
@@ -1274,7 +1208,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                   Colors.blue),
               const SizedBox(width: 10),
               _statCard(
-                  'Cancelled',
+                  'exam.cancelled'.tr(),
                   exams
                       .where((e) => e.status == 'cancelled')
                       .length
@@ -1302,14 +1236,14 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                   fontWeight: FontWeight.bold, fontSize: 13),
               dividerColor: Colors.transparent,
               padding: const EdgeInsets.all(4),
-              tabs: const [
+              tabs: [
                 Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.assignment, size: 16),
-                      SizedBox(width: 6),
-                      Text('Exams'),
+                      const SizedBox(width: 6),
+                      Text('exam.exams'.tr()),
                     ],
                   ),
                 ),
@@ -1318,8 +1252,8 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(Icons.table_chart, size: 16),
-                      SizedBox(width: 6),
-                      Text('Timetable'),
+                      const SizedBox(width: 6),
+                      Text('exam.timetable'.tr()),
                     ],
                   ),
                 ),
@@ -1332,12 +1266,11 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     );
   }
 
-
   Widget _buildExamsTab(ExamManagementViewModel vm, List exams) {
     if (vm.loading) return _shimmer();
     if (exams.isEmpty) {
       return _emptyView(
-          'No Exams Found', 'Tap + to add your first exam', Icons.assignment);
+          'exam.no_exams_found'.tr(), 'exam.tap_to_add_exam'.tr(), Icons.assignment);
     }
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 90),
@@ -1383,13 +1316,13 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                       AppText.customText(exam.examName ?? 'N/A',
                           size: 16, weight: FontWeight.bold),
                       const SizedBox(height: 4),
-                        _iconRow(Icons.calendar_today, exam.startDate != null
-                          ? 'Start Date: ${_formatDate(exam.startDate)}'
-                          : 'No Start date'),
+                      _iconRow(Icons.calendar_today, exam.startDate != null
+                          ? '${'exam.start_date'.tr()}: ${_formatDate(exam.startDate)}'
+                          : 'exam.no_start_date'.tr()),
                       const SizedBox(height: 2),
                       _iconRow(Icons.school, exam.endDate != null
-                          ? 'End Date: ${_formatDate(exam.endDate)}'
-                          : 'No end date'),
+                          ? '${'exam.end_date'.tr()}: ${_formatDate(exam.endDate)}'
+                          : 'exam.no_end_date'.tr()),
                       const SizedBox(height: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -1418,43 +1351,29 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                       onTap: () => Future.delayed(
                         Duration.zero,
                             () {
-
                           if (!PermissionExtensions.canAccess(
                               PermissionKeys.editExam)) {
-
-                            Utils.show(
-                              "You don't have permission to perform this action",
-                              context,
-                            );
-
+                            Utils.show('exam.permission_denied'.tr(), context);
                             return;
                           }
-
                           _showExamBottomSheet(exam: exam);
                         },
                       ),
-                      child: _menuRow(Icons.edit, 'Edit', Colors.blue),
+                      child: _menuRow(Icons.edit, 'exam.edit'.tr(), Colors.blue),
                     ),
                     PopupMenuItem(
                       onTap: () => Future.delayed(
                         Duration.zero,
                             () {
-
                           if (!PermissionExtensions.canAccess(
                               PermissionKeys.deleteExam)) {
-
-                            Utils.show(
-                              "You don't have permission to perform this action",
-                              context,
-                            );
-
+                            Utils.show('exam.permission_denied'.tr(), context);
                             return;
                           }
-
                           _showDeleteExamDialog(exam);
                         },
                       ),
-                      child: _menuRow(Icons.delete, 'Delete', Colors.red),
+                      child: _menuRow(Icons.delete, 'exam.delete'.tr(), Colors.red),
                     ),
                   ],
                 ),
@@ -1469,9 +1388,9 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _chip(Icons.calendar_month,
-                    'Year: ${exam.academicYear ?? 'N/A'}'),
+                    '${'exam.year'.tr()}: ${exam.academicYear ?? 'N/A'}'),
                 _chip(Icons.event_available,
-                    'Result: ${_formatDate(exam.resultDate)}'),
+                    '${'exam.result'.tr()}: ${_formatDate(exam.resultDate)}'),
               ],
             ),
           ),
@@ -1479,7 +1398,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
       ),
     );
   }
-
 
   Widget _buildTimetableTab(
       SchoolExamTimeTableViewModel ttVm, List exams) {
@@ -1501,19 +1419,19 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
           const SizedBox(height: 8),
           if (_viewExamId == null)
             _emptyView(
-                'Select an Exam',
-                'Choose an exam above to view its timetable',
+                'exam.select_exam_first'.tr(),
+                'exam.select_exam_subtitle'.tr(),
                 Icons.assignment_outlined)
           else if (_viewClassId == null || _viewSectionId == null)
             _emptyView(
-                'Select Class & Section',
-                'Choose class and section to load timetable',
+                'exam.select_class_section'.tr(),
+                'exam.select_class_section_subtitle'.tr(),
                 Icons.filter_list)
           else if (ttVm.loading)
               _shimmer()
             else if (ttVm.filterByDay(_filterDay).isEmpty)
-                _emptyView('No Timetable Entries',
-                    'Tap + to add a timetable entry', Icons.table_chart)
+                _emptyView('exam.no_timetable_entries'.tr(),
+                    'exam.tap_to_add_timetable'.tr(), Icons.table_chart)
               else
                 ListView.builder(
                   shrinkWrap: true,
@@ -1522,9 +1440,10 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                   itemCount: ttVm.filterByDay(_filterDay).length,
                   itemBuilder: (_, i) => _animated(
                     i,
-                    _timetableCard(ttVm.filterByDay(_filterDay)[i]), // ✅ cast hata do
+                    _timetableCard(ttVm.filterByDay(_filterDay)[i]),
                   ),
-                ),          SizedBox(height: screenHeight * 0.03),
+                ),
+          SizedBox(height: screenHeight * 0.03),
         ],
       ),
     );
@@ -1566,7 +1485,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                       color: Colors.white, size: 18),
                 ),
                 const SizedBox(width: 10),
-                AppText.customText('Select Exam',
+                AppText.customText('exam.select_exam'.tr(),
                     size: 14,
                     weight: FontWeight.bold,
                     color: Colors.white),
@@ -1579,7 +1498,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                       color: Colors.white.withOpacity(0.25),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: AppText.customText('Selected ✓',
+                    child: AppText.customText('exam.selected'.tr(),
                         size: 11,
                         weight: FontWeight.w600,
                         color: Colors.white),
@@ -1596,7 +1515,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
               icon: Icon(Icons.keyboard_arrow_down_rounded,
                   color: AppColor.lightBlueColor),
               decoration: InputDecoration(
-                hintText: 'Choose an exam to view timetable',
+                hintText: 'exam.select_exam_hint'.tr(),
                 hintStyle: TextStyle(
                     color: AppColor.softGreyText, fontSize: 13),
                 filled: true,
@@ -1687,7 +1606,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                 Icon(Icons.filter_alt_rounded,
                     color: AppColor.lightBlueColor, size: 18),
                 const SizedBox(width: 8),
-                AppText.customText('Filter by Class & Section',
+                AppText.customText('exam.filter_by_class_section'.tr(),
                     size: 13,
                     weight: FontWeight.w600,
                     color: AppColor.lightBlueColor),
@@ -1698,7 +1617,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
             padding: const EdgeInsets.all(14),
             child: Row(
               children: [
-                // ── Class ──
                 Expanded(
                   child: Consumer<AllClassesViewModel>(
                     builder: (context, vm, _) {
@@ -1716,7 +1634,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                                   size: 13,
                                   color: AppColor.lightBlueColor),
                               const SizedBox(width: 4),
-                              AppText.customText('Class',
+                              AppText.customText('exam.class'.tr(),
                                   size: 12,
                                   weight: FontWeight.w600,
                                   color: AppColor.lightBlueColor),
@@ -1732,7 +1650,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                                 color: AppColor.lightBlueColor,
                                 size: 20),
                             decoration: InputDecoration(
-                              hintText: 'Select',
+                              hintText: 'exam.select'.tr(),
                               hintStyle: TextStyle(
                                   color: AppColor.softGreyText,
                                   fontSize: 12),
@@ -1802,7 +1720,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                         size: 14, color: AppColor.lightBlueColor),
                   ),
                 ),
-                // ── Section ──
                 Expanded(
                   child: Consumer<AllSectionsViewModel>(
                     builder: (context, vm, _) {
@@ -1820,7 +1737,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                                   size: 13,
                                   color: AppColor.lightBlueColor),
                               const SizedBox(width: 4),
-                              AppText.customText('Section',
+                              AppText.customText('exam.section'.tr(),
                                   size: 12,
                                   weight: FontWeight.w600,
                                   color: AppColor.lightBlueColor),
@@ -1840,8 +1757,8 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                             ),
                             decoration: InputDecoration(
                               hintText: _viewClassId == null
-                                  ? 'Pick class first'
-                                  : 'Select',
+                                  ? 'exam.pick_class_first'.tr()
+                                  : 'exam.select'.tr(),
                               hintStyle: TextStyle(
                                   color: AppColor.softGreyText,
                                   fontSize: 12),
@@ -1888,7 +1805,6 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                                 : (v) {
                               setState(
                                       () => _viewSectionId = v);
-                              // ✅ SchoolExamTimeTableViewModel.getExamTimetable call
                               if (_viewExamId != null &&
                                   _viewClassId != null &&
                                   v != null) {
@@ -1933,7 +1849,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                       color: Colors.green, size: 16),
                   const SizedBox(width: 6),
                   AppText.customText(
-                    'Loading timetable for selected class & section…',
+                    'exam.loading_timetable'.tr(),
                     size: 11,
                     color: Colors.green.shade700,
                     weight: FontWeight.w500,
@@ -1946,7 +1862,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _timetableCard(ExamTimetableData e) {  // ✅ ExamTimetableData → TimetableData
+  Widget _timetableCard(ExamTimetableData e) {
     final dc = const Color(0xFF607D8B);
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -1977,7 +1893,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
-                    _formatDate(e.examDate),   // ✅ TimetableData mein examDate
+                    _formatDate(e.examDate),
                     style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -2017,10 +1933,10 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                           size: 15, weight: FontWeight.bold),
                       const SizedBox(height: 4),
                       _iconRow(Icons.meeting_room,
-                          'Room: ${e.roomNo ?? 'N/A'}'),
+                          '${'exam.room'.tr()}: ${e.roomNo ?? 'N/A'}'),
                       const SizedBox(height: 2),
                       _iconRow(Icons.score,
-                          'Max Marks: ${e.maxMarks ?? 'N/A'}'),
+                          '${'exam.max_marks_label'.tr()}: ${e.maxMarks ?? 'N/A'}'),
                     ],
                   ),
                 ),
@@ -2034,14 +1950,14 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
                         Duration.zero,
                             () => _showTimetableBottomSheet(entry: e),
                       ),
-                      child: _menuRow(Icons.edit, 'Edit', Colors.blue),
+                      child: _menuRow(Icons.edit, 'exam.edit'.tr(), Colors.blue),
                     ),
                     PopupMenuItem(
                       onTap: () => Future.delayed(
                         Duration.zero,
                             () => _showDeleteTimetableDialog(e),
                       ),
-                      child: _menuRow(Icons.delete, 'Delete', Colors.red),
+                      child: _menuRow(Icons.delete, 'exam.delete'.tr(), Colors.red),
                     ),
                   ],
                 ),
@@ -2057,8 +1973,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
       String label, String value, IconData icon, Color color) {
     return Expanded(
       child: Container(
-        padding:
-        const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         decoration: BoxDecoration(
           color: AppColor.glassWhite,
           borderRadius: BorderRadius.circular(16),
@@ -2085,8 +2000,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         margin: const EdgeInsets.only(right: 8),
-        padding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           gradient: sel ? AppColor.primaryGradient : null,
           color: sel ? null : AppColor.cardWhite,
@@ -2102,8 +2016,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
           day,
           style: TextStyle(
             color: sel ? Colors.white : AppColor.softGreyText,
-            fontWeight:
-            sel ? FontWeight.bold : FontWeight.normal,
+            fontWeight: sel ? FontWeight.bold : FontWeight.normal,
             fontSize: 12,
           ),
         ),
@@ -2188,8 +2101,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
       animation: _animController,
       builder: (_, c) {
         final delay = (i * 0.08).clamp(0.0, 0.9);
-        final raw =
-            (_animController.value - delay) / (1.0 - delay);
+        final raw = (_animController.value - delay) / (1.0 - delay);
         final val = Curves.easeOut.transform(raw.clamp(0.0, 1.0));
         return Transform.translate(
           offset: Offset(0, 30 * (1 - val)),
@@ -2279,7 +2191,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
         TextField(
           controller: ctrl,
           readOnly: true,
-          decoration: _inputDeco('Select date', icon),
+          decoration: _inputDeco('exam.select_date'.tr(), icon),
           onTap: () async {
             final picked = await showDatePicker(
               context: ctx,
@@ -2316,7 +2228,7 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
         TextField(
           controller: ctrl,
           readOnly: true,
-          decoration: _inputDeco('Select time', icon),
+          decoration: _inputDeco('exam.select_time'.tr(), icon),
           onTap: () async {
             final picked = await showTimePicker(
               context: ctx,
@@ -2341,12 +2253,12 @@ class _ExamScreenState extends State<ExamScreen> with TickerProviderStateMixin {
     required VoidCallback onPressed,
   }) {
     return SizedBox(
-      width: double.infinity,
-      height: 50,
-      child: AppButton(
-        title: label,
-        onTap: onPressed,
-      )
+        width: double.infinity,
+        height: 50,
+        child: AppButton(
+          title: label,
+          onTap: onPressed,
+        )
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -582,16 +583,17 @@ class _AccountantManagementDashBoardScreenState
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
+                // In drawer items:
                 _drawerItem(
                   icon: Icons.shield_outlined,
-                  title: 'Privacy Policy',
+                  title: 'cms.privacy_policy'.tr(),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CmsScreen(
+                        builder: (_) => CmsScreen(
                           pageType: "privacy_policy",
-                          title: "Privacy Policy",
+                          title: 'cms.privacy_policy'.tr(),
                         ),
                       ),
                     );
@@ -599,14 +601,14 @@ class _AccountantManagementDashBoardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.description_outlined,
-                  title: 'Terms & Conditions',
+                  title: 'cms.terms_conditions'.tr(),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CmsScreen(
+                        builder: (_) => CmsScreen(
                           pageType: "terms_conditions",
-                          title: "Terms & Conditions",
+                          title: 'cms.terms_conditions'.tr(),
                         ),
                       ),
                     );
@@ -614,14 +616,14 @@ class _AccountantManagementDashBoardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.info_outline_rounded,
-                  title: 'About Us',
+                  title: 'cms.about_us'.tr(),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CmsScreen(
+                        builder: (_) => CmsScreen(
                           pageType: "about_us",
-                          title: "About Us",
+                          title: 'cms.about_us'.tr(),
                         ),
                       ),
                     );

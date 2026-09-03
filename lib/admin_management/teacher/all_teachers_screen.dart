@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,7 +29,11 @@ class AllTeacherListScreen extends StatefulWidget {
 
 class _AllTeacherListScreenState extends State
     with SingleTickerProviderStateMixin {
-  Future<void> pickImage(ImageSource source, bool isTeacherPhoto, StateSetter setSheetState) async {
+  Future<void> pickImage(
+    ImageSource source,
+    bool isTeacherPhoto,
+    StateSetter setSheetState,
+  ) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: source, imageQuality: 80);
     if (picked != null) {
@@ -41,6 +46,7 @@ class _AllTeacherListScreenState extends State
       });
     }
   }
+
   late AnimationController _animationController;
   String? selectedClassId;
   String? selectedSectionId;
@@ -48,17 +54,21 @@ class _AllTeacherListScreenState extends State
   File? aadharCard;
   Future<void> _onRefresh() async {
     _animationController.reset();
-    await Provider.of<AllTeachersListVieModel>(context, listen: false)
-        .allTeachersListApi(context);
+    await Provider.of<AllTeachersListVieModel>(
+      context,
+      listen: false,
+    ).allTeachersListApi(context);
     _animationController.forward();
   }
-// AllTeacherModel mein
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AllTeachersListVieModel>(context, listen: false)
-          .allTeachersListApi(context);
+      Provider.of<AllTeachersListVieModel>(
+        context,
+        listen: false,
+      ).allTeachersListApi(context);
     });
     _animationController = AnimationController(
       vsync: this,
@@ -75,19 +85,25 @@ class _AllTeacherListScreenState extends State
   void _snack(BuildContext ctx, String msg) {
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(
-        content: Row(children: [
-          const Icon(Icons.info_outline_rounded,
-              color: Colors.white, size: 18),
-          const SizedBox(width: 8),
-          Expanded(
-              child: Text(msg,
-                  style:
-                  const TextStyle(fontWeight: FontWeight.w500))),
-        ]),
+        content: Row(
+          children: [
+            const Icon(
+              Icons.info_outline_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                msg,
+                style: const TextStyle(fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
         backgroundColor: AppColor.error,
         behavior: SnackBarBehavior.floating,
-        shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
       ),
     );
@@ -100,7 +116,7 @@ class _AllTeacherListScreenState extends State
     required File? file,
     required Function(ImageSource) onPickImage,
     required StateSetter setSheetState,
-    String? existingImageUrl, // existing server image URL
+    String? existingImageUrl,
   }) {
     final bool hasLocalFile = file != null;
     final bool hasNetworkImage =
@@ -131,7 +147,6 @@ class _AllTeacherListScreenState extends State
               backgroundColor: Colors.transparent,
               builder: (_) => SafeArea(
                 child: Container(
-
                   margin: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: AppColor.bg,
@@ -152,7 +167,7 @@ class _AllTeacherListScreenState extends State
                       const SizedBox(height: 16),
                       ListTile(
                         leading: const Icon(Icons.camera_alt_outlined),
-                        title: const Text("Take Photo"),
+                        title: Text('all_teachers.take_photo'.tr()),
                         onTap: () {
                           Navigator.pop(context);
                           onPickImage(ImageSource.camera);
@@ -160,7 +175,7 @@ class _AllTeacherListScreenState extends State
                       ),
                       ListTile(
                         leading: const Icon(Icons.photo_library_outlined),
-                        title: const Text("Choose from Gallery"),
+                        title: Text('all_teachers.choose_gallery'.tr()),
                         onTap: () {
                           Navigator.pop(context);
                           onPickImage(ImageSource.gallery);
@@ -187,164 +202,172 @@ class _AllTeacherListScreenState extends State
               ),
             ),
             child: hasLocalFile
-            // 1. Naya pick kiya local file
                 ? ClipRRect(
-              borderRadius: BorderRadius.circular(13),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.file(file, fit: BoxFit.cover),
-                  Positioned(
-                    top: 6,
-                    right: 6,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: AppColor.success,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.check_rounded,
-                          color: Colors.white, size: 14),
-                    ),
-                  ),
-                ],
-              ),
-            )
-                : hasNetworkImage
-            // 2. Server se existing image
-                ? ClipRRect(
-              borderRadius: BorderRadius.circular(13),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.network(
-                    existingImageUrl,
-                    fit: BoxFit.cover,
-                    loadingBuilder:
-                        (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColor.primary,
-                          value: loadingProgress
-                              .expectedTotalBytes !=
-                              null
-                              ? loadingProgress
-                              .cumulativeBytesLoaded /
-                              loadingProgress
-                                  .expectedTotalBytes!
-                              : null,
+                    borderRadius: BorderRadius.circular(13),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.file(file, fit: BoxFit.cover),
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColor.success,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.check_rounded,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                          ),
                         ),
-                      );
-                    },
-                    errorBuilder: (_, __, ___) => const Center(
-                      child: Icon(
-                          Icons.broken_image_outlined,
-                          size: 32,
-                          color: AppColor.sub),
+                      ],
                     ),
-                  ),
-                  // "Tap to change" overlay
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      padding:
-                      const EdgeInsets.symmetric(vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.45),
-                        borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(13)),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.edit_outlined,
-                              color: Colors.white, size: 12),
-                          SizedBox(width: 4),
-                          Text("Tap to change",
-                              style: TextStyle(
+                  )
+                : hasNetworkImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(13),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.network(
+                          existingImageUrl,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColor.primary,
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                          errorBuilder: (_, __, ___) => const Center(
+                            child: Icon(
+                              Icons.broken_image_outlined,
+                              size: 32,
+                              color: AppColor.sub,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.45),
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(13),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.edit_outlined,
                                   color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500)),
-                        ],
-                      ),
+                                  size: 12,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'all_teachers.tap_to_change'.tr(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppColor.success,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.check_rounded,
+                              color: Colors.white,
+                              size: 14,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  Positioned(
-                    top: 6,
-                    right: 6,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: AppColor.success,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.check_rounded,
-                          color: Colors.white, size: 14),
-                    ),
-                  ),
-                ],
-              ),
-            )
-            // 3. Koi image nahi
+                  )
                 : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.add_photo_alternate_outlined,
-                    size: 28,
-                    color: AppColor.sub.withOpacity(0.6)),
-                const SizedBox(height: 6),
-                Text(
-                  "Tap to upload",
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: AppColor.sub.withOpacity(0.7),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_photo_alternate_outlined,
+                        size: 28,
+                        color: AppColor.sub.withOpacity(0.6),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'all_teachers.tap_to_upload'.tr(),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColor.sub.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         ),
       ],
     );
   }
+
   void _openAccountantSheet({AllTeacherModel? existing}) {
     final isEdit = existing != null;
 
-    final nameCtrl =
-    TextEditingController(text: existing?.name ?? '');
-    final emailCtrl =
-    TextEditingController(text: existing?.userEmail ?? '');
+    final nameCtrl = TextEditingController(text: existing?.name ?? '');
+    final emailCtrl = TextEditingController(text: existing?.userEmail ?? '');
     final passwordCtrl = TextEditingController();
-    final qualificationCtrl =
-    TextEditingController(text: existing?.qualification ?? '');
-    // final experienceCtrl = TextEditingController(
-    //     text: existing?.experienceYears?.toString() ?? '');
-    // ✅ BAAD MEIN (Fix)
+    final qualificationCtrl = TextEditingController(
+      text: existing?.qualification ?? '',
+    );
     final experienceCtrl = TextEditingController(
-        text: existing?.experienceYears != null
-            ? existing!.experienceYears!.toInt().toString()  // "5.0" → "5"
-            : '');
-    final joiningDateCtrl =
-    TextEditingController(text: existing?.joiningDate ?? '');
-    final mobileCtrl =
-    TextEditingController(text: existing?.mobileNumber ?? '');
-    final addressCtrl =
-    TextEditingController(text: existing?.address ?? '');
-    final fatherNameCtrl =
-    TextEditingController(text: existing?.fatherName ?? '');
-    final motherNameCtrl =
-    TextEditingController(text: existing?.motherName ?? '');
-    final employeeIdCtrl =
-    TextEditingController(text: existing?.employeeId ?? '');
-    final designationCtrl =
-    TextEditingController(text: existing?.designation ?? '');
-    final dobCtrl =
-    TextEditingController(text: existing?.dob ?? '');
+      text: existing?.experienceYears != null
+          ? existing!.experienceYears!.toInt().toString()
+          : '',
+    );
+    final joiningDateCtrl = TextEditingController(
+      text: existing?.joiningDate ?? '',
+    );
+    final mobileCtrl = TextEditingController(
+      text: existing?.mobileNumber ?? '',
+    );
+    final addressCtrl = TextEditingController(text: existing?.address ?? '');
+    final fatherNameCtrl = TextEditingController(
+      text: existing?.fatherName ?? '',
+    );
+    final motherNameCtrl = TextEditingController(
+      text: existing?.motherName ?? '',
+    );
+    final employeeIdCtrl = TextEditingController(
+      text: existing?.employeeId ?? '',
+    );
+    final designationCtrl = TextEditingController(
+      text: existing?.designation ?? '',
+    );
+    final dobCtrl = TextEditingController(text: existing?.dob ?? '');
 
     bool obscurePassword = true;
     bool isLoading = false;
@@ -354,28 +377,26 @@ class _AllTeacherListScreenState extends State
       "Full Time",
       "Part Time",
       "Contract",
-      "Temporary"
+      "Temporary",
     ];
 
     String? selectedGender;
     String? selectedEmploymentType;
 
-    // Normalize gender from API
     if (existing?.gender != null && existing!.gender!.isNotEmpty) {
       final apiGender = existing.gender!.toLowerCase();
       selectedGender = genderOptions.firstWhere(
-            (g) => g.toLowerCase() == apiGender,
+        (g) => g.toLowerCase() == apiGender,
         orElse: () => '',
       );
       if (selectedGender!.isEmpty) selectedGender = null;
     }
 
-    // Normalize employment type from API
     if (existing?.employmentType != null &&
         existing!.employmentType!.isNotEmpty) {
       final apiType = existing.employmentType!.toLowerCase();
       selectedEmploymentType = employmentOptions.firstWhere(
-            (e) => e.toLowerCase() == apiType,
+        (e) => e.toLowerCase() == apiType,
         orElse: () => '',
       );
       if (selectedEmploymentType!.isEmpty) selectedEmploymentType = null;
@@ -392,72 +413,72 @@ class _AllTeacherListScreenState extends State
               final bottom = MediaQuery.of(ctx).viewInsets.bottom;
 
               Future handleSubmit() async {
-                // ── ADD MODE VALIDATION ──
                 if (!isEdit) {
                   if (nameCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter full name");
+                    _snack(ctx, 'all_teachers.errors.enter_full_name'.tr());
                     return;
                   }
                   final email = emailCtrl.text.trim();
                   if (email.isEmpty) {
-                    _snack(ctx, "Please enter email");
+                    _snack(ctx, 'all_teachers.errors.enter_email'.tr());
                     return;
                   }
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                      .hasMatch(email)) {
-                    _snack(ctx, "Please enter a valid email");
+                  if (!RegExp(
+                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                  ).hasMatch(email)) {
+                    _snack(ctx, 'all_teachers.errors.valid_email'.tr());
                     return;
                   }
                   if (passwordCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter password");
+                    _snack(ctx, 'all_teachers.errors.enter_password'.tr());
                     return;
                   }
                   if (employeeIdCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter employee ID");
+                    _snack(ctx, 'all_teachers.errors.enter_employee_id'.tr());
                     return;
                   }
                   if (selectedGender == null) {
-                    _snack(ctx, "Please select gender");
+                    _snack(ctx, 'all_teachers.errors.select_gender'.tr());
                     return;
                   }
                   if (selectedEmploymentType == null) {
-                    _snack(ctx, "Please select employment type");
+                    _snack(ctx, 'all_teachers.errors.select_employment'.tr());
                     return;
                   }
                   if (designationCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter designation");
+                    _snack(ctx, 'all_teachers.errors.enter_designation'.tr());
                     return;
                   }
                   if (qualificationCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter qualification");
+                    _snack(ctx, 'all_teachers.errors.enter_qualification'.tr());
                     return;
                   }
                   if (experienceCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter experience years");
+                    _snack(ctx, 'all_teachers.errors.enter_experience'.tr());
                     return;
                   }
                   if (joiningDateCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter joining date");
+                    _snack(ctx, 'all_teachers.errors.enter_joining_date'.tr());
                     return;
                   }
                   if (dobCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter date of birth");
+                    _snack(ctx, 'all_teachers.errors.enter_dob'.tr());
                     return;
                   }
                   if (mobileCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter mobile number");
+                    _snack(ctx, 'all_teachers.errors.enter_mobile'.tr());
                     return;
                   }
                   if (addressCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter address");
+                    _snack(ctx, 'all_teachers.errors.enter_address'.tr());
                     return;
                   }
                   if (fatherNameCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter father's name");
+                    _snack(ctx, 'all_teachers.errors.enter_father_name'.tr());
                     return;
                   }
                   if (motherNameCtrl.text.trim().isEmpty) {
-                    _snack(ctx, "Please enter mother's name");
+                    _snack(ctx, 'all_teachers.errors.enter_mother_name'.tr());
                     return;
                   }
                 }
@@ -481,26 +502,25 @@ class _AllTeacherListScreenState extends State
                     qualification: qualificationCtrl.text.trim().isEmpty
                         ? (existing!.qualification ?? '')
                         : qualificationCtrl.text.trim(),
-                    // ✅ BAAD MEIN
                     experinceYears: experienceCtrl.text.trim().isEmpty
                         ? (existing!.experienceYears != null
-                        ? existing!.experienceYears!.toInt().toString()
-                        : '')
-
+                              ? existing!.experienceYears!.toInt().toString()
+                              : '')
                         : experienceCtrl.text.trim(),
                     mobileNumber: mobileCtrl.text.trim().isEmpty
-                        ? (existing!.mobileNumber ?? '') : mobileCtrl.text.trim(),
+                        ? (existing!.mobileNumber ?? '')
+                        : mobileCtrl.text.trim(),
                     address: addressCtrl.text.trim().isEmpty
-                        ? (existing!.address ?? '') : addressCtrl.text.trim(),
+                        ? (existing!.address ?? '')
+                        : addressCtrl.text.trim(),
                     fatherName: fatherNameCtrl.text.trim().isEmpty
-                        ? (existing!.fatherName ?? '') : fatherNameCtrl.text.trim(),
+                        ? (existing!.fatherName ?? '')
+                        : fatherNameCtrl.text.trim(),
                     motherName: motherNameCtrl.text.trim().isEmpty
-                        ? (existing!.motherName ?? '') : motherNameCtrl.text.trim(),
-                    teacher_photo: teacherPhoto,   // ✅ state variable
+                        ? (existing!.motherName ?? '')
+                        : motherNameCtrl.text.trim(),
+                    teacher_photo: teacherPhoto,
                     aadharCard: aadharCard,
-                    // experinceYears: experienceCtrl.text.trim().isEmpty
-                    //     ? (existing!.experienceYears?.toString() ?? '')
-                    //     : experienceCtrl.text.trim(),
                     joining_date: joiningDateCtrl.text.trim().isEmpty
                         ? (existing!.joiningDate ?? '')
                         : joiningDateCtrl.text.trim(),
@@ -509,8 +529,10 @@ class _AllTeacherListScreenState extends State
                         ? (existing!.employeeId ?? '')
                         : employeeIdCtrl.text.trim(),
                     gender: selectedGender ?? existing!.gender ?? '',
-                    employmentType: selectedEmploymentType ??
-                        existing!.employmentType ?? '',
+                    employmentType:
+                        selectedEmploymentType ??
+                        existing!.employmentType ??
+                        '',
                     designation: designationCtrl.text.trim().isEmpty
                         ? (existing!.designation ?? '')
                         : designationCtrl.text.trim(),
@@ -539,7 +561,7 @@ class _AllTeacherListScreenState extends State
                     employmentType: selectedEmploymentType ?? '',
                     designation: designationCtrl.text.trim(),
                     dob: dobCtrl.text.trim(),
-                    teacher_photo: teacherPhoto,   // ← ADD THIS
+                    teacher_photo: teacherPhoto,
                     aadharCard: aadharCard,
                   );
                 }
@@ -556,8 +578,7 @@ class _AllTeacherListScreenState extends State
               return Container(
                 decoration: const BoxDecoration(
                   color: AppColor.bg,
-                  borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(32)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -573,10 +594,8 @@ class _AllTeacherListScreenState extends State
                     ),
                     const SizedBox(height: 4),
 
-                    // ── Header ──
                     Padding(
-                      padding:
-                      const EdgeInsets.fromLTRB(20, 14, 20, 16),
+                      padding: const EdgeInsets.fromLTRB(20, 14, 20, 16),
                       child: Row(
                         children: [
                           Container(
@@ -584,10 +603,7 @@ class _AllTeacherListScreenState extends State
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: isEdit
-                                    ? [
-                                  AppColor.editGradA,
-                                  AppColor.editGradB
-                                ]
+                                    ? [AppColor.editGradA, AppColor.editGradB]
                                     : [AppColor.gradA, AppColor.gradB],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -595,10 +611,11 @@ class _AllTeacherListScreenState extends State
                               borderRadius: BorderRadius.circular(14),
                               boxShadow: [
                                 BoxShadow(
-                                  color: (isEdit
-                                      ? AppColor.editGradA
-                                      : AppColor.primary)
-                                      .withOpacity(0.35),
+                                  color:
+                                      (isEdit
+                                              ? AppColor.editGradA
+                                              : AppColor.primary)
+                                          .withOpacity(0.35),
                                   blurRadius: 12,
                                   offset: const Offset(0, 4),
                                 ),
@@ -617,7 +634,9 @@ class _AllTeacherListScreenState extends State
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isEdit ? "Edit Teacher" : "Add Teacher",
+                                isEdit
+                                    ? 'all_teachers.edit_teacher_title'.tr()
+                                    : 'all_teachers.add_teacher_title'.tr(),
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -628,11 +647,12 @@ class _AllTeacherListScreenState extends State
                               const SizedBox(height: 2),
                               Text(
                                 isEdit
-                                    ? "Update the details below"
-                                    : "Fill in the details below",
+                                    ? 'all_teachers.update_details'.tr()
+                                    : 'all_teachers.fill_details'.tr(),
                                 style: const TextStyle(
-                                    fontSize: 12.5,
-                                    color: AppColor.sub),
+                                  fontSize: 12.5,
+                                  color: AppColor.sub,
+                                ),
                               ),
                             ],
                           ),
@@ -642,48 +662,54 @@ class _AllTeacherListScreenState extends State
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color:
-                                AppColor.border.withOpacity(0.6),
+                                color: AppColor.border.withOpacity(0.6),
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              child: const Icon(Icons.close_rounded,
-                                  size: 18, color: AppColor.sub),
+                              child: const Icon(
+                                Icons.close_rounded,
+                                size: 18,
+                                color: AppColor.sub,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    // Edit info banner
                     if (isEdit)
                       Padding(
-                        padding:
-                        const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                        padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 10),
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColor.success.withOpacity(0.09),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                                color:
-                                AppColor.success.withOpacity(0.25)),
+                              color: AppColor.success.withOpacity(0.25),
+                            ),
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.info_outline_rounded,
-                                  size: 16,
-                                  color:
-                                  AppColor.success.withOpacity(0.8)),
+                              Icon(
+                                Icons.info_outline_rounded,
+                                size: 16,
+                                color: AppColor.success.withOpacity(0.8),
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: RichText(
                                   text: TextSpan(
                                     style: const TextStyle(
-                                        fontSize: 12.5,
-                                        color: AppColor.sub),
+                                      fontSize: 12.5,
+                                      color: AppColor.sub,
+                                    ),
                                     children: [
-                                      const TextSpan(text: "Editing: "),
+                                      TextSpan(
+                                        text: 'all_teachers.editing'.tr(),
+                                      ),
                                       TextSpan(
                                         text: existing?.name ?? '',
                                         style: const TextStyle(
@@ -691,8 +717,10 @@ class _AllTeacherListScreenState extends State
                                           color: AppColor.success,
                                         ),
                                       ),
-                                      const TextSpan(
-                                          text: " • Password optional"),
+                                      TextSpan(
+                                        text:
+                                            '  •  ${'all_teachers.password_optional'.tr()}',
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -702,31 +730,28 @@ class _AllTeacherListScreenState extends State
                         ),
                       ),
 
-                    // ── Scrollable Fields ──
                     Flexible(
                       child: SingleChildScrollView(
-                        padding: EdgeInsets.fromLTRB(
-                            20, 4, 20, bottom + 24),
+                        padding: EdgeInsets.fromLTRB(20, 4, 20, bottom + 24),
                         child: Column(
                           children: [
-                            // ── Section 1 — Account Info ──
                             _sectionCard(
                               index: 1,
                               icon: Icons.manage_accounts_rounded,
-                              title: "Account Info",
+                              title: 'all_teachers.account_info'.tr(),
                               color: AppColor.lightBlueColor,
                               children: [
                                 _sheetField(
                                   nameCtrl,
-                                  "Full Name",
-                                  "e.g. Rahul Sharma",
+                                  'all_teachers.full_name'.tr(),
+                                  'all_teachers.full_name_hint'.tr(),
                                   Icons.person_outline_rounded,
                                 ),
                                 const SizedBox(height: 14),
                                 _sheetField(
                                   emailCtrl,
-                                  "Email Address",
-                                  "e.g. rahul@school.com",
+                                  'all_teachers.email_address'.tr(),
+                                  'all_teachers.email_hint'.tr(),
                                   Icons.email_outlined,
                                   keyboard: TextInputType.emailAddress,
                                 ),
@@ -735,205 +760,171 @@ class _AllTeacherListScreenState extends State
                                   ctrl: passwordCtrl,
                                   obscure: obscurePassword,
                                   isEdit: isEdit,
-                                  onToggle: () => setSheetState(() =>
-                                  obscurePassword =
-                                  !obscurePassword),
+                                  onToggle: () => setSheetState(
+                                    () => obscurePassword = !obscurePassword,
+                                  ),
                                 ),
                               ],
                             ),
 
                             const SizedBox(height: 16),
 
-                            // ── Section 2 — Professional Details ──
                             _sectionCard(
                               index: 2,
                               icon: Icons.work_outline_rounded,
-                              title: "Professional Details",
+                              title: 'all_teachers.professional_details'.tr(),
                               color: AppColor.success,
                               children: [
-                                // Employee ID
                                 _sheetField(
                                   employeeIdCtrl,
-                                  "Employee ID",
-                                  "e.g. EMP001",
+                                  'all_teachers.employee_id'.tr(),
+                                  'all_teachers.employee_id_hint'.tr(),
                                   Icons.badge_outlined,
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Gender
                                 _dropdownField(
-                                  label: "Gender",
+                                  label: 'all_teachers.gender'.tr(),
                                   icon: Icons.wc_outlined,
-                                  value: genderOptions
-                                      .contains(selectedGender)
+                                  value: genderOptions.contains(selectedGender)
                                       ? selectedGender
                                       : null,
-                                  hint: "Select Gender",
+                                  hint: 'all_teachers.select_gender'.tr(),
                                   items: genderOptions,
-                                  onChanged: (val) => setSheetState(
-                                          () => selectedGender = val),
+                                  onChanged: (val) =>
+                                      setSheetState(() => selectedGender = val),
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Employment Type
                                 _dropdownField(
-                                  label: "Employment Type",
+                                  label: 'all_teachers.employment_type'.tr(),
                                   icon: Icons.work_history_outlined,
-                                  value: employmentOptions.contains(
-                                      selectedEmploymentType)
+                                  value:
+                                      employmentOptions.contains(
+                                        selectedEmploymentType,
+                                      )
                                       ? selectedEmploymentType
                                       : null,
-                                  hint: "Select Employment Type",
+                                  hint: 'all_teachers.select_employment'.tr(),
                                   items: employmentOptions,
                                   onChanged: (val) => setSheetState(
-                                          () =>
-                                      selectedEmploymentType = val),
+                                    () => selectedEmploymentType = val,
+                                  ),
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Designation
                                 _sheetField(
                                   designationCtrl,
-                                  "Designation",
-                                  "e.g. Senior Teacher",
+                                  'all_teachers.designation'.tr(),
+                                  'all_teachers.designation_hint'.tr(),
                                   Icons.military_tech_outlined,
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Qualification
                                 _sheetField(
                                   qualificationCtrl,
-                                  "Qualification",
-                                  "e.g. B.Ed, M.Sc",
+                                  'all_teachers.qualification'.tr(),
+                                  'all_teachers.qualification_hint'.tr(),
                                   Icons.school_outlined,
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Experience
                                 _sheetField(
                                   experienceCtrl,
-                                  "Experience (Years)",
-                                  "e.g. 5",
+                                  'all_teachers.experience'.tr(),
+                                  'all_teachers.experience_hint'.tr(),
                                   Icons.timeline_outlined,
                                   keyboard: TextInputType.number,
                                   formatters: [
-                                    FilteringTextInputFormatter
-                                        .digitsOnly
+                                    FilteringTextInputFormatter.digitsOnly,
                                   ],
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Joining Date
                                 _dateField(joiningDateCtrl, ctx),
                               ],
                             ),
 
                             const SizedBox(height: 16),
 
-                            // ── Section 3 — Personal Info ──
                             _sectionCard(
                               index: 3,
                               icon: Icons.badge_outlined,
-                              title: "Personal Info",
+                              title: 'all_teachers.personal_info'.tr(),
                               color: const Color(0xFFF77F00),
                               children: [
-                                // Date of Birth
                                 _dobField(dobCtrl, ctx),
                                 const SizedBox(height: 14),
 
-                                // Mobile
                                 _sheetField(
                                   mobileCtrl,
-                                  "Mobile Number",
-                                  "e.g. 9876543210",
+                                  'all_teachers.mobile_number'.tr(),
+                                  'all_teachers.mobile_hint'.tr(),
                                   Icons.phone_outlined,
                                   keyboard: TextInputType.phone,
                                   formatters: [
-                                    FilteringTextInputFormatter
-                                        .digitsOnly,
+                                    FilteringTextInputFormatter.digitsOnly,
                                     LengthLimitingTextInputFormatter(10),
                                   ],
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Address
                                 _sheetField(
                                   addressCtrl,
-                                  "Address",
-                                  "Full residential address",
+                                  'all_teachers.address'.tr(),
+                                  'all_teachers.address_hint'.tr(),
                                   Icons.location_on_outlined,
                                   maxLines: 2,
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Father's Name
                                 _sheetField(
                                   fatherNameCtrl,
-                                  "Father's Name",
-                                  "e.g. Suresh Sharma",
+                                  'all_teachers.father_name'.tr(),
+                                  'all_teachers.father_hint'.tr(),
                                   Icons.family_restroom_outlined,
                                 ),
                                 const SizedBox(height: 14),
 
-                                // Mother's Name
                                 _sheetField(
                                   motherNameCtrl,
-                                  "Mother's Name",
-                                  "e.g. Sunita Sharma",
+                                  'all_teachers.mother_name'.tr(),
+                                  'all_teachers.mother_hint'.tr(),
                                   Icons.woman_outlined,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 16),
 
-// ── Section 4 — Documents / Photos ──
                             _sectionCard(
                               index: 4,
                               icon: Icons.photo_library_outlined,
-                              title: "Documents & Photo",
+                              title: 'all_teachers.documents_photo'.tr(),
                               color: const Color(0xFF7B2FBE),
                               children: [
-                                // Teacher Photo
-                                // Teacher Photo
-//                                 _imagePickerField(
-//                                   label: "Teacher Photo",
-//                                   icon: Icons.person_pin_outlined,
-//                                   file: teacherPhoto,
-//                                   onPickImage: (source) => pickImage(source, true, setSheetState),
-//                                 ),
-//                                 const SizedBox(height: 14),
-//
-// // Aadhar Card
-//                                 _imagePickerField(
-//                                   label: "Aadhar Card",
-//                                   icon: Icons.credit_card_outlined,
-//                                   file: aadharCard,
-//                                   onPickImage: (source) => pickImage(source, false, setSheetState),
-//                                 ),
-                                // Section 4 — Documents & Photo ke andar
-
                                 _imagePickerField(
-                                  label: "Teacher Photo",
+                                  label: 'all_teachers.teacher_photo'.tr(),
                                   icon: Icons.person_pin_outlined,
                                   file: teacherPhoto,
-                                  onPickImage: (source) => pickImage(source, true, setSheetState),
-                                  setSheetState: setSheetState,          // ✅ ADD
-                                  existingImageUrl: existing?.teacherPhotoUrl, // ✅ ADD
+                                  onPickImage: (source) =>
+                                      pickImage(source, true, setSheetState),
+                                  setSheetState: setSheetState,
+                                  existingImageUrl: existing?.teacherPhotoUrl,
                                 ),
                                 const SizedBox(height: 14),
                                 _imagePickerField(
-                                  label: "Aadhar Card",
+                                  label: 'all_teachers.aadhar_card'.tr(),
                                   icon: Icons.credit_card_outlined,
                                   file: aadharCard,
-                                  onPickImage: (source) => pickImage(source, false, setSheetState),
-                                  setSheetState: setSheetState,          // ✅ ADD
-                                  existingImageUrl: existing?.aadharCardUrl,   // ✅ ADD
+                                  onPickImage: (source) =>
+                                      pickImage(source, false, setSheetState),
+                                  setSheetState: setSheetState,
+                                  existingImageUrl: existing?.aadharCardUrl,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 28),
 
-                            // ── Buttons ──
                             if (isEdit)
                               Row(
                                 children: [
@@ -944,28 +935,35 @@ class _AllTeacherListScreenState extends State
                                       child: Container(
                                         height: 54,
                                         decoration: BoxDecoration(
-                                          color: AppColor.border
-                                              .withOpacity(0.4),
-                                          borderRadius:
-                                          BorderRadius.circular(16),
+                                          color: AppColor.border.withOpacity(
+                                            0.4,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
                                           border: Border.all(
-                                              color: AppColor.border,
-                                              width: 1.5),
+                                            color: AppColor.border,
+                                            width: 1.5,
+                                          ),
                                         ),
-                                        child: const Row(
+                                        child: Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                              MainAxisAlignment.center,
                                           children: [
-                                            Icon(Icons.close_rounded,
-                                                size: 18,
-                                                color: AppColor.sub),
-                                            SizedBox(width: 6),
-                                            Text("Cancel",
-                                                style: TextStyle(
-                                                    color: AppColor.sub,
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                    FontWeight.w600)),
+                                            Icon(
+                                              Icons.close_rounded,
+                                              size: 18,
+                                              color: AppColor.sub,
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'all_teachers.cancel'.tr(),
+                                              style: TextStyle(
+                                                color: AppColor.sub,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -976,8 +974,8 @@ class _AllTeacherListScreenState extends State
                                     flex: 3,
                                     child: AppButton(
                                       title: isLoading
-                                          ? "Saving..."
-                                          : "Save Changes",
+                                          ? 'all_teachers.saving'.tr()
+                                          : 'all_teachers.save_changes'.tr(),
                                       onTap: handleSubmit,
                                       height: 54,
                                       radius: 16,
@@ -992,8 +990,7 @@ class _AllTeacherListScreenState extends State
                                       textColor: Colors.white,
                                       icon: isLoading
                                           ? null
-                                          : Icons
-                                          .check_circle_outline_rounded,
+                                          : Icons.check_circle_outline_rounded,
                                       loading: isLoading,
                                     ),
                                   ),
@@ -1002,8 +999,8 @@ class _AllTeacherListScreenState extends State
                             else
                               AppButton(
                                 title: isLoading
-                                    ? "Adding Teacher..."
-                                    : "Add Teacher",
+                                    ? 'all_teachers.adding_teacher'.tr()
+                                    : 'all_teachers.add_teacher_btn'.tr(),
                                 onTap: handleSubmit,
                                 height: 54,
                                 radius: 16,
@@ -1039,7 +1036,7 @@ class _AllTeacherListScreenState extends State
       floatingActionButton: SizedBox(
         width: 170,
         child: AppButton(
-          title: "Add Teacher",
+          title: 'all_teachers.add_teacher'.tr(),
           icon: Icons.add_rounded,
           height: 50,
           radius: 18,
@@ -1047,23 +1044,20 @@ class _AllTeacherListScreenState extends State
             if (!PermissionGuard.check(
               context,
               PermissionKeys.addTeacher,
-              "Add Teacher",
+              'all_teachers.add_teacher'.tr(),
             )) {
               return;
             }
 
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const AddTeacherScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => const AddTeacherScreen()),
             );
           },
         ),
       ),
       body: Column(
         children: [
-          /// ===== CUSTOM HEADER =====
           Container(
             padding: const EdgeInsets.fromLTRB(14, 50, 20, 24),
             decoration: BoxDecoration(
@@ -1104,7 +1098,7 @@ class _AllTeacherListScreenState extends State
                 const SizedBox(width: 14),
                 Expanded(
                   child: AppText.customText(
-                    "All Teachers",
+                    'all_teachers.title'.tr(),
                     size: 20,
                     weight: FontWeight.bold,
                     color: Colors.white,
@@ -1122,63 +1116,51 @@ class _AllTeacherListScreenState extends State
 
           const SizedBox(height: 12),
 
-          /// ===== LIST =====
           Expanded(
             child: viewModel.loading
                 ? _shimmerList()
                 : teachers.isEmpty
                 ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.school_outlined,
-                    size: 60,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    "No Teachers Found",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey.shade600,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.school_outlined,
+                          size: 60,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'all_teachers.no_teachers_found'.tr(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : RefreshIndicator(
+                    color: AppColor.lightBlueColor,
+                    onRefresh: _onRefresh,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      itemCount: teachers.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index >= teachers.length) {
+                          return _teacherFooter(viewModel);
+                        }
+                        return _animatedTeacherCard(index, teachers[index]);
+                      },
                     ),
                   ),
-                ],
-              ),
-            )
-            //     : ListView.builder(
-            //   padding:
-            //   const EdgeInsets.fromLTRB(18, 8, 18, 20),
-            //   physics: const BouncingScrollPhysics(),
-            //   itemCount: teachers.length,
-            //   itemBuilder: (context, index) {
-            //     return _animatedTeacherCard(
-            //         index, teachers[index]);
-            //   },
-            // ),
-                : RefreshIndicator(
-              color: AppColor.lightBlueColor,
-              onRefresh: _onRefresh,
-              child: ListView.builder(
-                padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: teachers.length + 1, // ✅ +1 for footer
-                itemBuilder: (context, index) {
-                  if (index >= teachers.length) {
-                    return _teacherFooter(viewModel);
-                  }
-                  return _animatedTeacherCard(index, teachers[index]);
-                },
-              ),
-            ),
           ),
         ],
       ),
     );
   }
-
 
   Widget _teacherFooter(AllTeachersListVieModel viewModel) {
     if (!viewModel.hasMore) {
@@ -1187,7 +1169,7 @@ class _AllTeacherListScreenState extends State
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
       child: AppButton(
-        title: "View More",
+        title: 'all_teachers.view_more'.tr(),
         icon: Icons.expand_more_rounded,
         height: 48,
         radius: 14,
@@ -1199,9 +1181,6 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Shimmer
-  // ─────────────────────────────────────────────
   Widget _shimmerList() {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(18, 8, 18, 20),
@@ -1223,9 +1202,6 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Dropdown field helper
-  // ─────────────────────────────────────────────
   Widget _dropdownField({
     required String label,
     required IconData icon,
@@ -1253,15 +1229,18 @@ class _AllTeacherListScreenState extends State
           hint: Text(
             hint,
             style: TextStyle(
-                fontSize: 13.5,
-                color: AppColor.sub.withOpacity(0.6)),
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
           ),
           items: items
-              .map((item) =>
-              DropdownMenuItem(value: item, child: Text(item)))
+              .map((item) => DropdownMenuItem(value: item, child: Text(item)))
               .toList(),
-          icon: const Icon(Icons.keyboard_arrow_down_rounded,
-              color: AppColor.sub, size: 20),
+          icon: const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppColor.sub,
+            size: 20,
+          ),
           style: const TextStyle(
             fontSize: 14,
             color: AppColor.text,
@@ -1269,21 +1248,24 @@ class _AllTeacherListScreenState extends State
           ),
           dropdownColor: Colors.white,
           decoration: InputDecoration(
-            prefixIcon: Icon(icon,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
+            prefixIcon: Icon(
+              icon,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                  color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -1291,14 +1273,11 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Animated teacher card
-  // ─────────────────────────────────────────────
   Widget _animatedTeacherCard(int index, dynamic t) {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
-        final delay = (index * 0.08).clamp(0.0, 0.9); // ✅ negative-safe cap
+        final delay = (index * 0.08).clamp(0.0, 0.9);
         final value = Curves.easeOut.transform(
           (_animationController.value - delay).clamp(0.0, 1.0) / (1 - delay),
         );
@@ -1311,27 +1290,27 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Sheet field
-  // ─────────────────────────────────────────────
   Widget _sheetField(
-      TextEditingController ctrl,
-      String label,
-      String hint,
-      IconData icon, {
-        TextInputType keyboard = TextInputType.text,
-        List<TextInputFormatter>? formatters,
-        int maxLines = 1,
-      }) {
+    TextEditingController ctrl,
+    String label,
+    String hint,
+    IconData icon, {
+    TextInputType keyboard = TextInputType.text,
+    List<TextInputFormatter>? formatters,
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColor.sub,
-                letterSpacing: 0.3)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColor.sub,
+            letterSpacing: 0.3,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: ctrl,
@@ -1339,29 +1318,34 @@ class _AllTeacherListScreenState extends State
           inputFormatters: formatters,
           maxLines: maxLines,
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-                fontSize: 13.5,
-                color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon: Icon(icon,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              icon,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                  color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -1369,9 +1353,6 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Password field
-  // ─────────────────────────────────────────────
   Widget _passwordField({
     required TextEditingController ctrl,
     required bool obscure,
@@ -1383,26 +1364,31 @@ class _AllTeacherListScreenState extends State
       children: [
         Row(
           children: [
-            const Text("Password",
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColor.sub,
-                    letterSpacing: 0.3)),
+            Text(
+              'all_teachers.password'.tr(),
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColor.sub,
+                letterSpacing: 0.3,
+              ),
+            ),
             if (isEdit) ...[
               const SizedBox(width: 6),
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 7, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColor.success.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text("Optional",
-                    style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: AppColor.success)),
+                child: Text(
+                  'all_teachers.password_optional'.tr(),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColor.success,
+                  ),
+                ),
               ),
             ],
           ],
@@ -1412,17 +1398,23 @@ class _AllTeacherListScreenState extends State
           controller: ctrl,
           obscureText: obscure,
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           decoration: InputDecoration(
             hintText: isEdit
-                ? "Leave blank to keep current password"
-                : "Create a strong password",
+                ? 'all_teachers.password_hint_edit'.tr()
+                : 'all_teachers.password_hint'.tr(),
             hintStyle: TextStyle(
-                fontSize: 13, color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon: Icon(Icons.lock_outline_rounded,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
+              fontSize: 13,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              Icons.lock_outline_rounded,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
             suffixIcon: IconButton(
               onPressed: onToggle,
               icon: Icon(
@@ -1436,16 +1428,16 @@ class _AllTeacherListScreenState extends State
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                  color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -1453,32 +1445,32 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Joining Date field
-  // ─────────────────────────────────────────────
   Widget _dateField(TextEditingController ctrl, BuildContext ctx) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Joining Date",
-            style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColor.sub,
-                letterSpacing: 0.3)),
+        Text(
+          'all_teachers.joining_date'.tr(),
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: AppColor.sub,
+            letterSpacing: 0.3,
+          ),
+        ),
         const SizedBox(height: 6),
         TextFormField(
           controller: ctrl,
           readOnly: true,
           style: const TextStyle(
-              fontSize: 14,
-              color: AppColor.text,
-              fontWeight: FontWeight.w500),
+            fontSize: 14,
+            color: AppColor.text,
+            fontWeight: FontWeight.w500,
+          ),
           onTap: () async {
             DateTime initial = DateTime.now();
             try {
-              if (ctrl.text.isNotEmpty)
-                initial = DateTime.parse(ctrl.text);
+              if (ctrl.text.isNotEmpty) initial = DateTime.parse(ctrl.text);
             } catch (_) {}
             final picked = await showDatePicker(
               context: ctx,
@@ -1499,31 +1491,37 @@ class _AllTeacherListScreenState extends State
             );
             if (picked != null) {
               ctrl.text =
-              "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+                  "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
             }
           },
           decoration: InputDecoration(
-            hintText: "Select joining date",
+            hintText: 'all_teachers.joining_date_hint'.tr(),
             hintStyle: TextStyle(
-                fontSize: 13.5,
-                color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon: Icon(Icons.calendar_today_outlined,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
-            suffixIcon: const Icon(Icons.arrow_drop_down_rounded,
-                color: AppColor.sub),
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              Icons.calendar_today_outlined,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
+            suffixIcon: const Icon(
+              Icons.arrow_drop_down_rounded,
+              color: AppColor.sub,
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                  color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -1531,16 +1529,13 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Date of Birth field
-  // ─────────────────────────────────────────────
   Widget _dobField(TextEditingController ctrl, BuildContext ctx) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Date of Birth",
-          style: TextStyle(
+        Text(
+          'all_teachers.date_of_birth'.tr(),
+          style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
             color: AppColor.sub,
@@ -1559,8 +1554,7 @@ class _AllTeacherListScreenState extends State
           onTap: () async {
             DateTime initial = DateTime(2000);
             try {
-              if (ctrl.text.isNotEmpty)
-                initial = DateTime.parse(ctrl.text);
+              if (ctrl.text.isNotEmpty) initial = DateTime.parse(ctrl.text);
             } catch (_) {}
             final picked = await showDatePicker(
               context: ctx,
@@ -1581,31 +1575,37 @@ class _AllTeacherListScreenState extends State
             );
             if (picked != null) {
               ctrl.text =
-              "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+                  "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
             }
           },
           decoration: InputDecoration(
-            hintText: "Select date of birth",
+            hintText: 'all_teachers.dob_hint'.tr(),
             hintStyle: TextStyle(
-                fontSize: 13.5,
-                color: AppColor.sub.withOpacity(0.6)),
-            prefixIcon: Icon(Icons.cake_outlined,
-                size: 18, color: AppColor.primary.withOpacity(0.7)),
-            suffixIcon: const Icon(Icons.arrow_drop_down_rounded,
-                color: AppColor.sub),
+              fontSize: 13.5,
+              color: AppColor.sub.withOpacity(0.6),
+            ),
+            prefixIcon: Icon(
+              Icons.cake_outlined,
+              size: 18,
+              color: AppColor.primary.withOpacity(0.7),
+            ),
+            suffixIcon: const Icon(
+              Icons.arrow_drop_down_rounded,
+              color: AppColor.sub,
+            ),
             filled: true,
             fillColor: AppColor.primaryLight.withOpacity(0.5),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14, vertical: 12),
+              horizontal: 14,
+              vertical: 12,
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide:
-              const BorderSide(color: AppColor.border, width: 1.2),
+              borderSide: const BorderSide(color: AppColor.border, width: 1.2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(
-                  color: AppColor.primary, width: 1.8),
+              borderSide: const BorderSide(color: AppColor.primary, width: 1.8),
             ),
           ),
         ),
@@ -1613,9 +1613,6 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Section card
-  // ─────────────────────────────────────────────
   Widget _sectionCard({
     required int index,
     required IconData icon,
@@ -1629,9 +1626,10 @@ class _AllTeacherListScreenState extends State
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 16,
-              offset: const Offset(0, 4)),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Column(
@@ -1641,10 +1639,12 @@ class _AllTeacherListScreenState extends State
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
             decoration: BoxDecoration(
               color: color.withOpacity(0.06),
-              borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
               border: Border(
-                  bottom: BorderSide(color: color.withOpacity(0.12))),
+                bottom: BorderSide(color: color.withOpacity(0.12)),
+              ),
             ),
             child: Row(
               children: [
@@ -1652,51 +1652,55 @@ class _AllTeacherListScreenState extends State
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(8)),
+                    color: color,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Center(
-                    child: Text("$index",
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700)),
+                    child: Text(
+                      "$index",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Icon(icon, size: 18, color: color),
                 const SizedBox(width: 8),
-                Text(title,
-                    style: TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w600,
-                        color: color,
-                        letterSpacing: 0.2)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                    letterSpacing: 0.2,
+                  ),
+                ),
               ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: children),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ),
           ),
         ],
       ),
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Teacher card
-  // ─────────────────────────────────────────────
   Widget _teacherCard(dynamic t) {
     final w = MediaQuery.of(context).size.width;
     return GestureDetector(
       onTap: () {
-
         if (!PermissionGuard.check(
           context,
           PermissionKeys.viewOneTeacherProfile,
-          "View Teacher Profile",
+          'all_teachers.view_profile'.tr(),
         )) {
           return;
         }
@@ -1704,9 +1708,8 @@ class _AllTeacherListScreenState extends State
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SchoolTeachersDetailScreen(
-              teacherId: t.teacherId,
-            ),
+            builder: (context) =>
+                SchoolTeachersDetailScreen(teacherId: t.teacherId),
           ),
         );
       },
@@ -1727,19 +1730,16 @@ class _AllTeacherListScreenState extends State
           padding: EdgeInsets.all(w * 0.04),
           child: Row(
             children: [
-              // Avatar
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: AppColor.lightBlueColor,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Icons.person,
-                    color: Colors.white, size: 30),
+                child: const Icon(Icons.person, color: Colors.white, size: 30),
               ),
               SizedBox(width: w * 0.035),
 
-              // Teacher Info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1757,14 +1757,14 @@ class _AllTeacherListScreenState extends State
                     ),
                     const SizedBox(height: 4),
                     AppText.customText(
-                      "Designation: ${t.designation ?? "N/A"}",
+                      '${'all_teachers.designation_label'.tr()}: ${t.designation ?? "N/A"}',
                       size: 13,
                       weight: FontWeight.w600,
                       color: AppColor.lightBlueColor,
                     ),
                     const SizedBox(height: 2),
                     AppText.customText(
-                      "Emp ID: ${t.employeeId ?? "N/A"}  •  ${t.employmentType ?? "N/A"}",
+                      '${'all_teachers.emp_id'.tr()}: ${t.employeeId ?? "N/A"}  •  ${t.employmentType ?? "N/A"}',
                       size: 12,
                       color: AppColor.textGrey,
                     ),
@@ -1772,63 +1772,17 @@ class _AllTeacherListScreenState extends State
                 ),
               ),
 
-              // Edit & Delete buttons
-              // Column(
-              //   children: [
-              //     IconButton(
-              //       onPressed: () =>
-              //           _openAccountantSheet(existing: t),
-              //       icon: const Icon(Icons.edit,
-              //           color: AppColor.lightBlueColor),
-              //     ),
-              //     IconButton(
-              //       onPressed: () async {
-              //         bool confirmed = await _showDeleteDialog();
-              //         if (confirmed) {
-              //           Provider.of<DeleteTeacherViewModel>(context,
-              //               listen: false)
-              //               .deleteTeacherApi(t.teacherId, context);
-              //         }
-              //       },
-              //       icon: const Icon(Icons.delete_forever,
-              //           color: Colors.red),
-              //     ),
-              //   ],
-              // ),
-              // Edit & Delete buttons
               Column(
                 children: [
-                  // IconButton(
-                  //   onPressed: () =>
-                  //       _openAccountantSheet(existing: t),
-                  //   icon: const Icon(Icons.edit,
-                  //       color: AppColor.lightBlueColor),
-                  // ),
-                  // IconButton(
-                  //   onPressed: () async {
-                  //     bool confirmed = await _showDeleteDialog();
-                  //     if (confirmed) {
-                  //       Provider.of<DeleteTeacherViewModel>(context,
-                  //           listen: false)
-                  //           .deleteTeacherApi(t.teacherId, context);
-                  //     }
-                  //   },
-                  //   icon: const Icon(Icons.delete_forever,
-                  //       color: Colors.red),
-                  // ),
                   GestureDetector(
                     onTap: () {
-
-                      if(
-                      !PermissionGuard.check(
+                      if (!PermissionGuard.check(
                         context,
                         PermissionKeys.editTeacher,
-                        "Edit Teacher",
-                      )
-                      ){
+                        'all_teachers.edit_teacher'.tr(),
+                      )) {
                         return;
                       }
-
                       _openAccountantSheet(existing: t);
                     },
                     child: Container(
@@ -1837,21 +1791,21 @@ class _AllTeacherListScreenState extends State
                         color: AppColor.primaryLight,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.edit_note_rounded,
-                          color: AppColor.lightBlueColor, size: 20),
+                      child: const Icon(
+                        Icons.edit_note_rounded,
+                        color: AppColor.lightBlueColor,
+                        size: 20,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 6),
                   GestureDetector(
                     onTap: () async {
-
-                      if(
-                      !PermissionGuard.check(
+                      if (!PermissionGuard.check(
                         context,
                         PermissionKeys.deleteTeacher,
-                        "Delete Teacher",
-                      )
-                      ){
+                        'all_teachers.delete_teacher'.tr(),
+                      )) {
                         return;
                       }
 
@@ -1861,10 +1815,7 @@ class _AllTeacherListScreenState extends State
                         Provider.of<DeleteTeacherViewModel>(
                           context,
                           listen: false,
-                        ).deleteTeacherApi(
-                          t.teacherId,
-                          context,
-                        );
+                        ).deleteTeacherApi(t.teacherId, context);
                       }
                     },
                     child: Container(
@@ -1873,8 +1824,11 @@ class _AllTeacherListScreenState extends State
                         color: AppColor.error.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(Icons.delete_outline_rounded,
-                          color: AppColor.error, size: 20),
+                      child: Icon(
+                        Icons.delete_outline_rounded,
+                        color: AppColor.error,
+                        size: 20,
+                      ),
                     ),
                   ),
                 ],
@@ -1886,124 +1840,82 @@ class _AllTeacherListScreenState extends State
     );
   }
 
-  // ─────────────────────────────────────────────
-  // Delete dialog
-  // ─────────────────────────────────────────────
   Future<bool> _showDeleteDialog() async {
     return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Top Icon
-              Container(
-                height: 65,
-                width: 65,
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: Colors.red,
-                  size: 34,
-                ),
-              ),
-
-              const SizedBox(height: 14),
-
-              // Title
-              const Text(
-                "Delete Teacher",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              // Message
-              const Text(
-                "Are you sure you want to delete this teacher?",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
-              ),
-
-              const SizedBox(height: 22),
-
-              // Buttons Row
-              Row(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () =>
-                          Navigator.pop(context, false),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text("Cancel"),
+                  Container(
+                    height: 65,
+                    width: 65,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.red,
+                      size: 34,
                     ),
                   ),
-
-                  const SizedBox(width: 10),
-
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () =>
-                          Navigator.pop(context, true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding:
-                        const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  const SizedBox(height: 14),
+                  Text(
+                    'all_teachers.delete_teacher'.tr(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'all_teachers.delete_confirmation'.tr(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                  const SizedBox(height: 22),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text('all_teachers.cancel'.tr()),
                         ),
                       ),
-                      child: const Text("Delete"),
-                    ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text('all_teachers.delete'.tr()),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    ) ??
+        ) ??
         false;
   }
-  // Future<bool> _showDeleteDialog() async {
-  //   return await showDialog<bool>(
-  //     context: context,
-  //     builder: (_) => AlertDialog(
-  //       title: const Text("Confirm Delete"),
-  //       content: const Text(
-  //           "Are you sure you want to delete this teacher?"),
-  //       actions: [
-  //         TextButton(
-  //             onPressed: () => Navigator.pop(context, false),
-  //             child: const Text("Cancel")),
-  //         TextButton(
-  //             onPressed: () => Navigator.pop(context, true),
-  //             child: const Text("Delete",
-  //                 style: TextStyle(color: Colors.red))),
-  //       ],
-  //     ),
-  //   ) ??
-  //       false;
-  // }
-
 }

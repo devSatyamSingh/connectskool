@@ -389,6 +389,7 @@
 //     );
 //   }
 // }
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
@@ -422,19 +423,23 @@ class _SchoolTeachersDetailScreenState
 
   // ─── Helpers ────────────────────────────────────────────
   String _formatDate(String? dateString) {
-    if (dateString == null || dateString.trim().isEmpty) return 'N/A';
+    if (dateString == null || dateString.trim().isEmpty) {
+      return 'teacher_detail.not_available'.tr();
+    }
     try {
       final date = DateTime.parse(dateString);
       return '${date.day.toString().padLeft(2, '0')}/'
           '${date.month.toString().padLeft(2, '0')}/'
           '${date.year}';
     } catch (_) {
-      return 'N/A';
+      return 'teacher_detail.not_available'.tr();
     }
   }
 
   String _capitalize(String? value) {
-    if (value == null || value.trim().isEmpty) return 'N/A';
+    if (value == null || value.trim().isEmpty) {
+      return 'teacher_detail.not_available'.tr();
+    }
     final v = value.trim();
     return v[0].toUpperCase() + v.substring(1);
   }
@@ -454,13 +459,12 @@ class _SchoolTeachersDetailScreenState
     final uri = Uri.parse(url);
     try {
       final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (!launched) _showErrorSnack("Could not open document");
+      if (!launched) _showErrorSnack('teacher_detail.could_not_open'.tr());
     } catch (e) {
       _showErrorSnack("Error: $e");
     }
   }
 
-  // ─── Full-screen image viewer ────────────────────────────
   void _openImageViewer(BuildContext context, String url, String title) {
     Navigator.push(
       context,
@@ -478,7 +482,7 @@ class _SchoolTeachersDetailScreenState
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Teacher Details'),
+        title: Text('teacher_detail.title'.tr()),
         backgroundColor: AppColor.lightBlueColor,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -492,7 +496,7 @@ class _SchoolTeachersDetailScreenState
           final t = viewModel.schoolTeachersDetailModel?.data;
 
           if (t == null) {
-            return const Center(child: Text('No data found'));
+            return Center(child: Text('teacher_detail.no_data'.tr()));
           }
 
           return SingleChildScrollView(
@@ -542,7 +546,7 @@ class _SchoolTeachersDetailScreenState
 
                         // Name
                         Text(
-                          t.name ?? 'N/A',
+                          t.name ?? 'teacher_detail.not_available'.tr(),
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -565,7 +569,7 @@ class _SchoolTeachersDetailScreenState
 
                         // Qualification
                         Text(
-                          t.qualification ?? 'N/A',
+                          t.qualification ?? 'teacher_detail.not_available'.tr(),
                           style: const TextStyle(
                               fontSize: 13, color: Colors.white70),
                         ),
@@ -587,7 +591,7 @@ class _SchoolTeachersDetailScreenState
                                     size: 14, color: Colors.white),
                                 const SizedBox(width: 5),
                                 Text(
-                                  'EMP ID: ${t.employeeId}',
+                                  '${'teacher_detail.emp_id_label'.tr()}: ${t.employeeId}',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.white,
@@ -598,24 +602,6 @@ class _SchoolTeachersDetailScreenState
                             ),
                           ),
                         const SizedBox(height: 10),
-
-                        // Status chip
-                        // Container(
-                        //   padding: const EdgeInsets.symmetric(
-                        //       horizontal: 14, vertical: 6),
-                        //   decoration: BoxDecoration(
-                        //     color: t.status == 1 ? Colors.green : Colors.red,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   child: Text(
-                        //     t.status == 1 ? 'Active' : 'Inactive',
-                        //     style: const TextStyle(
-                        //       color: Colors.white,
-                        //       fontWeight: FontWeight.bold,
-                        //       fontSize: 13,
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -624,59 +610,57 @@ class _SchoolTeachersDetailScreenState
                 const SizedBox(height: 20),
 
                 // ── Personal Information ────────────────────
-                _buildSection('Personal Information', [
-                  _buildInfoRow(Icons.person_outline, 'Full Name',
-                      t.name ?? 'N/A'),
-                  _buildInfoRow(Icons.email_outlined, 'Email',
-                      t.userEmail ?? 'N/A'),
-                  _buildInfoRow(Icons.phone_outlined, 'Mobile',
-                      t.mobileNumber ?? 'N/A'),
-                  _buildInfoRow(Icons.wc_rounded, 'Gender',
+                _buildSection('teacher_detail.personal_information'.tr(), [
+                  _buildInfoRow(Icons.person_outline, 'teacher_detail.full_name'.tr(),
+                      t.name ?? 'teacher_detail.not_available'.tr()),
+                  _buildInfoRow(Icons.email_outlined, 'teacher_detail.email'.tr(),
+                      t.userEmail ?? 'teacher_detail.not_available'.tr()),
+                  _buildInfoRow(Icons.phone_outlined, 'teacher_detail.mobile'.tr(),
+                      t.mobileNumber ?? 'teacher_detail.not_available'.tr()),
+                  _buildInfoRow(Icons.wc_rounded, 'teacher_detail.gender'.tr(),
                       _capitalize(t.gender?.toString())),
-                  _buildInfoRow(Icons.cake_outlined, 'Date of Birth',
+                  _buildInfoRow(Icons.cake_outlined, 'teacher_detail.date_of_birth'.tr(),
                       _formatDate(t.dob?.toString())),
-                  _buildInfoRow(Icons.location_on_outlined, 'Address',
-                      t.address ?? 'N/A'),
+                  _buildInfoRow(Icons.location_on_outlined, 'teacher_detail.address'.tr(),
+                      t.address ?? 'teacher_detail.not_available'.tr()),
                 ]),
 
                 // ── Family Information ──────────────────────
-                _buildSection('Family Information', [
+                _buildSection('teacher_detail.family_information'.tr(), [
                   _buildInfoRow(
-                      Icons.person, "Father's Name", t.fatherName ?? 'N/A'),
+                      Icons.person, 'teacher_detail.father_name'.tr(), t.fatherName ?? 'teacher_detail.not_available'.tr()),
                   _buildInfoRow(
-                      Icons.person, "Mother's Name", t.motherName ?? 'N/A'),
+                      Icons.person, 'teacher_detail.mother_name'.tr(), t.motherName ?? 'teacher_detail.not_available'.tr()),
                 ]),
 
                 // ── Professional Information ────────────────
-                _buildSection('Professional Information', [
-                  _buildInfoRow(Icons.badge_outlined, 'Employee ID',
+                _buildSection('teacher_detail.professional_information'.tr(), [
+                  _buildInfoRow(Icons.badge_outlined, 'teacher_detail.employee_id'.tr(),
                       (t.employeeId ?? '').toString().trim().isEmpty
-                          ? 'N/A'
+                          ? 'teacher_detail.not_available'.tr()
                           : t.employeeId.toString()),
-                  _buildInfoRow(Icons.work_outline, 'Designation',
+                  _buildInfoRow(Icons.work_outline, 'teacher_detail.designation'.tr(),
                       _capitalize(t.designation?.toString())),
-                  _buildInfoRow(Icons.school_outlined, 'Qualification',
-                      t.qualification ?? 'N/A'),
+                  _buildInfoRow(Icons.school_outlined, 'teacher_detail.qualification'.tr(),
+                      t.qualification ?? 'teacher_detail.not_available'.tr()),
                   _buildInfoRow(
-                      Icons.business_center_outlined, 'Employment Type',
+                      Icons.business_center_outlined, 'teacher_detail.employment_type'.tr(),
                       (t.employmentType ?? '').toString().trim().isEmpty
-                          ? 'N/A'
+                          ? 'teacher_detail.not_available'.tr()
                           : _capitalize(t.employmentType?.toString())),
-                  _buildInfoRow(Icons.star_outline, 'Experience',
-                      '${t.experienceYears ?? 0} Years'),
-                  _buildInfoRow(Icons.calendar_today_outlined, 'Joining Date',
+                  _buildInfoRow(Icons.star_outline, 'teacher_detail.experience'.tr(),
+                      '${t.experienceYears ?? 0} ${'teacher_detail.years'.tr()}'),
+                  _buildInfoRow(Icons.calendar_today_outlined, 'teacher_detail.joining_date'.tr(),
                       _formatDate(t.joiningDate?.toString())),
                 ]),
 
                 // ── Documents ──────────────────────────────
-                _buildSection('Documents', [
+                _buildSection('teacher_detail.documents'.tr(), [
                   _buildDocumentCard(
-                    title: 'Aadhar Card',
+                    title: 'teacher_detail.aadhar_card'.tr(),
                     url: t.aadharCardUrl?.toString(),
                     icon: Icons.credit_card_rounded,
                   ),
-                  // Add more docs here as needed:
-                  // _buildDocumentCard(title: 'Resume', url: t.resumeUrl?.toString(), icon: Icons.description_rounded),
                 ]),
 
                 const SizedBox(height: 28),
@@ -771,7 +755,6 @@ class _SchoolTeachersDetailScreenState
   }) {
     final bool hasDoc = url != null && url.trim().isNotEmpty;
 
-    // Check if it's an image file
     final bool isImage = hasDoc &&
         (url!.toLowerCase().endsWith('.png') ||
             url.toLowerCase().endsWith('.jpg') ||
@@ -853,9 +836,9 @@ class _SchoolTeachersDetailScreenState
                           Text(
                             hasDoc
                                 ? (isImage
-                                ? 'Uploaded • Tap to view'
-                                : 'Uploaded • Tap to open')
-                                : 'Not Uploaded',
+                                ? 'teacher_detail.uploaded_view'.tr()
+                                : 'teacher_detail.uploaded_open'.tr())
+                                : 'teacher_detail.not_uploaded'.tr(),
                             style: TextStyle(
                               fontSize: 12,
                               color:
@@ -931,14 +914,14 @@ class _SchoolTeachersDetailScreenState
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.broken_image_rounded,
+                          const Icon(Icons.broken_image_rounded,
                               size: 40, color: Colors.grey),
-                          SizedBox(height: 8),
-                          Text('Image could not be loaded',
-                              style: TextStyle(
+                          const SizedBox(height: 8),
+                          Text('teacher_detail.image_error'.tr(),
+                              style: const TextStyle(
                                   color: Colors.grey, fontSize: 12)),
                         ],
                       ),
@@ -955,14 +938,14 @@ class _SchoolTeachersDetailScreenState
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.zoom_out_map_rounded,
+                          const Icon(Icons.zoom_out_map_rounded,
                               color: Colors.white, size: 13),
-                          SizedBox(width: 4),
-                          Text('Tap to expand',
-                              style: TextStyle(
+                          const SizedBox(width: 4),
+                          Text('teacher_detail.tap_to_expand'.tr(),
+                              style: const TextStyle(
                                   color: Colors.white, fontSize: 11)),
                         ],
                       ),
@@ -1018,20 +1001,18 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
         title: Text(widget.title,
             style: const TextStyle(fontSize: 16, color: Colors.white)),
         actions: [
-          // Reset zoom button
           IconButton(
             onPressed: _resetZoom,
             icon: const Icon(Icons.fit_screen_rounded, color: Colors.white),
-            tooltip: 'Reset Zoom',
+            tooltip: 'teacher_detail.reset_zoom'.tr(),
           ),
-          // Download / Open externally
           IconButton(
             onPressed: () async {
               final uri = Uri.parse(widget.imageUrl);
               await launchUrl(uri, mode: LaunchMode.externalApplication);
             },
             icon: const Icon(Icons.open_in_new_rounded, color: Colors.white),
-            tooltip: 'Open in browser',
+            tooltip: 'teacher_detail.open_browser'.tr(),
           ),
         ],
       ),
@@ -1058,19 +1039,19 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
                     color: Colors.white,
                   ),
                   const SizedBox(height: 12),
-                  const Text('Loading image...',
-                      style: TextStyle(color: Colors.white60, fontSize: 13)),
+                  Text('teacher_detail.loading_image'.tr(),
+                      style: const TextStyle(color: Colors.white60, fontSize: 13)),
                 ],
               );
             },
-            errorBuilder: (_, __, ___) => const Column(
+            errorBuilder: (_, __, ___) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.broken_image_rounded,
+                const Icon(Icons.broken_image_rounded,
                     size: 60, color: Colors.white54),
-                SizedBox(height: 12),
-                Text('Could not load image',
-                    style: TextStyle(color: Colors.white54)),
+                const SizedBox(height: 12),
+                Text('teacher_detail.image_error'.tr(),
+                    style: const TextStyle(color: Colors.white54)),
               ],
             ),
           ),

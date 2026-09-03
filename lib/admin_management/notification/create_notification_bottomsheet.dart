@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -76,17 +77,17 @@ class _CreateNotificationBottomSheetState
 
   Future<void> _sendNotification() async {
     if (titleController.text.trim().isEmpty) {
-      Utils.show("Please enter notification title", context);
+      Utils.show('notification_form.enter_title'.tr(), context);
       return;
     }
 
     if (descriptionController.text.trim().isEmpty) {
-      Utils.show("Please enter notification description", context);
+      Utils.show('notification_form.enter_description'.tr(), context);
       return;
     }
 
     if (selectedTargets.isEmpty) {
-      Utils.show("Please add at least one target", context);
+      Utils.show('notification_form.add_at_least_one_target'.tr(), context);
       return;
     }
 
@@ -110,11 +111,7 @@ class _CreateNotificationBottomSheetState
     });
 
     if (success && mounted) {
-
-      Utils.show(
-        "Notification sent successfully",
-        context,
-      );
+      Utils.show('notification_form.notification_sent'.tr(), context);
 
       titleController.clear();
 
@@ -140,14 +137,12 @@ class _CreateNotificationBottomSheetState
   @override
   Widget build(BuildContext context) {
     return FractionallySizedBox(
-      heightFactor: 0.90, // 90% screen
+      heightFactor: 0.90,
 
       child: Container(
         decoration: const BoxDecoration(
           color: Color(0xFFF4F6FB),
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(40),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
         ),
         child: SafeArea(
           top: false,
@@ -186,8 +181,8 @@ class _CreateNotificationBottomSheetState
 
                       AppButton(
                         title: isLoading
-                            ? "Sending..."
-                            : "Send Notification",
+                            ? 'notification_form.sending'.tr()
+                            : 'notification_form.send_notification'.tr(),
                         loading: isLoading,
                         radius: 16,
                         height: 54,
@@ -208,6 +203,7 @@ class _CreateNotificationBottomSheetState
       ),
     );
   }
+
   Widget _buildHandle() {
     return Container(
       width: 44,
@@ -227,15 +223,10 @@ class _CreateNotificationBottomSheetState
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColor.primary.withOpacity(.12),
-            Colors.white,
-          ],
+          colors: [AppColor.primary.withOpacity(.12), Colors.white],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: AppColor.primary.withOpacity(.12),
-        ),
+        border: Border.all(color: AppColor.primary.withOpacity(.12)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.04),
@@ -272,7 +263,7 @@ class _CreateNotificationBottomSheetState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Create Notification",
+                  'notification_form.create_notification'.tr(),
                   style: GoogleFonts.poppins(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -281,7 +272,7 @@ class _CreateNotificationBottomSheetState
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Send notifications to students, teachers, accountants or entire school",
+                  'notification_form.notification_subtitle'.tr(),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.poppins(
@@ -306,10 +297,7 @@ class _CreateNotificationBottomSheetState
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: const Icon(
-                Icons.close_rounded,
-                color: Colors.red,
-              ),
+              icon: const Icon(Icons.close_rounded, color: Colors.red),
             ),
           ),
         ],
@@ -321,9 +309,8 @@ class _CreateNotificationBottomSheetState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         Text(
-          "Notification Title",
+          'notification_form.notification_title'.tr(),
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -335,13 +322,10 @@ class _CreateNotificationBottomSheetState
 
         TextFormField(
           controller: titleController,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
           textInputAction: TextInputAction.next,
           decoration: InputDecoration(
-            hintText: "Enter notification title",
+            hintText: 'notification_form.title_hint'.tr(),
             hintStyle: GoogleFonts.poppins(
               color: Colors.grey.shade500,
               fontSize: 13,
@@ -370,44 +354,35 @@ class _CreateNotificationBottomSheetState
 
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: Colors.grey.shade300,
-              ),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
 
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: Colors.grey.shade300,
-              ),
+              borderSide: BorderSide(color: Colors.grey.shade300),
             ),
 
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: AppColor.primary,
-                width: 1.5,
-              ),
+              borderSide: BorderSide(color: AppColor.primary, width: 1.5),
             ),
 
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
-                color: Colors.red,
-              ),
+              borderSide: const BorderSide(color: Colors.red),
             ),
           ),
         ),
       ],
     );
   }
+
   Widget _buildDescriptionField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         Text(
-          "Notification Description",
+          'notification_form.notification_description'.tr(),
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w600,
@@ -438,8 +413,7 @@ class _CreateNotificationBottomSheetState
               fontWeight: FontWeight.w500,
             ),
             decoration: InputDecoration(
-              hintText:
-              "Write your notification message here...",
+              hintText: 'notification_form.description_hint'.tr(),
               hintStyle: GoogleFonts.poppins(
                 fontSize: 12,
                 color: Colors.grey.shade500,
@@ -473,40 +447,26 @@ class _CreateNotificationBottomSheetState
               filled: true,
               fillColor: Colors.grey.shade50,
 
-              contentPadding: const EdgeInsets.fromLTRB(
-                16,
-                18,
-                16,
-                18,
-              ),
+              contentPadding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
 
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(
-                  color: Colors.grey.shade300,
-                ),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
 
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(
-                  color: Colors.grey.shade300,
-                ),
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
 
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(
-                  color: AppColor.primary,
-                  width: 1.5,
-                ),
+                borderSide: BorderSide(color: AppColor.primary, width: 1.5),
               ),
 
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: const BorderSide(
-                  color: Colors.red,
-                ),
+                borderSide: const BorderSide(color: Colors.red),
               ),
             ),
           ),
@@ -522,11 +482,9 @@ class _CreateNotificationBottomSheetState
               size: 14,
               color: Colors.grey.shade500,
             ),
-
             const SizedBox(width: 4),
-
             Text(
-              "Keep message short and clear",
+              'notification_form.message_hint'.tr(),
               style: GoogleFonts.poppins(
                 fontSize: 11,
                 color: Colors.grey.shade600,
@@ -542,7 +500,7 @@ class _CreateNotificationBottomSheetState
   Widget _buildAddTargetButton() {
     return AppButton(
       height: 45,
-      title: "Add Target",
+      title: 'notification_form.add_target'.tr(),
       icon: Icons.add_circle_outline_rounded,
       onTap: () {
         _showAddTargetDialog();
@@ -551,18 +509,14 @@ class _CreateNotificationBottomSheetState
   }
 
   Widget _buildSelectedTargets() {
-
     if (selectedTargets.isEmpty) {
-
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: AppColor.primary.withOpacity(.08),
-          ),
+          border: Border.all(color: AppColor.primary.withOpacity(.08)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(.03),
@@ -591,22 +545,18 @@ class _CreateNotificationBottomSheetState
                 color: AppColor.primary,
               ),
             ),
-
             const SizedBox(height: 16),
-
             Text(
-              "No Recipient Added",
+              'notification_form.no_recipient'.tr(),
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: Colors.black,
               ),
             ),
-
             const SizedBox(height: 6),
-
             Text(
-              "Add one or multiple targets to receive this notification.",
+              'notification_form.no_recipient_sub'.tr(),
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 11,
@@ -614,7 +564,6 @@ class _CreateNotificationBottomSheetState
                 color: AppColor.sub,
               ),
             ),
-
           ],
         ),
       );
@@ -626,9 +575,7 @@ class _CreateNotificationBottomSheetState
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: AppColor.primary.withOpacity(.08),
-        ),
+        border: Border.all(color: AppColor.primary.withOpacity(.08)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.03),
@@ -657,39 +604,33 @@ class _CreateNotificationBottomSheetState
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Selected Recipients",
+                      'notification_form.selected_recipients'.tr(),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-
                     Text(
-                      "${selectedTargets.length} target(s) added",
+                      '${selectedTargets.length} ${'notification_form.targets_added'.tr()}',
                       style: GoogleFonts.poppins(
                         fontSize: 11,
                         color: AppColor.sub,
                       ),
                     ),
-
                   ],
                 ),
               ),
-
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color:
-                  AppColor.primary.withOpacity(.08),
-                  borderRadius:
-                  BorderRadius.circular(30),
+                  color: AppColor.primary.withOpacity(.08),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 child: Text(
                   selectedTargets.length.toString(),
@@ -701,32 +642,22 @@ class _CreateNotificationBottomSheetState
               ),
             ],
           ),
-
           const SizedBox(height: 18),
-
           Wrap(
             spacing: 10,
             runSpacing: 10,
-            children: List.generate(
-              selectedTargets.length,
-                  (index) {
+            children: List.generate(selectedTargets.length, (index) {
+              final target = selectedTargets[index];
 
-                final target =
-                selectedTargets[index];
-
-                return _targetPreviewChip(
-                  target,
-                  index,
-                );
-              },
-            ),
+              return _targetPreviewChip(target, index);
+            }),
           ),
         ],
       ),
     );
   }
 
-  Widget _targetPreviewChip(Map<String, dynamic> target, int index,) {
+  Widget _targetPreviewChip(Map<String, dynamic> target, int index) {
     final type = target["target_type"];
 
     IconData icon;
@@ -764,19 +695,12 @@ class _CreateNotificationBottomSheetState
     }
 
     return Container(
-      constraints: const BoxConstraints(
-        maxWidth: 280,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 10,
-      ),
+      constraints: const BoxConstraints(maxWidth: 280),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: color.withOpacity(.18),
-        ),
+        border: Border.all(color: color.withOpacity(.18)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.03),
@@ -795,15 +719,9 @@ class _CreateNotificationBottomSheetState
               color: color.withOpacity(.10),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: color,
-            ),
+            child: Icon(icon, size: 18, color: color),
           ),
-
           const SizedBox(width: 10),
-
           Expanded(
             child: Text(
               target["_display"] ?? "",
@@ -816,9 +734,7 @@ class _CreateNotificationBottomSheetState
               ),
             ),
           ),
-
           const SizedBox(width: 8),
-
           InkWell(
             borderRadius: BorderRadius.circular(50),
             onTap: () {
@@ -852,15 +768,10 @@ class _CreateNotificationBottomSheetState
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            AppColor.primary.withOpacity(.08),
-            Colors.white,
-          ],
+          colors: [AppColor.primary.withOpacity(.08), Colors.white],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: AppColor.primary.withOpacity(.12),
-        ),
+        border: Border.all(color: AppColor.primary.withOpacity(.12)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.03),
@@ -889,18 +800,17 @@ class _CreateNotificationBottomSheetState
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Notification Summary",
+                      'notification_form.notification_summary'.tr(),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
-                      "Review before sending",
+                      'notification_form.review_before_sending'.tr(),
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: AppColor.sub,
@@ -917,19 +827,16 @@ class _CreateNotificationBottomSheetState
               Expanded(
                 child: _summaryItem(
                   icon: Icons.groups_rounded,
-                  title: "Recipients",
-                  value:
-                  "${selectedTargets.length}",
+                  title: 'notification_form.recipients'.tr(),
+                  value: "${selectedTargets.length}",
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _summaryItem(
-                  icon:
-                  Icons.notifications_active_rounded,
-                  title: "Targets",
-                  value:
-                  "${selectedTargets.length}",
+                  icon: Icons.notifications_active_rounded,
+                  title: 'notification_form.targets'.tr(),
+                  value: "${selectedTargets.length}",
                 ),
               ),
             ],
@@ -939,8 +846,7 @@ class _CreateNotificationBottomSheetState
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: Colors.green.withOpacity(.08),
-              borderRadius:
-              BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               children: [
@@ -949,17 +855,13 @@ class _CreateNotificationBottomSheetState
                   color: Colors.green,
                   size: 18,
                 ),
-
                 const SizedBox(width: 8),
-
                 Expanded(
                   child: Text(
-                    "Ready to send notification",
-                    style:
-                    GoogleFonts.poppins(
+                    'notification_form.ready_to_send'.tr(),
+                    style: GoogleFonts.poppins(
                       fontSize: 12,
-                      fontWeight:
-                      FontWeight.w600,
+                      fontWeight: FontWeight.w600,
                       color: Colors.green,
                     ),
                   ),
@@ -982,17 +884,11 @@ class _CreateNotificationBottomSheetState
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.shade200,
-        ),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
         children: [
-          Icon(
-            icon,
-            color: AppColor.primary,
-            size: 15,
-          ),
+          Icon(icon, color: AppColor.primary, size: 15),
           const SizedBox(height: 8),
           Text(
             value,
@@ -1004,15 +900,13 @@ class _CreateNotificationBottomSheetState
           const SizedBox(height: 2),
           Text(
             title,
-            style: GoogleFonts.poppins(
-              fontSize: 10,
-              color: AppColor.sub,
-            ),
+            style: GoogleFonts.poppins(fontSize: 10, color: AppColor.sub),
           ),
         ],
       ),
     );
   }
+
   Future<void> _showAddTargetDialog() async {
     await showModalBottomSheet(
       context: context,
@@ -1063,25 +957,20 @@ class _CreateNotificationBottomSheetState
                               size: 22,
                             ),
                           ),
-
                           const SizedBox(width: 12),
-
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-
                                 Text(
-                                  "Add Target Audience",
+                                  'notification_form.add_target_title'.tr(),
                                   style: GoogleFonts.poppins(
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-
                                 Text(
-                                  "Select who should receive this notification",
+                                  'notification_form.add_target_subtitle'.tr(),
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     color: AppColor.sub,
@@ -1093,15 +982,13 @@ class _CreateNotificationBottomSheetState
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 20),
-
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
                       children: [
                         _targetChip(
-                          title: "School Wide",
+                          title: 'notification_form.school_wide'.tr(),
                           selected: selectedType == "school_wide",
                           onTap: () {
                             setSheet(() {
@@ -1109,9 +996,8 @@ class _CreateNotificationBottomSheetState
                             });
                           },
                         ),
-
                         _targetChip(
-                          title: "Class",
+                          title: 'notification_form.class'.tr(),
                           selected: selectedType == "class",
                           onTap: () {
                             setSheet(() {
@@ -1119,9 +1005,8 @@ class _CreateNotificationBottomSheetState
                             });
                           },
                         ),
-
                         _targetChip(
-                          title: "Class + Section",
+                          title: 'notification_form.class_section'.tr(),
                           selected: selectedType == "class_section",
                           onTap: () {
                             setSheet(() {
@@ -1129,9 +1014,8 @@ class _CreateNotificationBottomSheetState
                             });
                           },
                         ),
-
                         _targetChip(
-                          title: "Role Based",
+                          title: 'notification_form.role_based'.tr(),
                           selected: selectedType == "role_based",
                           onTap: () {
                             setSheet(() {
@@ -1139,9 +1023,8 @@ class _CreateNotificationBottomSheetState
                             });
                           },
                         ),
-
                         _targetChip(
-                          title: "Individual",
+                          title: 'notification_form.individual'.tr(),
                           selected: selectedType == "individual",
                           onTap: () {
                             setSheet(() {
@@ -1151,25 +1034,26 @@ class _CreateNotificationBottomSheetState
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 24),
 
                     /// DYNAMIC FORM
                     _buildTargetForm(selectedType, setSheet),
 
                     const SizedBox(height: 20),
-                    AppButton(title: "Add Target",
-                        height: 45,
-                        onTap: (){
-                      final count = selectedTargets.length;
+                    AppButton(
+                      title: 'notification_form.add_target_btn'.tr(),
+                      height: 45,
+                      onTap: () {
+                        final count = selectedTargets.length;
 
-                      _addTarget(selectedType);
+                        _addTarget(selectedType);
 
-                      if(selectedTargets.length > count){
-                        Navigator.pop(context);
-                      }
-                    }),
-                    SizedBox(height: 28,),
+                        if (selectedTargets.length > count) {
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 28),
                   ],
                 ),
               ),
@@ -1180,7 +1064,11 @@ class _CreateNotificationBottomSheetState
     );
   }
 
-  Widget _targetChip({required String title, required bool selected, required VoidCallback onTap,}) {
+  Widget _targetChip({
+    required String title,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
     IconData icon;
 
     switch (title) {
@@ -1214,20 +1102,13 @@ class _CreateNotificationBottomSheetState
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          gradient: selected
-              ? AppColor.primaryGradient
-              : null,
+          gradient: selected ? AppColor.primaryGradient : null,
           color: selected ? null : Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: selected
-                ? Colors.transparent
-                : Colors.grey.shade300,
+            color: selected ? Colors.transparent : Colors.grey.shade300,
           ),
           boxShadow: [
             BoxShadow(
@@ -1254,28 +1135,20 @@ class _CreateNotificationBottomSheetState
               child: Icon(
                 icon,
                 size: 18,
-                color: selected
-                    ? Colors.white
-                    : AppColor.primary,
+                color: selected ? Colors.white : AppColor.primary,
               ),
             ),
-
             const SizedBox(width: 10),
-
             Text(
               title,
               style: GoogleFonts.poppins(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: selected
-                    ? Colors.white
-                    : Colors.black87,
+                color: selected ? Colors.white : Colors.black87,
               ),
             ),
-
             if (selected) ...[
               const SizedBox(width: 8),
-
               const Icon(
                 Icons.check_circle_rounded,
                 size: 18,
@@ -1288,14 +1161,12 @@ class _CreateNotificationBottomSheetState
     );
   }
 
-  Widget _buildTargetForm(String selectedType, StateSetter setSheet,) {
+  Widget _buildTargetForm(String selectedType, StateSetter setSheet) {
     switch (selectedType) {
-
       case "school_wide":
-
         return _formSection(
-          title: "Entire School",
-          subtitle: "Send notification to all users",
+          title: 'notification_form.entire_school'.tr(),
+          subtitle: 'notification_form.entire_school_desc'.tr(),
           icon: Icons.public_rounded,
           child: Container(
             padding: const EdgeInsets.all(16),
@@ -1305,22 +1176,15 @@ class _CreateNotificationBottomSheetState
             ),
             child: Row(
               children: [
-
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.green.withOpacity(.12),
-                    borderRadius:
-                    BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
-                    Icons.public_rounded,
-                    color: Colors.green,
-                  ),
+                  child: const Icon(Icons.public_rounded, color: Colors.green),
                 ),
-
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: Text(
                     "Notification will be sent to all students, teachers, accountants and school users.",
@@ -1335,36 +1199,31 @@ class _CreateNotificationBottomSheetState
           ),
         );
 
-    /// ==========================================
-    /// CLASS
-    /// ==========================================
-
       case "class":
-
         return _formSection(
-          title: "Class Notification",
-          subtitle: "Send to all sections of a class",
+          title: 'notification_form.class_notification'.tr(),
+          subtitle: 'notification_form.class_notification_sub'.tr(),
           icon: Icons.school_rounded,
           child: Consumer<AllClassesViewModel>(
             builder: (_, vm, __) {
-
               return DropdownButtonFormField<Data>(
                 value: selectedClass,
                 decoration: _dropdownDecoration(
-                  "Select Class",
+                  'notification_form.select_class'.tr(),
                   Icons.school_rounded,
                 ),
-                items: vm.allClassesModel?.data
-                    ?.map(
-                      (e) => DropdownMenuItem<Data>(
-                    value: e,
-                    child: Text(
-                      e.className ?? "",
-                      style: GoogleFonts.poppins(),
-                    ),
-                  ),
-                )
-                    .toList() ??
+                items:
+                    vm.allClassesModel?.data
+                        ?.map(
+                          (e) => DropdownMenuItem<Data>(
+                            value: e,
+                            child: Text(
+                              e.className ?? "",
+                              style: GoogleFonts.poppins(),
+                            ),
+                          ),
+                        )
+                        .toList() ??
                     [],
                 onChanged: (value) {
                   setSheet(() {
@@ -1376,57 +1235,45 @@ class _CreateNotificationBottomSheetState
           ),
         );
 
-    /// ==========================================
-    /// CLASS + SECTION
-    /// ==========================================
-
       case "class_section":
-
         return _formSection(
-          title: "Class & Section",
-          subtitle: "Send notification to a specific section",
+          title: 'notification_form.class_section_notification'.tr(),
+          subtitle: 'notification_form.class_section_notification_sub'.tr(),
           icon: Icons.class_rounded,
           child: Column(
             children: [
-
               Consumer<AllClassesViewModel>(
                 builder: (_, vm, __) {
-
                   return DropdownButtonFormField<Data>(
                     value: selectedClass,
                     decoration: _dropdownDecoration(
-                      "Select Class",
+                      'notification_form.select_class'.tr(),
                       Icons.school_rounded,
                     ),
-                    items: vm.allClassesModel?.data
-                        ?.map(
-                          (e) => DropdownMenuItem<Data>(
-                        value: e,
-                        child: Text(
-                          e.className ?? "",
-                          style: GoogleFonts.poppins(),
-                        ),
-                      ),
-                    )
-                        .toList() ??
+                    items:
+                        vm.allClassesModel?.data
+                            ?.map(
+                              (e) => DropdownMenuItem<Data>(
+                                value: e,
+                                child: Text(
+                                  e.className ?? "",
+                                  style: GoogleFonts.poppins(),
+                                ),
+                              ),
+                            )
+                            .toList() ??
                         [],
                     onChanged: (value) async {
-
                       setSheet(() {
                         selectedClass = value;
                         selectedSection = null;
                       });
 
                       if (value?.classId != null) {
-
-                        await Provider.of<
-                            AllSectionsViewModel>(
+                        await Provider.of<AllSectionsViewModel>(
                           context,
                           listen: false,
-                        ).allSectionsApi(
-                          context,
-                          value!.classId.toString(),
-                        );
+                        ).allSectionsApi(context, value!.classId.toString());
 
                         setSheet(() {});
                       }
@@ -1434,52 +1281,39 @@ class _CreateNotificationBottomSheetState
                   );
                 },
               ),
-
               const SizedBox(height: 16),
-
               Consumer<AllSectionsViewModel>(
                 builder: (_, sectionVm, __) {
-
                   if (sectionVm.loading) {
                     return const Padding(
                       padding: EdgeInsets.all(20),
-                      child: Center(
-                        child:
-                        CircularProgressIndicator(),
-                      ),
+                      child: Center(child: CircularProgressIndicator()),
                     );
                   }
 
-                  return DropdownButtonFormField<
-                      SectionData>(
+                  return DropdownButtonFormField<SectionData>(
                     value: selectedSection,
                     decoration: _dropdownDecoration(
-                      "Select Section",
+                      'notification_form.select_section'.tr(),
                       Icons.groups_rounded,
                     ),
-                    items: sectionVm
-                        .allSectionsModel?.data
-                        ?.map(
-                          (e) => DropdownMenuItem<
-                          SectionData>(
-                        value: e,
-                        child: Text(
-                          e.displayName ??
-                              e.sectionName ??
-                              "",
-                          style:
-                          GoogleFonts.poppins(),
-                        ),
-                      ),
-                    )
-                        .toList() ??
+                    items:
+                        sectionVm.allSectionsModel?.data
+                            ?.map(
+                              (e) => DropdownMenuItem<SectionData>(
+                                value: e,
+                                child: Text(
+                                  e.displayName ?? e.sectionName ?? "",
+                                  style: GoogleFonts.poppins(),
+                                ),
+                              ),
+                            )
+                            .toList() ??
                         [],
                     onChanged: (value) {
-
                       setSheet(() {
                         selectedSection = value;
                       });
-
                     },
                   );
                 },
@@ -1488,36 +1322,27 @@ class _CreateNotificationBottomSheetState
           ),
         );
 
-    /// ==========================================
-    /// ROLE BASED
-    /// ==========================================
-
       case "role_based":
-
         return _formSection(
-          title: "Role Based Notification",
-          subtitle:
-          "Select one or multiple roles",
+          title: 'notification_form.role_based_notification'.tr(),
+          subtitle: 'notification_form.role_based_notification_sub'.tr(),
           icon: Icons.groups_rounded,
           child: Wrap(
             spacing: 12,
             runSpacing: 12,
             children: [
-
               _roleChoiceChip(
-                label: "Students",
+                label: 'notification_form.students'.tr(),
                 value: "student",
                 setSheet: setSheet,
               ),
-
               _roleChoiceChip(
-                label: "Teachers",
+                label: 'notification_form.teachers'.tr(),
                 value: "teacher",
                 setSheet: setSheet,
               ),
-
               _roleChoiceChip(
-                label: "Accountants",
+                label: 'notification_form.accountants'.tr(),
                 value: "accountant",
                 setSheet: setSheet,
               ),
@@ -1525,56 +1350,39 @@ class _CreateNotificationBottomSheetState
           ),
         );
 
-    /// ==========================================
-    /// INDIVIDUAL
-    /// ==========================================
-
       case "individual":
-
         return _formSection(
-          title: "Individual User",
-          subtitle:
-          "Send notification to one user",
+          title: 'notification_form.individual_user'.tr(),
+          subtitle: 'notification_form.individual_user_sub'.tr(),
           icon: Icons.person_rounded,
           child: Column(
             children: [
-
               Wrap(
                 spacing: 12,
                 runSpacing: 12,
                 children: [
-
                   _individualTypeChip(
-                    label: "Student",
+                    label: 'notification_form.student'.tr(),
                     value: "student",
-                    selected:
-                    selectedIndividualType,
+                    selected: selectedIndividualType,
                     setSheet: setSheet,
                   ),
-
                   _individualTypeChip(
-                    label: "Teacher",
+                    label: 'notification_form.teacher'.tr(),
                     value: "teacher",
-                    selected:
-                    selectedIndividualType,
+                    selected: selectedIndividualType,
                     setSheet: setSheet,
                   ),
-
                   _individualTypeChip(
-                    label: "Accountant",
+                    label: 'notification_form.accountant'.tr(),
                     value: "accountant",
-                    selected:
-                    selectedIndividualType,
+                    selected: selectedIndividualType,
                     setSheet: setSheet,
                   ),
                 ],
               ),
-
               const SizedBox(height: 20),
-
-              _buildIndividualDropdown(
-                setSheet,
-              ),
+              _buildIndividualDropdown(setSheet),
             ],
           ),
         );
@@ -1596,9 +1404,7 @@ class _CreateNotificationBottomSheetState
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.grey.shade200,
-        ),
+        border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(.03),
@@ -1610,10 +1416,8 @@ class _CreateNotificationBottomSheetState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             children: [
-
               if (icon != null)
                 Container(
                   padding: const EdgeInsets.all(8),
@@ -1621,22 +1425,13 @@ class _CreateNotificationBottomSheetState
                     color: AppColor.primary.withOpacity(.08),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 18,
-                    color: AppColor.primary,
-                  ),
+                  child: Icon(icon, size: 18, color: AppColor.primary),
                 ),
-
-              if (icon != null)
-                const SizedBox(width: 10),
-
+              if (icon != null) const SizedBox(width: 10),
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                  CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
                     Text(
                       title,
                       style: GoogleFonts.poppins(
@@ -1644,7 +1439,6 @@ class _CreateNotificationBottomSheetState
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-
                     Text(
                       subtitle,
                       style: GoogleFonts.poppins(
@@ -1657,79 +1451,51 @@ class _CreateNotificationBottomSheetState
               ),
             ],
           ),
-
           const SizedBox(height: 16),
-
           child,
         ],
       ),
     );
   }
 
-  InputDecoration _dropdownDecoration(
-      String label,
-      IconData icon,
-      ) {
+  InputDecoration _dropdownDecoration(String label, IconData icon) {
     return InputDecoration(
       labelText: label,
-
-      labelStyle: GoogleFonts.poppins(
-        color: AppColor.sub,
-        fontSize: 13,
-      ),
-
+      labelStyle: GoogleFonts.poppins(color: AppColor.sub, fontSize: 13),
       prefixIcon: Container(
         margin: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: AppColor.primary.withOpacity(.08),
-          borderRadius:
-          BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(
-          icon,
-          color: AppColor.primary,
-          size: 20,
-        ),
+        child: Icon(icon, color: AppColor.primary, size: 20),
       ),
-
       filled: true,
       fillColor: Colors.grey.shade50,
-
-      border: OutlineInputBorder(
-        borderRadius:
-        BorderRadius.circular(18),
-      ),
-
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
       enabledBorder: OutlineInputBorder(
-        borderRadius:
-        BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: Colors.grey.shade300,
-        ),
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: Colors.grey.shade300),
       ),
-
       focusedBorder: OutlineInputBorder(
-        borderRadius:
-        BorderRadius.circular(18),
-        borderSide: BorderSide(
-          color: AppColor.primary,
-          width: 1.5,
-        ),
+        borderRadius: BorderRadius.circular(18),
+        borderSide: BorderSide(color: AppColor.primary, width: 1.5),
       ),
     );
   }
 
-  Widget _roleChoiceChip({required String label, required String value, required StateSetter setSheet,}) {
-
-    final bool isSelected =
-    selectedRoles.contains(value);
+  Widget _roleChoiceChip({
+    required String label,
+    required String value,
+    required StateSetter setSheet,
+  }) {
+    final bool isSelected = selectedRoles.contains(value);
 
     IconData icon;
 
     Color chipColor;
 
     switch (value) {
-
       case "student":
         icon = Icons.school_rounded;
         chipColor = Colors.blue;
@@ -1753,37 +1519,23 @@ class _CreateNotificationBottomSheetState
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: () {
-
         setSheet(() {
-
           if (isSelected) {
             selectedRoles.remove(value);
           } else {
             selectedRoles.add(value);
           }
-
         });
-
       },
       child: AnimatedContainer(
-        duration: const Duration(
-          milliseconds: 250,
-        ),
+        duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? chipColor.withOpacity(.10)
-              : Colors.white,
-          borderRadius:
-          BorderRadius.circular(18),
+          color: isSelected ? chipColor.withOpacity(.10) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected
-                ? chipColor
-                : Colors.grey.shade300,
+            color: isSelected ? chipColor : Colors.grey.shade300,
             width: isSelected ? 1.5 : 1,
           ),
           boxShadow: [
@@ -1797,10 +1549,8 @@ class _CreateNotificationBottomSheetState
           ],
         ),
         child: Row(
-          mainAxisSize:
-          MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: [
-
             Container(
               height: 34,
               width: 34,
@@ -1808,36 +1558,22 @@ class _CreateNotificationBottomSheetState
                 color: isSelected
                     ? chipColor.withOpacity(.12)
                     : Colors.grey.shade100,
-                borderRadius:
-                BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                size: 18,
-                color: chipColor,
-              ),
+              child: Icon(icon, size: 18, color: chipColor),
             ),
-
             const SizedBox(width: 10),
-
             Text(
               label,
               style: GoogleFonts.poppins(
                 fontSize: 13,
-                fontWeight:
-                FontWeight.w600,
+                fontWeight: FontWeight.w600,
                 color: Colors.black87,
               ),
             ),
-
             if (isSelected) ...[
               const SizedBox(width: 8),
-
-              Icon(
-                Icons.check_circle_rounded,
-                size: 18,
-                color: chipColor,
-              ),
+              Icon(Icons.check_circle_rounded, size: 18, color: chipColor),
             ],
           ],
         ),
@@ -1845,17 +1581,19 @@ class _CreateNotificationBottomSheetState
     );
   }
 
-  Widget _individualTypeChip({required String label, required String value, required String selected, required StateSetter setSheet,}) {
-
-    final bool isSelected =
-        selected == value;
+  Widget _individualTypeChip({
+    required String label,
+    required String value,
+    required String selected,
+    required StateSetter setSheet,
+  }) {
+    final bool isSelected = selected == value;
 
     IconData icon;
 
     Color chipColor;
 
     switch (value) {
-
       case "student":
         icon = Icons.school_rounded;
         chipColor = Colors.blue;
@@ -1879,31 +1617,19 @@ class _CreateNotificationBottomSheetState
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: () {
-
         setSheet(() {
           selectedIndividualType = value;
         });
-
       },
       child: AnimatedContainer(
-        duration: const Duration(
-          milliseconds: 250,
-        ),
+        duration: const Duration(milliseconds: 250),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected
-              ? chipColor.withOpacity(.10)
-              : Colors.white,
-          borderRadius:
-          BorderRadius.circular(18),
+          color: isSelected ? chipColor.withOpacity(.10) : Colors.white,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected
-                ? chipColor
-                : Colors.grey.shade300,
+            color: isSelected ? chipColor : Colors.grey.shade300,
             width: isSelected ? 1.5 : 1,
           ),
           boxShadow: [
@@ -1917,10 +1643,8 @@ class _CreateNotificationBottomSheetState
           ],
         ),
         child: Row(
-          mainAxisSize:
-          MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min,
           children: [
-
             Container(
               height: 34,
               width: 34,
@@ -1928,36 +1652,22 @@ class _CreateNotificationBottomSheetState
                 color: isSelected
                     ? chipColor.withOpacity(.12)
                     : Colors.grey.shade100,
-                borderRadius:
-                BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
-                icon,
-                size: 18,
-                color: chipColor,
-              ),
+              child: Icon(icon, size: 18, color: chipColor),
             ),
-
             const SizedBox(width: 10),
-
             Text(
               label,
               style: GoogleFonts.poppins(
                 fontSize: 13,
-                fontWeight:
-                FontWeight.w600,
+                fontWeight: FontWeight.w600,
                 color: Colors.black87,
               ),
             ),
-
             if (isSelected) ...[
               const SizedBox(width: 8),
-
-              Icon(
-                Icons.check_circle_rounded,
-                size: 18,
-                color: chipColor,
-              ),
+              Icon(Icons.check_circle_rounded, size: 18, color: chipColor),
             ],
           ],
         ),
@@ -1966,7 +1676,6 @@ class _CreateNotificationBottomSheetState
   }
 
   Widget _buildIndividualDropdown(StateSetter setSheet) {
-
     /// ==========================
     /// STUDENT
     /// ==========================
@@ -1974,7 +1683,6 @@ class _CreateNotificationBottomSheetState
     if (selectedIndividualType == "student") {
       return Consumer<AllStudentListVieModel>(
         builder: (_, vm, __) {
-
           if (vm.loading) {
             return const Center(
               child: Padding(
@@ -1984,12 +1692,11 @@ class _CreateNotificationBottomSheetState
             );
           }
 
-          final students =
-              vm.allStudentListModel?.data ?? [];
+          final students = vm.allStudentListModel?.data ?? [];
 
           if (students.isEmpty) {
             return _emptyUserCard(
-              title: "No Students Found",
+              title: 'notification_form.no_students'.tr(),
               icon: Icons.school_rounded,
               color: Colors.blue,
             );
@@ -2000,9 +1707,7 @@ class _CreateNotificationBottomSheetState
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.grey.shade200,
-              ),
+              border: Border.all(color: Colors.grey.shade200),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(.03),
@@ -2017,7 +1722,7 @@ class _CreateNotificationBottomSheetState
               isExpanded: true,
 
               decoration: _dropdownDecoration(
-                "Select Student",
+                'notification_form.select_student'.tr(),
                 Icons.school_rounded,
               ),
 
@@ -2026,24 +1731,18 @@ class _CreateNotificationBottomSheetState
                   value: e,
                   child: Row(
                     children: [
-
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor:
-                        Colors.blue.withOpacity(.10),
+                        backgroundColor: Colors.blue.withOpacity(.10),
                         child: Text(
-                          (e.name ?? "S")
-                              .substring(0, 1)
-                              .toUpperCase(),
+                          (e.name ?? "S").substring(0, 1).toUpperCase(),
                           style: GoogleFonts.poppins(
                             color: Colors.blue,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 10),
-
                       Expanded(
                         child: Text(
                           "${e.name ?? ''} (${e.userId ?? ''})",
@@ -2076,7 +1775,6 @@ class _CreateNotificationBottomSheetState
     if (selectedIndividualType == "teacher") {
       return Consumer<AllTeachersListVieModel>(
         builder: (_, vm, __) {
-
           if (vm.loading) {
             return const Center(
               child: Padding(
@@ -2086,12 +1784,11 @@ class _CreateNotificationBottomSheetState
             );
           }
 
-          final teachers =
-              vm.allTeachersListModel?.data ?? [];
+          final teachers = vm.allTeachersListModel?.data ?? [];
 
           if (teachers.isEmpty) {
             return _emptyUserCard(
-              title: "No Teachers Found",
+              title: 'notification_form.no_teachers'.tr(),
               icon: Icons.menu_book_rounded,
               color: Colors.green,
             );
@@ -2102,9 +1799,7 @@ class _CreateNotificationBottomSheetState
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: Colors.grey.shade200,
-              ),
+              border: Border.all(color: Colors.grey.shade200),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(.03),
@@ -2118,7 +1813,7 @@ class _CreateNotificationBottomSheetState
               value: selectedTeacher,
               isExpanded: true,
               decoration: _dropdownDecoration(
-                "Select Teacher",
+                'notification_form.select_teacher'.tr(),
                 Icons.menu_book_rounded,
               ),
 
@@ -2129,21 +1824,16 @@ class _CreateNotificationBottomSheetState
                     children: [
                       CircleAvatar(
                         radius: 16,
-                        backgroundColor:
-                        Colors.green.withOpacity(.10),
+                        backgroundColor: Colors.green.withOpacity(.10),
                         child: Text(
-                          (e.name ?? "T")
-                              .substring(0, 1)
-                              .toUpperCase(),
+                          (e.name ?? "T").substring(0, 1).toUpperCase(),
                           style: GoogleFonts.poppins(
                             color: Colors.green,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 10),
-
                       Expanded(
                         child: Text(
                           "${e.name ?? ''} (${e.userId ?? ''})",
@@ -2175,7 +1865,6 @@ class _CreateNotificationBottomSheetState
 
     return Consumer<AllAccountantListVieModel>(
       builder: (_, vm, __) {
-
         if (vm.loading) {
           return const Center(
             child: Padding(
@@ -2185,12 +1874,11 @@ class _CreateNotificationBottomSheetState
           );
         }
 
-        final accountants =
-            vm.allAccountantListModel?.data ?? [];
+        final accountants = vm.allAccountantListModel?.data ?? [];
 
         if (accountants.isEmpty) {
           return _emptyUserCard(
-            title: "No Accountants Found",
+            title: 'notification_form.no_accountants'.tr(),
             icon: Icons.account_balance_wallet_rounded,
             color: Colors.orange,
           );
@@ -2201,9 +1889,7 @@ class _CreateNotificationBottomSheetState
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Colors.grey.shade200,
-            ),
+            border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(.03),
@@ -2218,7 +1904,7 @@ class _CreateNotificationBottomSheetState
             isExpanded: true,
 
             decoration: _dropdownDecoration(
-              "Select Accountant",
+              'notification_form.select_accountant'.tr(),
               Icons.account_balance_wallet_rounded,
             ),
 
@@ -2227,31 +1913,23 @@ class _CreateNotificationBottomSheetState
                 value: e,
                 child: Row(
                   children: [
-
                     CircleAvatar(
                       radius: 16,
-                      backgroundColor:
-                      Colors.orange.withOpacity(.10),
+                      backgroundColor: Colors.orange.withOpacity(.10),
                       child: Text(
-                        (e.name ?? "A")
-                            .substring(0, 1)
-                            .toUpperCase(),
+                        (e.name ?? "A").substring(0, 1).toUpperCase(),
                         style: GoogleFonts.poppins(
                           color: Colors.orange,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 10),
-
                     Expanded(
                       child: Text(
                         "${e.name ?? ''} (${e.userId ?? ''})",
                         overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
                       ),
                     ),
                   ],
@@ -2270,7 +1948,6 @@ class _CreateNotificationBottomSheetState
     );
   }
 
-
   Widget _emptyUserCard({
     required String title,
     required IconData icon,
@@ -2285,15 +1962,8 @@ class _CreateNotificationBottomSheetState
       ),
       child: Column(
         children: [
-
-          Icon(
-            icon,
-            color: color,
-            size: 32,
-          ),
-
+          Icon(icon, color: color, size: 32),
           const SizedBox(height: 10),
-
           Text(
             title,
             style: GoogleFonts.poppins(
@@ -2305,6 +1975,7 @@ class _CreateNotificationBottomSheetState
       ),
     );
   }
+
   void _addTarget(String selectedType) {
     Map<String, dynamic>? target;
     if (selectedType == "school_wide") {
@@ -2313,7 +1984,7 @@ class _CreateNotificationBottomSheetState
       );
 
       if (alreadyExists) {
-        Utils.show("School wide target already added", context);
+        Utils.show('notification_form.school_wide_already_added'.tr(), context);
         return;
       }
 
@@ -2324,7 +1995,7 @@ class _CreateNotificationBottomSheetState
     /// ==========================
     else if (selectedType == "class") {
       if (selectedClass == null) {
-        Utils.show("Please select class", context);
+        Utils.show('notification_form.select_class_error'.tr(), context);
         return;
       }
 
@@ -2335,7 +2006,7 @@ class _CreateNotificationBottomSheetState
       );
 
       if (alreadyExists) {
-        Utils.show("This class already added", context);
+        Utils.show('notification_form.class_already_added'.tr(), context);
         return;
       }
 
@@ -2350,12 +2021,12 @@ class _CreateNotificationBottomSheetState
     /// ==========================
     else if (selectedType == "class_section") {
       if (selectedClass == null) {
-        Utils.show("Please select class", context);
+        Utils.show('notification_form.select_class_error'.tr(), context);
         return;
       }
 
       if (selectedSection == null) {
-        Utils.show("Please select section", context);
+        Utils.show('notification_form.select_section_error'.tr(), context);
         return;
       }
 
@@ -2367,7 +2038,10 @@ class _CreateNotificationBottomSheetState
       );
 
       if (alreadyExists) {
-        Utils.show("This class section already added", context);
+        Utils.show(
+          'notification_form.class_section_already_added'.tr(),
+          context,
+        );
         return;
       }
 
@@ -2375,7 +2049,8 @@ class _CreateNotificationBottomSheetState
         "target_type": "class_section",
         "class_id": selectedClass!.classId,
         "section_id": selectedSection!.sectionId,
-        "_display": "${selectedClass!.className} - ${selectedSection!.sectionName}",
+        "_display":
+            "${selectedClass!.className} - ${selectedSection!.sectionName}",
       };
     }
     /// ==========================
@@ -2383,7 +2058,7 @@ class _CreateNotificationBottomSheetState
     /// ==========================
     else if (selectedType == "role_based") {
       if (selectedRoles.isEmpty) {
-        Utils.show("Please select role", context);
+        Utils.show('notification_form.select_role_error'.tr(), context);
 
         return;
       }
@@ -2415,7 +2090,7 @@ class _CreateNotificationBottomSheetState
 
       if (selectedIndividualType == "student") {
         if (selectedStudent == null) {
-          Utils.show("Please select student", context);
+          Utils.show('notification_form.select_student_error'.tr(), context);
 
           return;
         }
@@ -2425,7 +2100,7 @@ class _CreateNotificationBottomSheetState
         userName = selectedStudent!.name;
       } else if (selectedIndividualType == "teacher") {
         if (selectedTeacher == null) {
-          Utils.show("Please select teacher", context);
+          Utils.show('notification_form.select_teacher_error'.tr(), context);
 
           return;
         }
@@ -2435,7 +2110,7 @@ class _CreateNotificationBottomSheetState
         userName = selectedTeacher!.name;
       } else {
         if (selectedAccountant == null) {
-          Utils.show("Please select accountant", context);
+          Utils.show('notification_form.select_accountant_error'.tr(), context);
 
           return;
         }
@@ -2451,7 +2126,7 @@ class _CreateNotificationBottomSheetState
       );
 
       if (alreadyExists) {
-        Utils.show("User already added", context);
+        Utils.show('notification_form.user_already_added'.tr(), context);
 
         return;
       }

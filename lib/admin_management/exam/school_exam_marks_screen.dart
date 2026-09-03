@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -31,7 +32,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animController;
 
-  // ── Filters ──
   final _classes = <Map<String, dynamic>>[];
   final _sections = <Map<String, dynamic>>[];
   final _exams = <Map<String, dynamic>>[];
@@ -43,7 +43,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
   String? _selectedTimetableId;
   String? _selectedSubjectId;
 
-  // ── Marks entry controllers ──
   final Map<int, TextEditingController> _controllers = {};
 
   @override
@@ -57,16 +56,13 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!PermissionExtensions.canAccess(
           PermissionKeys.viewMarks)) {
-
         Utils.show(
-          "You don't have permission to perform this action",
+          'exam_marks.you_dont_have_permission'.tr(),
           context,
         );
-
         Navigator.pop(context);
         return;
       }
-      // Classes load
       final classesVm =
       Provider.of<AllClassesViewModel>(context, listen: false);
       await classesVm.allClassesApi(context);
@@ -78,7 +74,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
         }));
       });
 
-      // Exams load
       final examVm =
       Provider.of<ExamManagementViewModel>(context, listen: false);
       await examVm.examManagementApi(context);
@@ -101,9 +96,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     super.dispose();
   }
 
-  // ────────────────────────────────────────────
-  // LOAD SECTIONS
-  // ────────────────────────────────────────────
   Future<void> _loadSections(String classId) async {
     final repo = AllSectionsRepository();
     final res = await repo.allSectionsApi(classId);
@@ -119,9 +111,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     }
   }
 
-  // ────────────────────────────────────────────
-  // LOAD TIMETABLES (getExamTimetable API)
-  // ────────────────────────────────────────────
   Future<void> _loadTimetables(
       String examId, String classId, String sectionId) async {
     final vm = Provider.of<SchoolExamTimeTableViewModel>(context, listen: false);
@@ -149,9 +138,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     });
   }
 
-  // ────────────────────────────────────────────
-  // RESOLVE TIMETABLE FROM SUBJECT
-  // ────────────────────────────────────────────
   void _resolveTimetableFromSubject(String subjectId) {
     final match = _timetables.firstWhere(
           (t) => t['subject_id'] == subjectId,
@@ -159,13 +145,9 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
     _selectedTimetableId =
     match.isNotEmpty ? match['timetable_id'] : null;
-    print(
-        "🎯 subject_id: $subjectId → timetable_id: $_selectedTimetableId");
+    print("🎯 subject_id: $subjectId → timetable_id: $_selectedTimetableId");
   }
 
-  // ────────────────────────────────────────────
-  // LOAD MARKS
-  // ────────────────────────────────────────────
   Future<void> _loadMarks() async {
     if (_selectedTimetableId == null && _selectedSubjectId != null) {
       _resolveTimetableFromSubject(_selectedSubjectId!);
@@ -177,11 +159,10 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
         _selectedTimetableId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Please select Class, Section, Exam & Subject'),
+          content: Text('exam_marks.select_filters_warning'.tr()),
           backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       return;
@@ -211,9 +192,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     _animController.forward();
   }
 
-  // ────────────────────────────────────────────
-  // STATS HELPERS
-  // ────────────────────────────────────────────
   int _totalStudents(List<ExamMarksData> list) => list.length;
 
   int _appeared(List<ExamMarksData> list) =>
@@ -272,7 +250,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     }
   }
 
-
   String _formatDate(String? dateStr) {
     if (dateStr == null) return '—';
     try {
@@ -287,7 +264,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Consumer<ExamMarksViewModel>(
@@ -299,24 +275,20 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
           floatingActionButton: SizedBox(
             width: 180,
             child: AppButton(
-              title: "Enter Marks",
+              title: 'exam_marks.enter_marks'.tr(),
               icon: Icons.edit_rounded,
               height: 50,
               radius: 14,
               onTap: () {
-
                 if (!PermissionExtensions.canAccess(
                     PermissionKeys.assignMarks)) {
-
                   Utils.show(
-                    "You don't have permission to assign marks.",
+                    'exam_marks.no_permission_assign'.tr(),
                     context,
                     type: "warning",
                   );
-
                   return;
                 }
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -374,7 +346,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AppText.customText('Exam Marks',
+                AppText.customText('exam_marks.title'.tr(),
                     size: 20,
                     weight: FontWeight.bold,
                     color: Colors.white),
@@ -392,10 +364,12 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
                 color: AppColor.glassWhite,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: AppText.customText('${marks.length} Students',
-                  size: 12,
-                  weight: FontWeight.bold,
-                  color: Colors.white),
+              child: AppText.customText(
+                'exam_marks.students_count'.tr().replaceAll('{count}', '${marks.length}'),
+                size: 12,
+                weight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
         ],
       ),
@@ -407,12 +381,11 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Column(
         children: [
-          // ── Row 1: Class + Section ──
           Row(
             children: [
               Expanded(
                 child: _filterDropdown(
-                  hint: 'Class',
+                  hint: 'exam_marks.class'.tr(),
                   icon: Icons.class_,
                   value: _selectedClassId,
                   items: _classes
@@ -440,16 +413,16 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
               Expanded(
                 child: _selectedClassId == null
                     ? _filterDropdown(
-                  hint: 'Section',
+                  hint: 'exam_marks.section'.tr(),
                   icon: Icons.group,
                   value: null,
                   items: const [],
                   onChanged: (_) {},
                 )
                     : _sections.isEmpty
-                    ? _noDataBox('No Section')
+                    ? _noDataBox('exam_marks.no_section'.tr())
                     : _filterDropdown(
-                  hint: 'Section',
+                  hint: 'exam_marks.section'.tr(),
                   icon: Icons.group,
                   value: _selectedSectionId,
                   items: _sections
@@ -485,9 +458,8 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
           ),
           const SizedBox(height: 10),
 
-          // ── Exam ──
           _filterDropdown(
-            hint: 'Exam',
+            hint: 'exam_marks.exam'.tr(),
             icon: Icons.assignment_outlined,
             value: _selectedExamId,
             items: _exams
@@ -516,12 +488,11 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
           ),
           const SizedBox(height: 10),
 
-          // ── Subject (from timetable) ──
           _timetables.isEmpty
-              ? _noDataBox('Select Class, Section & Exam first',
+              ? _noDataBox('exam_marks.no_data_hint'.tr(),
               icon: Icons.menu_book_outlined)
               : _filterDropdown(
-            hint: 'Subject',
+            hint: 'exam_marks.subject'.tr(),
             icon: Icons.menu_book_outlined,
             value: _selectedSubjectId,
             items: _timetables
@@ -542,11 +513,10 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
           ),
           const SizedBox(height: 10),
 
-          // ── Load Button ──
           SizedBox(
             width: double.infinity,
             child: AppButton(
-              title: "Load Marks",
+              title: 'exam_marks.load_marks'.tr(),
               icon: Icons.search_rounded,
               height: 46,
               radius: 14,
@@ -618,23 +588,22 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 
-
   Widget _buildStatsRow(List<ExamMarksData> marks) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       child: Row(
         children: [
-          _statChip('Total', '${_totalStudents(marks)}', Icons.people,
+          _statChip('exam_marks.total'.tr(), '${_totalStudents(marks)}', Icons.people,
               Colors.blue),
           const SizedBox(width: 8),
-          _statChip('Appeared', '${_appeared(marks)}',
+          _statChip('exam_marks.appeared'.tr(), '${_appeared(marks)}',
               Icons.how_to_reg, Colors.purple),
           const SizedBox(width: 8),
-          _statChip('Passed', '${_passed(marks)}',
+          _statChip('exam_marks.passed'.tr(), '${_passed(marks)}',
               Icons.check_circle, Colors.green),
           const SizedBox(width: 8),
           _statChip(
-              'Failed', '${_failed(marks)}', Icons.cancel, Colors.red),
+              'exam_marks.failed'.tr(), '${_failed(marks)}', Icons.cancel, Colors.red),
         ],
       ),
     );
@@ -668,7 +637,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 
-
   Widget _buildBody(
       ExamMarksViewModel vm, List<ExamMarksData> marks) {
     if (vm.loading) return _shimmer();
@@ -681,14 +649,13 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             Icon(Icons.assignment_outlined,
                 size: 80, color: Colors.grey.shade300),
             const SizedBox(height: 16),
-            Text('Select filters & load marks',
+            Text('exam_marks.select_filters_load'.tr(),
                 style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey.shade500)),
             const SizedBox(height: 8),
-            Text(
-                'Choose class, section, exam & subject\nthen tap Load Marks',
+            Text('exam_marks.select_filters_hint'.tr(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 13, color: Colors.grey.shade400)),
@@ -701,11 +668,9 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
 
     return Column(
       children: [
-        // ── Stats ──
         _buildStatsRow(marks),
         const SizedBox(height: 10),
 
-        // ── Average Bar ──
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Container(
@@ -720,7 +685,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
                 const Icon(Icons.bar_chart_rounded,
                     color: Colors.white, size: 18),
                 const SizedBox(width: 8),
-                AppText.customText('Class Average',
+                AppText.customText('exam_marks.class_average'.tr(),
                     size: 12, color: Colors.white70),
                 const Spacer(),
                 AppText.customText(
@@ -749,13 +714,14 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
         ),
         const SizedBox(height: 8),
 
-        // ── Record count ──
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 18),
           child: Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              'Showing 1 to ${marks.length} of ${marks.length} records',
+              'exam_marks.showing_records'.tr()
+                  .replaceAll('{count}', '${marks.length}')
+                  .replaceAll('{total}', '${marks.length}'),
               style: TextStyle(
                   fontSize: 12, color: Colors.grey.shade500),
             ),
@@ -763,7 +729,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
         ),
         const SizedBox(height: 8),
 
-        // ── Table ──
         Expanded(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(18, 0, 18, 90),
@@ -823,14 +788,14 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
       ),
       child: Row(
         children: [
-          _headerCell('ROLL NO', width: 80),
-          _headerCell('STUDENT NAME', width: 150),
-          _headerCell('EXAM', width: 130),
-          _headerCell('SUBJECT', width: 90),
-          _headerCell('CLASS-SECTION', width: 110),
-          _headerCell('MARKS', width: 120),
-          _headerCell('EXAM DATE', width: 110),
-          _headerCell('REMARKS', width: 70),
+          _headerCell('exam_marks.roll_no'.tr(), width: 80),
+          _headerCell('exam_marks.student_name'.tr(), width: 150),
+          _headerCell('exam_marks.exam_col'.tr(), width: 130),
+          _headerCell('exam_marks.subject_col'.tr(), width: 90),
+          _headerCell('exam_marks.class_section'.tr(), width: 110),
+          _headerCell('exam_marks.marks_col'.tr(), width: 120),
+          _headerCell('exam_marks.exam_date'.tr(), width: 110),
+          _headerCell('exam_marks.remarks'.tr(), width: 70),
         ],
       ),
     );
@@ -863,7 +828,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     final bg =
     index.isEven ? Colors.white : const Color(0xFFFAFBFC);
 
-    // Avatar
     final avatarColors = [
       const Color(0xFF3B82F6),
       const Color(0xFFEC4899),
@@ -886,7 +850,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
           horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          // ── Roll No ──
           SizedBox(
             width: 80,
             child: Text(
@@ -898,7 +861,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             ),
           ),
 
-          // ── Student Name + Avatar ──
           SizedBox(
             width: 150,
             child: Row(
@@ -932,7 +894,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             ),
           ),
 
-          // ── Exam ──
           SizedBox(
             width: 130,
             child: Text(s.examName ?? '—',
@@ -941,7 +902,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
                 overflow: TextOverflow.ellipsis),
           ),
 
-          // ── Subject ──
           SizedBox(
             width: 90,
             child: Text(s.subjectName ?? '—',
@@ -950,7 +910,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
                 overflow: TextOverflow.ellipsis),
           ),
 
-          // ── Class - Section ──
           SizedBox(
             width: 110,
             child: Text(
@@ -961,7 +920,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             ),
           ),
 
-          // ── Marks ──
           SizedBox(
             width: 120,
             child: s.marksObtained != null
@@ -1012,7 +970,7 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
                 border: Border.all(
                     color: Colors.orange.shade200),
               ),
-              child: Text('Absent',
+              child: Text('exam_marks.absent'.tr(),
                   style: TextStyle(
                       fontSize: 11,
                       color: Colors.orange.shade700,
@@ -1020,7 +978,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             ),
           ),
 
-          // ── Exam Date ──
           SizedBox(
             width: 110,
             child: Text(
@@ -1030,7 +987,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
             ),
           ),
 
-          // ── Remarks ──
           SizedBox(
             width: 170,
             child: Text(
@@ -1064,7 +1020,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 
-
   Widget _animated(int i, Widget child) {
     return AnimatedBuilder(
       animation: _animController,
@@ -1083,7 +1038,6 @@ class _SchoolExamMarksScreenState extends State<SchoolExamMarksScreen>
     );
   }
 }
-
 
 class _MarksEntrySheet extends StatefulWidget {
   final List<ExamMarksData> marks;
@@ -1115,14 +1069,14 @@ class _MarksEntrySheetState extends State<_MarksEntrySheet> {
       if (text.isEmpty) continue;
       final val = double.tryParse(text);
       if (val == null) {
-        _errors[id] = 'Invalid number';
+        _errors[id] = 'exam_marks.invalid_number'.tr();
         valid = false;
       } else if (val < 0) {
-        _errors[id] = 'Cannot be negative';
+        _errors[id] = 'exam_marks.cannot_be_negative'.tr();
         valid = false;
       } else if (val > (s.totalMarks ?? 100)) {
         _errors[id] =
-        'Max: ${s.totalMarks?.toStringAsFixed(0) ?? "100"}';
+            'exam_marks.max_marks_error'.tr().replaceAll('{max}', s.totalMarks?.toStringAsFixed(0) ?? "100");
         valid = false;
       }
     }
@@ -1133,7 +1087,7 @@ class _MarksEntrySheetState extends State<_MarksEntrySheet> {
   Future<void> _saveAll() async {
     if (!_validate()) return;
     if (widget.timetableId == null) {
-      _snack('Timetable ID missing. Please reload marks.',
+      _snack('exam_marks.timetable_missing'.tr(),
           Colors.red.shade400);
       return;
     }
@@ -1174,8 +1128,10 @@ class _MarksEntrySheetState extends State<_MarksEntrySheet> {
 
     _snack(
       failCount == 0
-          ? '$successCount student(s) marks saved successfully!'
-          : '$successCount saved, $failCount failed.',
+          ? 'exam_marks.marks_saved'.tr().replaceAll('{count}', '$successCount')
+          : 'exam_marks.marks_saved_partial'.tr()
+          .replaceAll('{saved}', '$successCount')
+          .replaceAll('{failed}', '$failCount'),
       failCount == 0
           ? Colors.green.shade500
           : Colors.orange.shade600,
@@ -1255,11 +1211,12 @@ class _MarksEntrySheetState extends State<_MarksEntrySheet> {
                     crossAxisAlignment:
                     CrossAxisAlignment.start,
                     children: [
-                      AppText.customText('Enter Marks',
+                      AppText.customText('exam_marks.enter_marks_title'.tr(),
                           size: 18,
                           weight: FontWeight.bold),
                       AppText.customText(
-                        '${widget.marks.length} students  •  Total: ${total.toStringAsFixed(0)}',
+                        'exam_marks.students_count'.tr().replaceAll('{count}', '${widget.marks.length}') + '  •  ' +
+                            'exam_marks.total_marks_label'.tr().replaceAll('{total}', '${total.toStringAsFixed(0)}'),
                         size: 12,
                         color: AppColor.softGreyText,
                       ),
@@ -1379,7 +1336,7 @@ class _MarksEntrySheetState extends State<_MarksEntrySheet> {
                             }
                           },
                           decoration: InputDecoration(
-                            hintText: 'Absent',
+                            hintText: 'exam_marks.absent'.tr(),
                             hintStyle: TextStyle(
                                 fontSize: 11,
                                 color: Colors
@@ -1448,7 +1405,7 @@ class _MarksEntrySheetState extends State<_MarksEntrySheet> {
                       color: Colors.orange.shade400),
                   const SizedBox(width: 6),
                   Text(
-                    'Leave field empty to mark student as Absent',
+                    'exam_marks.absent_hint'.tr(),
                     style: TextStyle(
                         fontSize: 11,
                         color: Colors.orange.shade600),
@@ -1502,7 +1459,7 @@ class _MarksEntrySheetState extends State<_MarksEntrySheet> {
                               size: 20),
                           const SizedBox(width: 8),
                           AppText.customText(
-                            'Save All Marks',
+                            'exam_marks.save_all_marks'.tr(),
                             size: 15,
                             weight: FontWeight.bold,
                             color: Colors.white,

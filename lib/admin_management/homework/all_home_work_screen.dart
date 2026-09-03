@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -81,18 +82,13 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
   int? loadingHomeworkId;
 
   bool _allowSubmission = true;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!PermissionExtensions.canAccess(
-          PermissionKeys.viewHomework)) {
-
-        Utils.show(
-          "You don't have permission to view homework",
-          context,
-        );
-
+      if (!PermissionExtensions.canAccess(PermissionKeys.viewHomework)) {
+        Utils.show('homework.no_permission_view'.tr(), context);
         Navigator.pop(context);
         return;
       }
@@ -120,6 +116,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
   }
 
   String? _filterStatus; // "submitted" | "pending" | "late"
+
   @override
   void dispose() {
     _controller.dispose();
@@ -137,7 +134,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     }
   }
 
-  // ✅ FIX #2 — UTC timezone shift avoid karo, local date string banao
   String _localDateString(DateTime d) =>
       "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
 
@@ -173,7 +169,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Handle
                   Center(
                     child: Container(
                       width: 44,
@@ -186,7 +181,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                   ),
                   const SizedBox(height: 20),
 
-                  // Title row
                   Row(
                     children: [
                       Container(
@@ -207,7 +201,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "New Homework",
+                              'homework.new_homework'.tr(),
                               style: GoogleFonts.poppins(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600,
@@ -215,7 +209,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                               ),
                             ),
                             Text(
-                              "Fill in the details below",
+                              'homework.fill_details'.tr(),
                               style: GoogleFonts.poppins(
                                 fontSize: 12,
                                 color: _DS.textLight,
@@ -243,8 +237,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                   ),
                   const SizedBox(height: 28),
 
-                  // Subject
-                  _FormLabel("Subject", Icons.menu_book_rounded),
+                  _FormLabel('homework.subject'.tr(), Icons.menu_book_rounded),
                   const SizedBox(height: 8),
                   Consumer<AllSubjectsVieModel>(
                     builder: (_, vm, __) {
@@ -252,7 +245,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                       final subjects = vm.allSubjectsModel?.data ?? [];
                       return _styledDropdown<String>(
                         value: _selectedSubject,
-                        hint: "Choose subject",
+                        hint: 'homework.choose_subject'.tr(),
                         icon: Icons.menu_book_rounded,
                         items: subjects
                             .map(
@@ -268,14 +261,14 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                   ),
                   const SizedBox(height: 16),
 
-                  _FormLabel("Class", Icons.class_outlined),
+                  _FormLabel('homework.class'.tr(), Icons.class_outlined),
                   const SizedBox(height: 8),
                   Consumer<AllClassesViewModel>(
                     builder: (_, vm, __) {
                       final classes = vm.allClassesModel?.data ?? [];
                       return _styledDropdown<String>(
                         value: selectedClassId,
-                        hint: "Choose class",
+                        hint: 'homework.choose_class'.tr(),
                         icon: Icons.class_outlined,
                         items: classes
                             .map(
@@ -300,25 +293,22 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                   ),
                   const SizedBox(height: 16),
 
-                  // ── Section field — replace karo existing Section block ko ──
-                  _FormLabel("Section", Icons.grid_view_rounded),
+                  _FormLabel('homework.section'.tr(), Icons.grid_view_rounded),
                   const SizedBox(height: 8),
                   Consumer<AllSectionsViewModel>(
                     builder: (_, vm, __) {
                       final sections = vm.allSectionsModel?.data ?? [];
 
-                      // Class select nahi hui abhi tak
                       if (selectedClassId == null) {
                         return _styledDropdown<String>(
                           value: null,
-                          hint: "Choose section",
+                          hint: 'homework.choose_section'.tr(),
                           icon: Icons.grid_view_rounded,
                           items: const [],
                           onChanged: (_) {},
                         );
                       }
 
-                      // Class select hui lekin sections nahi hain
                       if (sections.isEmpty) {
                         return Container(
                           padding: const EdgeInsets.symmetric(
@@ -343,11 +333,11 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  "No Section Available for this class",
+                                  'homework.no_section_available'.tr(),
                                   style: GoogleFonts.poppins(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFFF59E0B),
+                                    color: const Color(0xFFF59E0B),
                                   ),
                                 ),
                               ),
@@ -356,10 +346,9 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         );
                       }
 
-                      // Sections available
                       return _styledDropdown<String>(
                         value: selectedSectionId,
-                        hint: "Choose section",
+                        hint: 'homework.choose_section'.tr(),
                         icon: Icons.grid_view_rounded,
                         items: sections
                             .map(
@@ -373,36 +362,26 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                       );
                     },
                   ),
-                  // Section
-                  // _FormLabel("Section", Icons.grid_view_rounded),
-                  // const SizedBox(height: 8),
-                  // Consumer<AllSectionsViewModel>(builder: (_, vm, __) {
-                  //   final sections = vm.allSectionsModel?.data ?? [];
-                  //   return _styledDropdown<String>(
-                  //     value: selectedSectionId, hint: "Choose section", icon: Icons.grid_view_rounded,
-                  //     items: sections.map((s) => DropdownMenuItem(value: s.sectionId.toString(), child: Text(s.sectionName ?? ""))).toList(),
-                  //     onChanged: (v) => setSheet(() => selectedSectionId = v),
-                  //   );
-                  // }),
                   const SizedBox(height: 16),
 
-                  // Description
-                  _FormLabel("Description", Icons.edit_note_rounded),
+                  _FormLabel(
+                    'homework.description'.tr(),
+                    Icons.edit_note_rounded,
+                  ),
                   const SizedBox(height: 8),
                   TextField(
                     controller: _descriptionController,
                     maxLines: 3,
                     style: const TextStyle(fontSize: 14, color: _DS.textDark),
                     decoration: _inputDeco(
-                      hint: "Enter homework details...",
+                      hint: 'homework.description_hint'.tr(),
                       icon: Icons.edit_note_rounded,
                     ),
                   ),
                   const SizedBox(height: 16),
 
-                  // ✅ FIX #2 — Due Date: local date, no UTC shift
                   _FormLabel(
-                    "Due Date (Optional)",
+                    'homework.due_date'.tr(),
                     Icons.calendar_month_rounded,
                   ),
                   const SizedBox(height: 8),
@@ -435,7 +414,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                       }
                     },
                     decoration: _inputDeco(
-                      hint: "Select due date",
+                      hint: 'homework.select_due_date'.tr(),
                       icon: Icons.calendar_month_rounded,
                     ),
                   ),
@@ -473,15 +452,13 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                 : Colors.grey,
                           ),
                         ),
-
                         const SizedBox(width: 14),
-
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Allow Online Submission",
+                                'homework.allow_online_submission'.tr(),
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 13,
@@ -490,8 +467,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                               const SizedBox(height: 4),
                               Text(
                                 _allowSubmission
-                                    ? "Students can submit homework online"
-                                    : "Submission disabled",
+                                    ? 'homework.submission_enabled'.tr()
+                                    : 'homework.submission_disabled'.tr(),
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
                                   color: Colors.grey,
@@ -500,7 +477,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                             ],
                           ),
                         ),
-
                         Switch.adaptive(
                           value: _allowSubmission,
                           activeColor: AppColor.primary,
@@ -514,43 +490,16 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                     ),
                   ),
 
-                  //  FIX #1 — Document Upload
                   _FormLabel(
-                    "Attachment (Optional)",
+                    'homework.attachment_optional'.tr(),
                     Icons.attach_file_rounded,
                   ),
                   const SizedBox(height: 8),
                   GestureDetector(
-                    // onTap: () async {
-                    //   final result = await FilePicker.platform.pickFiles(
-                    //     type: FileType.custom,
-                    //     allowedExtensions: ["PDF, DOC, DOCX • Max 1 MB"],
-                    //   );
-                    //
-                    //   if (result != null && result.files.single.path != null) {
-                    //     final file = File(result.files.single.path!);
-                    //
-                    //     // ✅ 1 MB = 1024 * 1024 bytes
-                    //     final fileSizeInBytes = file.lengthSync();
-                    //
-                    //     if (fileSizeInBytes > 1024 * 1024) {
-                    //       // ❌ Size exceed
-                    //       Utils.show("Max file size allowed is 1 MB", context);
-                    //       return;
-                    //     }
-                    //
-                    //     // ✅ Valid file
-                    //     setSheet(() {
-                    //       _selectedPdfFile = file;
-                    //       _selectedPdfName = result.files.single.name;
-                    //     });
-                    //   }
-                    // },
                     onTap: () async {
-                      // ✅ Sirf PDF allow karo
                       final result = await FilePicker.platform.pickFiles(
                         type: FileType.custom,
-                        allowedExtensions: ['pdf'], // ✅ Only PDF
+                        allowedExtensions: ['pdf'],
                         allowMultiple: false,
                       );
 
@@ -558,9 +507,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
 
                       final pickedFile = result.files.first;
 
-                      // ✅ 1 MB = 1024 * 1024 bytes
                       if (pickedFile.size > 1 * 1024 * 1024) {
-                        Utils.show("PDF size must be less than 1 MB", context);
+                        Utils.show('homework.pdf_size_limit'.tr(), context);
                         return;
                       }
 
@@ -615,8 +563,9 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                               children: [
                                 Text(
                                   _selectedPdfFile != null
-                                      ? _selectedPdfName ?? "File selected"
-                                      : "Tap to upload PDF",
+                                      ? _selectedPdfName ??
+                                            'homework.file_selected'.tr()
+                                      : 'homework.tap_to_upload_pdf'.tr(),
                                   style: TextStyle(
                                     fontSize: 13.5,
                                     fontWeight: _selectedPdfFile != null
@@ -671,9 +620,9 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                 gradient: _DS.gradientHeader,
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: const Text(
-                                "Browse",
-                                style: TextStyle(
+                              child: Text(
+                                'homework.browse'.tr(),
+                                style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.white,
@@ -685,8 +634,9 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                     ),
                   ),
                   const SizedBox(height: 16),
+
                   _FormLabel(
-                    "Submission Image (Optional)",
+                    'homework.submission_image_optional'.tr(),
                     Icons.image_rounded,
                   ),
                   const SizedBox(height: 10),
@@ -703,10 +653,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                       final file = File(result.files.first.path!);
 
                       if (file.lengthSync() > 2 * 1024 * 1024) {
-                        Utils.show(
-                          "Image size must be less than 2 MB",
-                          context,
-                        );
+                        Utils.show('homework.image_size_limit'.tr(), context);
                         return;
                       }
 
@@ -715,7 +662,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         _selectedImageName = result.files.first.name;
                       });
                     },
-
                     child: Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -725,7 +671,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         ),
                         color: AppColor.primary.withOpacity(.03),
                       ),
-
                       child: _selectedImageFile == null
                           ? Padding(
                               padding: const EdgeInsets.all(24),
@@ -736,20 +681,16 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                     size: 40,
                                     color: AppColor.primary,
                                   ),
-
                                   const SizedBox(height: 12),
-
                                   Text(
-                                    "Upload Homework Image",
+                                    'homework.upload_homework_image'.tr(),
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-
                                   const SizedBox(height: 4),
-
                                   Text(
-                                    "PNG, JPG • Max 2 MB",
+                                    'homework.image_format_hint'.tr(),
                                     style: GoogleFonts.poppins(
                                       color: Colors.grey.shade600,
                                       fontSize: 12,
@@ -769,7 +710,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-
                                 Positioned(
                                   right: 10,
                                   top: 10,
@@ -794,7 +734,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                     ),
                                   ),
                                 ),
-
                                 Positioned(
                                   left: 12,
                                   bottom: 12,
@@ -820,27 +759,21 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                             ),
                     ),
                   ),
-
                   const SizedBox(height: 8),
-
                   const SizedBox(height: 28),
 
-                  // Submit
                   Consumer<CreateAdminTeachersHomeworkViewModel>(
                     builder: (_, addVM, __) => AppButton(
-                      title: "Add Homework",
+                      title: 'homework.add_homework_btn'.tr(),
                       icon: Icons.assignment_ind_outlined,
                       loading: addVM.loading,
                       onTap: () async {
-                        print("PDF => ${_selectedPdfFile?.path}");
-                        print("IMAGE => ${_selectedImageFile?.path}");
-
                         if (_selectedSubject == null ||
                             selectedClassId == null ||
                             selectedSectionId == null ||
                             _descriptionController.text.trim().isEmpty) {
                           Utils.show(
-                            "Please select Subject, Class, Section and Description",
+                            'homework.select_all_fields'.tr(),
                             context,
                           );
                           return;
@@ -867,8 +800,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                           ).allHomeworkApi(context);
 
                           Navigator.pop(context);
-
-                          Utils.show("Homework created successfully", context);
+                          Utils.show('homework.homework_created'.tr(), context);
                         }
                       },
                     ),
@@ -882,92 +814,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     );
   }
 
-  // ─── FIX #3: Submission Status Bottom Sheet ────────────────────────────────
-  // void _showSubmissionStatus(HomeworkData hw) {
-  //   final submitted = int.tryParse(hw.submittedCount ?? "0") ?? 0;
-  //   final pending   = int.tryParse(hw.pendingCount   ?? "0") ?? 0;
-  //   final late      = int.tryParse(hw.lateCount      ?? "0") ?? 0;
-  //   final total     = hw.totalStudents ?? (submitted + pending + late);
-  //   final progress  = total > 0 ? submitted / total : 0.0;
-  //
-  //   showModalBottomSheet(
-  //     context: context,
-  //     backgroundColor: Colors.transparent,
-  //     builder: (_) => SafeArea(
-  //       child: Container(
-  //         padding: const EdgeInsets.fromLTRB(24, 12, 24, 40),
-  //         decoration: const BoxDecoration(
-  //           color: Colors.white,
-  //           borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-  //         ),
-  //         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-  //           Center(child: Container(width: 44, height: 4,
-  //               decoration: BoxDecoration(color: _DS.border, borderRadius: BorderRadius.circular(99)))),
-  //           const SizedBox(height: 20),
-  //
-  //           // Title
-  //           Row(children: [
-  //             Container(padding: const EdgeInsets.all(10),
-  //                 decoration: BoxDecoration(gradient: _DS.gradientHeader, borderRadius: BorderRadius.circular(12)),
-  //                 child: const Icon(Icons.bar_chart_rounded, color: Colors.white, size: 20)),
-  //             const SizedBox(width: 12),
-  //             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-  //               Text(hw.subjectName ?? "Subject",
-  //                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: _DS.textDark)),
-  //               Text("${hw.className ?? ''} • ${hw.sectionName ?? ''}",
-  //                   style: const TextStyle(fontSize: 12, color: _DS.textLight)),
-  //             ])),
-  //           ]),
-  //           const SizedBox(height: 24),
-  //
-  //           // Progress bar
-  //           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-  //             const Text("Overall Submission",
-  //                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _DS.textMid)),
-  //             Text("${(progress * 100).round()}%",
-  //                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _DS.primary)),
-  //           ]),
-  //           const SizedBox(height: 8),
-  //           ClipRRect(borderRadius: BorderRadius.circular(99),
-  //               child: LinearProgressIndicator(value: progress, minHeight: 10,
-  //                   backgroundColor: _DS.primaryLight,
-  //                   valueColor: const AlwaysStoppedAnimation<Color>(_DS.primary))),
-  //           const SizedBox(height: 24),
-  //
-  //           // 3 stat cards
-  //           Row(children: [
-  //             _statCard(icon: Icons.check_circle_rounded, label: "Submitted", value: "$submitted", color: _DS.green,   total: total),
-  //             const SizedBox(width: 10),
-  //             _statCard(icon: Icons.hourglass_empty_rounded, label: "Pending", value: "$pending",  color: _DS.orange,  total: total),
-  //             const SizedBox(width: 10),
-  //             _statCard(icon: Icons.schedule_rounded,        label: "Late",    value: "$late",      color: _DS.red,     total: total),
-  //           ]),
-  //           const SizedBox(height: 20),
-  //
-  //           // Total students
-  //           Container(
-  //             padding: const EdgeInsets.all(14),
-  //             decoration: BoxDecoration(
-  //                 color: _DS.bg, borderRadius: BorderRadius.circular(12),
-  //                 border: Border.all(color: _DS.border)),
-  //             child: Row(children: [
-  //               const Icon(Icons.people_rounded, size: 18, color: _DS.primary),
-  //               const SizedBox(width: 10),
-  //               const Text("Total Students",
-  //                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: _DS.textDark)),
-  //               const Spacer(),
-  //               Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-  //                   decoration: BoxDecoration(color: AppColor.primaryLight, borderRadius: BorderRadius.circular(20)),
-  //                   child: Text("$total",
-  //                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: _DS.primary))),
-  //             ]),
-  //           ),
-  //         ]),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   void _showSubmissionStatus(HomeworkData hw) async {
     final detailsVM = Provider.of<HomeworkDetailsViewModel>(
       context,
@@ -977,7 +823,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     final homeworkData = detailsVM.homeworkDetailsModel?.data;
 
     if (homeworkData == null) {
-      Utils.show("Unable to load submissions", context);
+      Utils.show('homework.failed_to_load_submissions'.tr(), context);
       return;
     }
 
@@ -998,7 +844,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     }).length;
 
     final total = students.length;
-
     final progress = total > 0 ? submitted / total : 0.0;
 
     showModalBottomSheet(
@@ -1031,9 +876,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         ),
                       ),
                     ),
-              
                     const SizedBox(height: 20),
-              
+
                     Row(
                       children: [
                         Container(
@@ -1047,9 +891,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                             color: Colors.white,
                           ),
                         ),
-              
                         const SizedBox(width: 12),
-              
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1061,7 +903,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
-              
                               Text(
                                 "${hw.className} • ${hw.sectionName}",
                                 style: const TextStyle(color: Colors.grey),
@@ -1071,41 +912,34 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         ),
                       ],
                     ),
-              
                     const SizedBox(height: 20),
-              
+
                     IntrinsicHeight(
                       child: Row(
                         children: [
                           _detailStatTile(
-                            "Total",
+                            'homework.total'.tr(),
                             "$total",
                             Icons.people,
                             Colors.indigo,
                           ),
-              
                           const SizedBox(width: 10),
-              
                           _detailStatTile(
-                            "Submitted",
+                            'homework.submitted'.tr(),
                             "$submitted",
                             Icons.check_circle,
                             Colors.green,
                           ),
-              
                           const SizedBox(width: 10),
-              
                           _detailStatTile(
-                            "Pending",
+                            'homework.pending'.tr(),
                             "$pending",
                             Icons.hourglass_empty,
                             Colors.orange,
                           ),
-              
                           const SizedBox(width: 10),
-              
                           _detailStatTile(
-                            "Late",
+                            'homework.late'.tr(),
                             "$late",
                             Icons.schedule,
                             Colors.red,
@@ -1113,36 +947,30 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         ],
                       ),
                     ),
-              
                     const SizedBox(height: 20),
-              
-                    if (attachment != null ||
-                        attachmentPhotos.isNotEmpty)
+
+                    if (attachment != null || attachmentPhotos.isNotEmpty)
                       Container(
                         margin: const EdgeInsets.only(bottom: 20),
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: Colors.blue.shade50,
                           borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: Colors.blue.shade100,
-                          ),
+                          border: Border.all(color: Colors.blue.shade100),
                         ),
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-              
-                            const Row(
+                            Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.assignment,
                                   color: Colors.blue,
                                 ),
-                                SizedBox(width: 8),
+                                const SizedBox(width: 8),
                                 Text(
-                                  "Homework Attachment",
-                                  style: TextStyle(
+                                  'homework.attachment'.tr(),
+                                  style: const TextStyle(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,
                                   ),
@@ -1171,27 +999,32 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                               Color(0xFFD32F2F),
                                             ],
                                           ),
-                                          borderRadius: BorderRadius.circular(14),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.red.withOpacity(.25),
+                                              color: Colors.red.withOpacity(
+                                                .25,
+                                              ),
                                               blurRadius: 12,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
                                         ),
-                                        child: const Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.picture_as_pdf_rounded,
                                               color: Colors.white,
                                               size: 18,
                                             ),
-                                            SizedBox(width: 8),
+                                            const SizedBox(width: 8),
                                             Text(
-                                              "View PDF",
-                                              style: TextStyle(
+                                              'homework.view_pdf'.tr(),
+                                              style: const TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w500,
                                                 fontSize: 13,
@@ -1202,11 +1035,9 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                       ),
                                     ),
                                   ),
-              
                                 if (attachment != null &&
                                     attachmentPhotos.isNotEmpty)
                                   const SizedBox(width: 12),
-              
                                 if (attachmentPhotos.isNotEmpty)
                                   Expanded(
                                     child: InkWell(
@@ -1225,27 +1056,32 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                               Color(0xFF00A152),
                                             ],
                                           ),
-                                          borderRadius: BorderRadius.circular(14),
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.green.withOpacity(.25),
+                                              color: Colors.green.withOpacity(
+                                                .25,
+                                              ),
                                               blurRadius: 12,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
                                         ),
-                                        child: const Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.image_rounded,
                                               color: Colors.white,
                                               size: 15,
                                             ),
-                                            SizedBox(width: 8),
+                                            const SizedBox(width: 8),
                                             Text(
-                                              "View Image",
-                                              style: TextStyle(
+                                              'homework.view_image'.tr(),
+                                              style: const TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: 13,
@@ -1261,10 +1097,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                           ],
                         ),
                       ),
-              
                     const SizedBox(height: 15),
-              
-              
+
                     ClipRRect(
                       borderRadius: BorderRadius.circular(100),
                       child: LinearProgressIndicator(
@@ -1272,28 +1106,27 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         minHeight: 10,
                       ),
                     ),
-              
                     const SizedBox(height: 24),
-              
+
                     Text(
-                      "Student Submissions (${students.length})",
+                      'homework.student_submissions'.tr().replaceAll(
+                        '{count}',
+                        '${students.length}',
+                      ),
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-              
                     const SizedBox(height: 15),
-              
+
                     ...students.map((student) {
                       final status = student.status ?? "";
-              
                       final isSubmitted = status.toLowerCase() == "submitted";
-              
                       final statusColor = isSubmitted
                           ? Colors.green
                           : Colors.orange;
-              
+
                       return Container(
                         margin: const EdgeInsets.only(bottom: 12),
                         padding: const EdgeInsets.all(14),
@@ -1314,12 +1147,11 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                         "?",
                                   ),
                                 ),
-              
                                 const SizedBox(width: 12),
-              
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         student.studentName ?? "",
@@ -1327,12 +1159,13 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
-              
-                                      Text("Roll No : ${student.rollNo ?? "-"}"),
+                                      Text(
+                                        'homework.roll_no'.tr() +
+                                            " : ${student.rollNo ?? "-"}",
+                                      ),
                                     ],
                                   ),
                                 ),
-              
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 10,
@@ -1352,10 +1185,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                 ),
                               ],
                             ),
-              
                             if (isSubmitted) ...[
                               const SizedBox(height: 12),
-              
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: SizedBox(
@@ -1366,11 +1197,12 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                         student.studentId!,
                                       );
                                     },
-              
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor: _DS.primary,
                                       side: BorderSide(
-                                        color: AppColor.primary.withOpacity(.35),
+                                        color: AppColor.primary.withOpacity(
+                                          .35,
+                                        ),
                                         width: 1.2,
                                       ),
                                       backgroundColor: AppColor.primaryLight,
@@ -1382,14 +1214,14 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                         vertical: 0,
                                       ),
                                     ),
-              
                                     child: const Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.visibility_outlined, size: 14),
-              
-                                        SizedBox(width: 5),
-              
+                                        Icon(
+                                          Icons.visibility_outlined,
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 5),
                                         Text(
                                           "View Homework",
                                           style: TextStyle(
@@ -1425,7 +1257,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     );
 
     if (student == null) {
-      Utils.show("Submission not found", context);
+      Utils.show('homework.submission_not_found'.tr(), context);
       return;
     }
 
@@ -1444,7 +1276,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
             child: Column(
               children: [
                 const SizedBox(height: 12),
-          
                 Container(
                   width: 60,
                   height: 5,
@@ -1453,16 +1284,14 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
-          
                 const SizedBox(height: 20),
-          
+
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        /// Header
                         Row(
                           children: [
                             CircleAvatar(
@@ -1477,9 +1306,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                 ),
                               ),
                             ),
-          
                             const SizedBox(width: 12),
-          
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1491,12 +1318,13 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                       fontWeight: FontWeight.w700,
                                     ),
                                   ),
-          
-                                  Text("Roll: ${student.rollNo ?? "-"}"),
+                                  Text(
+                                    'homework.roll_no'.tr() +
+                                        ": ${student.rollNo ?? "-"}",
+                                  ),
                                 ],
                               ),
                             ),
-          
                             IconButton(
                               onPressed: () {
                                 Navigator.pop(context);
@@ -1505,9 +1333,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                             ),
                           ],
                         ),
-          
                         const SizedBox(height: 20),
-          
+
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -1525,7 +1352,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                 color: Colors.green,
                                 size: 16,
                               ),
-                              SizedBox(width: 6),
+                              const SizedBox(width: 6),
                               Text(
                                 "Submitted",
                                 style: TextStyle(
@@ -1536,16 +1363,12 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                             ],
                           ),
                         ),
-          
                         const SizedBox(height: 24),
-          
-                        /// PDF SECTION
+
                         if (student.submittedFile != null)
                           _pdfCard(student.submittedFile!.url ?? ""),
-          
                         const SizedBox(height: 24),
-          
-                        /// IMAGES
+
                         if (student.submittedPhotos != null &&
                             student.submittedPhotos!.isNotEmpty)
                           _imageSection(student),
@@ -1553,13 +1376,13 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                     ),
                   ),
                 ),
-          
+
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: SizedBox(
                     width: double.infinity,
                     child: AppButton(
-                      title: "Close",
+                      title: 'homework.close'.tr(),
                       onTap: () {
                         Navigator.pop(context);
                       },
@@ -1597,20 +1420,16 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
               size: 28,
             ),
           ),
-
           const SizedBox(width: 14),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Submitted PDF",
-                  style: TextStyle(fontWeight: FontWeight.w700),
+                Text(
+                  'homework.submitted_pdf'.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.w700),
                 ),
-
                 const SizedBox(height: 4),
-
                 Text(
                   pdfUrl.split('/').last,
                   maxLines: 1,
@@ -1620,7 +1439,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
               ],
             ),
           ),
-
           IconButton(
             icon: const Icon(Icons.open_in_new, color: Colors.red),
             onPressed: () async {
@@ -1638,13 +1456,11 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
       children: [
         Row(
           children: [
-            const Text(
-              "Submitted Photos",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            Text(
+              'homework.submitted_photos'.tr(),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
             ),
-
             const SizedBox(width: 8),
-
             CircleAvatar(
               radius: 12,
               backgroundColor: Colors.green.shade100,
@@ -1655,9 +1471,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
             ),
           ],
         ),
-
         const SizedBox(height: 14),
-
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -1679,18 +1493,15 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                 child: Image.network(
                   imageUrl,
                   fit: BoxFit.cover,
-
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) {
                       return child;
                     }
-
                     return Container(
                       color: Colors.grey.shade100,
                       child: const Center(child: CircularProgressIndicator()),
                     );
                   },
-
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
                       color: Colors.grey.shade100,
@@ -1724,7 +1535,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                 height: 500,
                 child: PhotoView(imageProvider: NetworkImage(imageUrl)),
               ),
-
               Positioned(
                 right: 10,
                 top: 10,
@@ -1774,8 +1584,12 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     }
   }
 
-  // Detail stat tile helper
-  Widget _detailStatTile(String label, String value, IconData icon, Color color,) {
+  Widget _detailStatTile(
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
@@ -1785,7 +1599,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
           color: color.withOpacity(0.05),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👈 important
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Icon(icon, color: color, size: 22),
             Column(
@@ -1851,15 +1665,18 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
   @override
   Widget build(BuildContext context) {
     final homeworkVM = Provider.of<AllHomeWorkViewModel>(context);
-    // final homeworkList = homeworkVM.allHomeworkModel?.data ?? <Data>[];
     final List<HomeworkData> homeworkList =
         (homeworkVM.allHomeworkModel?.data ?? []).cast<HomeworkData>();
     final isLoading = homeworkVM.loading;
     final filteredList = homeworkList.where((hw) {
-      final matchClass = _filterClassId == null || hw.className?.toLowerCase() ==
+      final matchClass =
+          _filterClassId == null ||
+          hw.className?.toLowerCase() ==
               getClassNameById(_filterClassId)?.toLowerCase();
-      final matchSubject = _filterSubjectId == null || hw.subjectName?.toLowerCase() ==
-          getSubjectNameById(_filterSubjectId)?.toLowerCase();
+      final matchSubject =
+          _filterSubjectId == null ||
+          hw.subjectName?.toLowerCase() ==
+              getSubjectNameById(_filterSubjectId)?.toLowerCase();
       final submitted = int.tryParse(hw.submittedCount ?? "0") ?? 0;
       final pending = int.tryParse(hw.pendingCount ?? "0") ?? 0;
       final late = int.tryParse(hw.lateCount ?? "0") ?? 0;
@@ -1876,6 +1693,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
 
       return matchClass && matchSubject && matchStatus;
     }).toList();
+
     return SafeArea(
       top: false,
       child: Scaffold(
@@ -1896,7 +1714,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                       child: ListView.builder(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 35),
                         itemCount: filteredList.length,
-                        itemBuilder: (_, i) => _animatedCard(i, filteredList[i]),
+                        itemBuilder: (_, i) =>
+                            _animatedCard(i, filteredList[i]),
                       ),
                     ),
             ),
@@ -1910,10 +1729,9 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal, // ✅ IMPORTANT
+        scrollDirection: Axis.horizontal,
         child: Row(
           children: [
-            /// Class
             SizedBox(
               width: 140,
               child: Consumer<AllClassesViewModel>(
@@ -1922,7 +1740,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
 
                   return _styledDropdown<String>(
                     value: _filterClassId,
-                    hint: "Class",
+                    hint: 'homework.filter_class'.tr(),
                     icon: Icons.class_,
                     items: classes.map((c) {
                       return DropdownMenuItem(
@@ -1937,10 +1755,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                 },
               ),
             ),
-
             const SizedBox(width: 10),
 
-            /// Subject
             SizedBox(
               width: 150,
               child: Consumer<AllSubjectsVieModel>(
@@ -1949,7 +1765,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
 
                   return _styledDropdown<String>(
                     value: _filterSubjectId,
-                    hint: "Subject",
+                    hint: 'homework.filter_subject'.tr(),
                     icon: Icons.menu_book,
                     items: subjects.map((s) {
                       return DropdownMenuItem(
@@ -1964,30 +1780,33 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                 },
               ),
             ),
-
             const SizedBox(width: 10),
 
-            /// Status
             SizedBox(
               width: 160,
               child: _styledDropdown<String>(
                 value: _filterStatus,
-                hint: "Status",
+                hint: 'homework.filter_status'.tr(),
                 icon: Icons.filter_alt_rounded,
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: "submitted",
-                    child: Text("Submitted"),
+                    child: Text('homework.submitted'.tr()),
                   ),
-                  DropdownMenuItem(value: "pending", child: Text("Pending")),
-                  DropdownMenuItem(value: "late", child: Text("Late")),
+                  DropdownMenuItem(
+                    value: "pending",
+                    child: Text('homework.pending'.tr()),
+                  ),
+                  DropdownMenuItem(
+                    value: "late",
+                    child: Text('homework.late'.tr()),
+                  ),
                 ],
                 onChanged: (v) {
                   setState(() => _filterStatus = v);
                 },
               ),
             ),
-
             const SizedBox(width: 10),
 
             Container(
@@ -2015,7 +1834,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                     listen: false,
                   ).allHomeworkApi(context);
 
-                  Utils.show("Filters reset successfully", context);
+                  Utils.show('homework.filters_reset'.tr(), context);
                 },
               ),
             ),
@@ -2052,13 +1871,13 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                 ),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Homework",
-                      style: TextStyle(
+                      'homework.title'.tr(),
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w800,
                         color: Colors.white,
@@ -2066,8 +1885,8 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                       ),
                     ),
                     Text(
-                      "Management Dashboard",
-                      style: TextStyle(
+                      'homework.subtitle'.tr(),
+                      style: const TextStyle(
                         fontSize: 13,
                         color: Colors.white60,
                         fontWeight: FontWeight.w500,
@@ -2106,11 +1925,19 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
           const SizedBox(height: 20),
           Row(
             children: [
-              _headerStat("📚", "Total", "$count"),
+              _headerStat("📚", 'homework.total'.tr(), "$count"),
               const SizedBox(width: 10),
-              _headerStat("✅", "Active", "${(count * 0.7).round()}"),
+              _headerStat(
+                "✅",
+                'homework.active'.tr(),
+                "${(count * 0.7).round()}",
+              ),
               const SizedBox(width: 10),
-              _headerStat("⏳", "Pending", "${(count * 0.3).round()}"),
+              _headerStat(
+                "⏳",
+                'homework.pending'.tr(),
+                "${(count * 0.3).round()}",
+              ),
             ],
           ),
         ],
@@ -2171,35 +1998,29 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-
             if (!PermissionExtensions.canAccess(
-                PermissionKeys.teacherCreateHomework)) {
-
-              Utils.show(
-                "You don't have permission to create homework",
-                context,
-              );
-
+              PermissionKeys.teacherCreateHomework,
+            )) {
+              Utils.show('homework.no_permission_create'.tr(), context);
               return;
             }
-
             _showHomeworkBottomSheet();
           },
           borderRadius: BorderRadius.circular(18),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
+                const Icon(
                   Icons.add_circle_outline_rounded,
                   color: Colors.white,
                   size: 20,
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 Text(
-                  "Add Homework",
-                  style: TextStyle(
+                  'homework.add_homework'.tr(),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                     fontSize: 14,
@@ -2219,7 +2040,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     final late = int.tryParse(hw.lateCount ?? "0") ?? 0;
     final total = hw.totalStudents ?? 1;
     final progress = total > 0 ? submitted / total : 0.0;
-    final delay = index * 0.08;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -2228,29 +2048,26 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
         borderRadius: BorderRadius.circular(20),
         child: Column(
           children: [
-            // ✅ Top red accent bar (web jaisa)
             Container(
               height: 4,
               decoration: const BoxDecoration(gradient: _DS.gradientHeader),
             ),
-
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // ✅ Row 1: Class•Section pill + Due date pill
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       _pill(
-                        "${hw.className ?? ''} – sec ${hw.sectionName ?? ''}",
+                        "${hw.className ?? ''} – ${'homework.section'.tr()} ${hw.sectionName ?? ''}",
                         _DS.primaryLight,
                         _DS.primary,
                         Icons.school_rounded,
                       ),
                       _pill(
-                        "Due: ${_formatDate(hw.dueDate)}",
+                        'homework.due'.tr() + ": ${_formatDate(hw.dueDate)}",
                         const Color(0xFFFFF3E0),
                         _DS.orange,
                         Icons.calendar_today_rounded,
@@ -2259,7 +2076,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                   ),
                   const SizedBox(height: 14),
 
-                  // ✅ Row 2: Subject icon + name (web jaisa bold heading)
                   Row(
                     children: [
                       Container(
@@ -2291,7 +2107,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                             ),
                             if (hw.description?.isNotEmpty ?? false)
                               Text(
-                                "Note: ${hw.description}",
+                                'homework.note'.tr() + ": ${hw.description}",
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: _DS.textMid,
@@ -2306,19 +2122,35 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                   ),
                   const SizedBox(height: 14),
 
-                  // ✅ Row 3: Total • Submitted • Pending (web ke 3 dots jaisa)
                   Row(
                     children: [
-                      _dotStat("Total $total", Colors.grey),
+                      _dotStat(
+                        'homework.total_count'.tr().replaceAll(
+                          '{count}',
+                          '$total',
+                        ),
+                        Colors.grey,
+                      ),
                       const SizedBox(width: 16),
-                      _dotStat("${submitted} Submitted", _DS.green),
+                      _dotStat(
+                        'homework.submitted_count'.tr().replaceAll(
+                          '{count}',
+                          '$submitted',
+                        ),
+                        _DS.green,
+                      ),
                       const SizedBox(width: 16),
-                      _dotStat("${pending} Pending", _DS.orange),
+                      _dotStat(
+                        'homework.pending_count'.tr().replaceAll(
+                          '{count}',
+                          '$pending',
+                        ),
+                        _DS.orange,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 10),
 
-                  // ✅ Progress bar
                   ClipRRect(
                     borderRadius: BorderRadius.circular(99),
                     child: LinearProgressIndicator(
@@ -2331,7 +2163,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                     ),
                   ),
 
-                  // ✅ Percentage right-aligned
                   Align(
                     alignment: Alignment.centerRight,
                     child: Padding(
@@ -2348,23 +2179,22 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                   ),
                   const SizedBox(height: 10),
 
-                  // ✅ View Submissions button (web jaisa right-aligned)
                   Align(
                     alignment: Alignment.centerRight,
                     child: OutlinedButton(
                       onPressed: loadingHomeworkId == hw.homeworkId
                           ? null
                           : () async {
-                        if (!PermissionExtensions.canAccess(
-                            PermissionKeys.viewHomework)) {
-
-                          Utils.show(
-                            "You don't have permission to view homework submissions",
-                            context,
-                          );
-
-                          return;
-                        }
+                              if (!PermissionExtensions.canAccess(
+                                PermissionKeys.viewHomework,
+                              )) {
+                                Utils.show(
+                                  'homework.no_permission_view_submissions'
+                                      .tr(),
+                                  context,
+                                );
+                                return;
+                              }
                               setState(() {
                                 loadingHomeworkId = hw.homeworkId;
                               });
@@ -2383,7 +2213,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                 _showSubmissionStatus(hw);
                               } catch (e) {
                                 Utils.show(
-                                  "Failed to load submissions",
+                                  'homework.failed_to_load_submissions'.tr(),
                                   context,
                                 );
                               } finally {
@@ -2394,7 +2224,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                                 }
                               }
                             },
-
                       style: OutlinedButton.styleFrom(
                         foregroundColor: _DS.primary,
                         side: BorderSide(
@@ -2410,7 +2239,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                         ),
                         backgroundColor: AppColor.primaryLight,
                       ),
-
                       child: loadingHomeworkId == hw.homeworkId
                           ? const SizedBox(
                               width: 18,
@@ -2421,9 +2249,7 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.arrow_forward_ios_rounded, size: 13),
-
-                                SizedBox(width: 6),
-
+                                const SizedBox(width: 6),
                                 Text(
                                   "View Submissions",
                                   style: TextStyle(
@@ -2444,7 +2270,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
     );
   }
 
-  //  Naya helper widget — dot + label (web ke "● 0 Submitted" jaisa)
   Widget _dotStat(String label, Color color) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -2491,7 +2316,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
       ),
     );
   }
-  
 
   Widget _emptyView() {
     return Center(
@@ -2512,18 +2336,18 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            "No Homework Yet",
-            style: TextStyle(
+          Text(
+            'homework.no_homework_yet'.tr(),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
               color: _DS.textDark,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            "Tap the button below to add homework",
-            style: TextStyle(fontSize: 13, color: _DS.textLight),
+          Text(
+            'homework.tap_to_add_homework'.tr(),
+            style: const TextStyle(fontSize: 13, color: _DS.textLight),
           ),
         ],
       ),
@@ -2628,7 +2452,6 @@ class _AllHomeWorkScreenState extends State<AllHomeWorkScreen>
       ),
     );
   }
-  
 }
 
 class _FormLabel extends StatelessWidget {

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
   late AnimationController _animationController;
   String? selectedAcademicYear;
   List<dynamic> academicYears = [];
+
   @override
   void initState() {
     super.initState();
@@ -78,7 +80,7 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                 .length;
             final totalAmount = allFees.fold<double>(
               0,
-              (sum, f) => sum + (double.tryParse(f.totalAmount ?? '0') ?? 0),
+                  (sum, f) => sum + (double.tryParse(f.totalAmount ?? '0') ?? 0),
             );
 
             return Column(
@@ -120,7 +122,7 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                           const SizedBox(width: 12),
                           Expanded(
                             child: AppText.customText(
-                              'Fee Management',
+                              'fees_management.title'.tr(),
                               size: 19,
                               weight: FontWeight.bold,
                               color: Colors.white,
@@ -146,12 +148,11 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                       ),
                       const SizedBox(height: 20),
 
-                      // Stats Row
                       Row(
                         children: [
                           Expanded(
                             child: _buildStatCard(
-                              'Monthly',
+                              'fees_management.monthly'.tr(),
                               monthlyCount.toString(),
                               Icons.calendar_month,
                               Colors.blue.shade100,
@@ -160,7 +161,7 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                           const SizedBox(width: 8),
                           Expanded(
                             child: _buildStatCard(
-                              'Yearly',
+                              'fees_management.yearly'.tr(),
                               yearlyCount.toString(),
                               Icons.calendar_today,
                               Colors.green.shade100,
@@ -169,7 +170,7 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                           const SizedBox(width: 8),
                           Expanded(
                             child: _buildStatCard(
-                              'One Time',
+                              'fees_management.one_time'.tr(),
                               oneTimeCount.toString(),
                               Icons.payment,
                               Colors.orange.shade100,
@@ -181,14 +182,12 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                   ),
                 ),
 
-                // ── Scrollable body ──────────────────────────────────────────
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(18, 14, 18, 30),
                     physics: const BouncingScrollPhysics(),
                     child: Column(
                       children: [
-                        // ── Total Amount card ──────────────────────────────
                         Container(
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
@@ -221,7 +220,7 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   AppText.customText(
-                                    'Total Fee Structure Amount',
+                                    'fees_management.total_fee_structure_amount'.tr(),
                                     size: 12,
                                     color: AppColor.softGreyText,
                                   ),
@@ -239,21 +238,20 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                         ),
                         const SizedBox(height: 12),
 
-                        // ── Fee Heads ──────────────────────────────────────
                         _menuCard(
                           icon: Icons.category,
                           iconBg: Colors.blue.shade50,
                           iconColor: AppColor.lightBlueColor,
-                          title: 'Fee Heads',
-                          subtitle: 'Create & manage fee categories',
-                          btnLabel: 'Open',
+                          title: 'fees_management.fee_heads'.tr(),
+                          subtitle: 'fees_management.fee_heads_sub'.tr(),
+                          btnLabel: 'fees_management.open'.tr(),
                           btnColor: AppColor.lightBlueColor,
                           onTap: () {
                             if (!PermissionExtensions.canAccess(
                               PermissionKeys.manageFees,
                             )) {
                               Utils.show(
-                                "You don't have permission to perform this action.",
+                                'fees_management.permission_denied'.tr(),
                                 context,
                               );
                               return;
@@ -265,21 +263,22 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                             );
                           },
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
+
                         _menuCard(
                           icon: Icons.category,
                           iconBg: Colors.blue.shade50,
                           iconColor: AppColor.lightBlueColor,
-                          title: 'Fine Rule',
-                          subtitle: 'Create & manage Fine Rules',
-                          btnLabel: 'Open',
+                          title: 'fees_management.fine_rule'.tr(),
+                          subtitle: 'fees_management.fine_rule_sub'.tr(),
+                          btnLabel: 'fees_management.open'.tr(),
                           btnColor: AppColor.success,
                           onTap: () {
                             if (!PermissionExtensions.canAccess(
                               PermissionKeys.manageFees,
                             )) {
                               Utils.show(
-                                "You don't have permission to perform this action.",
+                                'fees_management.permission_denied'.tr(),
                                 context,
                               );
                               return;
@@ -292,24 +291,23 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                               ),
                             );
                           },
-                          // Navigator.pushNamed(context, RoutesName.fine),
                         ),
                         const SizedBox(height: 10),
-                        // ── Fee Structure ──────────────────────────────────
+
                         _menuCard(
                           icon: Icons.receipt_long,
                           iconBg: Colors.green.shade50,
                           iconColor: Colors.green.shade600,
-                          title: 'Fee Structure',
-                          subtitle: 'Create & manage fee structures',
-                          btnLabel: 'Add',
+                          title: 'fees_management.fee_structure'.tr(),
+                          subtitle: 'fees_management.fee_structure_sub'.tr(),
+                          btnLabel: 'fees_management.add'.tr(),
                           btnColor: Colors.green.shade600,
                           onTap: () {
                             if (!PermissionExtensions.canAccess(
                               PermissionKeys.manageFees,
                             )) {
                               Utils.show(
-                                "You don't have permission to perform this action.",
+                                'fees_management.permission_denied'.tr(),
                                 context,
                               );
                               return;
@@ -320,25 +318,23 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                               RoutesName.adminViewFeesStructureScreen,
                             );
                           },
-                          // onTap: () => Navigator.pushNamed(context, RoutesName.adminViewFeesStructureScreen),
                         ),
                         const SizedBox(height: 10),
 
-                        // ── Collect Fee ────────────────────────────────────
                         _menuCard(
                           icon: Icons.payments_rounded,
                           iconBg: Colors.purple.shade50,
                           iconColor: Colors.purple.shade600,
-                          title: 'Collect Fee',
-                          subtitle: 'Record & collect student payments',
-                          btnLabel: 'Collect',
+                          title: 'fees_management.collect_fee'.tr(),
+                          subtitle: 'fees_management.collect_fee_sub'.tr(),
+                          btnLabel: 'fees_management.collect'.tr(),
                           btnColor: Colors.purple.shade600,
                           onTap: () {
                             if (!PermissionExtensions.canAccess(
                               PermissionKeys.manageFees,
                             )) {
                               Utils.show(
-                                "You don't have permission to perform this action.",
+                                'fees_management.permission_denied'.tr(),
                                 context,
                               );
                               return;
@@ -352,22 +348,20 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
                         ),
                         const SizedBox(height: 10),
 
-                        // ── View Fee Structure ─────────────────────────────
-                        // ── View Fee Structure ─────────────────────────────
                         _menuCard(
                           icon: Icons.list_alt_rounded,
                           iconBg: Colors.orange.shade50,
                           iconColor: Colors.orange.shade700,
-                          title: 'View Fee Structure',
-                          subtitle: 'Browse all existing fee structures',
-                          btnLabel: 'View',
+                          title: 'fees_management.view_fee_structure'.tr(),
+                          subtitle: 'fees_management.view_fee_structure_sub'.tr(),
+                          btnLabel: 'fees_management.view'.tr(),
                           btnColor: Colors.orange.shade700,
                           onTap: () {
                             if (!PermissionExtensions.canAccess(
                               PermissionKeys.manageFees,
                             )) {
                               Utils.show(
-                                "You don't have permission to perform this action.",
+                                'fees_management.permission_denied'.tr(),
                                 context,
                               );
                               return;
@@ -394,7 +388,6 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
     );
   }
 
-  // ── Menu card ────────────────────────────────────────────────────────────
   Widget _menuCard({
     required IconData icon,
     required Color iconBg,
@@ -467,13 +460,12 @@ class _FeesManagementScreenState extends State<FeesManagementScreen>
     );
   }
 
-  // ── Stat card ─────────────────────────────────────────────────────────────
   Widget _buildStatCard(
-    String title,
-    String value,
-    IconData icon,
-    Color color,
-  ) {
+      String title,
+      String value,
+      IconData icon,
+      Color color,
+      ) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(

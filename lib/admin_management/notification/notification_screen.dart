@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,8 +38,7 @@ class _NotificationScreenState extends State<NotificationScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!PermissionExtensions.canAccess(PermissionKeys.notificationView)) {
-        Utils.show("You don't have permission to view notifications", context);
-
+        Utils.show('notifications.you_dont_have_permission_view'.tr(), context);
         Navigator.pop(context);
         return;
       }
@@ -163,8 +163,11 @@ class _NotificationScreenState extends State<NotificationScreen>
         },
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text(
-          "Send Notification",
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+          'notifications.send_notification'.tr(),
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
@@ -212,9 +215,9 @@ class _NotificationScreenState extends State<NotificationScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Notifications",
-                      style: TextStyle(
+                    Text(
+                      'notifications.title'.tr(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -222,7 +225,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                       ),
                     ),
                     Text(
-                      "Stay updated with all alert",
+                      'notifications.subtitle'.tr(),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 12,
@@ -259,7 +262,7 @@ class _NotificationScreenState extends State<NotificationScreen>
                       ),
                       const SizedBox(width: 5),
                       Text(
-                        "${markReadVM.readCount} new",
+                        "${markReadVM.readCount} ${'notifications.new_count'.tr()}",
                         style: TextStyle(
                           color: AppColor.primary,
                           fontWeight: FontWeight.w700,
@@ -306,20 +309,20 @@ class _NotificationScreenState extends State<NotificationScreen>
                 Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.inbox_rounded, size: 16),
-                      SizedBox(width: 6),
-                      Text("Inbox"),
+                    children: [
+                      const Icon(Icons.inbox_rounded, size: 16),
+                      const SizedBox(width: 6),
+                      Text('notifications.inbox'.tr()),
                     ],
                   ),
                 ),
                 Tab(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.send_rounded, size: 16),
-                      SizedBox(width: 6),
-                      Text("Sent"),
+                    children: [
+                      const Icon(Icons.send_rounded, size: 16),
+                      const SizedBox(width: 6),
+                      Text('notifications.sent'.tr()),
                     ],
                   ),
                 ),
@@ -336,7 +339,8 @@ class _NotificationScreenState extends State<NotificationScreen>
     final vm = Provider.of<AllNotificationViewModel>(context);
     final notifications = vm.allNotificationModel?.data?.notifications ?? [];
     if (vm.loading) return _shimmerList();
-    if (notifications.isEmpty) return _emptyState("No inbox notifications");
+    if (notifications.isEmpty)
+      return _emptyState('notifications.no_inbox'.tr());
     return RefreshIndicator(
       color: AppColor.primary,
       onRefresh: () => vm.allNotificationApi(context),
@@ -419,12 +423,10 @@ class _NotificationScreenState extends State<NotificationScreen>
 
   Widget _buildSent() {
     final vm = Provider.of<GetSendNotificationViewModel>(context);
-    print(
-      "UI SENT COUNT => ${vm.getSendNotificationModel?.data?.length}",
-    );
+    print("UI SENT COUNT => ${vm.getSendNotificationModel?.data?.length}");
     final notifications = vm.getSendNotificationModel?.data ?? [];
     if (vm.loading) return _shimmerList();
-    if (notifications.isEmpty) return _emptyState("No sent notifications");
+    if (notifications.isEmpty) return _emptyState('notifications.no_sent'.tr());
     return RefreshIndicator(
       color: AppColor.primary,
       onRefresh: () => vm.getSendNotificationApi(context),
@@ -496,13 +498,15 @@ class _NotificationScreenState extends State<NotificationScreen>
                             children: [
                               _statChip(
                                 icon: Icons.people_alt_rounded,
-                                label: "${n.recipientsCount ?? 0} Recipients",
+                                label:
+                                    "${n.recipientsCount ?? 0} ${'notifications.recipients'.tr()}",
                                 color: const Color(0xFF3B82F6),
                               ),
                               const SizedBox(width: 8),
                               _statChip(
                                 icon: Icons.visibility_rounded,
-                                label: "${n.readCount ?? 0} Read",
+                                label:
+                                    "${n.readCount ?? 0} ${'notifications.read'.tr()}",
                                 color: AppColor.success,
                               ),
                             ],
@@ -517,13 +521,12 @@ class _NotificationScreenState extends State<NotificationScreen>
                           PermissionKeys.notificationSend,
                         )) {
                           Utils.show(
-                            "You don't have permission to delete notifications",
+                            'notifications.you_dont_have_permission_delete'
+                                .tr(),
                             context,
                           );
-
                           return;
                         }
-
                         _showDeleteDialog(n.notificationId);
                       },
                       child: Container(
@@ -649,22 +652,26 @@ class _NotificationScreenState extends State<NotificationScreen>
               ),
             ),
             const SizedBox(width: 12),
-            const Text(
-              "Delete",
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            Text(
+              'notifications.delete'.tr(),
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
             ),
           ],
         ),
-        content: const Text(
-          "Are you sure you want to delete this notification? This action cannot be undone.",
-          style: TextStyle(color: AppColor.sub, fontSize: 14, height: 1.5),
+        content: Text(
+          'notifications.delete_confirm'.tr(),
+          style: const TextStyle(
+            color: AppColor.sub,
+            fontSize: 14,
+            height: 1.5,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text(
-              "Cancel",
-              style: TextStyle(
+            child: Text(
+              'notifications.cancel'.tr(),
+              style: const TextStyle(
                 color: AppColor.sub,
                 fontWeight: FontWeight.w600,
               ),
@@ -692,17 +699,14 @@ class _NotificationScreenState extends State<NotificationScreen>
               );
               final success = await deleteVM.deleteNotificationApi(id, context);
               if (success) {
-
                 sentVM.removeNotification(id);
-
                 sentVM.getSendNotificationApi(context);
-
-                _snack("Notification deleted");
+                _snack('notifications.notification_deleted'.tr());
               }
             },
-            child: const Text(
-              "Delete",
-              style: TextStyle(
+            child: Text(
+              'notifications.delete_btn'.tr(),
+              style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),

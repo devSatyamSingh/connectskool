@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -66,7 +67,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     super.dispose();
   }
 
-  // ── Discontinue dialog ───────────────────────────────────────────────────
   void _showDiscontinueDialog(BuildContext context, FeeBreakdown fee) {
     showDialog(
       context: context,
@@ -83,7 +83,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     );
   }
 
-  // ── Collect payment sheet ────────────────────────────────────────────────
   void _showCollectPaymentSheet(BuildContext context) {
     final vm = Provider.of<StudentFeeViewModel>(context, listen: false);
     showModalBottomSheet(
@@ -123,7 +122,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
         backgroundColor: AppColor.pageBgColor,
         body: Column(
           children: [
-            // ── Header ──────────────────────────────────────────────────
             Container(
               padding: const EdgeInsets.fromLTRB(16, 50, 16, 24),
               decoration: BoxDecoration(
@@ -154,26 +152,23 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Student Fee Profile',
-                            style: TextStyle(
+                        Text('student_fee.title'.tr(),
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold)),
-                        Text('Fee details & payment history',
+                        Text('student_fee.subtitle'.tr(),
                             style: TextStyle(
                                 color: Colors.white.withOpacity(0.75),
                                 fontSize: 12)),
                       ],
                     ),
                   ),
-                  // ✅ Global Collect Payment button
                   GestureDetector(
                     onTap: () {
                       if (!PermissionExtensions.canAccess(
                           PermissionKeys.collectPayment)) {
-                        Utils.show(
-                            "You don't have permission to collect fees.",
-                            context);
+                        Utils.show('student_fee.permission_denied'.tr(), context);
                         return;
                       }
                       _showCollectPaymentSheet(context);
@@ -190,7 +185,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                           Icon(Icons.payment_rounded,
                               color: AppColor.lightBlueColor, size: 16),
                           const SizedBox(width: 6),
-                          Text('Collect',
+                          Text('student_fee.collect'.tr(),
                               style: TextStyle(
                                   color: AppColor.lightBlueColor,
                                   fontWeight: FontWeight.bold,
@@ -203,7 +198,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
               ),
             ),
 
-            // ── Body ────────────────────────────────────────────────────
             Expanded(
               child: vm.loading
                   ? const Center(child: CircularProgressIndicator())
@@ -224,20 +218,17 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                     children: [
                       const SizedBox(height: 16),
 
-                      // ── Student Info Card ──────────────────────
                       _buildStudentCard(
                           student, paidPercent, pending),
 
                       const SizedBox(height: 14),
 
-                      // ── Summary Cards ──────────────────────────
                       _buildSummaryCards(
                           totalFee, paidAmount, paidPercent,
                           pending, fine),
 
                       const SizedBox(height: 16),
 
-                      // ── Tabs ───────────────────────────────────
                       Container(
                         margin: const EdgeInsets.symmetric(
                             horizontal: 16),
@@ -288,7 +279,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                                             size: 15),
                                         const SizedBox(width: 6),
                                         Text(
-                                            'Academic (${vm.feeBreakdown.length})'),
+                                            '${'student_fee.academic'.tr()} (${vm.feeBreakdown.length})'),
                                       ],
                                     ),
                                   ),
@@ -302,7 +293,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                                             size: 15),
                                         const SizedBox(width: 6),
                                         Text(
-                                            'Transport (${vm.transportFeeBreakdown.length})'),
+                                            '${'student_fee.transport'.tr()} (${vm.transportFeeBreakdown.length})'),
                                       ],
                                     ),
                                   ),
@@ -325,7 +316,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
 
                       const SizedBox(height: 20),
 
-                      // ── Payment History ────────────────────────
                       _buildPaymentHistory(vm),
 
                       const SizedBox(height: 24),
@@ -340,7 +330,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     );
   }
 
-  // ── Student card ─────────────────────────────────────────────────────────
   Widget _buildStudentCard(
       dynamic student, double paidPercent, num pending) {
     return Container(
@@ -430,7 +419,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                           : Colors.green.shade200),
                 ),
                 child: Text(
-                  pending > 0 ? 'Due' : 'Cleared',
+                  pending > 0 ? 'student_fee.due'.tr() : 'student_fee.cleared'.tr(),
                   style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -445,12 +434,12 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Payment Progress',
+              Text('student_fee.payment_progress'.tr(),
                   style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey.shade600,
                       fontWeight: FontWeight.w500)),
-              Text('${(paidPercent * 100).toStringAsFixed(0)}% paid',
+              Text('${(paidPercent * 100).toStringAsFixed(0)}% ${'student_fee.paid_label'.tr()}',
                   style: TextStyle(
                       fontSize: 12,
                       color: Colors.green.shade600,
@@ -473,7 +462,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     );
   }
 
-  // ── Summary cards ────────────────────────────────────────────────────────
   Widget _buildSummaryCards(num totalFee, num paidAmount, double paidPercent,
       num pending, num fine) {
     return Padding(
@@ -483,18 +471,17 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
           Row(
             children: [
               _summaryCard(
-                  title: 'TOTAL FEE',
+                  title: 'student_fee.total_fee'.tr(),
                   amount: '₹$totalFee',
-                  subtitle: 'Annual curriculum',
+                  subtitle: 'student_fee.annual_curriculum'.tr(),
                   bgColor: Colors.blue.shade50,
                   accentColor: Colors.blue.shade600,
                   icon: Icons.receipt_rounded),
               const SizedBox(width: 10),
               _summaryCard(
-                  title: 'PAID AMOUNT',
+                  title: 'student_fee.paid_amount'.tr(),
                   amount: '₹$paidAmount',
-                  subtitle:
-                  '${(paidPercent * 100).toStringAsFixed(0)}% of total',
+                  subtitle: 'student_fee.paid_percent'.tr().replaceAll('{percent}', '${(paidPercent * 100).toStringAsFixed(0)}'),
                   bgColor: Colors.green.shade50,
                   accentColor: Colors.green.shade600,
                   icon: Icons.check_circle_rounded),
@@ -504,17 +491,17 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
           Row(
             children: [
               _summaryCard(
-                  title: 'PENDING',
+                  title: 'student_fee.pending'.tr(),
                   amount: '₹$pending',
-                  subtitle: pending > 0 ? 'Due soon' : 'All clear!',
+                  subtitle: pending > 0 ? 'student_fee.due_soon'.tr() : 'student_fee.all_clear'.tr(),
                   bgColor: Colors.orange.shade50,
                   accentColor: Colors.orange.shade600,
                   icon: Icons.pending_actions_rounded),
               const SizedBox(width: 10),
               _summaryCard(
-                  title: 'LATE FINE',
+                  title: 'student_fee.late_fine'.tr(),
                   amount: '₹$fine',
-                  subtitle: fine > 0 ? 'Fine applicable' : 'No fines',
+                  subtitle: fine > 0 ? 'student_fee.fine_applicable'.tr() : 'student_fee.no_fines'.tr(),
                   bgColor: Colors.red.shade50,
                   accentColor: Colors.red.shade400,
                   icon: Icons.warning_amber_rounded),
@@ -575,12 +562,11 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     );
   }
 
-  // ── Academic fee list ────────────────────────────────────────────────────
   Widget _buildAcademicFeeList(StudentFeeViewModel vm) {
     final fees = vm.feeBreakdown;
     if (fees.isEmpty) {
       return _emptyState(
-          'No academic fees assigned', Icons.menu_book_outlined);
+          'student_fee.no_academic_fees'.tr(), Icons.menu_book_outlined);
     }
     return ListView.separated(
       padding: const EdgeInsets.all(14),
@@ -639,10 +625,10 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                     Row(
                       children: [
                         _statusBadge(isPaid
-                            ? 'PAID'
+                            ? 'student_fee.status_paid'.tr()
                             : isPartial
-                            ? 'PARTIAL'
-                            : 'PENDING',
+                            ? 'student_fee.status_partial'.tr()
+                            : 'student_fee.status_pending'.tr(),
                             isPaid
                                 ? Colors.green
                                 : isPartial
@@ -665,9 +651,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                       onTap: () {
                         if (!PermissionExtensions.canAccess(
                             PermissionKeys.collectPayment)) {
-                          Utils.show(
-                              "You don't have permission to collect fees.",
-                              context);
+                          Utils.show('student_fee.permission_denied_collect'.tr(), context);
                           return;
                         }
                         _showCollectPaymentSheet(context);
@@ -679,8 +663,8 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                           gradient: AppColor.primaryGradient,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Text('Collect Payment',
-                            style: TextStyle(
+                        child: Text('student_fee.collect_payment'.tr(),
+                            style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold)),
@@ -699,7 +683,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                           border:
                           Border.all(color: Colors.red.shade300),
                         ),
-                        child: Text('Discontinue',
+                        child: Text('student_fee.discontinue'.tr(),
                             style: TextStyle(
                                 color: Colors.red.shade600,
                                 fontSize: 11,
@@ -713,16 +697,16 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
           const SizedBox(height: 10),
           Row(
             children: [
-              _breakdownCell('Total', '₹${fee.totalAmount ?? 0}',
+              _breakdownCell('student_fee.total'.tr(), '₹${fee.totalAmount ?? 0}',
                   Colors.black87),
-              _breakdownCell('Paid', '₹${fee.paidAmount ?? 0}',
+              _breakdownCell('student_fee.paid'.tr(), '₹${fee.paidAmount ?? 0}',
                   Colors.green.shade600),
-              _breakdownCell('Pending', '₹$feePending',
+              _breakdownCell('student_fee.pending_status'.tr(), '₹$feePending',
                   feePending > 0
                       ? Colors.red.shade500
                       : Colors.grey.shade400),
               if (fine > 0)
-                _breakdownCell('Fine', '₹$fine', Colors.red.shade400),
+                _breakdownCell('student_fee.fine'.tr(), '₹$fine', Colors.red.shade400),
             ],
           ),
         ],
@@ -730,12 +714,11 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     );
   }
 
-  // ── Transport fee list ───────────────────────────────────────────────────
   Widget _buildTransportFeeList(StudentFeeViewModel vm) {
     final fees = vm.transportFeeBreakdown;
     if (fees.isEmpty) {
       return _emptyState(
-          'No transport fees assigned', Icons.directions_bus_outlined);
+          'student_fee.no_transport_fees'.tr(), Icons.directions_bus_outlined);
     }
     return ListView.separated(
       padding: const EdgeInsets.all(14),
@@ -791,7 +774,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                         style: const TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 14)),
                     const SizedBox(height: 2),
-                    // ✅ Route + stop info
                     if (fee.routeName != null)
                       Row(
                         children: [
@@ -799,7 +781,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                               size: 11, color: Colors.grey.shade500),
                           const SizedBox(width: 4),
                           Flexible(
-                            child: Text(fee.routeName!,
+                            child: Text('${'student_fee.route'.tr()}: ${fee.routeName!}',
                                 style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.grey.shade600)),
@@ -813,7 +795,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                               size: 11, color: Colors.green.shade400),
                           const SizedBox(width: 4),
                           Text(
-                              '${fee.stopName} · ${fee.distanceKm} km',
+                              '${'student_fee.stop'.tr()}: ${fee.stopName} · ${fee.distanceKm} ${'student_fee.km'.tr()}',
                               style: TextStyle(
                                   fontSize: 11,
                                   color: Colors.grey.shade600)),
@@ -824,10 +806,10 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                       children: [
                         _statusBadge(
                             isPaid
-                                ? 'PAID'
+                                ? 'student_fee.status_paid'.tr()
                                 : isPartial
-                                ? 'PARTIAL'
-                                : 'PENDING',
+                                ? 'student_fee.status_partial'.tr()
+                                : 'student_fee.status_pending'.tr(),
                             isPaid
                                 ? Colors.green
                                 : isPartial
@@ -848,9 +830,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                   onTap: () {
                     if (!PermissionExtensions.canAccess(
                         PermissionKeys.collectPayment)) {
-                      Utils.show(
-                          "You don't have permission to collect fees.",
-                          context);
+                      Utils.show('student_fee.permission_denied_collect'.tr(), context);
                       return;
                     }
                     _showCollectPaymentSheet(context);
@@ -862,8 +842,8 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                       gradient: AppColor.primaryGradient,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Text('Collect Payment',
-                        style: TextStyle(
+                    child: Text('student_fee.collect_payment'.tr(),
+                        style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.bold)),
@@ -874,16 +854,16 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
           const SizedBox(height: 10),
           Row(
             children: [
-              _breakdownCell('Total', '₹${fee.totalAmount ?? 0}',
+              _breakdownCell('student_fee.total'.tr(), '₹${fee.totalAmount ?? 0}',
                   Colors.black87),
-              _breakdownCell('Paid', '₹${fee.paidAmount ?? 0}',
+              _breakdownCell('student_fee.paid'.tr(), '₹${fee.paidAmount ?? 0}',
                   Colors.green.shade600),
-              _breakdownCell('Pending', '₹$feePending',
+              _breakdownCell('student_fee.pending_status'.tr(), '₹$feePending',
                   feePending > 0
                       ? Colors.red.shade500
                       : Colors.grey.shade400),
               if ((fee.fineAmount ?? 0) > 0)
-                _breakdownCell('Fine', '₹${fee.fineAmount}',
+                _breakdownCell('student_fee.fine'.tr(), '₹${fee.fineAmount}',
                     Colors.red.shade400),
             ],
           ),
@@ -892,7 +872,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     );
   }
 
-  // ── Payment history ──────────────────────────────────────────────────────
   Widget _buildPaymentHistory(StudentFeeViewModel vm) {
     final history = vm.paymentHistory;
     return Container(
@@ -915,8 +894,8 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Payment History',
-                    style: TextStyle(
+                Text('student_fee.payment_history'.tr(),
+                    style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold)),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -925,7 +904,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                     color: Colors.green.shade50,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text('${history.length} records',
+                  child: Text('${history.length} ${'student_fee.records'.tr()}',
                       style: TextStyle(
                           fontSize: 11,
                           color: Colors.green.shade700,
@@ -943,7 +922,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                     Icon(Icons.history_rounded,
                         size: 42, color: Colors.grey.shade300),
                     const SizedBox(height: 10),
-                    Text('No payment records',
+                    Text('student_fee.no_payment_records'.tr(),
                         style: TextStyle(
                             fontSize: 13, color: Colors.grey.shade500)),
                   ],
@@ -1010,7 +989,7 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
                                   fontWeight: FontWeight.bold,
                                   color: Colors.green.shade600)),
                           if (fine > 0)
-                            Text('+₹${fine.toStringAsFixed(0)} fine',
+                            Text('+₹${fine.toStringAsFixed(0)} ${'student_fee.fine'.tr()}',
                                 style: TextStyle(
                                     fontSize: 11,
                                     color: Colors.red.shade400,
@@ -1027,7 +1006,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
     );
   }
 
-  // ── Shared helpers ───────────────────────────────────────────────────────
   Widget _statusBadge(String label, Color color) => Container(
     padding:
     const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
@@ -1084,7 +1062,6 @@ class _StudentProfileFeesScreenState extends State<StudentProfileFeesScreen>
 // COLLECT PAYMENT SHEET — unified academic + transport
 // ═════════════════════════════════════════════════════════════════════════════
 
-// ── Unified selectable installment ───────────────────────────────────────────
 class _SelectableInstallment {
   final int id;
   final int installmentNo;
@@ -1157,7 +1134,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
   List<_SelectableInstallment> _buildInstallments() {
     final result = <_SelectableInstallment>[];
 
-    // Academic installments
     for (final fb in widget.feeBreakdowns) {
       for (final inst in (fb.installments ?? [])) {
         if (inst.id == null) continue;
@@ -1176,7 +1152,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
       }
     }
 
-    // Transport installments
     for (final tb in widget.transportBreakdowns) {
       for (final inst in (tb.installments ?? [])) {
         if (inst.studentTransportInstallmentId == null) continue;
@@ -1213,7 +1188,7 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
     if (_selectedIdx.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content:
-        const Text('Please select at least one installment'),
+        Text('student_fee.select_installment_hint'.tr()),
         backgroundColor: Colors.red,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -1223,7 +1198,7 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
     }
     if (_isRefRequired && _refCtrl.text.trim().isEmpty) {
       setState(() => _refError =
-      'Reference number required for $_paymentMode payment');
+          'student_fee.reference_required'.tr().replaceAll('{mode}', _paymentMode));
       return false;
     }
     setState(() => _refError = null);
@@ -1289,7 +1264,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
           height: MediaQuery.of(context).size.height * 0.92,
           child: Column(
             children: [
-              // ── Handle ─────────────────────────────────────────────
               Center(
                 child: Container(
                   width: 40,
@@ -1301,7 +1275,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                 ),
               ),
 
-              // ── Title ──────────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
                 child: Row(
@@ -1319,8 +1292,8 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Collect Payment',
-                              style: TextStyle(
+                          Text('student_fee.collect_payment'.tr(),
+                              style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold)),
                           Text(widget.studentName,
@@ -1346,13 +1319,12 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
 
               const SizedBox(height: 10),
 
-              // ── Header row ─────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    const Text('Select Installments',
-                        style: TextStyle(
+                    Text('student_fee.select_installments'.tr(),
+                        style: const TextStyle(
                             fontSize: 14, fontWeight: FontWeight.bold)),
                     const SizedBox(width: 4),
                     Text('*',
@@ -1361,7 +1333,7 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                             fontWeight: FontWeight.bold)),
                     const Spacer(),
                     Text(
-                        '${_allInstallments.where((e) => !e.isPaid).length} due',
+                        '${_allInstallments.where((e) => !e.isPaid).length} ${'student_fee.installment_due'.tr()}',
                         style: TextStyle(
                             fontSize: 12,
                             color: Colors.orange.shade600,
@@ -1372,7 +1344,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
 
               const SizedBox(height: 8),
 
-              // ── Installment list ───────────────────────────────────
               Expanded(
                 child: _allInstallments.isEmpty
                     ? Center(
@@ -1390,7 +1361,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                 ),
               ),
 
-              // ── Bottom panel ───────────────────────────────────────
               Container(
                 padding: EdgeInsets.fromLTRB(
                     20,
@@ -1409,10 +1379,9 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Payment mode
                     Row(
                       children: [
-                        Text('Mode:',
+                        Text('${'student_fee.mode'.tr()}:',
                             style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -1449,16 +1418,14 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Remark
                     TextField(
                       controller: _remarkCtrl,
                       style: const TextStyle(fontSize: 13),
-                      decoration: _fieldDeco('Remarks (optional)',
+                      decoration: _fieldDeco('student_fee.remarks'.tr(),
                           Icons.note_alt_outlined),
                     ),
                     const SizedBox(height: 10),
 
-                    // Reference (non-cash only)
                     if (_isRefRequired) ...[
                       TextField(
                         controller: _refCtrl,
@@ -1467,17 +1434,16 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                             setState(() => _refError = null),
                         decoration: _fieldDeco(
                             _paymentMode == 'Online'
-                                ? 'Transaction ID / UTR No. *'
+                                ? 'student_fee.transaction_id'.tr()
                                 : _paymentMode == 'Cheque'
-                                ? 'Cheque Number *'
-                                : 'DD Number *',
+                                ? 'student_fee.cheque_number'.tr()
+                                : 'student_fee.dd_number'.tr(),
                             Icons.confirmation_number_outlined,
                             error: _refError),
                       ),
                       const SizedBox(height: 10),
                     ],
 
-                    // Selected total
                     if (_selectedIdx.isNotEmpty) ...[
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -1510,7 +1476,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                       const SizedBox(height: 10),
                     ],
 
-                    // Submit button
                     Consumer<CollectFeePaymentViewModel>(
                       builder: (_, vm, __) => GestureDetector(
                         onTap: vm.loading ? null : _submit,
@@ -1545,8 +1510,8 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                                     strokeWidth: 2))
                                 : Text(
                               _selectedIdx.isEmpty
-                                  ? 'Select Installments'
-                                  : 'Confirm Payment  ₹${_selectedTotal.toStringAsFixed(0)}',
+                                  ? 'student_fee.select_installments'.tr()
+                                  : 'student_fee.confirm_payment'.tr().replaceAll('{amount}', '${_selectedTotal.toStringAsFixed(0)}'),
                               style: TextStyle(
                                   color: _selectedIdx.isEmpty
                                       ? Colors.grey.shade500
@@ -1574,7 +1539,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
     final isOverdue = inst.isOverdue;
     final fine = inst.fineAmount;
 
-    // ✅ Status color
     Color statusColor = isPaid
         ? Colors.green
         : isOverdue
@@ -1583,7 +1547,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
     String statusLabel =
     isPaid ? 'PAID' : isOverdue ? 'OVERDUE' : 'PENDING';
 
-    // ✅ Due date = end_due_date
     final dueDateStr = _formatDate(inst.endDueDate);
 
     return GestureDetector(
@@ -1614,7 +1577,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
         ),
         child: Row(
           children: [
-            // Checkbox
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 22,
@@ -1642,7 +1604,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
 
             const SizedBox(width: 10),
 
-            // Type badge
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 6, vertical: 3),
@@ -1664,7 +1625,7 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                           : Colors.blue.shade600),
                   const SizedBox(width: 3),
                   Text(
-                      inst.isTransport ? 'Transport' : 'Academic',
+                      inst.isTransport ? 'student_fee.transport'.tr() : 'student_fee.academic'.tr(),
                       style: TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
@@ -1677,7 +1638,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
 
             const SizedBox(width: 8),
 
-            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1696,7 +1656,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                       Icon(Icons.calendar_today_rounded,
                           size: 11, color: Colors.grey.shade400),
                       const SizedBox(width: 3),
-                      // ✅ Show end_due_date as due date
                       Text('Due $dueDateStr',
                           style: TextStyle(
                               fontSize: 11,
@@ -1705,14 +1664,13 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
                                   : Colors.grey.shade500)),
                     ],
                   ),
-                  // ✅ Show fine if applicable
                   if (fine > 0 && !isPaid)
                     Row(
                       children: [
                         Icon(Icons.warning_amber_rounded,
                             size: 11, color: Colors.red.shade400),
                         const SizedBox(width: 3),
-                        Text('+₹$fine fine',
+                        Text('+₹$fine ${'student_fee.fine'.tr()}',
                             style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.red.shade500,
@@ -1723,7 +1681,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
               ),
             ),
 
-            // Amount
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -1746,7 +1703,6 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
 
             const SizedBox(width: 8),
 
-            // Status badge
             Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 8, vertical: 4),
@@ -1799,15 +1755,11 @@ class _CollectPaymentSheetState extends State<_CollectPaymentSheet> {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
-// DISCONTINUE FEE DIALOG (unchanged, kept intact)
-// ═════════════════════════════════════════════════════════════════════════════
-// ═════════════════════════════════════════════════════════════════════════════
 // DISCONTINUE FEE DIALOG
 // ═════════════════════════════════════════════════════════════════════════════
 class _DiscontinueFeeDialog extends StatefulWidget {
   final FeeBreakdown fee;
   final dynamic studentId;
-  // ✅ student_fee_id instead of academic_year
   final dynamic studentFeeId;
 
   const _DiscontinueFeeDialog({
@@ -1826,16 +1778,15 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
   String? _selectedReason;
   final _notesController = TextEditingController();
 
-  // ✅ Track API response inline
   String? _apiMessage;
   bool? _apiSuccess;
 
   final List<String> _reasons = [
-    'Student Left School',
-    'Service / Facility Stopped',
-    'Scholarship Granted',
-    'Relocated',
-    'Other',
+    'student_fee.student_left'.tr(),
+    'student_fee.service_stopped'.tr(),
+    'student_fee.scholarship_granted'.tr(),
+    'student_fee.relocated'.tr(),
+    'student_fee.other'.tr(),
   ];
 
   @override
@@ -1877,7 +1828,6 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Title ───────────────────────────────────────────
               Row(
                 children: [
                   Container(
@@ -1889,9 +1839,9 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                         color: Colors.orange.shade600, size: 22),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
-                    child: Text('Discontinue Fee Service',
-                        style: TextStyle(
+                  Expanded(
+                    child: Text('student_fee.discontinue_fee'.tr(),
+                        style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.bold)),
                   ),
@@ -1905,7 +1855,6 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
 
               const SizedBox(height: 20),
 
-              // ── API message banner (shown after attempt) ─────────
               if (_apiMessage != null) ...[
                 Container(
                   width: double.infinity,
@@ -1950,10 +1899,9 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                 const SizedBox(height: 16),
               ],
 
-              // ── Fee head + balance ────────────────────────────────
               Row(
                 children: [
-                  Expanded(child: _infoBlock('FEE HEAD',
+                  Expanded(child: _infoBlock('student_fee.fee_head'.tr(),
                       fee.feeHeadName ?? '—')),
                   const SizedBox(width: 12),
                   Expanded(
@@ -1971,7 +1919,7 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                               crossAxisAlignment:
                               CrossAxisAlignment.start,
                               children: [
-                                Text('Paid',
+                                Text('student_fee.paid'.tr(),
                                     style: TextStyle(
                                         fontSize: 11,
                                         color: Colors.grey.shade500)),
@@ -1994,7 +1942,7 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                               crossAxisAlignment:
                               CrossAxisAlignment.start,
                               children: [
-                                Text('Due',
+                                Text('student_fee.due'.tr(),
                                     style: TextStyle(
                                         fontSize: 11,
                                         color: Colors.grey.shade500)),
@@ -2015,7 +1963,6 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
 
               const SizedBox(height: 16),
 
-              // ── Date + Reason ─────────────────────────────────────
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -2023,7 +1970,7 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _label('DATE *'),
+                        _label('student_fee.date'.tr()),
                         const SizedBox(height: 6),
                         GestureDetector(
                           onTap: _pickDate,
@@ -2060,7 +2007,7 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _label('REASON *'),
+                        _label('student_fee.reason'.tr()),
                         const SizedBox(height: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -2074,7 +2021,7 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               isExpanded: true,
-                              hint: Text('Select...',
+                              hint: Text('student_fee.select_reason'.tr(),
                                   style: TextStyle(
                                       fontSize: 13,
                                       color: Colors.grey.shade500)),
@@ -2100,16 +2047,14 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
 
               const SizedBox(height: 16),
 
-              // ── Notes ─────────────────────────────────────────────
-              _label('NOTES (Optional)'),
+              _label('student_fee.notes'.tr()),
               const SizedBox(height: 6),
               TextField(
                 controller: _notesController,
                 maxLines: 3,
                 style: const TextStyle(fontSize: 13),
                 decoration: InputDecoration(
-                  hintText:
-                  'Provide detailed explanation for records...',
+                  hintText: 'student_fee.notes_hint'.tr(),
                   hintStyle: TextStyle(
                       fontSize: 13, color: Colors.grey.shade400),
                   filled: true,
@@ -2132,7 +2077,6 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
 
               const SizedBox(height: 24),
 
-              // ── Buttons ───────────────────────────────────────────
               Row(
                 children: [
                   Expanded(
@@ -2146,7 +2090,7 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: Text('Cancel',
+                      child: Text('student_fee.cancel'.tr(),
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -2161,12 +2105,11 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                         onPressed: vm.loading
                             ? null
                             : () async {
-                          // Validate reason
                           if (_selectedReason == null) {
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(SnackBar(
-                              content: const Text(
-                                  'Please select a reason'),
+                              content: Text(
+                                  'student_fee.reason_required'.tr()),
                               backgroundColor:
                               Colors.red.shade400,
                               behavior:
@@ -2179,7 +2122,6 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                             return;
                           }
 
-                          // ✅ Build reason string including notes
                           final notes =
                           _notesController.text.trim();
                           final fullReason = notes.isNotEmpty
@@ -2198,7 +2140,6 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                           );
 
                           if (success && mounted) {
-                            // ✅ Auto close on success
                             Future.delayed(
                               const Duration(
                                   milliseconds: 800),
@@ -2208,7 +2149,6 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                               },
                             );
                           } else {
-                            // ✅ Show backend error inside dialog
                             setState(() {
                               _apiMessage = vm.lastMessage;
                               _apiSuccess = false;
@@ -2233,9 +2173,8 @@ class _DiscontinueFeeDialogState extends State<_DiscontinueFeeDialog> {
                             child: CircularProgressIndicator(
                                 color: Colors.white,
                                 strokeWidth: 2))
-                            : const Text(
-                          'Confirm Discontinuation',
-                          style: TextStyle(
+                            : Text('student_fee.confirm_discontinue'.tr(),
+                          style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Colors.white),

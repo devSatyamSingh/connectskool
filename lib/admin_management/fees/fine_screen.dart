@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +52,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     super.dispose();
   }
 
-  // ── Add / Edit Bottom Sheet ───────────────────────────────────────────────
   void _openAddEditFineSheet({
     bool isEdit = false,
     String? ruleId,
@@ -69,13 +69,11 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     final maxCapController = TextEditingController(text: maxFineCap);
 
     final selectedType = ValueNotifier<String>(fineType ?? "per_day");
-    // _openAddEditFineSheet me
     final selectedApplicable = ValueNotifier<String>(
       (applicableTo == "specific_fee" || applicableTo == "specific_fee_head")
           ? "specific_fee"
           : applicableTo ?? "all_fees",
     );
-    // final selectedApplicable = ValueNotifier<String>(applicableTo ?? "all_fees");
     final selectedFeeHead = ValueNotifier<String?>(feeHeadId);
 
     showModalBottomSheet(
@@ -101,27 +99,22 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // ── Title ─────────────────────────────────────────
                       AppText.customText(
-                        isEdit ? "Edit Fine Rule" : "Add Fine Rule",
+                        isEdit ? 'fine_management.edit_rule'.tr() : 'fine_management.add_rule_title'.tr(),
                         size: 18,
                         weight: FontWeight.bold,
                       ),
-
                       const SizedBox(height: 20),
 
-                      // ── Rule Name ─────────────────────────────────────
                       _buildTextField(
                         nameController,
-                        "Rule Name",
+                        'fine_management.rule_name'.tr(),
                         Icons.label_outline,
                       ),
-
                       const SizedBox(height: 14),
 
-                      // ── Fine Type Dropdown ────────────────────────────
                       AppText.customText(
-                        "Fine Type",
+                        'fine_management.fine_type'.tr(),
                         size: 13,
                         color: AppColor.softGreyText,
                       ),
@@ -144,44 +137,35 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                             ),
                             child: DropdownMenu<String>(
                               initialSelection: type,
-
                               width: double.infinity,
-
                               menuHeight: 250,
-
                               leadingIcon: Icon(
                                 Icons.gavel_rounded,
                                 color: AppColor.lightBlueColor,
                                 size: 20,
                               ),
-
                               textStyle: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
                               ),
-
                               inputDecorationTheme: InputDecorationTheme(
                                 filled: true,
                                 fillColor: Colors.white,
-
                                 contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 16,
                                   vertical: 16,
                                 ),
-
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(14),
                                   borderSide: BorderSide.none,
                                 ),
-
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(14),
                                   borderSide: BorderSide(
                                     color: Colors.grey.shade300,
                                   ),
                                 ),
-
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(14),
                                   borderSide: BorderSide(
@@ -190,11 +174,10 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                   ),
                                 ),
                               ),
-
                               dropdownMenuEntries: [
                                 DropdownMenuEntry(
                                   value: "per_day",
-                                  label: "Per Day Fine",
+                                  label: 'fine_management.per_day_fine'.tr(),
                                 ),
                               ],
                               onSelected: (value) {
@@ -206,41 +189,34 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                           );
                         },
                       ),
-
                       const SizedBox(height: 14),
 
-                      // ── Fine Amount ───────────────────────────────────
                       _buildTextField(
                         amountController,
-                        "Fine Amount (₹)",
+                        'fine_management.fine_amount'.tr(),
                         Icons.currency_rupee,
                         keyboardType: TextInputType.number,
                       ),
-
                       const SizedBox(height: 14),
 
-                      // ── Grace Period (Optional) ───────────────────────
                       _buildTextField(
                         graceController,
-                        "Grace Period (Days) — Optional",
+                        'fine_management.grace_period'.tr(),
                         Icons.calendar_today,
                         keyboardType: TextInputType.number,
                       ),
-
                       const SizedBox(height: 14),
 
-                      // ── Max Fine Cap (Optional) ───────────────────────
                       _buildTextField(
                         maxCapController,
-                        "Maximum Fine Cap (₹) — Optional",
+                        'fine_management.max_fine_cap'.tr(),
                         Icons.security,
                         keyboardType: TextInputType.number,
                       ),
-
                       const SizedBox(height: 14),
 
                       AppText.customText(
-                        "Applicable To",
+                        'fine_management.applicable_to'.tr(),
                         size: 13,
                         color: AppColor.softGreyText,
                       ),
@@ -255,11 +231,11 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                 children: [
                                   Expanded(
                                     child: _buildTypeChip(
-                                      "All Fees",
+                                      'fine_management.all_fees'.tr(),
                                       "all_fees",
                                       applicable,
                                       Icons.all_inclusive,
-                                      () {
+                                          () {
                                         setSheetState(() {
                                           selectedApplicable.value = "all_fees";
                                           selectedFeeHead.value = null;
@@ -270,13 +246,13 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: _buildTypeChip(
-                                      "Specific Fee",
+                                      'fine_management.specific_fee'.tr(),
                                       "specific_fee",
                                       applicable,
                                       Icons.category,
-                                      () => setSheetState(
-                                        () => selectedApplicable.value =
-                                            "specific_fee",
+                                          () => setSheetState(
+                                            () => selectedApplicable.value =
+                                        "specific_fee",
                                       ),
                                     ),
                                   ),
@@ -297,15 +273,15 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                             .feesHeadManagementModel
                                             ?.data
                                             ?.feeHeads ??
-                                        [];
+                                            [];
 
                                     return DropdownButtonFormField<String>(
                                       value: selectedFeeHead.value,
-                                      hint: Text("Select Fee Head", style: GoogleFonts.poppins(),),
+                                      hint: Text('fine_management.select_fee_head'.tr(), style: GoogleFonts.poppins()),
                                       items: feeHeads.map((e) {
                                         return DropdownMenuItem(
                                           value: e.feeHeadId.toString(),
-                                          child: Text(e.headName ?? "", style: GoogleFonts.poppins(),),
+                                          child: Text(e.headName ?? "", style: GoogleFonts.poppins()),
                                         );
                                       }).toList(),
                                       onChanged: (val) {
@@ -328,57 +304,14 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                           );
                         },
                       ),
-
                       const SizedBox(height: 24),
                       AppButton(
-                        title: isEdit ? "Update Rule" : "Add Rule",
-                        // onTap: () {
-                        //   // Validation
-                        //   if (nameController.text.trim().isEmpty ||
-                        //       amountController.text.trim().isEmpty) {
-                        //     Utils.show(
-                        //         "Rule name and amount required", context);
-                        //     return;
-                        //   }
-                        //
-                        //   // specific_fee select kiya but fee head nahi chuna
-                        //   if (selectedApplicable.value == "specific_fee" &&
-                        //       selectedFeeHead.value == null) {
-                        //     Utils.show("Please select a fee head", context);
-                        //     return;
-                        //   }
-                        //
-                        //   // Optional fields — null bhejo agar empty ho
-                        //   final graceDays =
-                        //   graceController.text.trim().isEmpty
-                        //       ? null
-                        //       : graceController.text.trim();
-                        //
-                        //   final maxCap =
-                        //   maxCapController.text.trim().isEmpty
-                        //       ? null
-                        //       : maxCapController.text.trim();
-                        //
-                        //   Provider.of<CreateFineViewModel>(context,
-                        //       listen: false)
-                        //       .createFineApi(
-                        //     nameController.text.trim(),
-                        //     selectedType.value,
-                        //     amountController.text.trim(),
-                        //     graceDays,
-                        //     maxCap,
-                        //     selectedApplicable.value,
-                        //     selectedApplicable.value == "specific_fee"
-                        //         ? selectedFeeHead.value
-                        //         : null,
-                        //     context,
-                        //   );
-                        // },
+                        title: isEdit ? 'fine_management.update_rule'.tr() : 'fine_management.add_rule_btn'.tr(),
                         onTap: () {
                           if (nameController.text.trim().isEmpty ||
                               amountController.text.trim().isEmpty) {
                             Utils.show(
-                              "Rule name and amount required",
+                              'fine_management.rule_name_amount_required'.tr(),
                               context,
                             );
                             return;
@@ -386,7 +319,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
 
                           if (selectedApplicable.value == "specific_fee" &&
                               selectedFeeHead.value == null) {
-                            Utils.show("Please select a fee head", context);
+                            Utils.show('fine_management.select_fee_head_error'.tr(), context);
                             return;
                           }
 
@@ -445,11 +378,11 @@ class _FineManagementScreenState extends State<FineManagementScreen>
   }
 
   Widget _buildTextField(
-    TextEditingController controller,
-    String hint,
-    IconData icon, {
-    TextInputType? keyboardType,
-  }) {
+      TextEditingController controller,
+      String hint,
+      IconData icon, {
+        TextInputType? keyboardType,
+      }) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
@@ -480,14 +413,13 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     );
   }
 
-  // ── Chip Builder ──────────────────────────────────────────────────────────
   Widget _buildTypeChip(
-    String label,
-    String value,
-    String currentValue,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
+      String label,
+      String value,
+      String currentValue,
+      IconData icon,
+      VoidCallback onTap,
+      ) {
     final isSelected = currentValue == value;
     return GestureDetector(
       onTap: onTap,
@@ -539,17 +471,17 @@ class _FineManagementScreenState extends State<FineManagementScreen>
               child: const Icon(Icons.warning_amber_rounded, color: Colors.red),
             ),
             const SizedBox(width: 12),
-            Text("Delete Fine Rule", style: GoogleFonts.poppins(),),
+            Text('fine_management.delete_rule'.tr(), style: GoogleFonts.poppins()),
           ],
         ),
         content: Text(
-          "Are you sure you want to delete '$ruleName'? This action cannot be undone.",
+          'fine_management.delete_confirm'.tr().replaceAll('{ruleName}', ruleName),
           style: GoogleFonts.poppins(fontSize: 14),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: AppText.customText("Cancel", size: 14, color: Colors.black),
+            child: AppText.customText('fine_management.cancel'.tr(), size: 14, color: Colors.black),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -566,14 +498,13 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: Text("Delete", style: GoogleFonts.poppins(color: Colors.white)),
+            child: Text('fine_management.delete'.tr(), style: GoogleFonts.poppins(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<FineRuleViewModel>(context);
@@ -583,7 +514,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     final totalRules = fineRules.length;
     final totalAmount = fineRules.fold<double>(
       0,
-      (sum, rule) => sum + (double.tryParse(rule.fineAmount.toString()) ?? 0),
+          (sum, rule) => sum + (double.tryParse(rule.fineAmount.toString()) ?? 0),
     );
 
     return SafeArea(
@@ -596,7 +527,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
         floatingActionButton: SizedBox(
           width: 160,
           child: AppButton(
-            title: "Add Rule",
+            title: 'fine_management.add_rule'.tr(),
             icon: Icons.add_rounded,
             height: 56,
             radius: 18,
@@ -605,7 +536,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                 PermissionKeys.manageFees,
               )) {
                 Utils.show(
-                  "You don't have permission to perform this action.",
+                  'fine_management.permission_denied'.tr(),
                   context,
                 );
                 return;
@@ -617,7 +548,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
         ),
         body: Column(
           children: [
-            // ── Header ────────────────────────────────────────────────────
             Container(
               padding: const EdgeInsets.fromLTRB(16, 50, 16, 20),
               decoration: BoxDecoration(
@@ -653,7 +583,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppText.customText(
-                      "Fine Rules",
+                      'fine_management.title'.tr(),
                       size: 19,
                       weight: FontWeight.bold,
                       color: Colors.white,
@@ -679,7 +609,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
               ),
             ),
 
-            // ── Total Amount Card ─────────────────────────────────────────
             if (totalRules > 0)
               Container(
                 margin: const EdgeInsets.fromLTRB(18, 12, 18, 8),
@@ -714,7 +643,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppText.customText(
-                          "Total Fine Amount",
+                          'fine_management.total_fine_amount'.tr(),
                           size: 12,
                           color: AppColor.softGreyText,
                         ),
@@ -731,52 +660,46 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                 ),
               ),
 
-            // ── List ──────────────────────────────────────────────────────
             Expanded(
               child: loading
                   ? _fineShimmer()
                   : fineRules.isEmpty
                   ? _emptyView()
                   : ListView.builder(
-                      padding: const EdgeInsets.fromLTRB(18, 12, 18, 90),
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: fineRules.length,
-                      itemBuilder: (context, index) {
-                        final f = fineRules[index];
-                        final isSpecific =
-                            f.applicableTo == "specific_fee" ||
-                            f.applicableTo == "specific_fee_head" ||
-                            (f.feeHeadId != null &&
-                                f.feeHeadId.toString().isNotEmpty &&
-                                f.feeHeadId.toString() != "null" &&
-                                f.feeHeadId.toString() != "0");
-                        final applicableText = isSpecific
-                            ? (f.feeHeadName != null &&
-                                      f.feeHeadName.toString().isNotEmpty
-                                  ? f.feeHeadName.toString()
-                                  : "Fee Head #${f.feeHeadId ?? '-'}")
-                            : "All Fees";
+                padding: const EdgeInsets.fromLTRB(18, 12, 18, 90),
+                physics: const BouncingScrollPhysics(),
+                itemCount: fineRules.length,
+                itemBuilder: (context, index) {
+                  final f = fineRules[index];
+                  final isSpecific =
+                      f.applicableTo == "specific_fee" ||
+                          f.applicableTo == "specific_fee_head" ||
+                          (f.feeHeadId != null &&
+                              f.feeHeadId.toString().isNotEmpty &&
+                              f.feeHeadId.toString() != "null" &&
+                              f.feeHeadId.toString() != "0");
+                  final applicableText = isSpecific
+                      ? (f.feeHeadName != null &&
+                      f.feeHeadName.toString().isNotEmpty
+                      ? f.feeHeadName.toString()
+                      : "Fee Head #${f.feeHeadId ?? '-'}")
+                      : 'fine_management.all_fees'.tr();
 
-                        // ✅ Debug — API se kya aa raha hai dekho
-                        debugPrint(
-                          "Rule: ${f.ruleName} | applicableTo: ${f.applicableTo} | feeHeadId: ${f.feeHeadId} | feeHeadName: ${f.feeHeadName}",
-                        );
-
-                        return _animatedFineCard(
-                          index,
-                          fineRuleId: f.fineRuleId,
-                          ruleName: f.ruleName ?? "-",
-                          fineType: f.fineType ?? "per_day",
-                          amount: f.fineAmount?.toString() ?? "0",
-                          grace: f.gracePeriodDays?.toString() ?? "0",
-                          applicable: applicableText,
-                          isSpecific: isSpecific,
-                          feeHeadId: f.feeHeadId?.toString(),
-                          maxFineCap: f.maxFineCap?.toString(),
-                          applicableTo: f.applicableTo?.toString(),
-                        );
-                      },
-                    ),
+                  return _animatedFineCard(
+                    index,
+                    fineRuleId: f.fineRuleId,
+                    ruleName: f.ruleName ?? "-",
+                    fineType: f.fineType ?? "per_day",
+                    amount: f.fineAmount?.toString() ?? "0",
+                    grace: f.gracePeriodDays?.toString() ?? "0",
+                    applicable: applicableText,
+                    isSpecific: isSpecific,
+                    feeHeadId: f.feeHeadId?.toString(),
+                    maxFineCap: f.maxFineCap?.toString(),
+                    applicableTo: f.applicableTo?.toString(),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -784,20 +707,19 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     );
   }
 
-  // ── Animated Card Wrapper ─────────────────────────────────────────────────
   Widget _animatedFineCard(
-    int index, {
-    required String ruleName,
-    required String fineType,
-    required String amount,
-    required String grace,
-    required String applicable,
-    required bool isSpecific,
-    required dynamic fineRuleId,
-    required String? feeHeadId,
-    required String? maxFineCap,
-    required String? applicableTo,
-  }) {
+      int index, {
+        required String ruleName,
+        required String fineType,
+        required String amount,
+        required String grace,
+        required String applicable,
+        required bool isSpecific,
+        required dynamic fineRuleId,
+        required String? feeHeadId,
+        required String? maxFineCap,
+        required String? applicableTo,
+      }) {
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -825,7 +747,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     );
   }
 
-  // ── Fine Rule Card ────────────────────────────────────────────────────────
   Widget _fineCard({
     required dynamic fineRuleId,
     required String ruleName,
@@ -859,7 +780,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Left icon ───────────────────────────────────────────
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -890,7 +810,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                           weight: FontWeight.w600,
                         ),
                       ),
-
                       Container(
                         height: 38,
                         width: 38,
@@ -905,24 +824,21 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                           color: Colors.white,
                           padding: EdgeInsets.zero,
                           elevation: 4,
-                          tooltip: "Actions",
-
+                          tooltip: 'fine_management.actions'.tr(),
                           icon: Icon(
                             Icons.more_vert_rounded,
                             color: AppColor.lightBlueColor,
                             size: 20,
                           ),
-
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
-
                           onSelected: (value) {
                             if (!PermissionExtensions.canAccess(
                               PermissionKeys.manageFees,
                             )) {
                               Utils.show(
-                                "You don't have permission to perform this action.",
+                                'fine_management.permission_denied'.tr(),
                                 context,
                               );
                               return;
@@ -944,7 +860,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                               _confirmDelete(fineRuleId.toString(), ruleName);
                             }
                           },
-
                           itemBuilder: (_) => [
                             PopupMenuItem(
                               value: "edit",
@@ -962,10 +877,9 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                       color: Colors.blue.shade700,
                                     ),
                                   ),
-
                                   const SizedBox(width: 10),
                                   Text(
-                                    "Edit Rule",
+                                    'fine_management.edit'.tr(),
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -973,7 +887,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                 ],
                               ),
                             ),
-
                             PopupMenuItem(
                               value: "delete",
                               child: Row(
@@ -990,11 +903,9 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                                       color: Colors.red.shade700,
                                     ),
                                   ),
-
                                   const SizedBox(width: 10),
-
                                   Text(
-                                    "Delete Rule",
+                                    'fine_management.delete_rule_btn'.tr(),
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -1007,39 +918,32 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 8),
 
-                  // Amount
                   _infoRow(
                     Icons.currency_rupee,
-                    "Amount",
+                    'fine_management.amount'.tr(),
                     "₹$amount",
                     AppColor.lightBlueColor,
                   ),
 
-                  // Grace Period
                   _infoRow(
                     Icons.calendar_today,
-                    "Grace Period",
+                    'fine_management.grace_period_label'.tr(),
                     "$grace days",
                     Colors.orange.shade700,
                   ),
 
-                  // ✅ Applicable To — fee head name dikhega specific_fee mein
                   _infoRow(
                     isSpecific ? Icons.receipt_long : Icons.all_inclusive,
-                    "Applicable To",
+                    'fine_management.applicable_to_label'.tr(),
                     applicable,
                     isSpecific ? Colors.deepPurple : Colors.purple.shade700,
                   ),
-
                   const SizedBox(height: 6),
 
-                  // ── Badges ──────────────────────────────────────────
                   Row(
                     children: [
-                      // Fine type badge
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -1060,8 +964,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                               : Colors.green.shade700,
                         ),
                       ),
-
-                      // ✅ "Specific Fee" badge — sirf tab dikhe
                       if (isSpecific) ...[
                         const SizedBox(width: 6),
                         Container(
@@ -1074,7 +976,7 @@ class _FineManagementScreenState extends State<FineManagementScreen>
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: AppText.customText(
-                            "Specific Fee",
+                            'fine_management.specific_fee_badge'.tr(),
                             size: 11,
                             weight: FontWeight.w600,
                             color: Colors.deepPurple,
@@ -1092,7 +994,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     );
   }
 
-  // ── Info Row ──────────────────────────────────────────────────────────────
   Widget _infoRow(IconData icon, String label, String value, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1118,7 +1019,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     );
   }
 
-  // ── Empty State ───────────────────────────────────────────────────────────
   Widget _emptyView() {
     return Center(
       child: Column(
@@ -1138,13 +1038,13 @@ class _FineManagementScreenState extends State<FineManagementScreen>
           ),
           const SizedBox(height: 20),
           AppText.customText(
-            "No fine rules found",
+            'fine_management.no_fine_rules'.tr(),
             size: 16,
             weight: FontWeight.w600,
           ),
           const SizedBox(height: 8),
           AppText.customText(
-            "Tap the + button to add your first rule",
+            'fine_management.tap_to_add'.tr(),
             size: 13,
             color: AppColor.softGreyText,
           ),
@@ -1153,7 +1053,6 @@ class _FineManagementScreenState extends State<FineManagementScreen>
     );
   }
 
-  // ── Shimmer ───────────────────────────────────────────────────────────────
   Widget _fineShimmer() {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(18, 12, 18, 20),

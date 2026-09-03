@@ -413,7 +413,7 @@ class _SchoolManagementDashboardScreenState
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    module.title,
+                    module.localizedTitle,
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -519,16 +519,17 @@ class _SchoolManagementDashboardScreenState
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
+                // In drawer items:
                 _drawerItem(
                   icon: Icons.shield_outlined,
-                  title: 'common.privacy_policy'.tr(),
+                  title: 'cms.privacy_policy'.tr(),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => CmsScreen(
                           pageType: "privacy_policy",
-                          title: 'common.privacy_policy'.tr(),
+                          title: 'cms.privacy_policy'.tr(),
                         ),
                       ),
                     );
@@ -536,14 +537,14 @@ class _SchoolManagementDashboardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.description_outlined,
-                  title: 'common.terms_conditions'.tr(),
+                  title: 'cms.terms_conditions'.tr(),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => CmsScreen(
                           pageType: "terms_conditions",
-                          title: 'common.terms_conditions'.tr(),
+                          title: 'cms.terms_conditions'.tr(),
                         ),
                       ),
                     );
@@ -551,14 +552,14 @@ class _SchoolManagementDashboardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.info_outline_rounded,
-                  title: 'common.about_us'.tr(),
+                  title: 'cms.about_us'.tr(),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => CmsScreen(
                           pageType: "about_us",
-                          title: 'common.about_us'.tr(),
+                          title: 'cms.about_us'.tr(),
                         ),
                       ),
                     );
