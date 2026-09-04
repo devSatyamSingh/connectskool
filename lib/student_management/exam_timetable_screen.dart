@@ -8,6 +8,8 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../model/school_model/classes/all_classes_model.dart';
 import 'package:school_pro/model/school_model/exam/exam_management_model.dart';
 import '../model/school_model/timetable/get_school_exam_time_table_model.dart';
@@ -28,14 +30,12 @@ class ExamTimetableScreen extends StatefulWidget {
 }
 
 class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
-  // ── Selected values ────────────────────────────────────────────────────────
-  Data?   _selectedClass;
+  Data? _selectedClass;
   SectionData? _selectedSection;
-  ExamData?    _selectedExam;
+  ExamData? _selectedExam;
 
   bool _pdfLoading = false;
 
-  // ── Theme colors ───────────────────────────────────────────────────────────
   static const _primary   = Color(0xFF1a237e);
   static const _accent    = Color(0xFF6D28D9);
   static const _surface   = Color(0xFFF5F7FB);
@@ -72,7 +72,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
   Future<void> _loadTimetable() async {
     if (_selectedClass == null || _selectedSection == null || _selectedExam == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select class, section, and exam')),
+        SnackBar(content: Text('exam_timetable.please_select_all'.tr())),
       );
       return;
     }
@@ -84,7 +84,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     );
   }
 
-  // ── PDF ────────────────────────────────────────────────────────────────────
   Future<void> _downloadPdf() async {
     final ttVm      = context.read<SchoolExamTimeTableViewModel>();
     final profileVm = context.read<SchoolAdminProfileViewModel>();
@@ -92,7 +91,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     final items = ttVm.examTimeTableModel?.data;
     if (items == null || items.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No timetable data to export')),
+        SnackBar(content: Text('exam_timetable.no_timetable_data'.tr())),
       );
       return;
     }
@@ -106,7 +105,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
           final status = await Permission.storage.request();
           if (!status.isGranted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Storage permission denied')),
+              SnackBar(content: Text('exam_timetable.storage_permission_denied'.tr())),
             );
             setState(() => _pdfLoading = false);
             return;
@@ -130,7 +129,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('PDF error: $e')),
+          SnackBar(content: Text('exam_timetable.pdf_error'.tr(namedArgs: {'error': e.toString()}))),
         );
       }
     } finally {
@@ -138,7 +137,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     }
   }
 
-  // ── PDF Builder ────────────────────────────────────────────────────────────
   static Future<File> _buildPdf({
     required List<ExamTimetableData> items,
     required String schoolName,
@@ -190,16 +188,14 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
       build: (ctx) => pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.stretch,
         children: [
-          // timestamp
           pw.Row(mainAxisAlignment: pw.MainAxisAlignment.spaceBetween, children: [
             pw.Text(printedAt, style: pw.TextStyle(fontSize: 7, color: tGrey)),
-            pw.Text('School Dashboard - Student Portal', style: pw.TextStyle(fontSize: 7, color: tGrey)),
+            pw.Text('exam_timetable.school_dashboard'.tr(), style: pw.TextStyle(fontSize: 7, color: tGrey)),
             pw.SizedBox(width: 40),
           ]),
           pw.Divider(color: border, thickness: 0.5),
           pw.SizedBox(height: 6),
 
-          // header
           pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
             pw.Expanded(
               child: pw.Text(schoolName.toUpperCase(),
@@ -209,7 +205,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
               padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 5),
               decoration: pw.BoxDecoration(border: pw.Border.all(color: dBlue, width: 1)),
               child: pw.Column(children: [
-                pw.Text('OFFICIAL DOCUMENT', style: pw.TextStyle(fontSize: 7, color: dBlue, fontWeight: pw.FontWeight.bold)),
+                pw.Text('exam_timetable.official_document'.tr(), style: pw.TextStyle(fontSize: 7, color: dBlue, fontWeight: pw.FontWeight.bold)),
                 pw.SizedBox(height: 2),
                 pw.Text(genDate, style: pw.TextStyle(fontSize: 7, color: dBlue)),
               ]),
@@ -222,18 +218,17 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
           pw.Divider(color: border, thickness: 0.5),
           pw.SizedBox(height: 6),
 
-          // title
-          pw.Center(child: pw.Text('EXAMINATION TIMETABLE',
+          pw.Center(child: pw.Text('exam_timetable.examination_timetable'.tr(),
               style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: dBlue, letterSpacing: 1.5))),
           pw.SizedBox(height: 3),
-          pw.Center(child: pw.Text('Class: $className – Section $sectionName',
+          pw.Center(child: pw.Text(
+              'exam_timetable.class_section_label'.tr(namedArgs: {'className': className, 'sectionName': sectionName}),
               style: pw.TextStyle(fontSize: 9, color: tDark))),
           pw.SizedBox(height: 2),
           pw.Center(child: pw.Text(examName,
               style: pw.TextStyle(fontSize: 8, color: tGrey, fontStyle: pw.FontStyle.italic))),
           pw.SizedBox(height: 8),
 
-          // info box
           pw.Table(
             border: pw.TableBorder.all(color: border, width: 0.5),
             columnWidths: const {0: pw.FlexColumnWidth(1), 1: pw.FlexColumnWidth(1), 2: pw.FlexColumnWidth(1)},
@@ -241,16 +236,15 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
               pw.TableRow(
                 decoration: const pw.BoxDecoration(color: hdrBg),
                 children: [
-                  _infoCell('EXAM', examName, border, tGrey, tDark),
-                  _infoCell('CLASS & SECTION', '$className – $sectionName', border, tGrey, tDark, right: true),
-                  _infoCell('TOTAL SUBJECTS', '${items.length} Subjects', border, tGrey, tDark, right: false),
+                  _infoCell('exam_timetable.exam_label'.tr(), examName, border, tGrey, tDark),
+                  _infoCell('exam_timetable.class_section_header'.tr(), '$className – $sectionName', border, tGrey, tDark, right: true),
+                  _infoCell('exam_timetable.total_subjects_header'.tr(), 'exam_timetable.total_subjects'.tr(namedArgs: {'count': items.length.toString()}), border, tGrey, tDark, right: false),
                 ],
               ),
             ],
           ),
           pw.SizedBox(height: 10),
 
-          // table
           pw.Table(
             border: pw.TableBorder.all(color: border, width: 0.3),
             columnWidths: const {
@@ -267,8 +261,17 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
             children: [
               pw.TableRow(
                 decoration: const pw.BoxDecoration(color: hdrBg),
-                children: ['S.No','Subject','Date','Day','Start Time','End Time','Room','Max Marks','Pass Marks']
-                    .map((h) => pw.Container(
+                children: [
+                  'exam_timetable.sno'.tr(),
+                  'exam_timetable.subject'.tr(),
+                  'exam_timetable.date'.tr(),
+                  'exam_timetable.day'.tr(),
+                  'exam_timetable.start_time'.tr(),
+                  'exam_timetable.end_time'.tr(),
+                  'exam_timetable.room'.tr(),
+                  'exam_timetable.max_marks'.tr(),
+                  'exam_timetable.pass_marks'.tr()
+                ].map((h) => pw.Container(
                   padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 5),
                   child: pw.Text(h, style: pw.TextStyle(fontSize: 7, color: tGrey, fontWeight: pw.FontWeight.bold)),
                 )).toList(),
@@ -297,14 +300,13 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
           ),
           pw.SizedBox(height: 12),
 
-          // instructions
           pw.Container(
             decoration: pw.BoxDecoration(border: pw.Border.all(color: blueBdr, width: 0.8)),
             child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: [
               pw.Container(
                 color: lBlue,
                 padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                child: pw.Text('  IMPORTANT INSTRUCTIONS FOR STUDENTS',
+                child: pw.Text('  exam_timetable.important_instructions'.tr(),
                     style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold, color: dBlue)),
               ),
               pw.Container(
@@ -312,18 +314,18 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
                 padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 child: pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
                   pw.Expanded(child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                    'Report 15 minutes before commencement of the exam',
-                    'Valid School ID Card & Admit Card must be carried',
-                    'Write Roll Number and Name clearly on the answer sheet',
+                    'exam_timetable.instruction_1'.tr(),
+                    'exam_timetable.instruction_2'.tr(),
+                    'exam_timetable.instruction_3'.tr(),
                   ].map((t) => pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 4),
                     child: pw.Text('✓  $t', style: pw.TextStyle(fontSize: 8, color: tDark)),
                   )).toList())),
                   pw.SizedBox(width: 10),
                   pw.Expanded(child: pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-                    'Possession of electronic gadgets is strictly prohibited',
-                    'No student will be allowed to leave before duration ends',
-                    'Use of unfair means leads to immediate cancellation',
+                    'exam_timetable.instruction_4'.tr(),
+                    'exam_timetable.instruction_5'.tr(),
+                    'exam_timetable.instruction_6'.tr(),
                   ].map((t) => pw.Padding(
                     padding: const pw.EdgeInsets.only(bottom: 4),
                     child: pw.Text('✓  $t', style: pw.TextStyle(fontSize: 8, color: tDark)),
@@ -334,28 +336,27 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
           ),
           pw.SizedBox(height: 20),
 
-          // signatures
           pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.end, children: [
             pw.Container(
               width: 60, height: 55,
               decoration: pw.BoxDecoration(border: pw.Border.all(color: border), borderRadius: const pw.BorderRadius.all(pw.Radius.circular(40))),
-              child: pw.Center(child: pw.Text('SCHOOL\nSTAMP', textAlign: pw.TextAlign.center, style: pw.TextStyle(fontSize: 7, color: border))),
+              child: pw.Center(child: pw.Text('exam_timetable.school_stamp'.tr(), textAlign: pw.TextAlign.center, style: pw.TextStyle(fontSize: 7, color: border))),
             ),
             pw.Expanded(child: pw.SizedBox()),
             pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.center, children: [
               pw.SizedBox(width: 100, child: pw.Divider(color: tDark, thickness: 0.8)),
-              pw.Text('Class Teacher', style: pw.TextStyle(fontSize: 8, color: tDark)),
-              pw.Text('SIGNATURE',    style: pw.TextStyle(fontSize: 7, color: tGrey)),
+              pw.Text('exam_timetable.class_teacher'.tr(), style: pw.TextStyle(fontSize: 8, color: tDark)),
+              pw.Text('exam_timetable.signature'.tr(),    style: pw.TextStyle(fontSize: 7, color: tGrey)),
             ]),
             pw.SizedBox(width: 30),
             pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.center, children: [
               pw.SizedBox(width: 100, child: pw.Divider(color: tDark, thickness: 0.8)),
-              pw.Text('Principal',  style: pw.TextStyle(fontSize: 8, color: tDark)),
-              pw.Text('SIGNATURE', style: pw.TextStyle(fontSize: 7, color: tGrey)),
+              pw.Text('exam_timetable.principal'.tr(),  style: pw.TextStyle(fontSize: 8, color: tDark)),
+              pw.Text('exam_timetable.signature'.tr(), style: pw.TextStyle(fontSize: 7, color: tGrey)),
             ]),
           ]),
           pw.SizedBox(height: 4),
-          pw.Text('Date: $genDate', style: pw.TextStyle(fontSize: 8, color: tDark)),
+          pw.Text('exam_timetable.date_label'.tr(namedArgs: {'date': genDate}), style: pw.TextStyle(fontSize: 8, color: tDark)),
           pw.SizedBox(height: 8),
           pw.Divider(color: border, thickness: 0.5),
           pw.SizedBox(height: 4),
@@ -396,7 +397,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     );
   }
 
-  // ── UI ─────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -439,27 +439,23 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
                         ),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Exam Timetable",
-                            style: TextStyle(
+                          Text(
+                            'exam_timetable.title'.tr(),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-
                           const SizedBox(height: 3),
-
                           Text(
-                            "View exam schedule by day and period",
+                            'exam_timetable.subtitle'.tr(),
                             style: TextStyle(
                               color: Colors.white.withOpacity(.9),
                               fontSize: 12,
@@ -500,7 +496,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     );
   }
 
-  // ── Filter Card ────────────────────────────────────────────────────────────
   Widget _buildFilterCard() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -522,9 +517,9 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
               child: const Icon(Icons.calendar_today_rounded, color: _primary, size: 22),
             ),
             const SizedBox(width: 12),
-            const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Exam Timetable', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              Text('Filter by class, section & exam', style: TextStyle(fontSize: 13, color: Colors.grey)),
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('exam_timetable.exam_timetable'.tr(), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('exam_timetable.filter_subtitle'.tr(), style: const TextStyle(fontSize: 13, color: Colors.grey)),
             ]),
           ]),
           const SizedBox(height: 20),
@@ -545,7 +540,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
       builder: (_, vm, __) {
         final items = vm.allClassesModel?.data ?? [];
         return _DropdownField<Data>(
-          label: 'Select Class',
+          label: 'exam_timetable.select_class'.tr(),
           icon: Icons.class_rounded,
           value: _selectedClass,
           items: items,
@@ -562,7 +557,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
       builder: (_, vm, __) {
         final items = vm.allSectionsModel?.data ?? [];
         return _DropdownField<SectionData>(
-          label: 'Select Section',
+          label: 'exam_timetable.select_section'.tr(),
           icon: Icons.group_rounded,
           value: _selectedSection,
           items: items,
@@ -571,7 +566,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
             setState(() => _selectedSection = v);
           },
           isLoading: vm.loading,
-          hint: _selectedClass == null ? 'Select class first' : 'Select Section',
+          hint: _selectedClass == null ? 'exam_timetable.select_class_first'.tr() : 'exam_timetable.select_section'.tr(),
         );
       },
     );
@@ -582,7 +577,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
       builder: (_, vm, __) {
         final items = vm.examManagementModel?.data ?? [];
         return _DropdownField<ExamData>(
-          label: 'Select Exam',
+          label: 'exam_timetable.select_exam'.tr(),
           icon: Icons.assignment_rounded,
           value: _selectedExam,
           items: items,
@@ -601,8 +596,8 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
           width: double.infinity,
           child: AppButton(
             title: vm.loading
-                ? "Loading..."
-                : "Load Timetable",
+                ? 'exam_timetable.loading'.tr()
+                : 'exam_timetable.load_timetable'.tr(),
             icon: vm.loading
                 ? null
                 : Icons.search_rounded,
@@ -616,7 +611,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     );
   }
 
-  // ── Stats Row ──────────────────────────────────────────────────────────────
   Widget _buildStatsRow(List<ExamTimetableData> data) {
     final totalDays    = data.map((e) => e.examDate).toSet().length;
     final uniqueSubs   = data.map((e) => e.subjectName).toSet().length;
@@ -624,10 +618,10 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     final maxMark      = maxMarksVals.isEmpty ? 0 : maxMarksVals.reduce((a, b) => a > b ? a : b);
 
     final stats = [
-      _StatInfo('TOTAL\nSUBJECTS', '${data.length}',   const Color(0xFFEEF3FB), const Color(0xFF003B8F), Icons.book_rounded),
-      _StatInfo('EXAM\nDAYS',      '$totalDays',       const Color(0xFFDDF6E7), Colors.green.shade800,   Icons.event_rounded),
-      _StatInfo('UNIQUE\nSUBJECTS','$uniqueSubs',      const Color(0xFFEEE8FF), Colors.deepPurple,       Icons.category_rounded),
-      _StatInfo('MAX\nMARKS',      '${maxMark.toInt()}',const Color(0xFFFFF1DB), Colors.deepOrange,      Icons.star_rounded),
+      _StatInfo('exam_timetable.total_subjects_stat'.tr(), '${data.length}',   const Color(0xFFEEF3FB), const Color(0xFF003B8F), Icons.book_rounded),
+      _StatInfo('exam_timetable.exam_days'.tr(),      '$totalDays',       const Color(0xFFDDF6E7), Colors.green.shade800,   Icons.event_rounded),
+      _StatInfo('exam_timetable.unique_subjects'.tr(),'$uniqueSubs',      const Color(0xFFEEE8FF), Colors.deepPurple,       Icons.category_rounded),
+      _StatInfo('exam_timetable.max_marks_stat'.tr(),      '${maxMark.toInt()}',const Color(0xFFFFF1DB), Colors.deepOrange,      Icons.star_rounded),
     ];
 
     return GridView.count(
@@ -662,7 +656,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
     );
   }
 
-  // ── Table Card ─────────────────────────────────────────────────────────────
   Widget _buildTableCard(List<ExamTimetableData> data) {
     return Container(
       decoration: BoxDecoration(
@@ -673,7 +666,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // card header
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
             child: Row(children: [
@@ -692,7 +684,7 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
                   : ElevatedButton.icon(
                 onPressed: _downloadPdf,
                 icon: const Icon(Icons.download_rounded, size: 18),
-                label: const Text('Download PDF'),
+                label: Text('exam_timetable.download_pdf'.tr()),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _accent,
                   foregroundColor: Colors.white,
@@ -705,7 +697,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
           ),
           const SizedBox(height: 16),
           const Divider(height: 1),
-          // horizontal scroll table
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.all(16),
@@ -752,7 +743,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
         final room = (item.roomNo?.isEmpty ?? true) ? '-' : item.roomNo!;
         final day  = fmtDay(item.examDate);
 
-        // day color
         const dayColors = {
           'Sunday': Color(0xFFE53935), 'Saturday': Color(0xFF8E24AA),
           'Monday': Color(0xFF1E88E5), 'Tuesday': Color(0xFF00897B),
@@ -813,7 +803,6 @@ class _ExamTimetableScreenState extends State<ExamTimetableScreen> {
   }
 }
 
-// ── Helper widgets ─────────────────────────────────────────────────────────────
 class _DropdownField<T> extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -885,12 +874,12 @@ class _EmptyCard extends StatelessWidget {
     return Container(
       height: 200,
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-      child: const Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.event_busy_rounded, size: 48, color: Colors.grey),
-        SizedBox(height: 12),
-        Text('No timetable found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey)),
-        SizedBox(height: 4),
-        Text('Try a different filter combination', style: TextStyle(color: Colors.grey)),
+      child: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.event_busy_rounded, size: 48, color: Colors.grey),
+        const SizedBox(height: 12),
+        Text('exam_timetable.no_timetable_found'.tr(), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey)),
+        const SizedBox(height: 4),
+        Text('exam_timetable.try_different_filter'.tr(), style: const TextStyle(color: Colors.grey)),
       ])),
     );
   }

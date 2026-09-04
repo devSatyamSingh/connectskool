@@ -4,6 +4,8 @@ import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/auth_view_model/user_view_model.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../res/app_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -26,21 +28,21 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   final List<Map<String, dynamic>> pages = [
     {
       "icon": Icons.school_rounded,
-      "title": "Manage Students\nEasily",
-      "desc": "Add, update and track all student records in one centralized platform",
-      "color": Color(0xFF6C5CE7),
+      "titleKey": "onboarding.page1_title",
+      "descKey": "onboarding.page1_desc",
+      "color": const Color(0xFF6C5CE7),
     },
     {
       "icon": Icons.fact_check_rounded,
-      "title": "Attendance &\nFee Management",
-      "desc": "Mark attendance and manage school fees digitally with automated tracking",
-      "color": Color(0xFF00B894),
+      "titleKey": "onboarding.page2_title",
+      "descKey": "onboarding.page2_desc",
+      "color": const Color(0xFF00B894),
     },
     {
       "icon": Icons.analytics_rounded,
-      "title": "Reports &\nCommunication",
-      "desc": "Generate detailed reports and connect with parents instantly",
-      "color": Color(0xFFFF6B6B),
+      "titleKey": "onboarding.page3_title",
+      "descKey": "onboarding.page3_desc",
+      "color": const Color(0xFFFF6B6B),
     },
   ];
 
@@ -76,7 +78,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _scaleController.forward();
   }
 
-  // ── Onboarding complete karo aur login pe jao ──────────────────────────────
   Future<void> _finish() async {
     await UserViewModel().markOnboardingDone();
 
@@ -115,9 +116,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 child: Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
-                    onPressed: _finish, // ← fix: sirf _finish()
+                    onPressed: _finish,
                     child: AppText.customText(
-                      "Skip",
+                      'onboarding.skip'.tr(),
                       size: 16,
                       color: Colors.white.withOpacity(0.9),
                       weight: FontWeight.w600,
@@ -206,7 +207,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                   ],
                                 ).createShader(bounds),
                                 child: AppText.customText(
-                                  page["title"],
+                                  page["titleKey"].tr(),
                                   size: 32,
                                   weight: FontWeight.w900,
                                   align: TextAlign.center,
@@ -230,7 +231,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                   ),
                                 ),
                                 child: AppText.customText(
-                                  page["desc"],
+                                  page["descKey"].tr(),
                                   size: 16,
                                   color: Colors.white.withOpacity(0.9),
                                   align: TextAlign.center,
@@ -343,7 +344,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                             borderRadius: BorderRadius.circular(16),
                             onTap: () {
                               if (currentIndex == pages.length - 1) {
-                                _finish(); // ← fix: sirf _finish()
+                                _finish();
                               } else {
                                 _controller.nextPage(
                                   duration: const Duration(milliseconds: 350),
@@ -357,8 +358,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                                 children: [
                                   AppText.customText(
                                     currentIndex == pages.length - 1
-                                        ? "Get Started"
-                                        : "Next",
+                                        ? 'onboarding.get_started'.tr()
+                                        : 'onboarding.next'.tr(),
                                     size: 18,
                                     weight: FontWeight.w700,
                                     color: AppColor.lightBlueColor,

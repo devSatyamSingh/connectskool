@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_button.dart';
 import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
 import '../../res/app_color.dart';
@@ -19,6 +19,7 @@ class CoScholasticScreen extends StatefulWidget {
 
 class _CoScholasticScreenState extends State<CoScholasticScreen> {
   static const Color _gold = Color(0xFFFFB300);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +32,6 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
               padding: const EdgeInsets.only(bottom: 20),
               child: Column(
                 children: [
-
                   CoScholasticFilterCard(
                     onLoad: ({
                       required classId,
@@ -39,15 +39,9 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                       required academicYear,
                       required term,
                     }) async {
-                      final gradeVm =
-                      context.read<CoScholasticGradeViewModel>();
-
-                      gradeVm.currentAcademicYear =
-                          academicYear;
-
+                      final gradeVm = context.read<CoScholasticGradeViewModel>();
+                      gradeVm.currentAcademicYear = academicYear;
                       gradeVm.currentTerm = term;
-
-                      // students + subjects load
                     },
                   ),
                   const SizedBox(height: 16),
@@ -63,6 +57,7 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
       ),
     );
   }
+
   Widget _buildHeader(BuildContext context) {
     final adminProfile = Provider.of<SchoolAdminProfileViewModel>(
       context,
@@ -99,28 +94,24 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(width: 14),
-
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Co-Scholastic Grades',
-                      style: TextStyle(
+                      'co_scholastic_screen.title'.tr(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                         letterSpacing: .3,
                       ),
                     ),
-
-                    SizedBox(height: 2),
-
+                    const SizedBox(height: 2),
                     Text(
-                      'Student Grade Management',
-                      style: TextStyle(color: Color(0xFFD7E7F7), fontSize: 12),
+                      'co_scholastic_screen.subtitle'.tr(),
+                      style: const TextStyle(color: Color(0xFFD7E7F7), fontSize: 12),
                     ),
                   ],
                 ),
@@ -130,8 +121,7 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) =>
-                      const CoScholasticGradesListScreen(),
+                      builder: (_) => const CoScholasticGradesListScreen(),
                     ),
                   );
                 },
@@ -148,18 +138,18 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                       color: Colors.white24,
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.list_alt_rounded,
                         color: Colors.white,
                         size: 16,
                       ),
-                      SizedBox(width: 5),
+                      const SizedBox(width: 5),
                       Text(
-                        "Grades List",
-                        style: TextStyle(
+                        'co_scholastic_screen.grades_list'.tr(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -190,9 +180,7 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                   size: 22,
                 ),
               ),
-
               const SizedBox(width: 12),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,19 +195,16 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 2),
-
-                    const Text(
-                      'Manage Co-Scholastic Grades',
-                      style: TextStyle(color: Color(0xFFAEC6E8), fontSize: 11),
+                    Text(
+                      'co_scholastic_screen.school_subtitle'.tr(),
+                      style: const TextStyle(color: Color(0xFFAEC6E8), fontSize: 11),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 14),
 
           /// INFO BAR
@@ -234,47 +219,43 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.groups_rounded, color: Colors.white, size: 16),
-                    SizedBox(width: 6),
+                    const Icon(Icons.groups_rounded, color: Colors.white, size: 16),
+                    const SizedBox(width: 6),
                     Text(
-                      'Class Wise',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      'co_scholastic_screen.class_wise'.tr(),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
-
                 SizedBox(
                   height: 18,
                   child: VerticalDivider(color: Colors.white38, thickness: 1),
                 ),
-
                 Row(
                   children: [
-                    Icon(Icons.grade_rounded, color: Colors.white, size: 16),
-                    SizedBox(width: 6),
+                    const Icon(Icons.grade_rounded, color: Colors.white, size: 16),
+                    const SizedBox(width: 6),
                     Text(
-                      'A1 - D Scale',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      'co_scholastic_screen.grade_scale'.tr(),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
-
                 SizedBox(
                   height: 18,
                   child: VerticalDivider(color: Colors.white38, thickness: 1),
                 ),
-
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.fact_check_outlined,
                       color: Colors.white,
                       size: 16,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
-                      'Assessment',
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+                      'co_scholastic_screen.assessment'.tr(),
+                      style: const TextStyle(color: Colors.white, fontSize: 12),
                     ),
                   ],
                 ),
@@ -286,8 +267,10 @@ class _CoScholasticScreenState extends State<CoScholasticScreen> {
     );
   }
 }
+
 class SaveGradesButton extends StatelessWidget {
   const SaveGradesButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Consumer<CoScholasticGradeViewModel>(
@@ -307,8 +290,8 @@ class SaveGradesButton extends StatelessWidget {
           ),
           child: AppButton(
             title: vm.loading
-                ? "Saving Grades..."
-                : "Save All Grades",
+                ? 'co_scholastic_screen.saving_grades'.tr()
+                : 'co_scholastic_screen.save_all_grades'.tr(),
             icon: Icons.save_rounded,
             loading: vm.loading,
             onTap: () async {

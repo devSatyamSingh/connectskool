@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../view_model/auth_view_model/academic_view_model.dart';
@@ -78,9 +80,9 @@ class _CoScholasticListFilterCardState
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
-                    "Filter Grades",
-                    style: TextStyle(
+                  Text(
+                    'co_scholastic_list_filter.filter_grades'.tr(),
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF1A1A2E),
@@ -95,22 +97,22 @@ class _CoScholasticListFilterCardState
                     child: DropdownButtonFormField<String>(
                       value: selectedAcademicYear,
                       decoration: _inputDecoration(
-                        "Academic Year",
+                        'co_scholastic_list_filter.academic_year'.tr(),
                         Icons.calendar_today_rounded,
                       ),
                       items: academicVm.years
                           .map(
                             (e) => DropdownMenuItem<String>(
-                              value: e.yearName,
-                              child: Text(
-                                e.yearName ?? "",
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                          value: e.yearName,
+                          child: Text(
+                            e.yearName ?? "",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
-                          )
+                          ),
+                        ),
+                      )
                           .toList(),
                       onChanged: (value) {
                         setState(() {
@@ -131,24 +133,24 @@ class _CoScholasticListFilterCardState
                     child: DropdownButtonFormField<String>(
                       value: selectedClassId,
                       decoration: _inputDecoration(
-                        "Class",
+                        'co_scholastic_list_filter.class'.tr(),
                         Icons.class_rounded,
                       ),
                       items:
-                          classVm.allClassesModel?.data
-                              ?.map(
-                                (e) => DropdownMenuItem<String>(
-                                  value: e.classId.toString(),
-                                  child: Text(
-                                    e.className ?? "",
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              )
-                              .toList() ??
+                      classVm.allClassesModel?.data
+                          ?.map(
+                            (e) => DropdownMenuItem<String>(
+                          value: e.classId.toString(),
+                          child: Text(
+                            e.className ?? "",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      )
+                          .toList() ??
                           [],
                       onChanged: (value) async {
                         studentVm.clearStudents();
@@ -178,24 +180,24 @@ class _CoScholasticListFilterCardState
               DropdownButtonFormField<String>(
                 value: selectedSectionId,
                 decoration: _inputDecoration(
-                  "Section",
+                  'co_scholastic_list_filter.section'.tr(),
                   Icons.view_agenda_rounded,
                 ),
                 items:
-                    sectionVm.allSectionsModel?.data
-                        ?.map(
-                          (e) => DropdownMenuItem<String>(
-                            value: e.sectionId.toString(),
-                            child: Text(
-                              e.sectionName ?? "",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList() ??
+                sectionVm.allSectionsModel?.data
+                    ?.map(
+                      (e) => DropdownMenuItem<String>(
+                    value: e.sectionId.toString(),
+                    child: Text(
+                      e.sectionName ?? "",
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                )
+                    .toList() ??
                     [],
                 onChanged: (value) async {
                   studentVm.clearStudents();
@@ -230,18 +232,16 @@ class _CoScholasticListFilterCardState
                       isExpanded: true,
                       value: selectedStudentId,
                       decoration: _inputDecoration(
-                        "Student",
+                        'co_scholastic_list_filter.student'.tr(),
                         Icons.person_rounded,
                       ),
-
                       hint: Text(
                         selectedClassId == null
-                            ? "Select Class First"
+                            ? 'co_scholastic_list_filter.select_class_first'.tr()
                             : selectedSectionId == null
-                            ? "Select Section First"
-                            : "Select Student",
+                            ? 'co_scholastic_list_filter.select_section_first'.tr()
+                            : 'co_scholastic_list_filter.select_student'.tr(),
                       ),
-
                       items: (selectedClassId == null || selectedSectionId == null)
                           ? []
                           : (studentVm.allStudentListModel?.data ?? [])
@@ -259,7 +259,6 @@ class _CoScholasticListFilterCardState
                         ),
                       )
                           .toList(),
-
                       onChanged: (selectedClassId == null ||
                           selectedSectionId == null)
                           ? null
@@ -274,7 +273,7 @@ class _CoScholasticListFilterCardState
               ),
               const SizedBox(height: 16),
               AppButton(
-                title: "Load Student Grades",
+                title: 'co_scholastic_list_filter.load_student_grades'.tr(),
                 icon: Icons.search_rounded,
                 loading: _isLoading,
                 onTap: _loadGrades,
@@ -319,21 +318,21 @@ class _CoScholasticListFilterCardState
 
   Future<void> _loadGrades() async {
     if (selectedClassId == null) {
-      _showSnackBar("Please select class");
+      _showSnackBar('co_scholastic_list_filter.please_select_class'.tr());
       return;
     }
 
     if (selectedSectionId == null) {
-      _showSnackBar("Please select section");
+      _showSnackBar('co_scholastic_list_filter.please_select_section'.tr());
       return;
     }
 
     if (selectedStudentId == null) {
-      _showSnackBar("Please select student");
+      _showSnackBar('co_scholastic_list_filter.please_select_student'.tr());
       return;
     }
     if (selectedStudentId == null || selectedAcademicYear == null) {
-      _showSnackBar("Please select both student and academic year");
+      _showSnackBar('co_scholastic_list_filter.please_select_student_and_year'.tr());
       return;
     }
 
@@ -347,7 +346,7 @@ class _CoScholasticListFilterCardState
         context: context,
       );
     } catch (e) {
-      _showSnackBar("Failed to load grades. Please try again.");
+      _showSnackBar('co_scholastic_list_filter.failed_to_load_grades'.tr());
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

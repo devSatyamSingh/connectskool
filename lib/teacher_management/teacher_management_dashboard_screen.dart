@@ -94,38 +94,38 @@ class _TeacherManagementDashBoardScreenState
 
   Future<bool> _showExitPopup() async {
     return await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: Text(
-              'teacher_dashboard.exit_app'.tr(),
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: Text('teacher_dashboard.exit_confirm'.tr()),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text('teacher_dashboard.cancel'.tr()),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1565C0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () => SystemNavigator.pop(),
-                child: Text(
-                  'teacher_dashboard.exit'.tr(),
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          'teacher_dashboard.exit_app'.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text('teacher_dashboard.exit_confirm'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('teacher_dashboard.cancel'.tr()),
           ),
-        ) ??
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1565C0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () => SystemNavigator.pop(),
+            child: Text(
+              'teacher_dashboard.exit'.tr(),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    ) ??
         false;
   }
 
@@ -141,17 +141,17 @@ class _TeacherManagementDashBoardScreenState
         Provider.of<AllStudentListVieModel>(
           context,
         ).allStudentListModel?.pagination?.total?.toString() ??
-        '...';
+            '...';
     final accountantTotal =
         Provider.of<AllAccountantListVieModel>(
           context,
         ).allAccountantListModel?.pagination?.total?.toString() ??
-        '0';
+            '0';
     final teacherTotal =
         Provider.of<AllTeachersListVieModel>(
           context,
         ).allTeachersListModel?.pagination?.total?.toString() ??
-        '...';
+            '...';
 
     return WillPopScope(
       onWillPop: () async => await _showExitPopup(),
@@ -178,15 +178,13 @@ class _TeacherManagementDashBoardScreenState
     );
   }
 
-  // ─── HEADER ─────────────────────────────────────────────────────────────────
-
   Widget _buildHeader(
-    BuildContext context,
-    String name,
-    String studentTotal,
-    String accountantTotal,
-    String teacherTotal,
-  ) {
+      BuildContext context,
+      String name,
+      String studentTotal,
+      String accountantTotal,
+      String teacherTotal,
+      ) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -319,8 +317,8 @@ class _TeacherManagementDashBoardScreenState
         route: RoutesName.teacherProfileScreen,
       ),
       ...DashboardModules.modules.where(
-        (e) =>
-            e.permission != PermissionKeys.managePermissions &&
+            (e) =>
+        e.permission != PermissionKeys.managePermissions &&
             PermissionExtensions.canAccess(e.permission),
       ),
     ];
@@ -495,7 +493,6 @@ class _TeacherManagementDashBoardScreenState
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
               children: [
-                // In drawer items:
                 _drawerItem(
                   icon: Icons.shield_outlined,
                   title: 'cms.privacy_policy'.tr(),
@@ -658,107 +655,107 @@ class _TeacherManagementDashBoardScreenState
                   onPressed: isLoggingOut
                       ? null
                       : () async {
-                          setDialogState(() => isLoggingOut = true);
+                    setDialogState(() => isLoggingOut = true);
 
-                          final userVM = UserViewModel();
+                    final userVM = UserViewModel();
 
-                          try {
-                            final session = await userVM.getSubscribedSession();
-                            final schoolId = session['schoolId'];
-                            final role = session['role'];
-                            final userId = session['userId'];
-                            final classId = session['classId'];
-                            final sectionId = session['sectionId'];
+                    try {
+                      final session = await userVM.getSubscribedSession();
+                      final schoolId = session['schoolId'];
+                      final role = session['role'];
+                      final userId = session['userId'];
+                      final classId = session['classId'];
+                      final sectionId = session['sectionId'];
 
-                            debugPrint(
-                              "🔍 Teacher Logout => school=$schoolId | role=$role",
-                            );
+                      debugPrint(
+                        "🔍 Teacher Logout => school=$schoolId | role=$role",
+                      );
 
-                            if (schoolId != null &&
-                                schoolId.isNotEmpty &&
-                                role != null &&
-                                role.isNotEmpty) {
-                              final topics = <String>[
-                                "school_$schoolId",
-                                "school_${schoolId}_role_$role",
-                              ];
+                      if (schoolId != null &&
+                          schoolId.isNotEmpty &&
+                          role != null &&
+                          role.isNotEmpty) {
+                        final topics = <String>[
+                          "school_$schoolId",
+                          "school_${schoolId}_role_$role",
+                        ];
 
-                              if (userId != null && userId.isNotEmpty) {
-                                topics.add("user_$userId");
-                              }
+                        if (userId != null && userId.isNotEmpty) {
+                          topics.add("user_$userId");
+                        }
 
-                              if (role == "student") {
-                                if (classId != null && classId.isNotEmpty) {
-                                  topics.add(
-                                    "school_${schoolId}_class_$classId",
-                                  );
-                                }
-                                if (classId != null &&
-                                    classId.isNotEmpty &&
-                                    sectionId != null &&
-                                    sectionId.isNotEmpty) {
-                                  topics.add(
-                                    "school_${schoolId}_class_${classId}_section_$sectionId",
-                                  );
-                                }
-                              }
-
-                              final messaging = FirebaseMessaging.instance;
-                              await Future.wait(
-                                topics.map(
-                                  (t) => messaging.unsubscribeFromTopic(t),
-                                ),
-                                eagerError: false,
-                              );
-                              debugPrint("✅ Teacher unsubscribed: $topics");
-                            }
-
-                            await FirebaseMessaging.instance.deleteToken();
-                            debugPrint("✅ FCM Token deleted");
-
-                            try {
-                              final repo = AuthRepository();
-                              await repo.logoutApi({"device_type": "android"});
-                              debugPrint("✅ Backend logout done");
-                            } catch (e) {
-                              debugPrint("⚠️ Backend logout error: $e");
-                            }
-
-                            await userVM.clearSubscribedSession();
-                            await userVM.clearUser();
-                            PermissionManager.clear();
-
-                            debugPrint("✅ Teacher logout complete");
-                          } catch (e) {
-                            debugPrint("❌ Teacher logout error: $e");
-                            await userVM.clearSubscribedSession();
-                            await userVM.clearUser();
-                            PermissionManager.clear();
-                          }
-
-                          if (ctx.mounted) Navigator.pop(ctx);
-
-                          if (context.mounted) {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              RoutesName.splash,
-                              (route) => false,
+                        if (role == "student") {
+                          if (classId != null && classId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_$classId",
                             );
                           }
-                        },
+                          if (classId != null &&
+                              classId.isNotEmpty &&
+                              sectionId != null &&
+                              sectionId.isNotEmpty) {
+                            topics.add(
+                              "school_${schoolId}_class_${classId}_section_$sectionId",
+                            );
+                          }
+                        }
+
+                        final messaging = FirebaseMessaging.instance;
+                        await Future.wait(
+                          topics.map(
+                                (t) => messaging.unsubscribeFromTopic(t),
+                          ),
+                          eagerError: false,
+                        );
+                        debugPrint("✅ Teacher unsubscribed: $topics");
+                      }
+
+                      await FirebaseMessaging.instance.deleteToken();
+                      debugPrint("✅ FCM Token deleted");
+
+                      try {
+                        final repo = AuthRepository();
+                        await repo.logoutApi({"device_type": "android"});
+                        debugPrint("✅ Backend logout done");
+                      } catch (e) {
+                        debugPrint("⚠️ Backend logout error: $e");
+                      }
+
+                      await userVM.clearSubscribedSession();
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+
+                      debugPrint("✅ Teacher logout complete");
+                    } catch (e) {
+                      debugPrint("❌ Teacher logout error: $e");
+                      await userVM.clearSubscribedSession();
+                      await userVM.clearUser();
+                      PermissionManager.clear();
+                    }
+
+                    if (ctx.mounted) Navigator.pop(ctx);
+
+                    if (context.mounted) {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        RoutesName.splash,
+                            (route) => false,
+                      );
+                    }
+                  },
                   child: isLoggingOut
                       ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2.5,
-                          ),
-                        )
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2.5,
+                    ),
+                  )
                       : Text(
-                          'teacher_dashboard.logout_btn'.tr(),
-                          style: const TextStyle(color: Colors.white),
-                        ),
+                    'teacher_dashboard.logout_btn'.tr(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             );

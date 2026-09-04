@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -70,16 +71,14 @@ class _RouteScreenState extends State<RouteScreen> {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Route',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        content:
-        Text('Are you sure you want to delete "${r.routeName}"?'),
+        title: Text('route.delete_route'.tr(),
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('route.delete_confirm'.tr().replaceAll('{name}', r.routeName ?? '')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('route.cancel'.tr(), style: const TextStyle(color: Colors.grey)),
           ),
-          // ── Delete button: watches DeleteRouteViewModel loading ──
           Consumer<DeleteRouteViewModel>(
             builder: (context, deleteVm, _) => TextButton(
               onPressed: deleteVm.loading
@@ -90,8 +89,8 @@ class _RouteScreenState extends State<RouteScreen> {
                   context,
                 );
                 if (success) {
-                  Navigator.pop(context); // close dialog
-                  _refreshList();         // reload list
+                  Navigator.pop(context);
+                  _refreshList();
                 }
               },
               child: deleteVm.loading
@@ -101,8 +100,8 @@ class _RouteScreenState extends State<RouteScreen> {
                 child: CircularProgressIndicator(
                     strokeWidth: 2, color: Color(0xFFFF4D6D)),
               )
-                  : const Text('Delete',
-                  style: TextStyle(
+                  : Text('route.delete'.tr(),
+                  style: const TextStyle(
                       color: Color(0xFFFF4D6D),
                       fontWeight: FontWeight.bold)),
             ),
@@ -134,8 +133,10 @@ class _RouteScreenState extends State<RouteScreen> {
                   children: [
                     AppText.customText(
                       vm.loading
-                          ? 'Loading...'
-                          : '${routes.length} route${routes.length != 1 ? 's' : ''} found',
+                          ? 'route.loading'.tr()
+                          : 'route.routes_found'.tr()
+                          .replaceAll('{count}', '${routes.length}')
+                          .replaceAll('{plural}', routes.length != 1 ? '' : ''),
                       size: 13,
                       color: Colors.grey.shade500,
                       weight: FontWeight.w600,
@@ -165,35 +166,21 @@ class _RouteScreenState extends State<RouteScreen> {
                   itemBuilder: (_, i) => _RouteCard(
                     route: routes[i],
                     onEdit: () {
-
                       if (!PermissionExtensions.canAccess(
                           PermissionKeys.manageTransport)) {
-
-                        Utils.show(
-                          "You don't have permission to perform this action.",
-                          context,
-                        );
-
+                        Utils.show('route.permission_denied'.tr(), context);
                         return;
                       }
-
                       _openSheet(
                         existing: routes[i],
                       );
                     },
                     onDelete: () {
-
                       if (!PermissionExtensions.canAccess(
                           PermissionKeys.manageTransport)) {
-
-                        Utils.show(
-                          "You don't have permission to perform this action.",
-                          context,
-                        );
-
+                        Utils.show('route.permission_denied'.tr(), context);
                         return;
                       }
-
                       _confirmDelete(
                         routes[i],
                       );
@@ -209,27 +196,21 @@ class _RouteScreenState extends State<RouteScreen> {
         width: 150,
         margin: const EdgeInsets.only(bottom: 10),
         child: AppButton(
-          title: "Add Route",
+          title: 'route.add_route'.tr(),
           icon: Icons.add_rounded,
           height: 50,
           radius: 10,
           onTap: () {
-
             if (!PermissionExtensions.canAccess(
                 PermissionKeys.manageTransport)) {
-
-              Utils.show(
-                "You don't have permission to perform this action.",
-                context,
-              );
-
+              Utils.show('route.permission_denied'.tr(), context);
               return;
             }
-
             _openSheet();
           },
         ),
-      ),    );
+      ),
+    );
   }
 
   Widget _buildHeader() {
@@ -260,7 +241,7 @@ class _RouteScreenState extends State<RouteScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: AppText.customText('Route Management',
+            child: AppText.customText('route.title'.tr(),
                 size: 19, weight: FontWeight.bold, color: Colors.white),
           ),
           Container(
@@ -296,7 +277,7 @@ class _RouteScreenState extends State<RouteScreen> {
             fontSize: 14,
             color: Color(0xFF1a2340)),
         decoration: InputDecoration(
-          hintText: 'Search routes, drivers, vehicles...',
+          hintText: 'route.search_hint'.tr(),
           hintStyle: TextStyle(
               color: Colors.grey.shade400, fontWeight: FontWeight.w500),
           prefixIcon: Icon(Icons.search_rounded,
@@ -327,10 +308,10 @@ class _RouteScreenState extends State<RouteScreen> {
           Icon(Icons.directions_bus_outlined,
               size: 72, color: Colors.grey.shade300),
           const SizedBox(height: 16),
-          AppText.customText('No routes found',
+          AppText.customText('route.no_routes_found'.tr(),
               size: 16, weight: FontWeight.bold, color: Colors.grey.shade400),
           const SizedBox(height: 6),
-          AppText.customText('Tap + Add Route to get started',
+          AppText.customText('route.tap_to_add'.tr(),
               size: 13, color: Colors.grey.shade400),
         ],
       ),
@@ -405,7 +386,7 @@ class _RouteCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '${route.totalStops} stops',
+                            '${route.totalStops} ${'route.stops'.tr()}',
                             style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -424,7 +405,7 @@ class _RouteCard extends StatelessWidget {
                   else
                     _InfoChip(
                         icon: Icons.directions_car_outlined,
-                        label: 'No vehicle assigned',
+                        label: 'route.no_vehicle'.tr(),
                         color: Colors.grey.shade400,
                         bg: const Color(0xFFF5F5F5)),
                   const SizedBox(height: 6),
@@ -589,7 +570,6 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_isEdit) {
-      // ── UPDATE ────────────────────────────────────────────────────────────
       final vm = Provider.of<UpdateRouteViewModel>(context, listen: false);
       final success = await vm.updateRouteApi(
         widget.existing!.transportRouteId,
@@ -604,7 +584,6 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
         widget.onSaved();
       }
     } else {
-      // ── CREATE ────────────────────────────────────────────────────────────
       final vm = Provider.of<CreateRouteViewModel>(context, listen: false);
       final success = await vm.createFineApi(
         _nameCtrl.text.trim(),
@@ -613,7 +592,6 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
         _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
         context,
       );
-      // CreateRouteViewModel already pops on success
       if (success) widget.onSaved();
     }
   }
@@ -666,7 +644,7 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
                     ),
                     const SizedBox(width: 12),
                     AppText.customText(
-                      _isEdit ? 'Edit Route' : 'Add New Route',
+                      _isEdit ? 'route.edit_route'.tr() : 'route.add_new_route'.tr(),
                       size: 18,
                       weight: FontWeight.w900,
                       color: const Color(0xFF1a2340),
@@ -676,41 +654,41 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
                 const SizedBox(height: 20),
                 _FormField(
                   controller: _nameCtrl,
-                  label: 'Route Name',
-                  hint: 'e.g. Route A',
+                  label: 'route.route_name'.tr(),
+                  hint: 'route.route_name_hint'.tr(),
                   icon: Icons.route_rounded,
                   required: true,
                   validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Route name is required'
+                      ? 'route.route_name_required'.tr()
                       : null,
                 ),
                 const SizedBox(height: 14),
                 _FormField(
                   controller: _vehicleCtrl,
-                  label: 'Vehicle Number',
-                  hint: 'e.g. UP32AB1234',
+                  label: 'route.vehicle_number'.tr(),
+                  hint: 'route.vehicle_number_hint'.tr(),
                   icon: Icons.directions_car_rounded,
                   textCapitalization: TextCapitalization.characters,
                   validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Vehicle number is required'
+                      ? 'route.vehicle_required'.tr()
                       : null,
                 ),
                 const SizedBox(height: 14),
                 _FormField(
                   controller: _driverCtrl,
-                  label: 'Driver Name',
-                  hint: 'e.g. Ramesh Kumar',
+                  label: 'route.driver_name'.tr(),
+                  hint: 'route.driver_name_hint'.tr(),
                   icon: Icons.person_rounded,
                   textCapitalization: TextCapitalization.words,
                   validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Driver name is required'
+                      ? 'route.driver_required'.tr()
                       : null,
                 ),
                 const SizedBox(height: 14),
                 _FormField(
                   controller: _phoneCtrl,
-                  label: 'Driver Phone',
-                  hint: '10-digit mobile number',
+                  label: 'route.driver_phone'.tr(),
+                  hint: 'route.driver_phone_hint'.tr(),
                   icon: Icons.phone_rounded,
                   keyboardType: TextInputType.phone,
                   inputFormatters: [
@@ -720,7 +698,7 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) return null;
                     if (v.trim().length != 10)
-                      return 'Enter valid 10-digit number';
+                      return 'route.valid_phone'.tr();
                     return null;
                   },
                 ),
@@ -737,7 +715,7 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14)),
                         ),
-                        child: AppText.customText('Cancel',
+                        child: AppText.customText('route.cancel'.tr(),
                             size: 14,
                             weight: FontWeight.w700,
                             color: Colors.grey.shade600),
@@ -747,7 +725,7 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
                     Expanded(
                       flex: 1,
                       child: AppButton(
-                        title: _isEdit ? "Update Route" : "Add Route",
+                        title: _isEdit ? 'route.update_route'.tr() : 'route.add_route'.tr(),
                         icon: _isEdit
                             ? Icons.edit_rounded
                             : Icons.add_rounded,
@@ -756,7 +734,8 @@ class _RouteFormSheetState extends State<_RouteFormSheet> {
                         radius: 14,
                         onTap: _save,
                       ),
-                    ),                  ],
+                    ),
+                  ],
                 ),
                 SizedBox(height: screenHeight * 0.05),
               ],
@@ -808,8 +787,8 @@ class _FormField extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF3a4a6b))),
             if (required)
-              const Text(' *',
-                  style: TextStyle(color: Color(0xFFFF4D6D), fontSize: 13)),
+              Text(' *',
+                  style: const TextStyle(color: Color(0xFFFF4D6D), fontSize: 13)),
           ],
         ),
         const SizedBox(height: 6),

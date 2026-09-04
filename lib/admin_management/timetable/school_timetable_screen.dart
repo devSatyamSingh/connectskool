@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:pdf/pdf.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
               .map((e) => e.sectionName ?? '')
               .firstOrNull ?? 'Section';
 
-      // ── Build PDF ──────────────────────────────────────────────────────────
       final pdf     = pw.Document();
       final grouped = _groupByDay(data);
       final sortedDays = _dayOrder.where((d) => grouped.containsKey(d)).toList();
@@ -90,7 +90,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
           '${now.year}  ${now.hour.toString().padLeft(2,'0')}:'
           '${now.minute.toString().padLeft(2,'0')}';
 
-      // Colors
       const headerBg  = PdfColor.fromInt(0xFF1a237e);
       const accentBg  = PdfColor.fromInt(0xFF1565c0);
       const lightBlue = PdfColor.fromInt(0xFFe3f2fd);
@@ -101,7 +100,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
       const tWhite    = PdfColors.white;
       const greenDot  = PdfColor.fromInt(0xFF2e7d32);
 
-      // Day accent colors
       const dayColors = {
         'Monday':    PdfColor.fromInt(0xFF1E88E5),
         'Tuesday':   PdfColor.fromInt(0xFF00897B),
@@ -117,7 +115,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
           pageFormat: PdfPageFormat.a4,
           margin: const pw.EdgeInsets.fromLTRB(20, 20, 20, 24),
 
-          // ── PAGE HEADER ─────────────────────────────────────────────────────
           header: (_) => pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.stretch,
             children: [
@@ -132,7 +129,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                       crossAxisAlignment: pw.CrossAxisAlignment.start,
                       children: [
                         pw.Text(
-                          'CLASS TIMETABLE',
+                          'timetable.class_timetable'.tr().toUpperCase(),
                           style: pw.TextStyle(
                             color: tWhite,
                             fontSize: 16,
@@ -142,12 +139,12 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
-                          '$className * Section $sectionName',
+                          '$className * ${'timetable.section'.tr()} $sectionName',
                           style: pw.TextStyle(color: tWhite, fontSize: 10),
                         ),
                         pw.SizedBox(height: 2),
                         pw.Text(
-                          'Academic Schedule ${data.length} periods',
+                          '${'timetable.academic_schedule'.tr()} ${data.length} ${'timetable.periods'.tr()}',
                           style: pw.TextStyle(
                             color: PdfColor.fromInt(0xFFbbdefb),
                             fontSize: 8,
@@ -167,7 +164,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                             ),
                           ),
                           child: pw.Text(
-                            'OFFICIAL DOCUMENT',
+                            'timetable.official_document'.tr().toUpperCase(),
                             style: pw.TextStyle(
                               color: PdfColor.fromInt(0xFFbbdefb),
                               fontSize: 7,
@@ -177,7 +174,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                         ),
                         pw.SizedBox(height: 4),
                         pw.Text(
-                          'Generated: $dateStr',
+                          '${'timetable.generated'.tr()}: $dateStr',
                           style: pw.TextStyle(
                             color: PdfColor.fromInt(0xFFbbdefb),
                             fontSize: 7,
@@ -189,18 +186,17 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                 ),
               ),
               pw.SizedBox(height: 4),
-              // Stats bar
               pw.Container(
                 padding: const pw.EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: const pw.BoxDecoration(color: lightBlue),
                 child: pw.Row(
                   children: [
-                    _statChip('TOTAL PERIODS', '${data.length}', accentBg, tWhite),
+                    _statChip('timetable.total_periods'.tr(), '${data.length}', accentBg, tWhite),
                     pw.SizedBox(width: 12),
-                    _statChip('WORKING DAYS', '${sortedDays.length}', greenDot, tWhite),
+                    _statChip('timetable.working_days'.tr(), '${sortedDays.length}', greenDot, tWhite),
                     pw.SizedBox(width: 12),
                     _statChip(
-                      'SUBJECTS',
+                      'timetable.subjects_count'.tr(),
                       '${data.map((e) => e.subjectName).toSet().length}',
                       PdfColor.fromInt(0xFF6D28D9),
                       tWhite,
@@ -212,7 +208,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
             ],
           ),
 
-          // ── PAGE FOOTER ─────────────────────────────────────────────────────
           footer: (ctx) => pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.stretch,
             children: [
@@ -222,7 +217,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text(
-                    '$className | Section $sectionName | Class Timetable',
+                    '$className | ${'timetable.section'.tr()} $sectionName | ${'timetable.class_timetable'.tr()}',
                     style: pw.TextStyle(fontSize: 7, color: tGrey),
                   ),
                   pw.Text(
@@ -234,7 +229,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
             ],
           ),
 
-          // ── CONTENT ─────────────────────────────────────────────────────────
           build: (_) => sortedDays.map((day) {
             final periods  = grouped[day]!;
             final dayColor = dayColors[day] ?? accentBg;
@@ -245,10 +239,18 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
               0.08,
             );
 
+            final dayKey = day.toLowerCase();
+            final dayLabel = dayKey == 'monday' ? 'timetable.monday'.tr() :
+            dayKey == 'tuesday' ? 'timetable.tuesday'.tr() :
+            dayKey == 'wednesday' ? 'timetable.wednesday'.tr() :
+            dayKey == 'thursday' ? 'timetable.thursday'.tr() :
+            dayKey == 'friday' ? 'timetable.friday'.tr() :
+            dayKey == 'saturday' ? 'timetable.saturday'.tr() :
+            dayKey == 'sunday' ? 'timetable.sunday'.tr() : day;
+
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.stretch,
               children: [
-                // Day header
                 pw.Container(
                   padding: const pw.EdgeInsets.fromLTRB(12, 8, 12, 8),
                   decoration: pw.BoxDecoration(
@@ -261,7 +263,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                   child: pw.Row(
                     children: [
                       pw.Text(
-                        day.toUpperCase(),
+                        dayLabel.toUpperCase(),
                         style: pw.TextStyle(
                           color: tWhite,
                           fontWeight: pw.FontWeight.bold,
@@ -277,7 +279,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                           borderRadius: const pw.BorderRadius.all(pw.Radius.circular(10)),
                         ),
                         child: pw.Text(
-                          '${periods.length} periods',
+                          '${periods.length} ${'timetable.periods'.tr()}',
                           style: pw.TextStyle(
                             color: dayColor,
                             fontSize: 8,
@@ -289,7 +291,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                   ),
                 ),
 
-                // Table
                 pw.Table(
                   border: pw.TableBorder.all(color: border, width: 0.4),
                   columnWidths: const {
@@ -298,19 +299,17 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                     2: pw.FlexColumnWidth(2.2),
                   },
                   children: [
-                    // Table header
                     pw.TableRow(
                       decoration: const pw.BoxDecoration(
                         color: PdfColor.fromInt(0xFFEEF3FB),
                       ),
                       children: [
-                        _pdfTh('TIME'),
-                        _pdfTh('SUBJECT'),
-                        _pdfTh('TEACHER'),
+                        _pdfTh('timetable.time'.tr()),
+                        _pdfTh('timetable.subject_label'.tr()),
+                        _pdfTh('timetable.teacher_label'.tr()),
                       ],
                     ),
 
-                    // Data rows
                     ...periods.asMap().entries.map((entry) {
                       final idx  = entry.key;
                       final p    = entry.value;
@@ -321,7 +320,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                       return pw.TableRow(
                         decoration: pw.BoxDecoration(color: bg),
                         children: [
-                          // Time cell
                           pw.Container(
                             padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 7),
                             child: pw.Column(
@@ -343,7 +341,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                             ),
                           ),
 
-                          // Subject cell
                           pw.Container(
                             padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 7),
                             child: pw.Row(
@@ -371,7 +368,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                             ),
                           ),
 
-                          // Teacher cell
                           pw.Container(
                             padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 7),
                             child: pw.Row(
@@ -418,7 +414,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
         ),
       );
 
-      // ── Save & Open ────────────────────────────────────────────────────────
       final dir      = await getApplicationDocumentsDirectory();
       final fileName = 'Timetable_${className}_${sectionName}_${now.millisecondsSinceEpoch}.pdf';
       final file     = File('${dir.path}/$fileName');
@@ -435,29 +430,27 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
           backgroundColor: Colors.green.shade700,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 10),
-              Text('PDF downloaded successfully'),
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 10),
+              Text('timetable.pdf_downloaded'.tr()),
             ],
           ),
         ),
       );
     } catch (e) {
       debugPrint('PDF DOWNLOAD ERROR => $e');
-      // ✅ Error pe bhi loading band karo
       if (!mounted) return;
       setState(() => _isDownloadingPdf = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to download PDF: $e'),
+          content: Text('${'timetable.pdf_failed'.tr()}: $e'),
           backgroundColor: Colors.red,
         ),
       );
     }
   }
-
 
   pw.Widget _statChip(String label, String value, PdfColor bg, PdfColor fg) {
     return pw.Container(
@@ -506,6 +499,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
       return t ?? '';
     }
   }
+
   pw.Widget _pdfCell(String text, {bool isHeader = false}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(8),
@@ -524,8 +518,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!PermissionExtensions.canAccess(PermissionKeys.viewTimetable)) {
-        Utils.show("You don't have permission to view timetable", context);
-
+        Utils.show('timetable.you_dont_have_permission'.tr(), context);
         Navigator.pop(context);
         return;
       }
@@ -537,7 +530,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
         context,
         listen: false,
       ).allSubjectsApi(context);
-      // ✅ Teachers bhi load karo:
       Provider.of<AllTeachersListVieModel>(
         context,
         listen: false,
@@ -610,9 +602,9 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
-              'Delete Period',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            Text(
+              'timetable.delete_period'.tr(),
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -624,23 +616,11 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
               height: 1.5,
             ),
             children: [
-              const TextSpan(text: 'Are you sure you want to delete '),
               TextSpan(
-                text: period.subjectName?.toString() ?? 'this period',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+                text: 'timetable.delete_confirm'.tr()
+                    .replaceAll('{subject}', period.subjectName?.toString() ?? 'this period')
+                    .replaceAll('{day}', period.dayOfWeek?.toString() ?? ''),
               ),
-              const TextSpan(text: ' from '),
-              TextSpan(
-                text: period.dayOfWeek?.toString() ?? '',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-              const TextSpan(text: '?\n\nThis action cannot be undone.'),
             ],
           ),
         ),
@@ -648,7 +628,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(
-              'Cancel',
+              'timetable.cancel'.tr(),
               style: TextStyle(color: Colors.grey.shade600),
             ),
           ),
@@ -664,7 +644,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
               Navigator.pop(ctx);
               _deletePeriod(period);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text('timetable.delete'.tr(), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -682,7 +662,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
         context,
         listen: false,
       ).timetableList.removeWhere((e) => e.timetableId == period.timetableId);
-      // ignore: invalid_use_of_protected_member, invalid_use_of_visible_for_testing_member
       Provider.of<GetClassesTimeTableViewModel>(
         context,
         listen: false,
@@ -737,7 +716,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
       floatingActionButton: SizedBox(
         width: 170,
         child: AppButton(
-          title: "Add Period",
+          title: 'timetable.add_period'.tr(),
           icon: Icons.add_rounded,
           height: 56,
           radius: 16,
@@ -745,10 +724,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
             if (!PermissionExtensions.canAccess(
               PermissionKeys.manageTimetable,
             )) {
-              Utils.show(
-                "You don't have permission to manage timetable",
-                context,
-              );
+              Utils.show('timetable.no_permission_manage'.tr(), context);
               return;
             }
 
@@ -758,7 +734,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
       ),
       body: Column(
         children: [
-          // ── Header ──────────────────────────────────────────────
           Container(
             padding: const EdgeInsets.fromLTRB(16, 55, 16, 20),
             decoration: BoxDecoration(
@@ -799,13 +774,13 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           AppText.customText(
-                            'School Timetable',
+                            'timetable.title'.tr(),
                             size: 20,
                             weight: FontWeight.bold,
                             color: Colors.white,
                           ),
                           AppText.customText(
-                            'View class schedule',
+                            'timetable.subtitle'.tr(),
                             size: 12,
                             color: Colors.white70,
                           ),
@@ -814,7 +789,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                     ),
                     Consumer<GetClassesTimeTableViewModel>(
                       builder: (context, vm, _) {
-
                         final hasData =
                             vm.timetableList.isNotEmpty &&
                                 _selectedClassId != null &&
@@ -861,29 +835,29 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                           ),
                         );
                       },
-                    ),                  ],
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    // ── Class ──
                     Expanded(
                       child: Consumer<AllClassesViewModel>(
                         builder: (context, vm, _) {
                           final classes = vm.allClassesModel?.data ?? [];
                           return _headerDropdown(
-                            hint: 'Select Class',
+                            hint: 'timetable.select_class'.tr(),
                             value: _selectedClassId,
                             items: classes
                                 .map(
                                   (c) => DropdownMenuItem(
-                                    value: c.classId?.toString(),
-                                    child: Text(
-                                      c.className ?? '',
-                                      style: const TextStyle(fontSize: 13),
-                                    ),
-                                  ),
-                                )
+                                value: c.classId?.toString(),
+                                child: Text(
+                                  c.className ?? '',
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                              ),
+                            )
                                 .toList(),
                             onChanged: (v) {
                               setState(() {
@@ -902,12 +876,10 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                       ),
                     ),
                     const SizedBox(width: 10),
-                    // ── Section ──
                     Expanded(
                       child: Consumer<AllSectionsViewModel>(
                         builder: (context, vm, _) {
                           final sections = vm.allSectionsModel?.data ?? [];
-                          // ✅ class select hai aur sections empty hain
                           final noSection =
                               _selectedClassId != null && sections.isEmpty;
 
@@ -916,54 +888,52 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(14),
-                              // ✅ orange border jab no section
                               border: noSection
                                   ? Border.all(
-                                      color: Colors.orange.shade400,
-                                      width: 1.5,
-                                    )
+                                color: Colors.orange.shade400,
+                                width: 1.5,
+                              )
                                   : null,
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 dropdownColor: Colors.white,
                                 value:
-                                    sections.any(
+                                sections.any(
                                       (s) =>
-                                          s.sectionId?.toString() ==
-                                          _selectedSectionId,
-                                    )
+                                  s.sectionId?.toString() ==
+                                      _selectedSectionId,
+                                )
                                     ? _selectedSectionId
                                     : null,
                                 isExpanded: true,
-                                // ✅ hint text hi warning hai — koi extra widget nahi
                                 hint: Row(
                                   children: noSection
                                       ? [
-                                          Icon(
-                                            Icons.warning_amber_rounded,
-                                            size: 14,
-                                            color: Colors.orange.shade600,
-                                          ),
-                                          const SizedBox(width: 5),
-                                          Text(
-                                            'No sections',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.orange.shade700,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ]
+                                    Icon(
+                                      Icons.warning_amber_rounded,
+                                      size: 14,
+                                      color: Colors.orange.shade600,
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      'timetable.no_sections'.tr(),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.orange.shade700,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ]
                                       : [
-                                          Text(
-                                            'Select Section',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.grey.shade400,
-                                            ),
-                                          ),
-                                        ],
+                                    Text(
+                                      'timetable.select_section'.tr(),
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey.shade400,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 icon: Icon(
                                   noSection
@@ -977,15 +947,14 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                                 items: sections
                                     .map(
                                       (s) => DropdownMenuItem(
-                                        value: s.sectionId?.toString(),
-                                        child: Text(
-                                          s.sectionName ?? '',
-                                          style: const TextStyle(fontSize: 13),
-                                        ),
-                                      ),
-                                    )
+                                    value: s.sectionId?.toString(),
+                                    child: Text(
+                                      s.sectionName ?? '',
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                  ),
+                                )
                                     .toList(),
-                                // ✅ no section hone par tap disable
                                 onChanged: noSection
                                     ? null
                                     : (v) {
@@ -993,11 +962,11 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                                     _selectedSectionId = v;
                                     selectedDay = null;
                                   });
-                                        if (v != null &&
-                                            _selectedClassId != null) {
-                                          _loadTimetable();
-                                        }
-                                      },
+                                  if (v != null &&
+                                      _selectedClassId != null) {
+                                    _loadTimetable();
+                                  }
+                                },
                               ),
                             ),
                           );
@@ -1010,7 +979,6 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
 
                 Consumer<GetClassesTimeTableViewModel>(
                   builder: (context, vm, _) {
-
                     final canSelectDay =
                         _selectedClassId != null &&
                             _selectedSectionId != null;
@@ -1028,29 +996,33 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                             dropdownColor: Colors.white,
                             value: selectedDay,
                             isExpanded: true,
-
-                            hint: const Text(
-                              "Select Day",
-                              style: TextStyle(
+                            hint: Text(
+                              'timetable.select_day'.tr(),
+                              style: const TextStyle(
                                 fontSize: 13,
                               ),
                             ),
-
                             items: dayList.map((day) {
+                              final dayKey = day.toLowerCase();
+                              final label = dayKey == 'all' ? 'timetable.all_days'.tr() :
+                              dayKey == 'monday' ? 'timetable.monday'.tr() :
+                              dayKey == 'tuesday' ? 'timetable.tuesday'.tr() :
+                              dayKey == 'wednesday' ? 'timetable.wednesday'.tr() :
+                              dayKey == 'thursday' ? 'timetable.thursday'.tr() :
+                              dayKey == 'friday' ? 'timetable.friday'.tr() :
+                              dayKey == 'saturday' ? 'timetable.saturday'.tr() :
+                              dayKey == 'sunday' ? 'timetable.sunday'.tr() : day;
                               return DropdownMenuItem<String>(
                                 value: day,
-                                child: Text(day),
+                                child: Text(label),
                               );
                             }).toList(),
-
                             onChanged: !canSelectDay
                                 ? null
                                 : (value) async {
-
                               setState(() {
                                 selectedDay = value;
                               });
-
                               await _loadTimetable();
                             },
                           ),
@@ -1068,21 +1040,21 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                             (classVm.allClassesModel?.data ?? [])
                                 .where(
                                   (c) =>
-                                      c.classId?.toString() == _selectedClassId,
-                                )
+                              c.classId?.toString() == _selectedClassId,
+                            )
                                 .map((c) => c.className ?? '')
                                 .firstOrNull ??
-                            '';
+                                '';
                         final sectionName =
                             (secVm.allSectionsModel?.data ?? [])
                                 .where(
                                   (s) =>
-                                      s.sectionId?.toString() ==
-                                      _selectedSectionId,
-                                )
+                              s.sectionId?.toString() ==
+                                  _selectedSectionId,
+                            )
                                 .map((s) => s.sectionName ?? '')
                                 .firstOrNull ??
-                            '';
+                                '';
                         if (className.isEmpty) return const SizedBox();
                         return Container(
                           padding: const EdgeInsets.symmetric(
@@ -1103,7 +1075,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                               ),
                               const SizedBox(width: 6),
                               AppText.customText(
-                                '$className  •  Section $sectionName',
+                                '$className  •  ${'timetable.section'.tr()} $sectionName',
                                 size: 12,
                                 color: Colors.white,
                                 weight: FontWeight.w500,
@@ -1192,9 +1164,9 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
         borderRadius: BorderRadius.circular(14),
         border: borderColor != null
             ? Border.all(
-                color: borderColor,
-                width: 1.5,
-              ) // ✅ orange border when no section
+          color: borderColor,
+          width: 1.5,
+        )
             : null,
       ),
       child: DropdownButtonHideUnderline(
@@ -1238,15 +1210,15 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
           children: [
             Icon(Icons.event_busy, size: 60, color: Colors.grey),
             const SizedBox(height: 10),
-            const Text(
-              "No Timetable Available",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Text(
+              'timetable.no_timetable'.tr(),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 5),
             Text(
               selectedDay == "All"
-                  ? "No timetable found"
-                  : "No timetable found for $selectedDay",
+                  ? 'timetable.no_timetable'.tr()
+                  : 'timetable.no_timetable_day'.tr().replaceAll('{day}', selectedDay!),
             ),
           ],
         ),
@@ -1259,28 +1231,23 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-
           Icon(
             Icons.calendar_month_rounded,
             size: 70,
             color: Colors.grey.shade400,
           ),
-
           const SizedBox(height: 12),
-
           Text(
-            "Select Day",
+            'timetable.select_day'.tr(),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.grey.shade700,
             ),
           ),
-
           const SizedBox(height: 6),
-
           Text(
-            "Please select a day to view timetable",
+            'timetable.select_day_desc'.tr(),
             style: TextStyle(
               color: Colors.grey.shade500,
             ),
@@ -1292,6 +1259,14 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
 
   Widget _dayCard(String day, List<TimeTableData> periods) {
     final color = _dayColor(day);
+    final dayKey = day.toLowerCase();
+    final dayLabel = dayKey == 'monday' ? 'timetable.monday'.tr() :
+    dayKey == 'tuesday' ? 'timetable.tuesday'.tr() :
+    dayKey == 'wednesday' ? 'timetable.wednesday'.tr() :
+    dayKey == 'thursday' ? 'timetable.thursday'.tr() :
+    dayKey == 'friday' ? 'timetable.friday'.tr() :
+    dayKey == 'saturday' ? 'timetable.saturday'.tr() :
+    dayKey == 'sunday' ? 'timetable.sunday'.tr() : day;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -1327,7 +1302,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                 ),
                 const SizedBox(width: 10),
                 AppText.customText(
-                  day,
+                  dayLabel,
                   size: 15,
                   weight: FontWeight.bold,
                   color: color,
@@ -1343,7 +1318,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: AppText.customText(
-                    '${periods.length} ${periods.length == 1 ? 'Period' : 'Periods'}',
+                    '${periods.length} ${periods.length == 1 ? 'timetable.period'.tr() : 'timetable.periods'.tr()}',
                     size: 11,
                     color: color,
                     weight: FontWeight.w600,
@@ -1353,7 +1328,7 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
             ),
           ),
           ...periods.asMap().entries.map(
-            (e) => _periodTile(e.value, color, e.key == periods.length - 1),
+                (e) => _periodTile(e.value, color, e.key == periods.length - 1),
           ),
         ],
       ),
@@ -1460,13 +1435,9 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                       if (!PermissionExtensions.canAccess(
                         PermissionKeys.manageTimetable,
                       )) {
-                        Utils.show(
-                          "You don't have permission to edit timetable",
-                          context,
-                        );
+                        Utils.show('timetable.no_permission_edit'.tr(), context);
                         return;
                       }
-
                       _showEditSheet(period);
                     },
                     child: Container(
@@ -1485,13 +1456,9 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
                       if (!PermissionExtensions.canAccess(
                         PermissionKeys.manageTimetable,
                       )) {
-                        Utils.show(
-                          "You don't have permission to delete timetable",
-                          context,
-                        );
+                        Utils.show('timetable.no_permission_delete'.tr(), context);
                         return;
                       }
-
                       _confirmDelete(period);
                     },
                     child: Container(
@@ -1542,13 +1509,13 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
         ),
         const SizedBox(height: 20),
         AppText.customText(
-          'Select Class & Section',
+          'timetable.select_class_section'.tr(),
           size: 18,
           weight: FontWeight.bold,
         ),
         const SizedBox(height: 8),
         AppText.customText(
-          'Choose class and section above\nto view the timetable',
+          'timetable.select_class_section_desc'.tr(),
           size: 13,
           color: AppColor.softGreyText,
           align: TextAlign.center,
@@ -1592,13 +1559,13 @@ class _SchoolTimetableScreenState extends State<SchoolTimetableScreen> {
         ),
         const SizedBox(height: 20),
         AppText.customText(
-          'No Timetable Found',
+          'timetable.no_timetable'.tr(),
           size: 18,
           weight: FontWeight.bold,
         ),
         const SizedBox(height: 8),
         AppText.customText(
-          'No schedule found for\nthis class & section',
+          'timetable.no_timetable_desc'.tr(),
           size: 13,
           color: AppColor.softGreyText,
           align: TextAlign.center,
@@ -1635,7 +1602,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
   final _endCtrl = TextEditingController();
   bool _loading = false;
 
-  // ✅ Validation error strings
   String? _sectionError;
   String? _subjectError;
   String? _teacherError;
@@ -1714,47 +1680,45 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
     }
   }
 
-  // ✅ Validate karo aur error set karo
   bool _validate(List sections) {
     bool valid = true;
     setState(() {
-      // Section: class select hai but section available nahi
       if (_classId != null && sections.isEmpty) {
-        _sectionError = "No sections available for this class";
+        _sectionError = 'timetable.no_section_error'.tr();
         valid = false;
       } else if (_sectionId == null) {
-        _sectionError = "Section is required";
+        _sectionError = 'timetable.section_required'.tr();
         valid = false;
       } else {
         _sectionError = null;
       }
 
       if (_subjectId == null) {
-        _subjectError = "Subject is required";
+        _subjectError = 'timetable.subject_required'.tr();
         valid = false;
       } else
         _subjectError = null;
 
       if (_teacherId == null) {
-        _teacherError = "Teacher is required";
+        _teacherError = 'timetable.teacher_required'.tr();
         valid = false;
       } else
         _teacherError = null;
 
       if (_dayOfWeek == null) {
-        _dayError = "Day is required";
+        _dayError = 'timetable.day_required'.tr();
         valid = false;
       } else
         _dayError = null;
 
       if (_startCtrl.text.isEmpty) {
-        _startError = "Start time is required";
+        _startError = 'timetable.start_time_required'.tr();
         valid = false;
       } else
         _startError = null;
 
       if (_endCtrl.text.isEmpty) {
-        _endError = "End time is required";
+        _endError = 'timetable.end_time_required'.tr();
         valid = false;
       } else
         _endError = null;
@@ -1765,7 +1729,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
   Future<void> _submit(List sections) async {
     if (!_validate(sections)) return;
 
-    // ✅ Class without section: section nahi hai toh block karo
     if (sections.isEmpty) {
       _showNoSectionDialog();
       return;
@@ -1775,50 +1738,47 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
 
     if (_isEditMode) {
       final success =
-          await Provider.of<EditClassesTimeTableViewModel>(
-            context,
-            listen: false,
-          ).editClassTimeTableApi(
-            widget.editData!.timetableId!,
-            int.parse(_classId!),
-            int.parse(_sectionId!),
-            int.parse(_subjectId!),
-            int.parse(_teacherId!),
-            _dayOfWeek!,
-            _startCtrl.text,
-            _endCtrl.text,
-            context,
-          );
+      await Provider.of<EditClassesTimeTableViewModel>(
+        context,
+        listen: false,
+      ).editClassTimeTableApi(
+        widget.editData!.timetableId!,
+        int.parse(_classId!),
+        int.parse(_sectionId!),
+        int.parse(_subjectId!),
+        int.parse(_teacherId!),
+        _dayOfWeek!,
+        _startCtrl.text,
+        _endCtrl.text,
+        context,
+      );
       setState(() => _loading = false);
       if (success && mounted) {
         Navigator.pop(context);
         widget.onSuccess();
-        // _showSuccessSnack("Timetable updated successfully");
       }
     } else {
       final success =
-          await Provider.of<CreateClassTimetableViewModel>(
-            context,
-            listen: false,
-          ).createClassTimeTableApi(
-            int.parse(_classId!),
-            int.parse(_sectionId!),
-            int.parse(_subjectId!),
-            int.parse(_teacherId!),
-            _dayOfWeek!,
-            _startCtrl.text,
-            _endCtrl.text,
-            context,
-          );
+      await Provider.of<CreateClassTimetableViewModel>(
+        context,
+        listen: false,
+      ).createClassTimeTableApi(
+        int.parse(_classId!),
+        int.parse(_sectionId!),
+        int.parse(_subjectId!),
+        int.parse(_teacherId!),
+        _dayOfWeek!,
+        _startCtrl.text,
+        _endCtrl.text,
+        context,
+      );
       setState(() => _loading = false);
       if (success && mounted) {
-        // Navigator.pop(context);
         widget.onSuccess();
       }
     }
   }
 
-  // ✅ Class mein section nahi hone par dialog
   void _showNoSectionDialog() {
     showDialog(
       context: context,
@@ -1839,16 +1799,15 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
-              "No Section Found",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              'timetable.no_section_dialog_title'.tr(),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        content: const Text(
-          "This class has no sections assigned yet.\n\n"
-          "Please add a section to this class first before creating a timetable.",
-          style: TextStyle(fontSize: 13.5, height: 1.6),
+        content: Text(
+          'timetable.no_section_dialog_desc'.tr(),
+          style: const TextStyle(fontSize: 13.5, height: 1.6),
         ),
         actions: [
           ElevatedButton(
@@ -1860,7 +1819,7 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
               elevation: 0,
             ),
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("OK", style: TextStyle(color: Colors.white)),
+            child: Text('timetable.ok'.tr(), style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -1906,7 +1865,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Handle bar
                   Center(
                     child: Container(
                       width: 40,
@@ -1919,7 +1877,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                     ),
                   ),
 
-                  // Title
                   Row(
                     children: [
                       Container(
@@ -1942,14 +1899,14 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AppText.customText(
-                              _isEditMode ? 'Edit Timetable' : 'Add Timetable',
+                              _isEditMode ? 'timetable.edit_timetable'.tr() : 'timetable.add_timetable'.tr(),
                               size: 18,
                               weight: FontWeight.bold,
                             ),
                             AppText.customText(
                               _isEditMode
-                                  ? 'Update period details'
-                                  : 'Fill period details',
+                                  ? 'timetable.update_details'.tr()
+                                  : 'timetable.fill_details'.tr(),
                               size: 12,
                               color: AppColor.softGreyText,
                             ),
@@ -1974,18 +1931,18 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                     children: [
                       Expanded(
                         child: _label(
-                          'Class *',
+                          '${'timetable.class'.tr()} *',
                           Consumer<AllClassesViewModel>(
                             builder: (ctx, vm, _) => _sheetDrop(
-                              hint: 'Select',
+                              hint: 'timetable.select'.tr(),
                               value: _classId,
                               items: (vm.allClassesModel?.data ?? [])
                                   .map(
                                     (c) => DropdownMenuItem(
-                                      value: c.classId?.toString(),
-                                      child: Text(c.className ?? ''),
-                                    ),
-                                  )
+                                  value: c.classId?.toString(),
+                                  child: Text(c.className ?? ''),
+                                ),
+                              )
                                   .toList(),
                               onChanged: (v) {
                                 setState(() {
@@ -2007,40 +1964,39 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _label(
-                          'Section *',
+                          '${'timetable.section'.tr()} *',
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // ✅ Warning banner HATA diya — ab sirf suffix icon se show hoga
                               _sheetDrop(
                                 hint: _classId != null && sections.isEmpty
-                                    ? '⚠ No sections' // ← hint text hi warning ban gaya
-                                    : 'Select',
+                                    ? '⚠ ${'timetable.no_sections'.tr()}'
+                                    : 'timetable.select'.tr(),
                                 value:
-                                    sections.any(
+                                sections.any(
                                       (s) =>
-                                          s.sectionId?.toString() == _sectionId,
-                                    )
+                                  s.sectionId?.toString() == _sectionId,
+                                )
                                     ? _sectionId
                                     : null,
                                 items: sections
                                     .map(
                                       (s) => DropdownMenuItem(
-                                        value: s.sectionId?.toString(),
-                                        child: Text(s.sectionName ?? ''),
-                                      ),
-                                    )
+                                    value: s.sectionId?.toString(),
+                                    child: Text(s.sectionName ?? ''),
+                                  ),
+                                )
                                     .toList(),
                                 onChanged: sections.isEmpty
                                     ? null
                                     : (v) => setState(() {
-                                        _sectionId = v;
-                                        _sectionError = null;
-                                      }),
+                                  _sectionId = v;
+                                  _sectionError = null;
+                                }),
                                 hasError: _sectionError != null,
                                 warningHint:
-                                    _classId != null &&
-                                    sections.isEmpty, // ← orange hint
+                                _classId != null &&
+                                    sections.isEmpty,
                               ),
                               if (_sectionError != null)
                                 Padding(
@@ -2064,9 +2020,8 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                   ),
                   const SizedBox(height: 14),
 
-                  // ── Subject ──────────────────────────────────────
                   _label(
-                    'Subject *',
+                    '${'timetable.subject'.tr()} *',
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -2074,20 +2029,20 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                           builder: (ctx, vm, _) {
                             final subjects = vm.allSubjectsModel?.data ?? [];
                             return _sheetDrop(
-                              hint: 'Select Subject',
+                              hint: 'timetable.select_subject'.tr(),
                               value:
-                                  subjects.any(
+                              subjects.any(
                                     (s) => s.subjectId.toString() == _subjectId,
-                                  )
+                              )
                                   ? _subjectId
                                   : null,
                               items: subjects
                                   .map(
                                     (s) => DropdownMenuItem(
-                                      value: s.subjectId.toString(),
-                                      child: Text(s.subjectName ?? ''),
-                                    ),
-                                  )
+                                  value: s.subjectId.toString(),
+                                  child: Text(s.subjectName ?? ''),
+                                ),
+                              )
                                   .toList(),
                               onChanged: (v) => setState(() {
                                 _subjectId = v;
@@ -2113,9 +2068,8 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                   ),
                   const SizedBox(height: 14),
 
-                  // ── Teacher ──────────────────────────────────────
                   _label(
-                    'Teacher *',
+                    '${'timetable.teacher'.tr()} *',
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -2124,20 +2078,20 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                             final teachers =
                                 vm.allTeachersListModel?.data ?? [];
                             return _sheetDrop(
-                              hint: 'Select Teacher',
+                              hint: 'timetable.select_teacher'.tr(),
                               value:
-                                  teachers.any(
+                              teachers.any(
                                     (t) => t.teacherId.toString() == _teacherId,
-                                  )
+                              )
                                   ? _teacherId
                                   : null,
                               items: teachers
                                   .map(
                                     (t) => DropdownMenuItem(
-                                      value: t.teacherId.toString(),
-                                      child: Text(t.name ?? ''),
-                                    ),
-                                  )
+                                  value: t.teacherId.toString(),
+                                  child: Text(t.name ?? ''),
+                                ),
+                              )
                                   .toList(),
                               onChanged: (v) => setState(() {
                                 _teacherId = v;
@@ -2163,20 +2117,29 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                   ),
                   const SizedBox(height: 14),
 
-                  // ── Day of Week ──────────────────────────────────
                   _label(
-                    'Day of Week *',
+                    '${'timetable.day_of_week'.tr()} *',
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _sheetDrop(
-                          hint: 'Select Day',
+                          hint: 'timetable.select_day_hint'.tr(),
                           value: _dayOfWeek,
                           items: _days
                               .map(
-                                (d) =>
-                                    DropdownMenuItem(value: d, child: Text(d)),
-                              )
+                                (d) => DropdownMenuItem(
+                              value: d,
+                              child: Text(
+                                d.toLowerCase() == 'monday' ? 'timetable.monday'.tr() :
+                                d.toLowerCase() == 'tuesday' ? 'timetable.tuesday'.tr() :
+                                d.toLowerCase() == 'wednesday' ? 'timetable.wednesday'.tr() :
+                                d.toLowerCase() == 'thursday' ? 'timetable.thursday'.tr() :
+                                d.toLowerCase() == 'friday' ? 'timetable.friday'.tr() :
+                                d.toLowerCase() == 'saturday' ? 'timetable.saturday'.tr() :
+                                'timetable.sunday'.tr(),
+                              ),
+                            ),
+                          )
                               .toList(),
                           onChanged: (v) => setState(() {
                             _dayOfWeek = v;
@@ -2200,12 +2163,11 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                   ),
                   const SizedBox(height: 14),
 
-                  // ── Start & End Time ─────────────────────────────
                   Row(
                     children: [
                       Expanded(
                         child: _label(
-                          'Start Time *',
+                          '${'timetable.start_time'.tr()} *',
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -2234,7 +2196,7 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _label(
-                          'End Time *',
+                          '${'timetable.end_time'.tr()} *',
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -2264,7 +2226,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                   ),
                   const SizedBox(height: 28),
 
-                  // ── Submit ───────────────────────────────────────
                   GestureDetector(
                     onTap: _loading ? null : () => _submit(sections),
                     child: Container(
@@ -2277,46 +2238,46 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
                         boxShadow: _loading
                             ? []
                             : [
-                                BoxShadow(
-                                  color: AppColor.lightBlueColor.withOpacity(
-                                    0.3,
-                                  ),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 5),
-                                ),
-                              ],
+                          BoxShadow(
+                            color: AppColor.lightBlueColor.withOpacity(
+                              0.3,
+                            ),
+                            blurRadius: 12,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
                       ),
                       child: Center(
                         child: _loading
                             ? const SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
                             : Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    _isEditMode
-                                        ? Icons.save_rounded
-                                        : Icons.check_circle_rounded,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  AppText.customText(
-                                    _isEditMode
-                                        ? 'Update Timetable'
-                                        : 'Create Timetable',
-                                    size: 15,
-                                    weight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ],
-                              ),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _isEditMode
+                                  ? Icons.save_rounded
+                                  : Icons.check_circle_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            AppText.customText(
+                              _isEditMode
+                                  ? 'timetable.update_timetable'.tr()
+                                  : 'timetable.create_timetable'.tr(),
+                              size: 15,
+                              weight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -2343,7 +2304,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
       child,
     ],
   );
-  // _sheetDrop ko replace karo is se:
 
   Widget _sheetDrop({
     required String hint,
@@ -2351,7 +2311,7 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
     required List<DropdownMenuItem<String>> items,
     required void Function(String?)? onChanged,
     bool hasError = false,
-    bool warningHint = false, // ← naya param
+    bool warningHint = false,
   }) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 12),
     decoration: BoxDecoration(
@@ -2361,9 +2321,7 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
         color: hasError
             ? Colors.red.shade400
             : warningHint
-            ? Colors
-                  .orange
-                  .shade300 // ← orange border jab no section
+            ? Colors.orange.shade300
             : Colors.grey.shade200,
         width: hasError || warningHint ? 1.4 : 1.0,
       ),
@@ -2376,7 +2334,6 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
         hint: Text(
           hint,
           style: TextStyle(
-            // ← orange text jab no section, grey otherwise
             color: warningHint ? Colors.orange.shade700 : Colors.grey.shade400,
             fontSize: 13,
             fontWeight: warningHint ? FontWeight.w500 : FontWeight.normal,
@@ -2384,8 +2341,7 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
         ),
         icon: Icon(
           warningHint
-              ? Icons
-                    .warning_amber_rounded // ← warning icon
+              ? Icons.warning_amber_rounded
               : Icons.keyboard_arrow_down_rounded,
           color: warningHint
               ? Colors.orange.shade500
@@ -2401,10 +2357,10 @@ class _CreateTimetableSheetState extends State<_CreateTimetableSheet> {
   );
 
   Widget _timeField(
-    TextEditingController ctrl,
-    String hint,
-    VoidCallback onTap,
-  ) => GestureDetector(
+      TextEditingController ctrl,
+      String hint,
+      VoidCallback onTap,
+      ) => GestureDetector(
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),

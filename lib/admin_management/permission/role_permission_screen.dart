@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/main.dart';
@@ -19,8 +20,6 @@ class RolePermissionScreen extends StatefulWidget {
 class _RolePermissionScreenState extends State<RolePermissionScreen> {
   String selectedRole = "teacher";
 
-  // Map<String, Map<int, bool>> permissionState = {};
-
   Map<int, bool> permissionLoading = {};
 
   @override
@@ -33,106 +32,12 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
       }
     });
   }
-  // void initState() {
-  //   super.initState();
-  //
-  //   Future.microtask(() async {
-  //
-  //     final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
-  //
-  //     await vm.selectRoleApi(context, selectedRole);
-  //
-  //     preparePermissions(vm);
-  //   });
-  // }
 
-  // void preparePermissions(SelectRoleViewModel vm) {
-  //
-  //   final permissions = vm.model?.data?.permissions;
-  //
-  //   if (permissions == null || permissions.isEmpty) {
-  //     permissionState = {};
-  //     setState(() {});
-  //     return;
-  //   }
-  //
-  //   Map<String, Map<int, bool>> temp = {};
-  //
-  //   for (var item in permissions) {
-  //
-  //     String section = item.section ?? "Other";
-  //     int id = item.permissionId ?? 0;
-  //
-  //     if (!temp.containsKey(section)) {
-  //       temp[section] = {};
-  //     }
-  //
-  //     temp[section]![id] = false;
-  //   }
-  //
-  //   permissionState = temp;
-  //
-  //   setState(() {});
-  // }
-  // void preparePermissions(SelectRoleViewModel vm) {
-  //
-  //   final permissions = vm.model?.data?.permissions;
-  //
-  //   if (permissions == null || permissions.isEmpty) {
-  //     permissionState = {};
-  //     setState(() {});
-  //     return;
-  //   }
-  //
-  //   Map<String, Map<int, bool>> temp = {};
-  //
-  //   for (var item in permissions) {
-  //
-  //     String section = item.section ?? "Other";
-  //     int id = item.permissionId ?? 0;
-  //
-  //     if (!temp.containsKey(section)) {
-  //       temp[section] = {};
-  //     }
-  //
-  //     // 🔥 OLD VALUE retain karega agar already selected hai
-  //     temp[section]![id] =
-  //         permissionState[section]?[id] ?? false;
-  //   }
-  //
-  //   permissionState = temp;
-  //
-  //   setState(() {});
-  // }
-  // void changeRole(String role) async {
-  //
-  //   selectedRole = role;
-  //
-  //   permissionState.clear();
-  //
-  //   setState(() {});
-  //
-  //   final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
-  //
-  //   await vm.selectRoleApi(context, role);
-  //
-  //   preparePermissions(vm);
-  // }
   void changeRole(String role) async {
-    // if (!PermissionGuard.check(
-    //   context,
-    //   PermissionKeys.managePermissions,
-    //   "Manage Permissions",
-    // )) {
-    //   return;
-    // }
     selectedRole = role;
     setState(() {});
     final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
-    await vm.loadRolePermissions(
-      context,
-      role,
-    ); // local se load karega agar available ho
+    await vm.loadRolePermissions(context, role);
   }
 
   String formatTitle(String value) {
@@ -140,31 +45,27 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
         .replaceAll('_', ' ')
         .split(' ')
         .map(
-          (e) => e[0].toUpperCase() +
-          e.substring(1),
+          (e) => e[0].toUpperCase() + e.substring(1),
     )
         .join(' ');
   }
 
   String getPermissionKey(int id) {
     final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
-
     return vm.permissionDetails[id]?.key ?? "";
   }
 
   String getPermissionDescription(int id) {
     final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
-
     return vm.permissionDetails[id]?.description ?? "";
   }
 
   Future<void> onPermissionTap(
-    String section,
-    int permId,
-    bool newValue,
-  ) async {
+      String section,
+      int permId,
+      bool newValue,
+      ) async {
     permissionLoading[permId] = true;
-
     setState(() {});
 
     bool success = false;
@@ -183,69 +84,15 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
 
     if (success) {
       final vm = Provider.of<SelectRoleViewModel>(context, listen: false);
-
       vm.permissionState[section]![permId] = newValue;
-
       vm.notifyListeners();
     }
 
     permissionLoading[permId] = false;
-
     setState(() {});
   }
-  // Future<void> onPermissionTap(
-  //     String section,
-  //     int permId,
-  //     bool newValue,
-  //     ) async
-  // {
-  //
-  //   permissionLoading[permId] = true;
-  //   setState(() {});
-  //
-  //   final assignVM =
-  //   Provider.of<AssignRoleViewModel>(context, listen: false);
-  //
-  //   bool success = await assignVM.assignRoleApi(
-  //     context,
-  //     selectedRole,
-  //     [permId],
-  //   );
-  //
-  //   if (success) {
-  //     permissionState[section]![permId] = newValue;
-  //   }
-  //
-  //   permissionLoading[permId] = false;
-  //
-  //   setState(() {});
-  // }
 
-  // void callAssignApi() {
-  //
-  //   List<int> selectedIds = [];
-  //
-  //   permissionState.forEach((section, perms) {
-  //     perms.forEach((id, selected) {
-  //       if (selected) selectedIds.add(id);
-  //     });
-  //   });
-  //
-  //   Provider.of<AssignRoleViewModel>(context, listen: false)
-  //       .assignRoleApi(
-  //     context,
-  //     selectedRole,
-  //     selectedIds,
-  //   );
-  // }
   void callAssignApi() {
-    // if (!PermissionGuard.check(
-    //   context,
-    //   PermissionKeys.managePermissions,
-    //   "Manage Permissions",
-    // )) {
-    //   return;
-    // }
     final roleVM = Provider.of<SelectRoleViewModel>(context, listen: false);
 
     List<int> selectedIds = [];
@@ -259,7 +106,7 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
     Provider.of<AssignRoleViewModel>(
       context,
       listen: false,
-    ).assignRoleApi(context, selectedRole, selectedIds, );
+    ).assignRoleApi(context, selectedRole, selectedIds);
   }
 
   @override
@@ -290,7 +137,7 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppText.customText(
-                      "Role Permissions",
+                      'role_permission.title'.tr(),
                       size: 19,
                       weight: FontWeight.bold,
                       color: Colors.white,
@@ -300,129 +147,6 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
               ),
             ),
 
-            // Expanded(
-            //   child: Consumer<SelectRoleViewModel>(
-            //     builder: (context, vm, child) {
-            //
-            //       if (vm.loading) {
-            //         return const Center(child: CircularProgressIndicator());
-            //       }
-            //
-            //       if (permissionState.isEmpty) {
-            //         return const Center(
-            //           child: Text("No Permissions Found"),
-            //         );
-            //       }
-            //
-            //       return Column(
-            //         children: [
-            //
-            //           SizedBox(height: screenHeight * 0.02),
-            //
-            //           /// ROLE CHIPS
-            //           SizedBox(
-            //             height: screenHeight * 0.05,
-            //             child: ListView(
-            //               scrollDirection: Axis.horizontal,
-            //               padding: const EdgeInsets.symmetric(horizontal: 12),
-            //               children: [
-            //                 // roleChip("school_admin"),
-            //                 roleChip("teacher"),
-            //                 roleChip("student"),
-            //                 roleChip("accountant"),
-            //               ],
-            //             ),
-            //           ),
-            //
-            //           const SizedBox(height: 12),
-            //
-            //           /// PERMISSIONS
-            //           Expanded(
-            //             child: ListView(
-            //               padding: const EdgeInsets.all(12),
-            //               children: permissionState.entries.map((sectionEntry) {
-            //
-            //                 String section = sectionEntry.key;
-            //                 Map<int, bool> permissions = sectionEntry.value;
-            //
-            //                 return Container(
-            //                   margin: const EdgeInsets.only(bottom: 14),
-            //                   padding: const EdgeInsets.all(12),
-            //                   decoration: BoxDecoration(
-            //                     color: Colors.white,
-            //                     borderRadius: BorderRadius.circular(14),
-            //                     boxShadow: [
-            //                       BoxShadow(
-            //                         color: Colors.grey.shade300,
-            //                         blurRadius: 6,
-            //                         offset: const Offset(0, 3),
-            //                       )
-            //                     ],
-            //                   ),
-            //                   child: Column(
-            //                     crossAxisAlignment: CrossAxisAlignment.start,
-            //                     children: [
-            //
-            //                       Text(
-            //                         section.toUpperCase(),
-            //                         style: const TextStyle(
-            //                           fontSize: 15,
-            //                           fontWeight: FontWeight.bold,
-            //                           color: Color(0xff357ABD),
-            //                         ),
-            //                       ),
-            //
-            //                       const Divider(),
-            //
-            //                       ...permissions.entries.map((permEntry) {
-            //
-            //                         int permId = permEntry.key;
-            //                         bool value = permEntry.value;
-            //                         bool loading =
-            //                             permissionLoading[permId] == true;
-            //                         return Row(
-            //                           children: [
-            //
-            //                             loading
-            //                                 ? const SizedBox(
-            //                               width: 22,
-            //                               height: 22,
-            //                               child: CircularProgressIndicator(
-            //                                   strokeWidth: 2),
-            //                             )
-            //                                 : Checkbox(
-            //                               value: value,
-            //                               onChanged: (val) {
-            //                                 onPermissionTap(
-            //                                   section,
-            //                                   permId,
-            //                                   val ?? false,
-            //                                 );
-            //                               },
-            //                             ),
-            //
-            //                             Expanded(
-            //                               child: Text(
-            //                                 getPermissionName(permId),
-            //                               ),
-            //                             ),
-            //                           ],
-            //                         );
-            //                       })
-            //
-            //                     ],
-            //                   ),
-            //                 );
-            //
-            //               }).toList(),
-            //             ),
-            //           ),
-            //
-            //         ],
-            //       );
-            //     },
-            //   ),
-            // ),
             Expanded(
               child: Consumer<SelectRoleViewModel>(
                 builder: (context, vm, child) {
@@ -431,7 +155,9 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                   }
 
                   if (vm.permissionState.isEmpty) {
-                    return const Center(child: Text("No Permissions Found"));
+                    return Center(
+                      child: Text('role_permission.no_permissions'.tr()),
+                    );
                   }
 
                   return Column(
@@ -456,8 +182,8 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                         child: ListView(
                           padding: const EdgeInsets.all(12),
                           children: vm.permissionState.entries.map((
-                            sectionEntry,
-                          ) {
+                              sectionEntry,
+                              ) {
                             String section = sectionEntry.key;
 
                             Map<int, bool> permissions = sectionEntry.value;
@@ -490,7 +216,7 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                                     padding: const EdgeInsets.all(16),
                                     child: Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Container(
                                           padding: const EdgeInsets.all(10),
@@ -505,13 +231,11 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                                             color: Color(0xff357ABD),
                                           ),
                                         ),
-
                                         const SizedBox(width: 12),
-
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 formatTitle(section),
@@ -520,34 +244,32 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                                                   fontSize: 18,
                                                 ),
                                               ),
-
                                               const SizedBox(height: 4),
-
                                               Text(
-                                                "$selectedCount / $totalCount permissions selected",
+                                                'role_permission.permissions_selected'.tr()
+                                                    .replaceAll('{count}', '$selectedCount')
+                                                    .replaceAll('{total}', '$totalCount'),
                                                 style: TextStyle(
                                                   color: Colors.grey.shade600,
                                                   fontSize: 13,
                                                 ),
                                               ),
-
                                               const SizedBox(height: 10),
-
                                               ClipRRect(
                                                 borderRadius:
-                                                    BorderRadius.circular(30),
+                                                BorderRadius.circular(30),
                                                 child: LinearProgressIndicator(
                                                   value: totalCount == 0
                                                       ? 0
                                                       : selectedCount /
-                                                            totalCount,
+                                                      totalCount,
                                                   minHeight: 6,
                                                   backgroundColor:
-                                                      Colors.grey.shade200,
+                                                  Colors.grey.shade200,
                                                   valueColor:
-                                                      const AlwaysStoppedAnimation(
-                                                        Colors.blue,
-                                                      ),
+                                                  const AlwaysStoppedAnimation(
+                                                    Colors.blue,
+                                                  ),
                                                 ),
                                               ),
                                             ],
@@ -564,8 +286,8 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                                     padding: const EdgeInsets.all(14),
                                     child: Column(
                                       children: permissions.entries.map((
-                                        permEntry,
-                                      ) {
+                                          permEntry,
+                                          ) {
                                         int permId = permEntry.key;
                                         bool value = permEntry.value;
 
@@ -594,68 +316,64 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
                                             children: [
                                               loading
                                                   ? const SizedBox(
-                                                      width: 24,
-                                                      height: 24,
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                            strokeWidth: 2,
-                                                          ),
-                                                    )
+                                                width: 24,
+                                                height: 24,
+                                                child:
+                                                CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                ),
+                                              )
                                                   : SizedBox(
-                                                      width: 24,
-                                                      height: 24,
-                                                      child: Checkbox(
-                                                        value: value,
-                                                        activeColor: const Color(
-                                                          0xff357ABD,
-                                                        ),
-                                                        checkColor: Colors.white,
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                6,
-                                                              ),
-                                                        ),
-                                                        side: BorderSide(
-                                                          color: Colors
-                                                              .grey
-                                                              .shade400,
-                                                        ),
-                                                        onChanged: (val) {
-                                                          onPermissionTap(
-                                                            section,
-                                                            permId,
-                                                            val ?? false,
-                                                          );
-                                                        },
-                                                      ),
+                                                width: 24,
+                                                height: 24,
+                                                child: Checkbox(
+                                                  value: value,
+                                                  activeColor: const Color(
+                                                    0xff357ABD,
+                                                  ),
+                                                  checkColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                    BorderRadius.circular(
+                                                      6,
                                                     ),
-
+                                                  ),
+                                                  side: BorderSide(
+                                                    color: Colors
+                                                        .grey
+                                                        .shade400,
+                                                  ),
+                                                  onChanged: (val) {
+                                                    onPermissionTap(
+                                                      section,
+                                                      permId,
+                                                      val ?? false,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
                                               const SizedBox(width: 14),
-
                                               Expanded(
                                                 child: Column(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       getPermissionKey(permId),
                                                       style: const TextStyle(
                                                         fontWeight:
-                                                            FontWeight.w700,
+                                                        FontWeight.w700,
                                                         fontSize: 15,
                                                       ),
                                                     ),
-
                                                     const SizedBox(height: 4),
-
                                                     Text(
                                                       getPermissionDescription(
                                                         permId,
                                                       ),
                                                       style: TextStyle(
                                                         color:
-                                                            Colors.grey.shade600,
+                                                        Colors.grey.shade600,
                                                         fontSize: 13,
                                                       ),
                                                     ),
@@ -688,6 +406,10 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
   Widget roleChip(String role) {
     bool isSelected = selectedRole == role;
 
+    final label = role == 'teacher' ? 'role_permission.teacher'.tr() :
+    role == 'student' ? 'role_permission.student'.tr() :
+    'role_permission.accountant'.tr();
+
     return GestureDetector(
       onTap: () => changeRole(role),
       child: Container(
@@ -697,8 +419,8 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
           borderRadius: BorderRadius.circular(30),
           gradient: isSelected
               ? const LinearGradient(
-                  colors: [Color(0xff2563EB), Color(0xff3B82F6)],
-                )
+            colors: [Color(0xff2563EB), Color(0xff3B82F6)],
+          )
               : null,
           color: isSelected ? null : Colors.white,
           border: Border.all(
@@ -706,11 +428,11 @@ class _RolePermissionScreenState extends State<RolePermissionScreen> {
           ),
         ),
         child: Text(
-          role.toUpperCase(),
+          label.toUpperCase(),
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black87,
-            fontWeight: FontWeight.w600,
-            fontSize: 14
+              color: isSelected ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.w600,
+              fontSize: 14
           ),
         ),
       ),

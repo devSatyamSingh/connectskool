@@ -6,6 +6,7 @@ import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/view_model/school_view_model/accountant/all_accountant_list_view_model.dart';
 import 'package:school_pro/view_model/accountant_attendance_view_model/accountant_attendance_view_model.dart';
 import 'package:school_pro/view_model/accountant_attendance_view_model/create_accountant_attendance_view_model.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 
 import '../../res/app_button.dart';
 import '../../utils/permission_extensions.dart';
@@ -19,7 +20,7 @@ class _AccountantRow {
   final String qualification;
   final String activeStatus;
   String? attendanceStatus;
-  String? attendanceId;        // ← add this
+  String? attendanceId;
   bool alreadyMarked = false;
   bool isEditing = false;
   final TextEditingController remarksCtrl;
@@ -55,61 +56,41 @@ class _SchoolAccountantAttendanceScreenState
   String get _displayDate => DateFormat('dd MMM yyyy').format(_selectedDate);
 
   static const _statuses = [
-    {'code': 'P', 'full': 'Present'},
-    {'code': 'A', 'full': 'Absent'},
-    {'code': 'L', 'full': 'Late'},
-    {'code': 'H', 'full': 'Half Day'},
-    {'code': 'OL', 'full': 'On Leave'},
+    {'code': 'P', 'full': 'status_present'},
+    {'code': 'A', 'full': 'status_absent'},
+    {'code': 'L', 'full': 'status_late'},
+    {'code': 'H', 'full': 'status_half_day'},
+    {'code': 'OL', 'full': 'status_on_leave'},
   ];
 
-  // ── Color / label helpers ──────────────────────────────────────────────────
   Color _statusColor(String? code) {
     switch (code) {
-      case 'P':
-        return const Color(0xFF22C55E);
-      case 'A':
-        return const Color(0xFFEF4444);
-      case 'L':
-        return const Color(0xFFF59E0B);
-      case 'H':
-        return const Color(0xFF3B82F6);
-      case 'OL':
-        return const Color(0xFFA855F7);
-      default:
-        return Colors.grey;
+      case 'P':  return const Color(0xFF22C55E);
+      case 'A':  return const Color(0xFFEF4444);
+      case 'L':  return const Color(0xFFF59E0B);
+      case 'H':  return const Color(0xFF3B82F6);
+      case 'OL': return const Color(0xFFA855F7);
+      default:   return Colors.grey;
     }
   }
 
   String _statusLabel(String? code) {
     switch (code) {
-      case 'P':
-        return 'Present';
-      case 'A':
-        return 'Absent';
-      case 'L':
-        return 'Late';
-      case 'H':
-        return 'Half Day';
-      case 'OL':
-        return 'On Leave';
-      default:
-        return code ?? '';
+      case 'P':  return 'accountant_attendance.status_present'.tr();
+      case 'A':  return 'accountant_attendance.status_absent'.tr();
+      case 'L':  return 'accountant_attendance.status_late'.tr();
+      case 'H':  return 'accountant_attendance.status_half_day'.tr();
+      case 'OL': return 'accountant_attendance.status_on_leave'.tr();
+      default:   return code ?? '';
     }
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (!PermissionExtensions.canAccess(
-          PermissionKeys.viewAccountants)) {
-
-        Utils.show(
-          "You don't have permission to view accountant attendance",
-          context,
-        );
-
+      if (!PermissionExtensions.canAccess(PermissionKeys.viewAccountants)) {
+        Utils.show('accountant_attendance.permission_view'.tr(), context);
         Navigator.pop(context);
         return;
       }
@@ -127,7 +108,6 @@ class _SchoolAccountantAttendanceScreenState
     super.dispose();
   }
 
-
   Future<void> _fetchAndApplyExisting() async {
     await context
         .read<AccountantAttendanceViewModel>()
@@ -138,13 +118,12 @@ class _SchoolAccountantAttendanceScreenState
       listen: false,
     ).attendanceList;
 
-    // Map accountantId → { status, attendanceId }
     final Map<String, Map<String, String>> markedMap = {
       for (final r in existing)
         if (r.accountantId != null)
           r.accountantId.toString(): {
             'status': r.status ?? '',
-            'attendanceId': r.attendanceId?.toString() ?? '',   // ← use your model's PK field
+            'attendanceId': r.attendanceId?.toString() ?? '',
           },
     };
 
@@ -154,7 +133,7 @@ class _SchoolAccountantAttendanceScreenState
           row.alreadyMarked = true;
           row.isEditing = false;
           row.attendanceStatus = markedMap[row.id]!['status'];
-          row.attendanceId = markedMap[row.id]!['attendanceId'];   // ← store it
+          row.attendanceId = markedMap[row.id]!['attendanceId'];
         } else {
           row.alreadyMarked = false;
           row.isEditing = false;
@@ -163,7 +142,7 @@ class _SchoolAccountantAttendanceScreenState
       }
     });
   }
-  // ── Build rows from accountant list ───────────────────────────────────────
+
   void _buildRows(List accountants) {
     if (_rows.length == accountants.length) return;
     for (final r in _rows) {
@@ -175,13 +154,14 @@ class _SchoolAccountantAttendanceScreenState
         id: a.accountantId.toString(),
         name: a.name ?? '',
         qualification: a.qualification ?? '',
-        activeStatus: (a.status == 1) ? 'Active' : 'Inactive',
+        activeStatus: (a.status == 1)
+            ? 'accountant_attendance.active'.tr()
+            : 'accountant_attendance.inactive'.tr(),
       ),
     )
         .toList();
   }
 
-  // ── Date picker ───────────────────────────────────────────────────────────
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -201,9 +181,7 @@ class _SchoolAccountantAttendanceScreenState
     }
   }
 
-  // ── Pull-to-refresh ───────────────────────────────────────────────────────
   Future<void> _onRefresh() async {
-    // Reset rows so _buildRows rebuilds them fresh
     for (final r in _rows) r.dispose();
     _rows = [];
     await Provider.of<AllAccountantListVieModel>(context, listen: false)
@@ -211,32 +189,24 @@ class _SchoolAccountantAttendanceScreenState
     await _fetchAndApplyExisting();
   }
 
-  // ── Save NEW attendance for all pending rows ───────────────────────────────
   Future<void> _saveAll() async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.markTeacherAttendance)) {
-
-      Utils.show(
-        "You don't have permission to mark accountant attendance",
-        context,
-      );
-
+    if (!PermissionExtensions.canAccess(PermissionKeys.markTeacherAttendance)) {
+      Utils.show('accountant_attendance.permission_mark'.tr(), context);
       return;
     }
     final pending = _rows.where((r) => !r.alreadyMarked).toList();
 
     if (pending.isEmpty) {
-      Utils.show(
-        "Attendance has already been marked for all accountants.",
-        context,
-      );
+      Utils.show('accountant_attendance.attendance_already_marked'.tr(), context);
       return;
     }
 
     final incomplete = pending.where((r) => r.attendanceStatus == null);
     if (incomplete.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(_snack(
-        '${incomplete.length} accountant(s) attendance status is not selected.',
+        'accountant_attendance.status_not_selected'.tr(
+            namedArgs: {'count': incomplete.length.toString()}
+        ),
         Colors.orange,
         Icons.warning_rounded,
       ));
@@ -273,38 +243,31 @@ class _SchoolAccountantAttendanceScreenState
 
     if (successCount > 0) {
       ScaffoldMessenger.of(context).showSnackBar(_snack(
-        '$successCount out of ${pending.length} accountant(s) saved successfully.',
+        'accountant_attendance.saved_success'.tr(
+            namedArgs: {
+              'saved': successCount.toString(),
+              'total': pending.length.toString()
+            }
+        ),
         Colors.green,
         Icons.check_circle_rounded,
       ));
     }
   }
 
-  // ── Update EXISTING attendance (edit flow) ─────────────────────────────────
-  Future<void> _updateAttendance(
-
-      _AccountantRow row, StateSetter setRow) async {
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.markTeacherAttendance)) {
-
-      Utils.show(
-        "ou don't have permission to update accountant attendance",
-        context,
-      );
-
+  Future<void> _updateAttendance(_AccountantRow row, StateSetter setRow) async {
+    if (!PermissionExtensions.canAccess(PermissionKeys.markTeacherAttendance)) {
+      Utils.show('accountant_attendance.permission_update'.tr(), context);
       return;
     }
     if (row.attendanceStatus == null) {
-      Utils.show(
-        "Please select a status before saving.",
-        context,
-      );
+      Utils.show('accountant_attendance.please_select_status'.tr(), context);
       return;
     }
 
     if (row.attendanceId == null) {
       ScaffoldMessenger.of(context).showSnackBar(_snack(
-        'Attendance ID not found. Please refresh and try again.',
+        'accountant_attendance.attendance_id_not_found'.tr(),
         Colors.red,
         Icons.error_rounded,
       ));
@@ -319,9 +282,9 @@ class _SchoolAccountantAttendanceScreenState
     );
 
     final ok = await updateVm.updateAccountantAttendanceApi(
-      int.parse(row.attendanceId!),   // attendance_id (PK of the record)
-      row.attendanceStatus!,           // status
-      row.remarksCtrl.text.trim(),     // remarks
+      int.parse(row.attendanceId!),
+      row.attendanceStatus!,
+      row.remarksCtrl.text.trim(),
       context,
     );
 
@@ -334,7 +297,7 @@ class _SchoolAccountantAttendanceScreenState
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(_snack(
-          'Attendance updated successfully.',
+          'accountant_attendance.update_success'.tr(),
           Colors.green,
           Icons.check_circle_rounded,
         ));
@@ -373,8 +336,11 @@ class _SchoolAccountantAttendanceScreenState
                 final accountants = vm.allAccountantListModel?.data ?? [];
                 if (accountants.isEmpty) {
                   return Center(
-                    child: AppText.customText('No Accountants Found',
-                        size: 16, weight: FontWeight.bold),
+                    child: AppText.customText(
+                        'accountant_attendance.no_accountants_found'.tr(),
+                        size: 16,
+                        weight: FontWeight.bold
+                    ),
                   );
                 }
 
@@ -409,7 +375,6 @@ class _SchoolAccountantAttendanceScreenState
         ],
       ),
 
-      // ── FAB: only show when there are pending (new) rows ──
       floatingActionButton: Consumer<AllAccountantListVieModel>(
         builder: (context, vm, _) {
           final accountants = vm.allAccountantListModel?.data ?? [];
@@ -422,8 +387,8 @@ class _SchoolAccountantAttendanceScreenState
             margin: const EdgeInsets.symmetric(horizontal: 16),
             child: AppButton(
               title: _saving
-                  ? "Saving..."
-                  : "Save All Attendance",
+                  ? 'accountant_attendance.saving'.tr()
+                  : 'accountant_attendance.save_all_attendance'.tr(),
               icon: _saving
                   ? null
                   : Icons.save_rounded,
@@ -439,7 +404,6 @@ class _SchoolAccountantAttendanceScreenState
     );
   }
 
-  // ── HEADER ────────────────────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
@@ -457,7 +421,6 @@ class _SchoolAccountantAttendanceScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Back + title
           Row(children: [
             InkWell(
               onTap: () => Navigator.pop(context),
@@ -471,16 +434,17 @@ class _SchoolAccountantAttendanceScreenState
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: AppText.customText('Accountant Attendance',
+              child: AppText.customText(
+                  'accountant_attendance.title'.tr(),
                   size: 19,
                   weight: FontWeight.bold,
-                  color: Colors.white),
+                  color: Colors.white
+              ),
             ),
           ]),
 
           const SizedBox(height: 16),
 
-          // Date selector
           GestureDetector(
             onTap: _pickDate,
             child: Container(
@@ -505,8 +469,11 @@ class _SchoolAccountantAttendanceScreenState
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        AppText.customText('Selected Date',
-                            size: 11, color: Colors.white70),
+                        AppText.customText(
+                            'accountant_attendance.selected_date'.tr(),
+                            size: 11,
+                            color: Colors.white70
+                        ),
                         AppText.customText(_displayDate,
                             size: 15,
                             weight: FontWeight.bold,
@@ -523,8 +490,11 @@ class _SchoolAccountantAttendanceScreenState
                     const Icon(Icons.edit_calendar_rounded,
                         color: Colors.white, size: 13),
                     const SizedBox(width: 4),
-                    AppText.customText('Change',
-                        size: 11, color: Colors.white),
+                    AppText.customText(
+                        'accountant_attendance.change'.tr(),
+                        size: 11,
+                        color: Colors.white
+                    ),
                   ]),
                 ),
               ]),
@@ -533,12 +503,12 @@ class _SchoolAccountantAttendanceScreenState
 
           const SizedBox(height: 14),
 
-          // Status legend chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: _statuses.map((s) {
-                final color = _statusColor(s['code']);
+                final code = s['code']!;
+                final color = _statusColor(code);
                 return Container(
                   margin: const EdgeInsets.only(right: 8),
                   padding: const EdgeInsets.symmetric(
@@ -555,7 +525,7 @@ class _SchoolAccountantAttendanceScreenState
                         decoration: BoxDecoration(
                             color: color, shape: BoxShape.circle)),
                     const SizedBox(width: 5),
-                    Text('${s['code']} = ${s['full']}',
+                    Text('$code = ${_statusLabel(code)}',
                         style: const TextStyle(
                             color: Colors.white,
                             fontSize: 11,
@@ -570,19 +540,28 @@ class _SchoolAccountantAttendanceScreenState
     );
   }
 
-  // ── Count pills bar ───────────────────────────────────────────────────────
   Widget _buildCountBar(int alreadyCount, int pendingCount) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
       child: Row(children: [
         if (alreadyCount > 0) ...[
-          _countPill('$alreadyCount Already Marked', Colors.green,
-              Icons.check_circle_rounded),
+          _countPill(
+              'accountant_attendance.already_marked_count'.tr(
+                  namedArgs: {'count': alreadyCount.toString()}
+              ),
+              Colors.green,
+              Icons.check_circle_rounded
+          ),
           const SizedBox(width: 8),
         ],
         if (pendingCount > 0)
           _countPill(
-              '$pendingCount Pending', Colors.orange, Icons.pending_rounded),
+              'accountant_attendance.pending_count'.tr(
+                  namedArgs: {'count': pendingCount.toString()}
+              ),
+              Colors.orange,
+              Icons.pending_rounded
+          ),
       ]),
     );
   }
@@ -606,15 +585,12 @@ class _SchoolAccountantAttendanceScreenState
     ]),
   );
 
-  // ── Single attendance row card ─────────────────────────────────────────────
   Widget _buildRow(_AccountantRow row) {
-    // Default to first status for new rows
     if (!row.alreadyMarked && row.attendanceStatus == null) {
       row.attendanceStatus = _statuses.first['code'];
     }
 
     return StatefulBuilder(builder: (context, setRow) {
-      // isLocked = marked AND not currently being edited
       final isLocked = row.alreadyMarked && !row.isEditing;
 
       final borderColor = row.isEditing
@@ -643,13 +619,11 @@ class _SchoolAccountantAttendanceScreenState
           ],
         ),
         child: Column(children: [
-          // ── Top: avatar / name / badges ───────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
             child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Avatar
                   Container(
                     width: 38,
                     height: 38,
@@ -680,7 +654,6 @@ class _SchoolAccountantAttendanceScreenState
                   ),
                   const SizedBox(width: 10),
 
-                  // Name + ID
                   Expanded(
                     flex: 3,
                     child: Column(
@@ -695,28 +668,29 @@ class _SchoolAccountantAttendanceScreenState
                             weight: FontWeight.bold,
                           ),
                           const SizedBox(height: 2),
-                          AppText.customText('ID: ${row.id}',
-                              size: 11, color: AppColor.softGreyText),
+                          AppText.customText(
+                              'accountant_attendance.id_label'.tr(
+                                  namedArgs: {'id': row.id}
+                              ),
+                              size: 11,
+                              color: AppColor.softGreyText
+                          ),
                         ]),
                   ),
 
-                  // Qualification
                   Expanded(
                     flex: 2,
                     child: AppText.customText(row.qualification,
                         size: 12, color: AppColor.softGreyText),
                   ),
 
-                  // ── RIGHT-SIDE BADGES ──────────────────────────────
                   Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         _pill(row.activeStatus, Colors.green),
 
-                        // ── Already marked badge + Edit button ──
                         if (isLocked) ...[
                           const SizedBox(height: 4),
-                          // Status badge (locked)
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
@@ -737,7 +711,7 @@ class _SchoolAccountantAttendanceScreenState
                                           row.attendanceStatus)),
                                   const SizedBox(width: 3),
                                   Text(
-                                    '${_statusLabel(row.attendanceStatus)} • Marked',
+                                    '${_statusLabel(row.attendanceStatus)} • ${'accountant_attendance.marked'.tr()}',
                                     style: TextStyle(
                                       color: _statusColor(
                                           row.attendanceStatus),
@@ -748,21 +722,16 @@ class _SchoolAccountantAttendanceScreenState
                                 ]),
                           ),
                           const SizedBox(height: 4),
-                          // ── EDIT BUTTON ──
                           GestureDetector(
                             onTap: () {
-
                               if (!PermissionExtensions.canAccess(
                                   PermissionKeys.markTeacherAttendance)) {
-
                                 Utils.show(
-                                  "You don't have permission to edit attendance",
+                                  'accountant_attendance.permission_edit'.tr(),
                                   context,
                                 );
-
                                 return;
                               }
-
                               setRow(() => row.isEditing = true);
                             },
                             child: Container(
@@ -784,7 +753,7 @@ class _SchoolAccountantAttendanceScreenState
                                         color: AppColor.lightBlueColor),
                                     const SizedBox(width: 3),
                                     Text(
-                                      'Edit',
+                                      'accountant_attendance.edit'.tr(),
                                       style: TextStyle(
                                           color: AppColor.lightBlueColor,
                                           fontSize: 10,
@@ -795,10 +764,8 @@ class _SchoolAccountantAttendanceScreenState
                           ),
                         ],
 
-                        // ── Editing mode: cancel button ──
                         if (row.isEditing) ...[
                           const SizedBox(height: 4),
-                          // Editing badge
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
@@ -818,7 +785,7 @@ class _SchoolAccountantAttendanceScreenState
                                       color: AppColor.lightBlueColor),
                                   const SizedBox(width: 3),
                                   Text(
-                                    'Editing',
+                                    'accountant_attendance.editing'.tr(),
                                     style: TextStyle(
                                         color: AppColor.lightBlueColor,
                                         fontSize: 10,
@@ -827,11 +794,9 @@ class _SchoolAccountantAttendanceScreenState
                                 ]),
                           ),
                           const SizedBox(height: 4),
-                          // Cancel button
                           GestureDetector(
                             onTap: () => setRow(() {
                               row.isEditing = false;
-                              // restore original status from already-marked state
                             }),
                             child: Container(
                               padding: const EdgeInsets.symmetric(
@@ -844,12 +809,12 @@ class _SchoolAccountantAttendanceScreenState
                               ),
                               child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: const [
+                                  children: [
                                     Icon(Icons.close_rounded,
                                         size: 10, color: Colors.red),
-                                    SizedBox(width: 3),
+                                    const SizedBox(width: 3),
                                     Text(
-                                      'Cancel',
+                                      'accountant_attendance.cancel'.tr(),
                                       style: TextStyle(
                                           color: Colors.red,
                                           fontSize: 10,
@@ -865,17 +830,18 @@ class _SchoolAccountantAttendanceScreenState
 
           Divider(height: 1, color: Colors.grey.shade100),
 
-          // ── Status chips ──────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
-                    AppText.customText('ATTENDANCE STATUS',
+                    AppText.customText(
+                        'accountant_attendance.attendance_status'.tr(),
                         size: 10,
                         weight: FontWeight.bold,
-                        color: AppColor.softGreyText),
+                        color: AppColor.softGreyText
+                    ),
                     if (row.isEditing) ...[
                       const SizedBox(width: 6),
                       Container(
@@ -885,11 +851,14 @@ class _SchoolAccountantAttendanceScreenState
                           color: AppColor.lightBlueColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text('Edit Mode',
-                            style: TextStyle(
-                                color: AppColor.lightBlueColor,
-                                fontSize: 9,
-                                fontWeight: FontWeight.w600)),
+                        child: Text(
+                          'accountant_attendance.edit_mode'.tr(),
+                          style: TextStyle(
+                              color: AppColor.lightBlueColor,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600
+                          ),
+                        ),
                       ),
                     ],
                   ]),
@@ -967,7 +936,6 @@ class _SchoolAccountantAttendanceScreenState
                 ]),
           ),
 
-          // ── Remarks ───────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 6, 14, 14),
             child: TextField(
@@ -977,10 +945,10 @@ class _SchoolAccountantAttendanceScreenState
               decoration: InputDecoration(
                 isDense: true,
                 hintText: isLocked
-                    ? 'Attendance already marked'
+                    ? 'accountant_attendance.already_marked'.tr()
                     : row.isEditing
-                    ? 'Update remarks...'
-                    : 'Enter remarks...',
+                    ? 'accountant_attendance.update_remarks'.tr()
+                    : 'accountant_attendance.enter_remarks'.tr(),
                 hintStyle: TextStyle(
                     color: isLocked
                         ? Colors.green.withOpacity(0.6)
@@ -1022,7 +990,6 @@ class _SchoolAccountantAttendanceScreenState
             ),
           ),
 
-          // ── UPDATE SAVE BUTTON (shown only in edit mode) ───────────────
           if (row.isEditing)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
@@ -1042,7 +1009,9 @@ class _SchoolAccountantAttendanceScreenState
                       : const Icon(Icons.save_rounded,
                       color: Colors.white, size: 18),
                   label: Text(
-                    _saving ? 'Saving...' : 'Update Attendance',
+                    _saving
+                        ? 'accountant_attendance.saving'.tr()
+                        : 'accountant_attendance.update_attendance'.tr(),
                     style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -1062,7 +1031,6 @@ class _SchoolAccountantAttendanceScreenState
     });
   }
 
-  // ── Pill helper ───────────────────────────────────────────────────────────
   Widget _pill(String label, Color color) => Container(
     padding:
     const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

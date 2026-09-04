@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 
 import '../../model/school_model/co_scholastic/co_scholastic_grade_model.dart';
 import '../../res/app_button.dart';
@@ -38,8 +39,8 @@ class _CoScholasticGradeListTableState
       ),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.grey.shade200
+            borderRadius: BorderRadius.circular(20),
+            color: Colors.grey.shade200
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -66,7 +67,7 @@ class _CoScholasticGradeListTableState
                       ),
                       child: TextField(
                         decoration: InputDecoration(
-                          hintText: "Search subject...",
+                          hintText: 'co_scholastic_list.search_hint'.tr(),
                           hintStyle: TextStyle(
                             color: Colors.grey.shade400,
                             fontSize: 13,
@@ -121,7 +122,7 @@ class _CoScholasticGradeListTableState
               ),
               SizedBox(height: 16),
               Text(
-                "Loading grades...",
+                "Loading grades...",  // ← FIX LATER
                 style: TextStyle(
                   color: Color(0xFF6B7280),
                   fontSize: 14,
@@ -147,7 +148,7 @@ class _CoScholasticGradeListTableState
               ),
               const SizedBox(height: 16),
               Text(
-                "No grades found",
+                'co_scholastic_list.no_grades_found'.tr(),
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -156,7 +157,7 @@ class _CoScholasticGradeListTableState
               ),
               const SizedBox(height: 8),
               Text(
-                "Try adjusting your search or filters",
+                'co_scholastic_list.no_grades_subtitle'.tr(),
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey.shade400,
@@ -194,33 +195,33 @@ class _CoScholasticGradeListTableState
           columnSpacing: 20,
           horizontalMargin: 16,
           dividerThickness: 1,
-          columns: const [
+          columns: [
             DataColumn(
-              label: Text("ROLL"),
+              label: Text('co_scholastic_list.roll'.tr()),
               tooltip: "Roll Number",
             ),
             DataColumn(
-              label: Text("STUDENT"),
+              label: Text('co_scholastic_list.student'.tr()),
               tooltip: "Student Name",
             ),
             DataColumn(
-              label: Text("SUBJECT"),
+              label: Text('co_scholastic_list.subject'.tr()),
               tooltip: "Subject Name",
             ),
             DataColumn(
-              label: Text("TERM"),
+              label: Text('co_scholastic_list.term'.tr()),
               tooltip: "Academic Term",
             ),
             DataColumn(
-              label: Text("GRADE"),
+              label: Text('co_scholastic_list.grade'.tr()),
               tooltip: "Grade Obtained",
             ),
             DataColumn(
-              label: Text("YEAR"),
+              label: Text('co_scholastic_list.year'.tr()),
               tooltip: "Academic Year",
             ),
             DataColumn(
-              label: Text("ACTION"),
+              label: Text('co_scholastic_list.action'.tr()),
               tooltip: "Edit or Delete",
             ),
           ],
@@ -286,14 +287,14 @@ class _CoScholasticGradeListTableState
                 icon: Icons.edit_outlined,
                 color: AppColor.primary,
                 onPressed: () => _showEditDialog(context, grade),
-                tooltip: "Edit Grade",
+                tooltip: 'co_scholastic_list.edit_grade'.tr(),
               ),
               const SizedBox(width: 4),
               _buildActionButton(
                 icon: Icons.delete_outline,
                 color: Colors.red.shade400,
                 onPressed: _isDeleting ? null : () => _deleteGrade(context, grade),
-                tooltip: "Delete Grade",
+                tooltip: 'co_scholastic_list.delete_grade'.tr(),
               ),
             ],
           ),
@@ -424,7 +425,6 @@ class _CoScholasticGradeListTableState
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     /// HEADER
                     Container(
                       width: 75,
@@ -439,27 +439,22 @@ class _CoScholasticGradeListTableState
                         size: 38,
                       ),
                     ),
-
                     const SizedBox(height: 16),
-
-                    const Text(
-                      "Update Grade",
-                      style: TextStyle(
+                    Text(
+                      'co_scholastic_list.update_grade'.tr(),
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-
                     const SizedBox(height: 6),
-
                     Text(
-                      "Modify student co-scholastic grade",
+                      'co_scholastic_list.update_grade_subtitle'.tr(),
                       style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 13,
                       ),
                     ),
-
                     const SizedBox(height: 24),
 
                     /// STUDENT CARD
@@ -485,13 +480,10 @@ class _CoScholasticGradeListTableState
                               ),
                             ),
                           ),
-
                           const SizedBox(width: 14),
-
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   grade.studentName ?? "",
@@ -500,11 +492,11 @@ class _CoScholasticGradeListTableState
                                     fontSize: 15,
                                   ),
                                 ),
-
                                 const SizedBox(height: 4),
-
                                 Text(
-                                  "Roll No : ${grade.rollNo ?? "-"}",
+                                  'co_scholastic_list.roll_no_label'.tr(
+                                    namedArgs: {'rollNo': grade.rollNo ?? "-"},
+                                  ),
                                   style: TextStyle(
                                     color: Colors.grey.shade600,
                                     fontSize: 12,
@@ -516,7 +508,6 @@ class _CoScholasticGradeListTableState
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 16),
 
                     /// SUBJECT
@@ -547,7 +538,6 @@ class _CoScholasticGradeListTableState
                         ],
                       ),
                     ),
-
                     const SizedBox(height: 22),
 
                     /// GRADE DROPDOWN
@@ -555,7 +545,7 @@ class _CoScholasticGradeListTableState
                       dropdownColor: Colors.white,
                       value: selectedGrade,
                       decoration: InputDecoration(
-                        labelText: "Select Grade",
+                        labelText: 'co_scholastic_list.select_grade'.tr(),
                         prefixIcon: const Icon(
                           Icons.grade_rounded,
                         ),
@@ -580,13 +570,11 @@ class _CoScholasticGradeListTableState
                         });
                       },
                     ),
-
                     const SizedBox(height: 28),
 
                     /// BUTTONS
                     Row(
                       children: [
-
                         Expanded(
                           child: OutlinedButton(
                             onPressed: () {
@@ -598,50 +586,38 @@ class _CoScholasticGradeListTableState
                                 52,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius:
-                                BorderRadius.circular(14),
+                                borderRadius: BorderRadius.circular(14),
                               ),
                             ),
-                            child: const Text("Cancel"),
+                            child: Text('co_scholastic_list.cancel'.tr()),
                           ),
                         ),
-
                         const SizedBox(width: 12),
-
                         Expanded(
                           child: AppButton(
-                            title: "Update",
+                            title: 'co_scholastic_list.update'.tr(),
                             icon: Icons.save_rounded,
                             onTap: () async {
-
                               final success =
                               await context
-                                  .read<
-                                  CoScholasticGradeViewModel>()
+                                  .read<CoScholasticGradeViewModel>()
                                   .updateGradeApi(
-                                gradeId: grade
-                                    .coScholasticGradesId!,
+                                gradeId: grade.coScholasticGradesId!,
                                 grade: selectedGrade,
                                 context: context,
                               );
 
                               if (success) {
-
                                 Navigator.pop(dialogContext);
-
                                 await context
-                                    .read<
-                                    CoScholasticGradeViewModel>()
+                                    .read<CoScholasticGradeViewModel>()
                                     .getGradesApi(
-                                  studentId: grade.studentId
-                                      .toString(),
-                                  academicYear:
-                                  grade.academicYear ?? "",
+                                  studentId: grade.studentId.toString(),
+                                  academicYear: grade.academicYear ?? "",
                                   context: context,
                                 );
-
                                 _showSnackBar(
-                                  "Grade updated successfully",
+                                  'co_scholastic_list.grade_updated_success'.tr(),
                                   isError: false,
                                 );
                               }
@@ -659,6 +635,7 @@ class _CoScholasticGradeListTableState
       },
     );
   }
+
   Future<void> _deleteGrade(
       BuildContext context,
       CoScholasticGradeData grade,
@@ -681,7 +658,6 @@ class _CoScholasticGradeListTableState
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-
                 /// DELETE ICON
                 Container(
                   width: 80,
@@ -696,27 +672,22 @@ class _CoScholasticGradeListTableState
                     size: 42,
                   ),
                 ),
-
                 const SizedBox(height: 18),
-
-                const Text(
-                  "Delete Grade",
-                  style: TextStyle(
+                Text(
+                  'co_scholastic_list.delete_grade_title'.tr(),
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
-                  "This action cannot be undone.",
+                  'co_scholastic_list.delete_grade_subtitle'.tr(),
                   style: TextStyle(
                     color: Colors.grey.shade600,
                     fontSize: 13,
                   ),
                 ),
-
                 const SizedBox(height: 24),
 
                 /// STUDENT INFO
@@ -732,7 +703,6 @@ class _CoScholasticGradeListTableState
                   ),
                   child: Row(
                     children: [
-
                       CircleAvatar(
                         radius: 24,
                         backgroundColor: Colors.red.shade400,
@@ -746,15 +716,11 @@ class _CoScholasticGradeListTableState
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 14),
-
                       Expanded(
                         child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
                             Text(
                               grade.studentName ?? "",
                               style: const TextStyle(
@@ -762,11 +728,11 @@ class _CoScholasticGradeListTableState
                                 fontSize: 15,
                               ),
                             ),
-
                             const SizedBox(height: 4),
-
                             Text(
-                              "Roll No : ${grade.rollNo ?? "-"}",
+                              'co_scholastic_list.roll_no_label'.tr(
+                                namedArgs: {'rollNo': grade.rollNo ?? "-"},
+                              ),
                               style: TextStyle(
                                 color: Colors.grey.shade600,
                                 fontSize: 12,
@@ -778,7 +744,6 @@ class _CoScholasticGradeListTableState
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 16),
 
                 /// SUBJECT CARD
@@ -793,10 +758,8 @@ class _CoScholasticGradeListTableState
                     ),
                   ),
                   child: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-
                       Row(
                         children: [
                           Icon(
@@ -804,9 +767,7 @@ class _CoScholasticGradeListTableState
                             color: Colors.red.shade600,
                             size: 18,
                           ),
-
                           const SizedBox(width: 8),
-
                           Expanded(
                             child: Text(
                               grade.subjectName ?? "",
@@ -817,9 +778,7 @@ class _CoScholasticGradeListTableState
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 10),
-
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
@@ -827,11 +786,12 @@ class _CoScholasticGradeListTableState
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                          BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          "Grade : ${grade.grade ?? "-"}",
+                          'co_scholastic_list.grade_label'.tr(
+                            namedArgs: {'grade': grade.grade ?? "-"},
+                          ),
                           style: TextStyle(
                             color: Colors.red.shade700,
                             fontWeight: FontWeight.bold,
@@ -841,49 +801,33 @@ class _CoScholasticGradeListTableState
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 28),
 
                 /// BUTTONS
                 Row(
                   children: [
-
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          Navigator.pop(
-                            dialogContext,
-                            false,
-                          );
+                          Navigator.pop(dialogContext, false);
                         },
                         style: OutlinedButton.styleFrom(
-                          minimumSize: const Size(
-                            double.infinity,
-                            52,
-                          ),
+                          minimumSize: const Size(double.infinity, 52),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.circular(14),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
-                        child: const Text(
-                          "Cancel",
-                        ),
+                        child: Text('co_scholastic_list.cancel'.tr()),
                       ),
                     ),
-
                     const SizedBox(width: 12),
-
                     Expanded(
                       child: AppButton(
-                        title: "Delete",
+                        title: 'co_scholastic_list.delete'.tr(),
                         icon: Icons.delete_rounded,
                         bgColor: Colors.red,
                         onTap: () {
-                          Navigator.pop(
-                            dialogContext,
-                            true,
-                          );
+                          Navigator.pop(dialogContext, true);
                         },
                       ),
                     ),
@@ -895,6 +839,22 @@ class _CoScholasticGradeListTableState
         );
       },
     );
+
+    if (confirm == true) {
+      setState(() => _isDeleting = true);
+      final success = await context.read<CoScholasticGradeViewModel>().deleteGradeApi(
+        gradeId: grade.coScholasticGradesId!,
+        context: context,
+      );
+      setState(() => _isDeleting = false);
+
+      if (success) {
+        _showSnackBar(
+          'co_scholastic_list.grade_deleted_success'.tr(),
+          isError: false,
+        );
+      }
+    }
   }
 
   void _showSnackBar(String message, {bool isError = true}) {

@@ -15,7 +15,7 @@ import '../utils/permission_extensions.dart';
 import '../utils/permission_manager.dart';
 import '../view_model/auth_view_model/academic_view_model.dart';
 import '../view_model/school_view_model/permission/user_permission_view_model.dart';
-import '../view_model/student_view_model/student_fee_view_model.dart'; // ← ADD karo
+import '../view_model/student_view_model/student_fee_view_model.dart';
 import '../view_model/student_view_model/student_profile_view_model.dart';
 import '../view_model/auth_view_model/user_view_model.dart';
 import 'exam_timetable_screen.dart';
@@ -36,57 +36,52 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
 
   static const List<_DashTile> _tiles = [
     _DashTile(
-      'My Profile',
+      'student_dashboard.my_profile',
       Icons.person_rounded,
       Color(0xFF1976D2),
-      'View & edit',
+      'student_dashboard.my_profile_sub',
       'view_one_student_profile',
     ),
-
     _DashTile(
-      'Attendance',
+      'student_dashboard.attendance',
       Icons.fact_check_rounded,
       Color(0xFF00897B),
-      'Daily record',
+      'student_dashboard.attendance_sub',
       'view_one_student_attendance',
     ),
-
     _DashTile(
-      'Homework',
+      'student_dashboard.homework',
       Icons.auto_stories_rounded,
       Color(0xFFF57C00),
-      'Assignments',
+      'student_dashboard.homework_sub',
       'submit_homework',
     ),
-
     _DashTile(
-      'Fees',
+      'student_dashboard.fees',
       Icons.receipt_long_rounded,
       Color(0xFF1565C0),
-      'Payment',
+      'student_dashboard.fees_sub',
       'view_fees',
     ),
-
     _DashTile(
-      'Notifications',
+      'student_dashboard.notifications',
       Icons.notifications_active_outlined,
       Color(0xFFC62828),
-      'new',
+      'student_dashboard.notifications_sub',
       'notification_view',
     ),
-
     _DashTile(
-      'School Timetable',
+      'student_dashboard.school_timetable',
       Icons.schedule_rounded,
       Color(0xFF6D28D9),
-      'Class Schedule',
+      'student_dashboard.school_timetable_sub',
       'view_timetable',
     ),
     _DashTile(
-      'Exam Timetable',
+      'student_dashboard.exam_timetable',
       Icons.event_note_rounded,
       Colors.indigoAccent,
-      'Exam Schedule',
+      'student_dashboard.exam_timetable_sub',
       'view_exam_timetable',
     ),
   ];
@@ -124,7 +119,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
 
         if (token == null || token.isEmpty) {
           debugPrint("❌ TOKEN NOT FOUND");
-
           return;
         }
 
@@ -154,7 +148,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         debugPrint("✅ STUDENT DASHBOARD READY");
       } catch (e, s) {
         debugPrint("❌ STUDENT DASHBOARD ERROR => $e");
-
         debugPrint(s.toString());
       }
     });
@@ -361,7 +354,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'STUDENT PORTAL',
+                      'student_dashboard.student_portal'.tr(),
                       style: GoogleFonts.poppins(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -371,7 +364,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Hi, $name 👋',
+                      'student_dashboard.hi'.tr(namedArgs: {'name': name}),
                       style: GoogleFonts.poppins(
                         fontSize: 20,
                         fontWeight: FontWeight.w500,
@@ -389,16 +382,16 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
               _infoCard(
                 Icons.account_balance_wallet_rounded,
                 totalStr,
-                'Total Fee',
+                'student_dashboard.total_fee'.tr(),
               ),
               const SizedBox(width: 10),
               _infoCard(
                 Icons.check_circle_outline_rounded,
                 paidStr,
-                'Paid Amount',
+                'student_dashboard.paid_amount'.tr(),
               ),
               const SizedBox(width: 10),
-              _infoCard(Icons.pending_actions_rounded, pendingStr, 'Pending'),
+              _infoCard(Icons.pending_actions_rounded, pendingStr, 'student_dashboard.pending'.tr()),
             ],
           ),
         ],
@@ -455,7 +448,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   }
 
   Widget _buildGrid() {
-
     if (!_permissionsLoaded) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -478,7 +470,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
       itemCount: visibleTiles.length,
       itemBuilder: (ctx, i) {
         final entry = visibleTiles[i];
-        final originalIdx = entry.key; // ✅ _onTileTap ke liye original index
+        final originalIdx = entry.key;
         final tile = entry.value;
 
         final animIdx = i.clamp(0, _tileAnimations.length - 1);
@@ -493,7 +485,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
             ),
           ),
           child: GestureDetector(
-            onTap: () => _onTileTap(originalIdx), // ✅ original index
+            onTap: () => _onTileTap(originalIdx),
             child: _buildTile(tile),
           ),
         );
@@ -560,7 +552,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  tile.label,
+                  tile.label.tr(),
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -569,7 +561,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  tile.sub,
+                  tile.sub.tr(),
                   style: GoogleFonts.poppins(
                     fontSize: 11,
                     color: Colors.white.withValues(alpha: 0.65),
@@ -584,11 +576,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
   }
 
   Widget _buildDrawer(
-    BuildContext context,
-    String name,
-    String email,
-    String studentClass,
-  ) {
+      BuildContext context,
+      String name,
+      String email,
+      String studentClass,
+      ) {
     return Drawer(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.horizontal(right: Radius.circular(28)),
@@ -655,7 +647,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
-                // In drawer items:
                 _drawerItem(
                   icon: Icons.shield_outlined,
                   title: 'cms.privacy_policy'.tr(),
@@ -701,13 +692,11 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                     );
                   },
                 ),
-
                 _drawerItem(
                   icon: Icons.help_outline_rounded,
-                  title: 'Help & Support',
+                  title: 'student_dashboard.help_support'.tr(),
                   onTap: () {
                     Navigator.pop(context);
-
                     Navigator.pushNamed(
                       context,
                       RoutesName.helpSupportScreen,
@@ -720,7 +709,7 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                 ),
                 _drawerItem(
                   icon: Icons.logout_rounded,
-                  title: 'Logout',
+                  title: 'student_dashboard.logout'.tr(),
                   iconColor: Colors.red.shade700,
                   titleColor: Colors.red.shade700,
                   iconBg: Colors.red.shade50,
@@ -789,31 +778,28 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: const Row(
+              title: Row(
                 children: [
-                  Icon(Icons.logout_rounded, color: Colors.red),
-                  SizedBox(width: 10),
+                  const Icon(Icons.logout_rounded, color: Colors.red),
+                  const SizedBox(width: 10),
                   Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'student_dashboard.logout_title'.tr(),
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
-              content: const Text(
-                'Are you sure you want to logout?',
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+              content: Text(
+                'student_dashboard.logout_confirm'.tr(),
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
               actions: [
-                // CANCEL — loading mein disable
                 TextButton(
                   onPressed: isLoggingOut ? null : () => Navigator.pop(ctx),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.grey),
+                  child: Text(
+                    'student_dashboard.cancel'.tr(),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
-
-                // LOGOUT
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -830,7 +816,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                     final userVM = UserViewModel();
 
                     try {
-                      // STEP 1: Subscribed session pehle padho
                       final session =
                       await userVM.getSubscribedSession();
                       final schoolId = session['schoolId'];
@@ -843,7 +828,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                         "🔍 Student Logout => school=$schoolId | role=$role",
                       );
 
-                      // STEP 2: FCM Topics unsubscribe
                       if (schoolId != null &&
                           schoolId.isNotEmpty &&
                           role != null &&
@@ -857,7 +841,6 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                           topics.add("user_$userId");
                         }
 
-                        // Student ke extra topics
                         if (role == "student") {
                           if (classId != null && classId.isNotEmpty) {
                             topics.add(
@@ -884,11 +867,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                         debugPrint("✅ Student unsubscribed: $topics");
                       }
 
-                      // STEP 3: FCM Token delete
                       await FirebaseMessaging.instance.deleteToken();
                       debugPrint("✅ FCM Token deleted");
 
-                      // STEP 4: Backend logout (best-effort)
                       try {
                         final repo = AuthRepository();
                         await repo.logoutApi({
@@ -899,26 +880,21 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                         debugPrint("⚠️ Backend logout error: $e");
                       }
 
-                      // STEP 5: Subscribed session clear
                       await userVM.clearSubscribedSession();
 
-                      // STEP 6: Sab local data clear
                       await userVM.clearUser();
                       PermissionManager.clear();
 
                       debugPrint("✅ Student logout complete");
                     } catch (e) {
                       debugPrint("❌ Student logout error: $e");
-                      // Error pe bhi clear karo
                       await userVM.clearSubscribedSession();
                       await userVM.clearUser();
                       PermissionManager.clear();
                     }
 
-                    // Dialog close
                     if (ctx.mounted) Navigator.pop(ctx);
 
-                    // Splash pe jao — pura stack clear
                     if (context.mounted) {
                       Navigator.pushNamedAndRemoveUntil(
                         context,
@@ -936,9 +912,9 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
                       strokeWidth: 2.5,
                     ),
                   )
-                      : const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.white),
+                      : Text(
+                    'student_dashboard.logout'.tr(),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -947,15 +923,15 @@ class _StudentDashboardScreenState extends State<StudentDashboardScreen>
         );
       },
     );
-  }}
-
+  }
+}
 
 class _DashTile {
   final String label;
   final IconData icon;
   final Color color;
   final String sub;
-  final String permKey; // ✅ new
+  final String permKey;
 
   const _DashTile(this.label, this.icon, this.color, this.sub, this.permKey);
 }

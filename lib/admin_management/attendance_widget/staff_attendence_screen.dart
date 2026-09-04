@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/student_management/student_widget/student_attandence_screen.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 
@@ -17,9 +19,21 @@ class StaffAttendanceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> roles = [
-      {"role": "Accountant", "status": "Present"},
-      {"role": "Student", "status": "Absent"},
-      {"role": "Teacher", "status": "Late"},
+      {
+        "role": 'staff_attendance.accountant'.tr(),
+        "status": 'staff_attendance.status_present'.tr(),
+        "key": "accountant"
+      },
+      {
+        "role": 'staff_attendance.student'.tr(),
+        "status": 'staff_attendance.status_absent'.tr(),
+        "key": "student"
+      },
+      {
+        "role": 'staff_attendance.teacher'.tr(),
+        "status": 'staff_attendance.status_late'.tr(),
+        "key": "teacher"
+      },
     ];
 
     return Scaffold(
@@ -61,7 +75,7 @@ class StaffAttendanceScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppText.customText(
-                    "Staff Attendance",
+                    'staff_attendance.title'.tr(),
                     size: 19,
                     weight: FontWeight.bold,
                     color: Colors.white,
@@ -85,17 +99,18 @@ class StaffAttendanceScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final role = roles[index]["role"]!;
                 final status = roles[index]["status"]!;
+                final key = roles[index]["key"]!;
 
-                Color statusColor = status == "Present"
+                Color statusColor = status == 'staff_attendance.status_present'.tr()
                     ? Colors.green
-                    : status == "Absent"
+                    : status == 'staff_attendance.status_absent'.tr()
                     ? Colors.red
                     : Colors.orange;
 
                 return InkWell(
                   borderRadius: BorderRadius.circular(18),
                   onTap: () {
-                    if (role == "Accountant") {
+                    if (key == "accountant") {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -104,7 +119,7 @@ class StaffAttendanceScreen extends StatelessWidget {
                         ),
                       );
                     }
-                    else if (role == "Student") {
+                    else if (key == "student") {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -113,16 +128,13 @@ class StaffAttendanceScreen extends StatelessWidget {
                         ),
                       );
                     }
-                    else if (role == "Teacher") {
-
+                    else if (key == "teacher") {
                       if (!PermissionExtensions.canAccess(
                           PermissionKeys.viewAllTeacherAttendance)) {
-
                         Utils.show(
-                          "You don't have permission to view teacher attendance",
+                          'staff_attendance.permission_teacher'.tr(),
                           context,
                         );
-
                         return;
                       }
 
@@ -158,20 +170,6 @@ class StaffAttendanceScreen extends StatelessWidget {
                           weight: FontWeight.w600,
                         ),
                         const SizedBox(height: 8),
-                        // Container(
-                        //   padding: const EdgeInsets.symmetric(
-                        //       horizontal: 10, vertical: 4),
-                        //   decoration: BoxDecoration(
-                        //     color: statusColor.withOpacity(0.12),
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   child: AppText.customText(
-                        //     status.toUpperCase(),
-                        //     size: 11,
-                        //     weight: FontWeight.bold,
-                        //     color: statusColor,
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),

@@ -4046,6 +4046,8 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/view_model/school_view_model/teacher/all_teachers_view_model.dart';
 import 'package:school_pro/view_model/teacher_view_model/teacher_attendance_view_model.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../res/app_button.dart';
@@ -4098,14 +4100,13 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
   String get _displayDate => DateFormat('dd MMM yyyy').format(_selectedDate);
 
   static const _statuses = [
-    {'code': 'P', 'full': 'Present'},
-    {'code': 'A', 'full': 'Absent'},
-    {'code': 'L', 'full': 'Leave'},
-    {'code': 'H', 'full': 'Half Day'},
-    {'code': 'OL', 'full': 'On Leave'},
+    {'code': 'P', 'full': 'status_present'},
+    {'code': 'A', 'full': 'status_absent'},
+    {'code': 'L', 'full': 'status_leave'},
+    {'code': 'H', 'full': 'status_half_day'},
+    {'code': 'OL', 'full': 'status_on_leave'},
   ];
 
-  // ── Color / label helpers ──────────────────────────────────────────────────
   Color _statusColor(String? code) {
     switch (code) {
       case 'P':  return const Color(0xFF22C55E);
@@ -4119,16 +4120,15 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
 
   String _statusLabel(String? code) {
     switch (code) {
-      case 'P':  return 'Present';
-      case 'A':  return 'Absent';
-      case 'L':  return 'Leave';
-      case 'H':  return 'Half Day';
-      case 'OL': return 'On Leave';
+      case 'P':  return 'teacher_attendance.status_present'.tr();
+      case 'A':  return 'teacher_attendance.status_absent'.tr();
+      case 'L':  return 'teacher_attendance.status_leave'.tr();
+      case 'H':  return 'teacher_attendance.status_half_day'.tr();
+      case 'OL': return 'teacher_attendance.status_on_leave'.tr();
       default:   return code ?? '';
     }
   }
 
-  // ── Lifecycle ─────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
@@ -4141,11 +4141,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     super.dispose();
   }
 
-  // ── MAIN LOAD — teachers + attendance ─────────────────────────────────────
   Future<void> _loadAll() async {
     setState(() => _loading = true);
 
-    // Step 1: Teacher list fetch karo
     await Provider.of<AllTeachersListVieModel>(context, listen: false)
         .allTeachersListApi(context);
 
@@ -4154,21 +4152,18 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
             .allTeachersListModel
             ?.data ?? [];
 
-    // Step 2: Rows banao
     for (final r in _rows) r.dispose();
     _rows = teachers.map((t) => _TeacherRow(
       id: t.teacherId.toString(),
       name: t.name ?? '',
       qualification: t.qualification ?? '',
-      activeStatus: (t.status == 1) ? 'Active' : 'Inactive',
+      activeStatus: (t.status == 1) ? 'teacher_attendance.active'.tr() : 'teacher_attendance.inactive'.tr(),
     )).toList();
 
-    // Step 3: Attendance fetch karo aur rows mein apply karo
     await _applyExistingAttendance();
 
     setState(() => _loading = false);
   }
-
 
   Future<void> _applyExistingAttendance() async {
     await context
@@ -4183,28 +4178,19 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     if (kDebugMode) {
       debugPrint('📋 Total existing records: ${existing.length}');
       for (final r in existing) {
-        // ✅ FIX LOG: dono possible field print karo taaki pata chale kaunsa hai
         debugPrint(
           '👉 teacherId=${r.teacherId}'
-              ' | attendanceId=${r.attendanceId}'   // ← agar ye null aata hai
-              ' | status=${r.status}',              //   to neeche wala try karo
+              ' | attendanceId=${r.attendanceId}'
+              ' | status=${r.status}',
         );
       }
     }
 
-    // ✅ FIX: attendanceId mapping — accountant ke bilkul same pattern
     final Map<String, Map<String, String>> markedMap = {
       for (final r in existing)
         if (r.teacherId != null)
           r.teacherId.toString(): {
-            'status'      : r.status ?? '',
-            // ── IMPORTANT ──────────────────────────────────────────────────
-            // Agar debug log mein attendanceId null aa raha hai to:
-            //   Option A (agar model mein field 'id' hai):
-            //     'attendanceId': r.id?.toString() ?? '',
-            //   Option B (agar field 'attendanceId' hai — current):
-            //     'attendanceId': r.attendanceId?.toString() ?? '',
-            // ──────────────────────────────────────────────────────────────
+            'status': r.status ?? '',
             'attendanceId': r.attendanceId?.toString() ?? '',
           },
     };
@@ -4234,10 +4220,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     });
   }
 
-  // ── Pull-to-refresh ───────────────────────────────────────────────────────
   Future<void> _onRefresh() async => _loadAll();
 
-  // ── Date picker ───────────────────────────────────────────────────────────
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -4261,7 +4245,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     }
   }
 
-  // ── Mark all present ──────────────────────────────────────────────────────
   void _markAllPresent() {
     setState(() {
       for (final r in _rows) {
@@ -4270,7 +4253,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     });
   }
 
-  // ── Save NEW attendance ───────────────────────────────────────────────────
   Future<void> _saveAll() async {
     if (!PermissionGuard.check(
       context,
@@ -4282,7 +4264,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     final pending = _rows.where((r) => !r.alreadyMarked).toList();
 
     if (pending.isEmpty) {
-      _snack('Attendance has already been marked for all teachers.',
+      _snack('teacher_attendance.attendance_already_marked'.tr(),
           Colors.blue, Icons.info_rounded);
       return;
     }
@@ -4290,7 +4272,9 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     final incomplete = pending.where((r) => r.attendanceStatus == null);
     if (incomplete.isNotEmpty) {
       _snack(
-        '${incomplete.length} teacher(s) attendance status is not selected.',
+        'teacher_attendance.status_not_selected'.tr(
+            namedArgs: {'count': incomplete.length.toString()}
+        ),
         Colors.orange, Icons.warning_rounded,
       );
       return;
@@ -4324,15 +4308,18 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
 
     if (successCount > 0) {
       _snack(
-        '$successCount out of ${pending.length} teacher(s) saved successfully.',
+        'teacher_attendance.saved_success'.tr(
+            namedArgs: {
+              'saved': successCount.toString(),
+              'total': pending.length.toString()
+            }
+        ),
         Colors.green, Icons.check_circle_rounded,
       );
-      // ✅ Save ke baad attendance IDs update karo
       await _applyExistingAttendance();
     }
   }
 
-  // ── Update EXISTING attendance ────────────────────────────────────────────
   Future<void> _updateAttendance(_TeacherRow row, StateSetter setRow) async {
     if (!PermissionGuard.check(
       context,
@@ -4342,15 +4329,14 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
       return;
     }
     if (row.attendanceStatus == null) {
-      _snack('Please select a status before saving.',
+      _snack('teacher_attendance.please_select_status'.tr(),
           Colors.orange, Icons.warning_rounded);
       return;
     }
 
-    // ✅ FIX: attendanceId null/empty check — accountant screen jesa
     if (row.attendanceId == null || row.attendanceId!.isEmpty) {
       _snack(
-        'Attendance ID not found. Please refresh and try again.',
+        'teacher_attendance.attendance_id_not_found'.tr(),
         Colors.red, Icons.error_rounded,
       );
       if (kDebugMode) {
@@ -4372,13 +4358,12 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
       );
     }
 
-    // ✅ FIX: UpdateTeacherAttendanceViewModel use — accountant ke same
     final ok = await Provider.of<UpdateTeacherAttendanceViewModel>(
       context, listen: false,
     ).updateTeacherAttendanceApi(
-      int.parse(row.attendanceId!),      // attendance PK
-      row.attendanceStatus!,             // status
-      row.remarksCtrl.text.trim(),       // remarks
+      int.parse(row.attendanceId!),
+      row.attendanceStatus!,
+      row.remarksCtrl.text.trim(),
       context,
     );
 
@@ -4390,13 +4375,12 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
         row.isEditing     = false;
       });
       if (mounted) {
-        _snack('Attendance updated successfully.',
+        _snack('teacher_attendance.update_success'.tr(),
             Colors.green, Icons.check_circle_rounded);
       }
     }
   }
 
-  // ── Snack helper ──────────────────────────────────────────────────────────
   void _snack(String msg, Color color, IconData icon) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -4411,7 +4395,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     ));
   }
 
-  // BUILD
   @override
   Widget build(BuildContext context) {
     final alreadyCount = _rows.where((r) => r.alreadyMarked).length;
@@ -4427,7 +4410,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
           Expanded(child: _buildBody(alreadyCount, pendingCount)),
         ]),
 
-        // ── FABs ─────────────────────────────────────────────────────────────
         floatingActionButton: (!_loading && hasPending)
             ? Container(
           width: double.infinity,
@@ -4437,15 +4419,15 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
               heroTag: 'mark_all_p',
               onPressed: _saving ? null : _markAllPresent,
               backgroundColor: const Color(0xFF22C55E),
-              tooltip: 'Mark All Present',
+              tooltip: 'teacher_attendance.mark_all_present'.tr(),
               child: const Icon(Icons.done_all_rounded, color: Colors.white),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: AppButton(
                 title: _saving
-                    ? "Saving..."
-                    : "Save All Attendance",
+                    ? 'teacher_attendance.saving'.tr()
+                    : 'teacher_attendance.save_all_attendance'.tr(),
                 icon: _saving
                     ? null
                     : Icons.save_rounded,
@@ -4463,7 +4445,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     );
   }
 
-  // ── HEADER ────────────────────────────────────────────────────────────────
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
@@ -4489,7 +4470,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: AppText.customText('Teacher Attendance',
+            child: AppText.customText('teacher_attendance.title'.tr(),
                 size: 19, weight: FontWeight.bold, color: Colors.white),
           ),
         ]),
@@ -4519,7 +4500,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      AppText.customText('Selected Date',
+                      AppText.customText('teacher_attendance.selected_date'.tr(),
                           size: 11, color: Colors.white70),
                       AppText.customText(_displayDate,
                           size: 15, weight: FontWeight.bold, color: Colors.white),
@@ -4534,7 +4515,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                   const Icon(Icons.edit_calendar_rounded,
                       color: Colors.white, size: 13),
                   const SizedBox(width: 4),
-                  AppText.customText('Change', size: 11, color: Colors.white),
+                  AppText.customText('teacher_attendance.change'.tr(),
+                      size: 11, color: Colors.white),
                 ]),
               ),
             ]),
@@ -4547,7 +4529,8 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
           scrollDirection: Axis.horizontal,
           child: Row(
             children: _statuses.map((s) {
-              final color = _statusColor(s['code']);
+              final code = s['code']!;
+              final color = _statusColor(code);
               return Container(
                 margin: const EdgeInsets.only(right: 8),
                 padding:
@@ -4563,7 +4546,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                       decoration:
                       BoxDecoration(color: color, shape: BoxShape.circle)),
                   const SizedBox(width: 5),
-                  Text('${s['code']} = ${s['full']}',
+                  Text('$code = ${_statusLabel(code)}',
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 11,
@@ -4577,7 +4560,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     );
   }
 
-  // ── BODY ──────────────────────────────────────────────────────────────────
   Widget _buildBody(int alreadyCount, int pendingCount) {
     if (_loading) {
       return Center(
@@ -4591,7 +4573,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
           Icon(Icons.people_outline_rounded,
               size: 72, color: AppColor.lightBlueColor.withOpacity(0.3)),
           const SizedBox(height: 16),
-          AppText.customText('No Teachers Found',
+          AppText.customText('teacher_attendance.no_teachers_found'.tr(),
               size: 16, weight: FontWeight.bold),
         ]),
       );
@@ -4602,19 +4584,31 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
         child: Row(children: [
           if (alreadyCount > 0) ...[
-            _countPill('$alreadyCount Already Marked', Colors.green,
-                Icons.check_circle_rounded),
+            _countPill(
+                'teacher_attendance.already_marked_count'.tr(
+                    namedArgs: {'count': alreadyCount.toString()}
+                ),
+                Colors.green, Icons.check_circle_rounded
+            ),
             const SizedBox(width: 8),
           ],
           if (pendingCount > 0)
             _countPill(
-                '$pendingCount Pending', Colors.orange, Icons.pending_rounded),
+                'teacher_attendance.pending_count'.tr(
+                    namedArgs: {'count': pendingCount.toString()}
+                ),
+                Colors.orange, Icons.pending_rounded
+            ),
           const Spacer(),
-          Text('Total: ${_rows.length}',
-              style: TextStyle(
-                  fontSize: 12,
-                  color: AppColor.softGreyText,
-                  fontWeight: FontWeight.w500)),
+          Text(
+            'teacher_attendance.total'.tr(
+                namedArgs: {'count': _rows.length.toString()}
+            ),
+            style: TextStyle(
+                fontSize: 12,
+                color: AppColor.softGreyText,
+                fontWeight: FontWeight.w500),
+          ),
         ]),
       ),
       Expanded(
@@ -4633,7 +4627,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     ]);
   }
 
-  // ── Single attendance row card ─────────────────────────────────────────────
   Widget _buildRow(_TeacherRow row) {
     if (!row.alreadyMarked && row.attendanceStatus == null) {
       row.attendanceStatus = _statuses.first['code'];
@@ -4672,7 +4665,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
             padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
             child:
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              // Avatar
               Container(
                 width: 38,
                 height: 38,
@@ -4700,8 +4692,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-
-              // Name + ID
               Expanded(
                 flex: 3,
                 child: Column(
@@ -4716,19 +4706,18 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                         weight: FontWeight.bold,
                       ),
                       const SizedBox(height: 2),
-                      AppText.customText('ID: ${row.id}',
+                      AppText.customText(
+                          'teacher_attendance.id_label'.tr(
+                              namedArgs: {'id': row.id}
+                          ),
                           size: 11, color: AppColor.softGreyText),
                     ]),
               ),
-
-              // Qualification
               Expanded(
                 flex: 2,
                 child: AppText.customText(row.qualification,
                     size: 12, color: AppColor.softGreyText),
               ),
-
-              // Right badges
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 _pill(row.activeStatus, Colors.green),
 
@@ -4751,7 +4740,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                           color: _statusColor(row.attendanceStatus)),
                       const SizedBox(width: 3),
                       Text(
-                        '${_statusLabel(row.attendanceStatus)} • Marked',
+                        '${_statusLabel(row.attendanceStatus)} • teacher_attendance.marked'.tr(),
                         style: TextStyle(
                             color: _statusColor(row.attendanceStatus),
                             fontSize: 10,
@@ -4776,7 +4765,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                         Icon(Icons.edit_rounded,
                             size: 10, color: AppColor.lightBlueColor),
                         const SizedBox(width: 3),
-                        Text('Edit',
+                        Text('teacher_attendance.edit'.tr(),
                             style: TextStyle(
                                 color: AppColor.lightBlueColor,
                                 fontSize: 10,
@@ -4803,7 +4792,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                       Icon(Icons.edit_rounded,
                           size: 10, color: AppColor.lightBlueColor),
                       const SizedBox(width: 3),
-                      Text('Editing',
+                      Text('teacher_attendance.editing'.tr(),
                           style: TextStyle(
                               color: AppColor.lightBlueColor,
                               fontSize: 10,
@@ -4824,11 +4813,11 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                       ),
                       child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          children: const [
+                          children: [
                             Icon(Icons.close_rounded,
                                 size: 10, color: Colors.red),
-                            SizedBox(width: 3),
-                            Text('Cancel',
+                            const SizedBox(width: 3),
+                            Text('teacher_attendance.cancel'.tr(),
                                 style: TextStyle(
                                     color: Colors.red,
                                     fontSize: 10,
@@ -4843,14 +4832,13 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
 
           Divider(height: 1, color: Colors.grey.shade100),
 
-          // Status chips
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 4),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
-                    AppText.customText('ATTENDANCE STATUS',
+                    AppText.customText('teacher_attendance.attendance_status'.tr(),
                         size: 10,
                         weight: FontWeight.bold,
                         color: AppColor.softGreyText),
@@ -4863,7 +4851,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                           color: AppColor.lightBlueColor.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text('Edit Mode',
+                        child: Text('teacher_attendance.edit_mode'.tr(),
                             style: TextStyle(
                                 color: AppColor.lightBlueColor,
                                 fontSize: 9,
@@ -4944,7 +4932,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                 ]),
           ),
 
-          // Remarks
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 6, 14, 14),
             child: TextField(
@@ -4954,10 +4941,10 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
               decoration: InputDecoration(
                 isDense: true,
                 hintText: isLocked
-                    ? 'Attendance already marked'
+                    ? 'teacher_attendance.already_marked'.tr()
                     : row.isEditing
-                    ? 'Update remarks...'
-                    : 'Enter remarks...',
+                    ? 'teacher_attendance.update_remarks'.tr()
+                    : 'teacher_attendance.enter_remarks'.tr(),
                 hintStyle: TextStyle(
                     color: isLocked
                         ? Colors.green.withOpacity(0.6)
@@ -4999,7 +4986,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
             ),
           ),
 
-          // ✅ FIX: Update button — accountant ke bilkul same
           if (row.isEditing)
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
@@ -5018,7 +5004,7 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
                       : const Icon(Icons.save_rounded,
                       color: Colors.white, size: 18),
                   label: Text(
-                    _saving ? 'Saving...' : 'Update Attendance',
+                    _saving ? 'teacher_attendance.saving'.tr() : 'teacher_attendance.update_attendance'.tr(),
                     style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -5038,7 +5024,6 @@ class _TeacherAttendanceScreenState extends State<TeacherAttendanceScreen> {
     });
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
   Widget _pill(String label, Color color) => Container(
     padding:
     const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

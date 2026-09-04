@@ -9,6 +9,7 @@ import 'package:school_pro/view_model/school_view_model/notification/create_noti
 import 'package:school_pro/view_model/school_view_model/notification/delete_notification_view_model.dart';
 import 'package:school_pro/view_model/student_view_model/student_notification_view_model.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 
 import '../utils/permission_extensions.dart';
 import '../utils/permission_keys.dart';
@@ -38,15 +39,8 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     )..forward();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      if (!PermissionExtensions.canAccess(
-          PermissionKeys.notificationView)) {
-
-        Utils.show(
-          "You don't have permission to view notifications",
-          context,
-        );
-
+      if (!PermissionExtensions.canAccess(PermissionKeys.notificationView)) {
+        Utils.show('student_notification.permission_denied'.tr(), context);
         Navigator.pop(context);
         return;
       }
@@ -131,33 +125,42 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     try {
       final dt = DateTime.parse(iso).toLocal();
       final diff = DateTime.now().difference(dt);
-      if (diff.inSeconds < 60) return 'Just now';
-      if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-      if (diff.inHours < 24) return '${diff.inHours}h ago';
-      if (diff.inDays < 7) return '${diff.inDays}d ago';
+      if (diff.inSeconds < 60) return 'student_notification.just_now'.tr();
+      if (diff.inMinutes < 60) {
+        return 'student_notification.minutes_ago'.tr(
+            namedArgs: {'minutes': diff.inMinutes.toString()}
+        );
+      }
+      if (diff.inHours < 24) {
+        return 'student_notification.hours_ago'.tr(
+            namedArgs: {'hours': diff.inHours.toString()}
+        );
+      }
+      if (diff.inDays < 7) {
+        return 'student_notification.days_ago'.tr(
+            namedArgs: {'days': diff.inDays.toString()}
+        );
+      }
       return '${dt.day}/${dt.month}/${dt.year}';
     } catch (_) {
       return '';
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FB),
       body: Column(
         children: [
           _buildHeader(),
           Expanded(
-            child: _buildInbox(), // Direct inbox, no TabBarView needed
+            child: _buildInbox(),
           ),
         ],
       ),
     );
   }
-
 
   Widget _buildHeader() {
     return Container(
@@ -201,9 +204,9 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Notifications",
-                      style: TextStyle(
+                    Text(
+                      'student_notification.title'.tr(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -211,7 +214,7 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                       ),
                     ),
                     Text(
-                      "Stay updated with all alerts",
+                      'student_notification.subtitle'.tr(),
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.7),
                         fontSize: 12,
@@ -228,14 +231,13 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
     );
   }
 
-
   Widget _buildInbox() {
     final vm = Provider.of<StudentNotificationViewModel>(context);
     final notifications =
         vm.studentNotificationModel?.data?.notifications ?? [];
 
     if (vm.loading) return _shimmerList();
-    if (notifications.isEmpty) return _emptyState("No inbox notifications");
+    if (notifications.isEmpty) return _emptyState('student_notification.no_inbox_notifications'.tr());
 
     return RefreshIndicator(
       color: AppColor.primary,
@@ -247,7 +249,6 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
         itemBuilder: (context, index) {
           final n = notifications[index];
           final bool isRead = (n.isRead ?? 1) == 1;
-          // _buildInbox() ke itemBuilder mein — pura card replace karo:
 
           return _animCard(
             index: index,
@@ -352,7 +353,7 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                                     ),
                                     const SizedBox(width: 3),
                                     Text(
-                                      n.senderName ?? "Unknown",
+                                      n.senderName ?? 'student_notification.unknown'.tr(),
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w600,
@@ -373,7 +374,7 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
                                   borderRadius: BorderRadius.circular(7),
                                 ),
                                 child: Text(
-                                  "Message",
+                                  'student_notification.message'.tr(),
                                   style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w600,
@@ -479,12 +480,12 @@ class _StudentNotificationScreenState extends State<StudentNotificationScreen>
             ),
             boxShadow: isSelected
                 ? [
-                    BoxShadow(
-                      color: AppColor.primary.withOpacity(0.3),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
+              BoxShadow(
+                color: AppColor.primary.withOpacity(0.3),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ]
                 : [],
           ),
           child: Column(

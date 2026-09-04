@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../res/app_button.dart';
 import '../view_model/auth_view_model/login_view_model.dart';
 
@@ -20,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen>
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
-  // String selectedRole = "Admin";
 
   @override
   void initState() {
@@ -42,15 +43,13 @@ class _LoginScreenState extends State<LoginScreen>
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      // Handle login logic here
       print("Email: ${_emailController.text}");
       print("Password: ${_passwordController.text}");
       print("Remember Me: $_rememberMe");
 
-      // Navigate to home screen or show success
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Login Successful!'),
+          content: Text('login.login_success'.tr()),
           backgroundColor: Colors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -154,21 +153,21 @@ class _LoginScreenState extends State<LoginScreen>
       child: Column(
         children: [
           AppText.customText(
-            "Welcome Back!",
+            'login.welcome_back'.tr(),
             size: 32,
             weight: FontWeight.bold,
             color: Colors.black87,
           ),
           const SizedBox(height: 8),
           AppText.customText(
-            "Login As ${role ?? ""}",
+            'login.login_as'.tr(namedArgs: {'role': role ?? ""}),
             size: 18,
             weight: FontWeight.bold,
             color: AppColor.lightBlueColor,
           ),
           const SizedBox(height: 8),
           AppText.customText(
-            "Sign in to continue to ConnectSkool",
+            'login.sign_in_subtitle'.tr(),
             size: 15,
             color: Colors.grey[600]!,
           ),
@@ -198,16 +197,16 @@ class _LoginScreenState extends State<LoginScreen>
             // Email Field
             _buildTextField(
               controller: _emailController,
-              label: "Email Address",
-              hint: "Enter your email",
+              label: 'login.email_address'.tr(),
+              hint: 'login.email_hint'.tr(),
               icon: Icons.email_rounded,
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
+                  return 'login.email_error_empty'.tr();
                 }
                 if (!value.contains('@')) {
-                  return 'Please enter a valid email';
+                  return 'login.email_error_valid'.tr();
                 }
                 return null;
               },
@@ -218,16 +217,16 @@ class _LoginScreenState extends State<LoginScreen>
             // Password Field
             _buildTextField(
               controller: _passwordController,
-              label: "Password",
-              hint: "Enter your password",
+              label: 'login.password'.tr(),
+              hint: 'login.password_hint'.tr(),
               icon: Icons.lock_rounded,
               isPassword: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your password';
+                  return 'login.password_error_empty'.tr();
                 }
                 if (value.length < 6) {
-                  return 'Password must be at least 6 characters';
+                  return 'login.password_error_length'.tr();
                 }
                 return null;
               },
@@ -274,7 +273,7 @@ class _LoginScreenState extends State<LoginScreen>
           color: Colors.black87,
         ),
         decoration: InputDecoration(
-          constraints: BoxConstraints(maxHeight: 55),
+          constraints: const BoxConstraints(maxHeight: 55),
           labelText: label,
           hintText: hint,
           labelStyle: TextStyle(
@@ -283,7 +282,6 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
           prefixIcon: Container(
-            // alignment: Alignment.center,
             margin: const EdgeInsets.all(11),
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
@@ -299,18 +297,18 @@ class _LoginScreenState extends State<LoginScreen>
           ),
           suffixIcon: isPassword
               ? IconButton(
-                  icon: Icon(
-                    _isPasswordVisible
-                        ? Icons.visibility_rounded
-                        : Icons.visibility_off_rounded,
-                    color: Colors.grey[600],
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _isPasswordVisible = !_isPasswordVisible;
-                    });
-                  },
-                )
+            icon: Icon(
+              _isPasswordVisible
+                  ? Icons.visibility_rounded
+                  : Icons.visibility_off_rounded,
+              color: Colors.grey[600],
+            ),
+            onPressed: () {
+              setState(() {
+                _isPasswordVisible = !_isPasswordVisible;
+              });
+            },
+          )
               : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
@@ -355,7 +353,6 @@ class _LoginScreenState extends State<LoginScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Remember Me Checkbox
           Row(
             children: [
               SizedBox(
@@ -376,31 +373,13 @@ class _LoginScreenState extends State<LoginScreen>
               ),
               const SizedBox(width: 8),
               AppText.customText(
-                "Remember Me",
+                'login.remember_me'.tr(),
                 size: 14,
                 color: Colors.grey[700]!,
                 weight: FontWeight.w600,
               ),
             ],
           ),
-
-          // Forgot Password
-          // TextButton(
-          //   onPressed: () {
-          //     // Handle forgot password
-          //   },
-          //   style: TextButton.styleFrom(
-          //     padding: EdgeInsets.zero,
-          //     minimumSize: const Size(0, 0),
-          //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          //   ),
-          //   child: AppText.customText(
-          //     "Forgot Password?",
-          //     size: 14,
-          //     color: AppColor.lightBlueColor,
-          //     weight: FontWeight.bold,
-          //   ),
-          // ),
         ],
       ),
     );
@@ -419,24 +398,24 @@ class _LoginScreenState extends State<LoginScreen>
           child: Opacity(opacity: animationValue, child: child),
         );
       },
-        child: Consumer<LoginViewModel>(
+      child: Consumer<LoginViewModel>(
         builder: (context, loginViewModel, _) {
-      return AppButton(
-        title: "Sign In",
-        icon: Icons.arrow_forward_rounded,
-        height: 50,
-        radius: 20,
-        loading: loginViewModel.loading,
-        onTap: () {
-          loginViewModel.loginApi(
-            context,
-            _emailController.text,
-            _passwordController.text,
+          return AppButton(
+            title: 'login.sign_in'.tr(),
+            icon: Icons.arrow_forward_rounded,
+            height: 50,
+            radius: 20,
+            loading: loginViewModel.loading,
+            onTap: () {
+              loginViewModel.loginApi(
+                context,
+                _emailController.text,
+                _passwordController.text,
+              );
+            },
           );
         },
-      );
-    },
-    ),
+      ),
     );
   }
 
@@ -457,7 +436,7 @@ class _LoginScreenState extends State<LoginScreen>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: AppText.customText(
-              "OR",
+              'login.or'.tr(),
               size: 13,
               color: Colors.grey[600]!,
               weight: FontWeight.w600,
@@ -488,22 +467,18 @@ class _LoginScreenState extends State<LoginScreen>
           Expanded(
             child: _buildSocialButton(
               icon: Icons.g_mobiledata_rounded,
-              label: "Google",
+              label: 'login.google'.tr(),
               color: const Color(0xFFDB4437),
-              onTap: () {
-                // Handle Google login
-              },
+              onTap: () {},
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: _buildSocialButton(
               icon: Icons.facebook_rounded,
-              label: "Facebook",
+              label: 'login.facebook'.tr(),
               color: const Color(0xFF4267B2),
-              onTap: () {
-                // Handle Facebook login
-              },
+              onTap: () {},
             ),
           ),
         ],
@@ -569,21 +544,19 @@ class _LoginScreenState extends State<LoginScreen>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AppText.customText(
-            "Don't have an account? ",
+            'login.no_account'.tr(),
             size: 14,
             color: Colors.grey[700]!,
           ),
           TextButton(
-            onPressed: () {
-              // Navigate to sign up screen
-            },
+            onPressed: () {},
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               minimumSize: const Size(0, 0),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: AppText.customText(
-              "Sign Up",
+              'login.sign_up'.tr(),
               size: 14,
               color: AppColor.lightBlueColor,
               weight: FontWeight.bold,

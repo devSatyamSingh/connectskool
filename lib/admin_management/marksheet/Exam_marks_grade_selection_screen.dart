@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:school_pro/admin_management/exam/school_exam_marks_screen.dart';
 import 'package:school_pro/main.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../../res/app_color.dart';
 import '../../../res/const_text.dart';
 import 'co_scholastic_grade_screen.dart';
@@ -13,15 +15,15 @@ class ExamMarksGradeSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> modules = [
       {
-        "title": "Scholastic Marks",
-        "subtitle": "Select exam and details to manage student performance",
+        "title": 'exam_marks_selection.scholastic_title'.tr(),
+        "subtitle": 'exam_marks_selection.scholastic_subtitle'.tr(),
         "type": "Scholastic",
         "icon": Icons.analytics_rounded,
         "gradientColors": [Colors.indigo.shade500, Colors.blue.shade700],
       },
       {
-        "title": "Co-Scholastic Grade",
-        "subtitle": "Manage skill & activity gradings",
+        "title": 'exam_marks_selection.co_scholastic_title'.tr(),
+        "subtitle": 'exam_marks_selection.co_scholastic_subtitle'.tr(),
         "type": "co-Scholastic",
         "icon": Icons.workspace_premium_rounded,
         "gradientColors": [Colors.deepPurple.shade500, Colors.purple.shade700],
@@ -44,7 +46,6 @@ class ExamMarksGradeSelectionScreen extends StatelessWidget {
                 BoxShadow(
                   color: AppColor.blueShadow.withOpacity(0.15),
                   blurRadius: 10,
-
                 ),
               ],
             ),
@@ -69,7 +70,7 @@ class ExamMarksGradeSelectionScreen extends StatelessWidget {
                 const SizedBox(width: 16),
                 Expanded(
                   child: AppText.customText(
-                    "Exam Marks Assign",
+                    'exam_marks_selection.title'.tr(),
                     size: 20,
                     weight: FontWeight.w600,
                     color: Colors.white,
@@ -82,7 +83,7 @@ class ExamMarksGradeSelectionScreen extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
             child: AppText.customText(
-              "Select Category",
+              'exam_marks_selection.select_category'.tr(),
               size: 17,
               weight: FontWeight.w600,
               color: Colors.black87,
@@ -98,8 +99,7 @@ class ExamMarksGradeSelectionScreen extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
-                childAspectRatio:
-                0.9, // Refined vertical room for subtitle elements
+                childAspectRatio: 0.9,
               ),
               itemBuilder: (context, index) {
                 final module = modules[index];
@@ -180,8 +180,6 @@ class ExamMarksGradeSelectionScreen extends StatelessWidget {
                               color: Colors.black,
                             ),
                             const SizedBox(height: 6),
-
-                            /// Subtitle Segment Text Block
                             Text(
                               subtitle,
                               maxLines: 2,

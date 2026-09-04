@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:school_pro/student_management/student_widget/student_home_work_screen.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 
 import '../../../model/student_model/student_home_work_model.dart';
 import '../../../res/app_color.dart';
@@ -29,20 +30,14 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final teacherPdfCount = homework.attachment != null ? 1 : 0;
-
     final teacherPhotoCount = homework.attachmentPhotos?.length ?? 0;
-
     final submittedPdfCount = homework.submittedFile != null ? 1 : 0;
-
     final submittedPhotoCount = homework.submittedPhotos?.length ?? 0;
-    if (!PermissionExtensions.canAccess(
-        PermissionKeys.viewHomework)) {
 
-      return const Scaffold(
+    if (!PermissionExtensions.canAccess(PermissionKeys.viewHomework)) {
+      return Scaffold(
         body: Center(
-          child: Text(
-            "You don't have permission",
-          ),
+          child: Text('homework_submission.permission_denied'.tr()),
         ),
       );
     }
@@ -86,22 +81,18 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppText.customText(
-                          "Submission Details",
+                          'homework_submission.title'.tr(),
                           size: 17,
                           weight: FontWeight.w600,
                           color: Colors.white,
                         ),
-
                         const SizedBox(height: 2),
-
                         AppText.customText(
                           homework.subjectName ?? "Homework",
                           size: 12,
@@ -110,7 +101,6 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
@@ -123,10 +113,10 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.check_circle, color: Colors.white, size: 12),
-                        SizedBox(width: 4),
+                        const Icon(Icons.check_circle, color: Colors.white, size: 12),
+                        const SizedBox(width: 4),
                         Text(
-                          "Submitted",
+                          'homework_submission.submitted_status'.tr(),
                           style: GoogleFonts.poppins(
                             color: Colors.white,
                             fontSize: 11,
@@ -154,7 +144,6 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                       weight: FontWeight.w500,
                       color: AppColor.text,
                     ),
-
                     const SizedBox(height: 20),
 
                     /// Submission Status Card
@@ -162,7 +151,6 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                       submittedAt: _formatDate(homework.submittedAt),
                       dueDate: _formatDate(homework.dueDate),
                     ),
-
                     const SizedBox(height: 16),
 
                     /// Summary
@@ -173,17 +161,14 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                       yourPdf: submittedPdfCount,
                       yourPhotos: submittedPhotoCount,
                     ),
-
                     const SizedBox(height: 16),
 
                     /// Teacher Files
                     TeacherFilesSection(homework: homework),
-
                     const SizedBox(height: 16),
 
                     /// Submitted Files
                     SubmittedFilesSection(homework: homework),
-
                     const SizedBox(height: 24),
 
                     SizedBox(
@@ -194,7 +179,7 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                           Navigator.pop(context);
                         },
                         icon: const Icon(Icons.arrow_back),
-                        label: const Text("Back To Homework"),
+                        label: Text('homework_submission.back_to_homework'.tr()),
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
@@ -202,7 +187,6 @@ class HomeworkSubmissionDetailsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -259,29 +243,25 @@ class SubmissionHeaderCard extends StatelessWidget {
                     size: 30,
                   ),
                 ),
-
                 const SizedBox(width: 14),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Submission Received",
+                        'homework_submission.submission_received'.tr(),
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xff14532d),
+                          color: const Color(0xff14532d),
                         ),
                       ),
-
                       const SizedBox(height: 4),
-
                       Text(
                         submittedAt,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
-                          color: Color(0xff15803d),
+                          color: const Color(0xff15803d),
                         ),
                       ),
                     ],
@@ -290,7 +270,6 @@ class SubmissionHeaderCard extends StatelessWidget {
               ],
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -298,18 +277,16 @@ class SubmissionHeaderCard extends StatelessWidget {
                 Expanded(
                   child: _InfoTile(
                     icon: Icons.calendar_today,
-                    title: "Due Date",
+                    title: 'homework_submission.due_date'.tr(),
                     value: dueDate,
                     bgColor: const Color(0xfff8fafc),
                   ),
                 ),
-
                 const SizedBox(width: 12),
-
                 Expanded(
                   child: _InfoTile(
                     icon: Icons.access_time,
-                    title: "Submitted At",
+                    title: 'homework_submission.submitted_at'.tr(),
                     value: submittedAt,
                     bgColor: const Color(0xffecfdf5),
                   ),
@@ -355,21 +332,19 @@ class _InfoTile extends StatelessWidget {
                 title,
                 style: GoogleFonts.poppins(
                   fontSize: 13,
-                  color: Color(0xff64748b),
+                  color: const Color(0xff64748b),
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 10),
-
           Text(
             value,
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Color(0xff0f172a),
+              color: const Color(0xff0f172a),
             ),
           ),
         ],
@@ -380,10 +355,8 @@ class _InfoTile extends StatelessWidget {
 
 class SubmissionSummaryCard extends StatelessWidget {
   final String subject;
-
   final int teacherPdf;
   final int teacherPhotos;
-
   final int yourPdf;
   final int yourPhotos;
 
@@ -416,38 +389,43 @@ class SubmissionSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "SUMMARY",
+            'homework_submission.summary'.tr(),
             style: GoogleFonts.poppins(
               fontSize: 13,
               letterSpacing: 1,
               fontWeight: FontWeight.w500,
-              color: Color(0xff94a3b8),
+              color: const Color(0xff94a3b8),
             ),
           ),
-
           const SizedBox(height: 18),
-
-          _summaryRow("Subject", subject, Colors.black87),
-
+          _summaryRow('homework_submission.subject'.tr(), subject, Colors.black87),
           _summaryRow(
-            "Teacher PDF",
-            "$teacherPdf file",
+            'homework_submission.teacher_pdf'.tr(),
+            teacherPdf == 1
+                ? 'homework_submission.file_count'.tr(namedArgs: {'count': teacherPdf.toString()})
+                : 'homework_submission.file_count_plural'.tr(namedArgs: {'count': teacherPdf.toString()}),
             const Color(0xff7c3aed),
           ),
-
           _summaryRow(
-            "Teacher Photos",
-            "$teacherPhotos photo",
+            'homework_submission.teacher_photos'.tr(),
+            teacherPhotos == 1
+                ? 'homework_submission.photo_count'.tr(namedArgs: {'count': teacherPhotos.toString()})
+                : 'homework_submission.photo_count_plural'.tr(namedArgs: {'count': teacherPhotos.toString()}),
             const Color(0xff7c3aed),
           ),
-
           const Divider(height: 24),
-
-          _summaryRow("Your PDF", "$yourPdf file", const Color(0xff16a34a)),
-
           _summaryRow(
-            "Your Photos",
-            "$yourPhotos photo",
+            'homework_submission.your_pdf'.tr(),
+            yourPdf == 1
+                ? 'homework_submission.file_count'.tr(namedArgs: {'count': yourPdf.toString()})
+                : 'homework_submission.file_count_plural'.tr(namedArgs: {'count': yourPdf.toString()}),
+            const Color(0xff16a34a),
+          ),
+          _summaryRow(
+            'homework_submission.your_photos'.tr(),
+            yourPhotos == 1
+                ? 'homework_submission.photo_count'.tr(namedArgs: {'count': yourPhotos.toString()})
+                : 'homework_submission.photo_count_plural'.tr(namedArgs: {'count': yourPhotos.toString()}),
             const Color(0xff16a34a),
           ),
         ],
@@ -463,7 +441,7 @@ class SubmissionSummaryCard extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: GoogleFonts.poppins(fontSize: 15, color: Color(0xff64748b)),
+              style: GoogleFonts.poppins(fontSize: 15, color: const Color(0xff64748b)),
             ),
           ),
           Text(
@@ -509,40 +487,38 @@ class TeacherFilesSection extends StatelessWidget {
             ),
             child: Row(
               children: [
-                Icon(Icons.menu_book_outlined, color: Color(0xff7c3aed)),
-                SizedBox(width: 10),
+                const Icon(Icons.menu_book_outlined, color: Color(0xff7c3aed)),
+                const SizedBox(width: 10),
                 Text(
-                  "TEACHER'S ASSIGNMENT FILES",
+                  'homework_submission.teacher_assignment_files'.tr(),
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     letterSpacing: 1,
-                    color: Color(0xff7c3aed),
+                    color: const Color(0xff7c3aed),
                   ),
                 ),
               ],
             ),
           ),
-
           const SizedBox(height: 16),
 
           if (pdf != null)
             _PdfCard(
-              title: "ASSIGNMENT PDF",
-              fileName: pdf.url?.split('/').last ?? "document.pdf",
+              title: 'homework_submission.assignment_pdf'.tr(),
+              fileName: pdf.url?.split('/').last ?? 'homework_submission.document_pdf'.tr(),
               color: const Color(0xffef4444),
               pdfUrl: pdf.url ?? "",
             ),
 
           if (photos.isNotEmpty) ...[
             const SizedBox(height: 16),
-
             Row(
               children: [
                 const Icon(Icons.photo_library, color: Color(0xff7c3aed)),
                 const SizedBox(width: 8),
-                const Text(
-                  "ASSIGNMENT PHOTOS",
-                  style: TextStyle(
+                Text(
+                  'homework_submission.assignment_photos'.tr(),
+                  style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     color: Color(0xff64748b),
                   ),
@@ -557,13 +533,15 @@ class TeacherFilesSection extends StatelessWidget {
                     color: const Color(0xffede9fe),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text("${photos.length} photo"),
+                  child: Text(
+                    photos.length == 1
+                        ? 'homework_submission.photo_count'.tr(namedArgs: {'count': photos.length.toString()})
+                        : 'homework_submission.photo_count_plural'.tr(namedArgs: {'count': photos.length.toString()}),
+                  ),
                 ),
               ],
             ),
-
             const SizedBox(height: 14),
-
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -598,13 +576,12 @@ class TeacherFilesSection extends StatelessWidget {
                           if (progress == null) {
                             return child;
                           }
-
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
                         },
                         errorBuilder: (_, __, ___) =>
-                            const Icon(Icons.broken_image),
+                        const Icon(Icons.broken_image),
                       ),
                     ),
                   ),
@@ -650,9 +627,7 @@ class _PdfCard extends StatelessWidget {
             ),
             child: Icon(Icons.picture_as_pdf, color: color),
           ),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -661,7 +636,7 @@ class _PdfCard extends StatelessWidget {
                   title,
                   style: GoogleFonts.poppins(
                     fontSize: 12,
-                    color: Color(0xff94a3b8),
+                    color: const Color(0xff94a3b8),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -677,21 +652,17 @@ class _PdfCard extends StatelessWidget {
               ],
             ),
           ),
-
           IconButton(
             onPressed: () async {
               showDialog(
                 context: context,
                 barrierDismissible: false,
                 builder: (_) =>
-                    const Center(child: CircularProgressIndicator()),
+                const Center(child: CircularProgressIndicator()),
               );
-
               await Future.delayed(const Duration(milliseconds: 300));
-
               if (context.mounted) {
                 Navigator.pop(context);
-
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -734,13 +705,13 @@ class SubmittedFilesSection extends StatelessWidget {
               color: const Color(0xffdcfce7),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.check_circle, color: Color(0xff16a34a)),
-                SizedBox(width: 10),
+                const Icon(Icons.check_circle, color: Color(0xff16a34a)),
+                const SizedBox(width: 10),
                 Text(
-                  "YOUR SUBMITTED FILES",
-                  style: TextStyle(
+                  'homework_submission.your_submitted_files'.tr(),
+                  style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     letterSpacing: 1,
                     color: Color(0xff15803d),
@@ -749,7 +720,6 @@ class SubmittedFilesSection extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 16),
 
           if (pdf != null)
@@ -760,14 +730,13 @@ class SubmittedFilesSection extends StatelessWidget {
 
           if (photos.isNotEmpty) ...[
             const SizedBox(height: 16),
-
             Row(
               children: [
                 const Icon(Icons.image, color: Color(0xff16a34a)),
                 const SizedBox(width: 8),
-                const Text(
-                  "YOUR PHOTOS",
-                  style: TextStyle(fontWeight: FontWeight.w500),
+                Text(
+                  'homework_submission.your_photos_label'.tr(),
+                  style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(width: 8),
                 Container(
@@ -779,13 +748,15 @@ class SubmittedFilesSection extends StatelessWidget {
                     color: const Color(0xffdcfce7),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text("${photos.length} photo"),
+                  child: Text(
+                    photos.length == 1
+                        ? 'homework_submission.photo_count'.tr(namedArgs: {'count': photos.length.toString()})
+                        : 'homework_submission.photo_count_plural'.tr(namedArgs: {'count': photos.length.toString()}),
+                  ),
                 ),
               ],
             ),
-
             const SizedBox(height: 14),
-
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -820,7 +791,6 @@ class SubmittedFilesSection extends StatelessWidget {
                           if (progress == null) {
                             return child;
                           }
-
                           return const Center(
                             child: CircularProgressIndicator(),
                           );
@@ -866,9 +836,7 @@ class _SubmittedPdfCard extends StatelessWidget {
             ),
             child: const Icon(Icons.picture_as_pdf, color: Color(0xffef4444)),
           ),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Text(
               fileName,
@@ -877,7 +845,6 @@ class _SubmittedPdfCard extends StatelessWidget {
               style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ),
-
           IconButton(
             onPressed: () {
               Navigator.push(

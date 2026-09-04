@@ -11,6 +11,8 @@ import 'package:school_pro/view_model/student_view_model/student_home_work_view_
 import 'package:school_pro/view_model/student_view_model/submit_home_work_view_model.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../model/student_model/student_home_work_model.dart';
 import '../../res/app_button.dart';
 import '../../res/app_color.dart';
@@ -28,22 +30,14 @@ class StudentHomeworkScreen extends StatefulWidget {
 }
 
 class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
-
   bool _pdfLoading = false;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      if (!PermissionExtensions.canAccess(
-        PermissionKeys.viewHomework,
-      )) {
-
-        Utils.show(
-          "You don't have permission to view Homework",
-          context,
-        );
-
+      if (!PermissionExtensions.canAccess(PermissionKeys.viewHomework)) {
+        Utils.show('student_homework.permission_view'.tr(), context);
         Navigator.pop(context);
         return;
       }
@@ -55,17 +49,9 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
     });
   }
 
-
   Future<void> _refreshHomework() async {
-    if (!PermissionExtensions.canAccess(
-      PermissionKeys.viewHomework,
-    )) {
-
-      Utils.show(
-        "You don't have permission to view Homework",
-        context,
-      );
-
+    if (!PermissionExtensions.canAccess(PermissionKeys.viewHomework)) {
+      Utils.show('student_homework.permission_view'.tr(), context);
       Navigator.pop(context);
       return;
     }
@@ -73,7 +59,6 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       context,
       listen: false,
     ).studentHomeWorkApi(context);
-
   }
 
   @override
@@ -84,7 +69,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
         backgroundColor: AppColor.bg,
         body: Column(
           children: [
-            /// 🔹 Header
+            /// Header
             Container(
               padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
               decoration: BoxDecoration(
@@ -120,7 +105,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppText.customText(
-                      "Home Work",
+                      'student_homework.title'.tr(),
                       size: 19,
                       weight: FontWeight.bold,
                       color: Colors.white,
@@ -137,15 +122,8 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                 }
 
                 return Container(
-                  margin: const EdgeInsets.fromLTRB(
-                    16,
-                    14,
-                    16,
-                    0,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                  ),
+                  margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -182,7 +160,9 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                                 color: AppColor.primary,
                               ),
                               const SizedBox(width: 10),
-                              Text(subject),
+                              Text(subject == "All Subjects"
+                                  ? 'student_homework.all_subjects'.tr()
+                                  : subject),
                             ],
                           ),
                         );
@@ -198,7 +178,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
               },
             ),
 
-            /// 🔹 Homework List
+            /// Homework List
             Expanded(
               child: Consumer<StudentHomeworkViewModel>(
                 builder: (context, vm, child) {
@@ -206,7 +186,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
 
-                  if (vm.filteredHomeworkList.isEmpty){
+                  if (vm.filteredHomeworkList.isEmpty) {
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -218,7 +198,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                           ),
                           const SizedBox(height: 12),
                           AppText.customText(
-                            "No Homework Found",
+                            'student_homework.no_homework_found'.tr(),
                             size: 16,
                             weight: FontWeight.w500,
                             color: AppColor.sub,
@@ -231,17 +211,12 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                   return RefreshIndicator(
                     onRefresh: _refreshHomework,
                     child: ListView.builder(
-                      physics:
-                      const AlwaysScrollableScrollPhysics(),
-                      padding:
-                      const EdgeInsets.symmetric(
-                        vertical: 10,
-                      ),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                       itemCount: vm.filteredHomeworkList.length,
                       itemBuilder: (context, index) {
                         return _buildHomeworkCard(
-                            vm.filteredHomeworkList[index]
-                        );
+                            vm.filteredHomeworkList[index]);
                       },
                     ),
                   );
@@ -257,14 +232,10 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   Widget _buildHomeworkCard(StudentProfileData data) {
     final bool isSubmitted =
         data.status == "submitted" || data.submittedAt != null;
-
     final bool isOnline = data.allowSubmission == 1;
-
     final bool isOffline =
         data.allowSubmission == 0 || data.allowSubmission == null;
-
     final bool showPending = !isSubmitted && isOnline;
-
     final bool showSubmitted = isSubmitted;
 
     return Container(
@@ -320,16 +291,16 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                   ),
                 ),
                 if (showSubmitted)
-                  const _StatusBadge(
+                  _StatusBadge(
                     isSubmitted: true,
-                    status: "Submitted",
+                    status: 'student_homework.submitted'.tr(),
                   ),
-
                 if (showPending)
-                  const _StatusBadge(
+                  _StatusBadge(
                     isSubmitted: false,
-                    status: "Pending",
-                  ),              ],
+                    status: 'student_homework.pending'.tr(),
+                  ),
+              ],
             ),
           ),
 
@@ -363,13 +334,14 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                         color: AppColor.sub,
                       ),
                       const SizedBox(width: 6),
-
                       AppText.customText(
                         data.dueDate == null
-                            ? "No due date"
-                            : "Due ${DateFormat('MMM d, yyyy').format(
-                          DateTime.parse(data.dueDate!),
-                        )}",
+                            ? 'student_homework.no_due_date'.tr()
+                            : 'student_homework.due_date'.tr(
+                            namedArgs: {
+                              'date': DateFormat('MMM d, yyyy')
+                                  .format(DateTime.parse(data.dueDate!))
+                            }),
                         size: 12,
                         weight: FontWeight.w500,
                         color: data.dueDate == null
@@ -398,24 +370,20 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                             Icons.picture_as_pdf,
                             color: Colors.red,
                           ),
-
                           const SizedBox(width: 10),
-
                           Expanded(
                             child: Text(
-                              data.attachment!.url!
-                                  .split('/')
-                                  .last,
+                              data.attachment!.url!.split('/').last,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-
                           const Icon(Icons.open_in_new),
                         ],
                       ),
                     ),
                   ),
+
                 if (data.attachmentPhotos != null &&
                     data.attachmentPhotos!.isNotEmpty)
                   InkWell(
@@ -440,48 +408,49 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                             Icons.image,
                             color: Colors.green,
                           ),
-
                           const SizedBox(width: 10),
-
                           Expanded(
                             child: Text(
-                              "${data.attachmentPhotos!.length} photo attached",
+                              data.attachmentPhotos!.length == 1
+                                  ? 'student_homework.photo_attached'.tr(
+                                  namedArgs: {
+                                    'count': data.attachmentPhotos!.length
+                                        .toString()
+                                  })
+                                  : 'student_homework.photos_attached'.tr(
+                                  namedArgs: {
+                                    'count': data.attachmentPhotos!.length
+                                        .toString()
+                                  }),
                             ),
                           ),
-
                           const Icon(Icons.open_in_full),
                         ],
                       ),
                     ),
                   ),
+
                 const SizedBox(height: 16),
 
                 if (isSubmitted)
-
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: OutlinedButton.icon(
                       onPressed: () {
-
                         if (!PermissionExtensions.canAccess(
                             PermissionKeys.viewHomework)) {
-
                           Utils.show(
-                            "You don't have permission to view homework",
-                            context,
-                          );
-
+                              'student_homework.permission_view'.tr(), context);
                           return;
                         }
 
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                HomeworkSubmissionDetailsScreen(
-                                  homework: data,
-                                ),
+                            builder: (_) => HomeworkSubmissionDetailsScreen(
+                              homework: data,
+                            ),
                           ),
                         );
                       },
@@ -490,7 +459,7 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                         color: Color(0xff16a34a),
                       ),
                       label: Text(
-                        "View Submission",
+                        'student_homework.view_submission'.tr(),
                         style: GoogleFonts.poppins(),
                       ),
                       style: OutlinedButton.styleFrom(
@@ -504,23 +473,16 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                       ),
                     ),
                   )
-
                 else if (isOnline)
-
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
                       onPressed: () {
-
                         if (!PermissionExtensions.canAccess(
                             PermissionKeys.submitHomework)) {
-
                           Utils.show(
-                            "You don't have permission to submit homework",
-                            context,
-                          );
-
+                              'student_homework.permission_submit'.tr(), context);
                           return;
                         }
 
@@ -535,14 +497,12 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                         ),
                       ),
                       child: Text(
-                        "Submit Homework",
+                        'student_homework.submit_homework'.tr(),
                         style: GoogleFonts.poppins(),
                       ),
                     ),
                   )
-
                 else if (isOffline)
-
                     SizedBox(
                       width: double.infinity,
                       height: 52,
@@ -552,13 +512,12 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                           Icons.school_outlined,
                         ),
                         label: Text(
-                          "Submit At School",
+                          'student_homework.submit_at_school'.tr(),
                           style: GoogleFonts.poppins(),
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: const Color(0xffb45309),
-                          disabledForegroundColor:
-                          const Color(0xffb45309),
+                          disabledForegroundColor: const Color(0xffb45309),
                           side: const BorderSide(
                             color: Color(0xfffcd34d),
                           ),
@@ -568,8 +527,6 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
                         ),
                       ),
                     ),
-
-
               ],
             ),
           ),
@@ -578,7 +535,6 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
     );
   }
 
-  /// 🔹 Submit Bottom Sheet
   void _openSubmitBottomSheet(StudentProfileData data) {
     showModalBottomSheet(
       context: context,
@@ -606,11 +562,10 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       );
     } catch (e) {
       debugPrint("PDF Error => $e");
-
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Unable to open PDF"),
+          SnackBar(
+            content: Text('student_homework.unable_to_open_pdf'.tr()),
           ),
         );
       }
@@ -622,7 +577,6 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
       }
     }
   }
-
 
   void _openImagePreview(
       BuildContext context,
@@ -641,7 +595,6 @@ class _StudentHomeworkScreenState extends State<StudentHomeworkScreen> {
   }
 }
 
-
 class PdfViewerScreen extends StatelessWidget {
   final String url;
 
@@ -654,7 +607,7 @@ class PdfViewerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Homework PDF"),
+        title: Text('student_homework.homework_pdf'.tr()),
       ),
       body: SfPdfViewer.network(url),
     );
@@ -664,6 +617,7 @@ class PdfViewerScreen extends StatelessWidget {
 class _StatusBadge extends StatelessWidget {
   final bool isSubmitted;
   final String status;
+
   const _StatusBadge({required this.isSubmitted, required this.status});
 
   @override
@@ -698,9 +652,9 @@ class _StatusBadge extends StatelessWidget {
   }
 }
 
-
 class _SubmitHomeworkSheet extends StatefulWidget {
   final StudentProfileData homeworkData;
+
   const _SubmitHomeworkSheet({required this.homeworkData});
 
   @override
@@ -712,11 +666,10 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
   String? _selectedPdfName;
   bool _isSubmitting = false;
 
-  // ✅ PDF picker — only PDF, max 1MB
   Future<void> _pickPdf() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf'], // ✅ Only PDF
+      allowedExtensions: ['pdf'],
       allowMultiple: false,
     );
 
@@ -724,16 +677,15 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
 
     final file = result.files.first;
 
-    // ✅ Size check — 1MB = 1 * 1024 * 1024 bytes
     if (file.size > 1 * 1024 * 1024) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.warning_rounded, color: Colors.white, size: 18),
-                SizedBox(width: 8),
-                Text("PDF size must be less than 1 MB"),
+                const Icon(Icons.warning_rounded, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Text('student_homework.pdf_size_limit'.tr()),
               ],
             ),
             backgroundColor: Colors.red.shade600,
@@ -758,24 +710,19 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
     if (_selectedPdf == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.info_outline,
-                  color: Colors.white,
-                  size: 18),
-              SizedBox(width: 8),
+              const Icon(Icons.info_outline, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  "Please select a PDF to submit",
-                ),
+                child: Text('student_homework.please_select_pdf'.tr()),
               ),
             ],
           ),
           backgroundColor: Colors.orange,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
-            borderRadius:
-            BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(10),
           ),
           margin: const EdgeInsets.all(12),
         ),
@@ -789,86 +736,58 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
 
     try {
       final submitHomeworkVm =
-      Provider.of<SubmitHomeworkViewModel>(
-        context,
-        listen: false,
-      );
+      Provider.of<SubmitHomeworkViewModel>(context, listen: false);
 
-      final response =
-      await submitHomeworkVm.submitHomeworkApi(
+      final response = await submitHomeworkVm.submitHomeworkApi(
         context: context,
-        homeworkId: widget
-            .homeworkData.homeworkId
-            .toString(),
+        homeworkId: widget.homeworkData.homeworkId.toString(),
         attachments: _selectedPdf!,
       );
 
       if (!mounted) return;
 
-      /// SUCCESS
       if (response == true) {
         Navigator.pop(context);
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(
-                  Icons.check_circle,
-                  color: Colors.white,
-                  size: 18,
-                ),
-                SizedBox(width: 8),
+                const Icon(Icons.check_circle, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    "Homework submitted successfully!",
-                  ),
+                  child: Text('student_homework.submit_success'.tr()),
                 ),
               ],
             ),
-            backgroundColor:
-            Colors.green.shade600,
-            behavior:
-            SnackBarBehavior.floating,
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
-              borderRadius:
-              BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(10),
             ),
-            margin:
-            const EdgeInsets.all(12),
+            margin: const EdgeInsets.all(12),
           ),
         );
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
-              "Homework submission failed",
-            ),
+            content: Text('student_homework.submit_failed'.tr()),
             backgroundColor: Colors.red,
-            behavior:
-            SnackBarBehavior.floating,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e, stackTrace) {
-      debugPrint(
-          "Homework Submit Error: $e");
-      debugPrintStack(
-          stackTrace: stackTrace);
+      debugPrint("Homework Submit Error: $e");
+      debugPrintStack(stackTrace: stackTrace);
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            "Failed to submit: ${e.toString()}",
-          ),
+          content: Text('student_homework.failed_to_submit'.tr(
+              namedArgs: {'error': e.toString()})),
           backgroundColor: Colors.red,
-          behavior:
-          SnackBarBehavior.floating,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     } finally {
@@ -880,7 +799,6 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
     }
   }
 
-  // ✅ File size readable format
   String _formatSize(int bytes) {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
@@ -903,7 +821,6 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Handle bar
               Center(
                 child: Container(
                   width: 40,
@@ -916,7 +833,6 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
               ),
               const SizedBox(height: 16),
 
-              // Title Row
               Row(
                 children: [
                   Container(
@@ -937,7 +853,7 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         AppText.customText(
-                          "Submit Homework",
+                          'student_homework.submit_sheet_title'.tr(),
                           size: 17,
                           weight: FontWeight.w700,
                           color: AppColor.text,
@@ -958,11 +874,10 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
               const Divider(height: 1),
               SizedBox(height: screenHeight * 0.02),
 
-              // Label + size hint
               Row(
                 children: [
                   AppText.customText(
-                    "Attach PDF *",
+                    'student_homework.attach_pdf'.tr(),
                     size: 14,
                     weight: FontWeight.w600,
                     color: AppColor.text,
@@ -979,7 +894,7 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                       border: Border.all(color: Colors.red.shade200),
                     ),
                     child: Text(
-                      "Max 1 MB",
+                      'student_homework.max_1mb'.tr(),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
@@ -991,7 +906,6 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
               ),
               const SizedBox(height: 10),
 
-              // ✅ PDF selected preview OR pick button
               if (_selectedPdf != null) ...[
                 Container(
                   padding: const EdgeInsets.all(14),
@@ -1020,7 +934,7 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _selectedPdfName ?? "document.pdf",
+                              _selectedPdfName ?? 'student_homework.document_pdf'.tr(),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -1039,7 +953,6 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                           ],
                         ),
                       ),
-                      // Remove button
                       GestureDetector(
                         onTap: () => setState(() {
                           _selectedPdf = null;
@@ -1066,11 +979,10 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                   child: TextButton.icon(
                     onPressed: _pickPdf,
                     icon: const Icon(Icons.swap_horiz_rounded, size: 16),
-                    label: const Text("Change PDF"),
+                    label: Text('student_homework.change_pdf'.tr()),
                   ),
                 ),
               ] else ...[
-                // ✅ Pick PDF button
                 GestureDetector(
                   onTap: _pickPdf,
                   child: Container(
@@ -1093,7 +1005,7 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "Tap to select PDF",
+                          'student_homework.tap_to_select_pdf'.tr(),
                           style: TextStyle(
                             color: AppColor.primary,
                             fontWeight: FontWeight.w600,
@@ -1102,7 +1014,7 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "Only .pdf files * Max size 1 MB",
+                          'student_homework.pdf_hint'.tr(),
                           style: TextStyle(
                             color: Colors.grey.shade500,
                             fontSize: 12,
@@ -1117,7 +1029,7 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
               SizedBox(height: screenHeight * 0.02),
 
               AppButton(
-                title: "Submit Homework",
+                title: 'student_homework.submit_btn'.tr(),
                 icon: Icons.send_rounded,
                 loading: _isSubmitting,
                 onTap: _submitHomework,
@@ -1133,7 +1045,6 @@ class _SubmitHomeworkSheetState extends State<_SubmitHomeworkSheet> {
     );
   }
 }
-
 
 class HomeworkImagePreviewScreen extends StatefulWidget {
   final List<HomeworkAttachment> photos;
@@ -1152,13 +1063,11 @@ class HomeworkImagePreviewScreen extends StatefulWidget {
 
 class _HomeworkImagePreviewScreenState
     extends State<HomeworkImagePreviewScreen> {
-
   late final PageController _controller;
 
   @override
   void initState() {
     super.initState();
-
     _controller = PageController(
       initialPage: widget.initialIndex,
     );
@@ -1168,25 +1077,20 @@ class _HomeworkImagePreviewScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
       ),
-
       body: PageView.builder(
         controller: _controller,
         itemCount: widget.photos.length,
-
         itemBuilder: (_, index) {
           return PhotoView(
             imageProvider: NetworkImage(
               widget.photos[index].url ?? "",
             ),
-            minScale:
-            PhotoViewComputedScale.contained,
-            maxScale:
-            PhotoViewComputedScale.covered * 3,
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered * 3,
           );
         },
       ),

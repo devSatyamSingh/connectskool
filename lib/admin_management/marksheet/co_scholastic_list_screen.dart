@@ -1,6 +1,8 @@
 // co_scholastic_grades_list_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_color.dart';
 import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
 import '../../view_model/auth_view_model/school_admin_profile_view_model.dart';
@@ -26,6 +28,7 @@ class _CoScholasticGradesListScreenState
       context.read<CoScholasticGradeViewModel>().clear();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -113,23 +116,23 @@ class CoScholasticHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Co-Scholastic Grades List",
-                      style: TextStyle(
+                      'co_scholastic_list_screen.title'.tr(),
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.3,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      "View, Edit & Delete Saved Grades",
-                      style: TextStyle(
+                      'co_scholastic_list_screen.subtitle'.tr(),
+                      style: const TextStyle(
                         color: Color(0xFFD6E5FF),
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -179,7 +182,7 @@ class CoScholasticHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        adminProfile?.data?.schoolName ?? "School Name",
+                        adminProfile?.data?.schoolName ?? 'co_scholastic_list_screen.school_name_default'.tr(),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 15,
@@ -189,9 +192,9 @@ class CoScholasticHeader extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const Text(
-                        "Co-Scholastic Grade Management",
-                        style: TextStyle(
+                      Text(
+                        'co_scholastic_list_screen.school_subtitle'.tr(),
+                        style: const TextStyle(
                           color: Color(0xFFAEC6E8),
                           fontSize: 12,
                           fontWeight: FontWeight.w400,

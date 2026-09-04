@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/view_model/student_view_model/student_profile_view_model.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 
@@ -13,7 +15,6 @@ class StudentProfileScreen extends StatefulWidget {
 }
 
 class _StudentProfileScreenState extends State<StudentProfileScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -23,7 +24,6 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
     });
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     final profileVM = Provider.of<StudentProfileViewModel>(context);
@@ -37,11 +37,11 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
 
     final data = profile.data;
 
-    final studentName = data?.name?.toString() ?? "";
+    final studentName = data?.name?.toString() ?? "student_profile.not_available".tr();
     final studentId = data?.studentId?.toString() ?? "";
     final admissionNo = data?.admissionNo?.toString() ?? "";
     final classId = data?.classId?.toString() ?? "";
-    final sectionId = data?.sectionId?.toString() ?? "N/A";
+    final sectionId = data?.sectionId?.toString() ?? "";
     final email = data?.userEmail?.toString() ?? "";
     final mobile = data?.mobileNumber?.toString() ?? "";
     final gender = data?.gender?.toString() ?? "";
@@ -52,7 +52,6 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
     final photoUrl = data?.studentPhotoUrl?.toString() ?? "";
     final className = data?.className?.toString() ?? "";
     final sectionName = data?.sectionName?.toString() ?? "";
-    // ✅ NEW
     final bloodGroup = data?.bloodGroup?.toString() ?? "";
     final category = data?.category?.toString() ?? "";
     final aadharNumber = data?.aadharNumber?.toString() ?? "";
@@ -82,8 +81,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-
-            /// 🔹 Header
+            /// Header
             Container(
               padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
               decoration: BoxDecoration(
@@ -103,18 +101,22 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: AppText.customText("Student Profile", size: 19, weight: FontWeight.bold, color: Colors.white),
+                    child: AppText.customText(
+                      'student_profile.title'.tr(),
+                      size: 19,
+                      weight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
             ),
 
-            /// 🔹 Body
+            /// Body
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-
                     /// Profile Card
                     Container(
                       margin: const EdgeInsets.all(16),
@@ -133,67 +135,87 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                             child: photoUrl.isEmpty ? const Icon(Icons.person, size: 50, color: Colors.white) : null,
                           ),
                           const SizedBox(height: 16),
-                          AppText.customText(studentName, size: 22, weight: FontWeight.w700, color: AppColor.text),
+                          AppText.customText(
+                            studentName,
+                            size: 22,
+                            weight: FontWeight.w700,
+                            color: AppColor.text,
+                          ),
                           const SizedBox(height: 6),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                            decoration: BoxDecoration(color: AppColor.primaryLight, borderRadius: BorderRadius.circular(20)),
-                            child: AppText.customText("Admission No: $admissionNo", size: 13, weight: FontWeight.w500, color: AppColor.primary),
+                            decoration: BoxDecoration(
+                              color: AppColor.primaryLight,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: AppText.customText(
+                              admissionNo.isNotEmpty
+                                  ? 'student_profile.admission_no'.tr(
+                                  namedArgs: {'number': admissionNo}
+                              )
+                                  : 'student_profile.not_available'.tr(),
+                              size: 13,
+                              weight: FontWeight.w500,
+                              color: AppColor.primary,
+                            ),
                           ),
                           const SizedBox(height: 8),
                           AppText.customText(
-                            "$className * Section $sectionName",
+                            'student_profile.class_section'.tr(
+                                namedArgs: {
+                                  'className': className.isNotEmpty ? className : 'student_profile.not_available'.tr(),
+                                  'sectionName': sectionName.isNotEmpty ? sectionName : 'student_profile.not_available'.tr(),
+                                }
+                            ),
                             size: 14,
                             weight: FontWeight.w500,
                             color: AppColor.sub,
                           ),
-                          // AppText.customText("Class $classId • Section $sectionId", size: 14, weight: FontWeight.w500, color: AppColor.sub),
                         ],
                       ),
                     ),
 
                     /// Personal Info
-                    _buildInfoCard("Personal Information", [
-                      _InfoItem("Full Name", studentName),
-                      _InfoItem("Gender", gender),
-                      _InfoItem("Date of Birth", dob),
-                      _InfoItem("Religion", religion),
-                      _InfoItem("Blood Group", bloodGroup),       // ✅ NEW
-                      _InfoItem("Category", category),             // ✅ NEW
-                      _InfoItem("Aadhar Number", aadharNumber),   // ✅ NEW
+                    _buildInfoCard('student_profile.personal_information'.tr(), [
+                      _InfoItem('student_profile.full_name'.tr(), studentName),
+                      _InfoItem('student_profile.gender'.tr(), gender.isNotEmpty ? gender : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.date_of_birth'.tr(), dob.isNotEmpty ? dob : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.religion'.tr(), religion.isNotEmpty ? religion : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.blood_group'.tr(), bloodGroup.isNotEmpty ? bloodGroup : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.category'.tr(), category.isNotEmpty ? category : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.aadhar_number'.tr(), aadharNumber.isNotEmpty ? aadharNumber : 'student_profile.not_available'.tr()),
                     ]),
                     const SizedBox(height: 16),
 
                     /// Academic Info
-                    _buildInfoCard("Academic Information", [
-                      // _InfoItem("Student ID", studentId),
-                      _InfoItem("Class", className),
-                      _InfoItem("Section", sectionName),
-                      _InfoItem("Academic Year", academicYear),   // ✅ NEW
+                    _buildInfoCard('student_profile.academic_information'.tr(), [
+                      _InfoItem('student_profile.class'.tr(), className.isNotEmpty ? className : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.section'.tr(), sectionName.isNotEmpty ? sectionName : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.academic_year'.tr(), academicYear.isNotEmpty ? academicYear : 'student_profile.not_available'.tr()),
                     ]),
                     const SizedBox(height: 16),
 
                     /// Contact Info
-                    _buildInfoCard("Contact Information", [
-                      _InfoItem("Email", email),
-                      _InfoItem("Mobile Number", mobile),
-                      _InfoItem("Address", address),
-                      _InfoItem("City", city),                           // ✅ NEW
-                      _InfoItem("State", state),                         // ✅ NEW
-                      _InfoItem("Pincode", pincode),                     // ✅ NEW
-                      _InfoItem("Emergency Contact", emergencyContact),  // ✅ NEW
+                    _buildInfoCard('student_profile.contact_information'.tr(), [
+                      _InfoItem('student_profile.email'.tr(), email.isNotEmpty ? email : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.mobile_number'.tr(), mobile.isNotEmpty ? mobile : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.address'.tr(), address.isNotEmpty ? address : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.city'.tr(), city.isNotEmpty ? city : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.state'.tr(), state.isNotEmpty ? state : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.pincode'.tr(), pincode.isNotEmpty ? pincode : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.emergency_contact'.tr(), emergencyContact.isNotEmpty ? emergencyContact : 'student_profile.not_available'.tr()),
                     ]),
                     const SizedBox(height: 16),
 
                     /// Guardian Info
-                    _buildInfoCard("Guardian Information", [
-                      _InfoItem("Father Name", fatherName),
-                      _InfoItem("Father Mobile", fatherMobile),         // ✅ NEW
-                      _InfoItem("Father Occupation", fatherOccupation), // ✅ NEW
-                      _InfoItem("Mother Name", motherName),
-                      _InfoItem("Mother Mobile", motherMobile),
-                      _InfoItem("Mother Occupation", motherOccupation),
-                      _InfoItem("Guardian Name", guardianName),
+                    _buildInfoCard('student_profile.guardian_information'.tr(), [
+                      _InfoItem('student_profile.father_name'.tr(), fatherName.isNotEmpty ? fatherName : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.father_mobile'.tr(), fatherMobile.isNotEmpty ? fatherMobile : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.father_occupation'.tr(), fatherOccupation.isNotEmpty ? fatherOccupation : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.mother_name'.tr(), motherName.isNotEmpty ? motherName : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.mother_mobile'.tr(), motherMobile.isNotEmpty ? motherMobile : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.mother_occupation'.tr(), motherOccupation.isNotEmpty ? motherOccupation : 'student_profile.not_available'.tr()),
+                      _InfoItem('student_profile.guardian_name'.tr(), guardianName.isNotEmpty ? guardianName : 'student_profile.not_available'.tr()),
                     ]),
                     const SizedBox(height: 30),
                   ],
@@ -206,7 +228,8 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       ),
     );
   }
-  /// 🔹 Reusable Info Card
+
+  /// Reusable Info Card
   Widget _buildInfoCard(String title, List<_InfoItem> items) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -225,16 +248,13 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           AppText.customText(
             title,
             size: 16,
             weight: FontWeight.w600,
             color: AppColor.text,
           ),
-
           const SizedBox(height: 16),
-
           ...items.map((item) => Padding(
             padding: const EdgeInsets.only(bottom: 14),
             child: Row(

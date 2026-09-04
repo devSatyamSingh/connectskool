@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -48,14 +49,12 @@ class _StopScreenState extends State<StopScreen> {
   final TextEditingController _searchCtrl = TextEditingController();
   String _searchQuery = '';
 
-  // ── Selected route for filtering stops ──
   Data? _selectedFilterRoute;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Load route and fee head dropdowns
       Provider.of<GetRouteViewModel>(context, listen: false)
           .getRouteApi(context);
       Provider.of<FeesHeadManagementViewModel>(context, listen: false)
@@ -63,7 +62,6 @@ class _StopScreenState extends State<StopScreen> {
     });
   }
 
-  // ── When route filter changes → call getStopApi with that routeId ──
   void _onFilterRouteChanged(Data? route) {
     setState(() {
       _selectedFilterRoute = route;
@@ -82,7 +80,6 @@ class _StopScreenState extends State<StopScreen> {
           orElse: () => const _FreqOption('', '-', Icons.help_outline))
           .label;
 
-  // ── Open Add/Edit sheet ───────────────────────────────────────────────────
   void _openSheet({
     StopData?        existing,
     required List<Data>     routes,
@@ -98,7 +95,6 @@ class _StopScreenState extends State<StopScreen> {
         feeHeads: feeHeads,
         preselectedRoute: _selectedFilterRoute,
         onSaved: () {
-          // Refresh stop list after add/edit
           if (_selectedFilterRoute?.transportRouteId != null) {
             Provider.of<GetStopViewModel>(context, listen: false)
                 .getStopApi(
@@ -115,39 +111,32 @@ class _StopScreenState extends State<StopScreen> {
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20)),
-        title: const Text('Delete Stop',
-            style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text('Delete "${s.stopName}"?'),
+        title: Text('stop.delete_stop'.tr(),
+            style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('stop.delete_confirm'.tr().replaceAll('{name}', s.stopName ?? '')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel',
-                style: TextStyle(color: Colors.grey)),
+            child: Text('stop.cancel'.tr(),
+                style: const TextStyle(color: Colors.grey)),
           ),
           TextButton(
             onPressed: () async {
-
               Navigator.pop(context);
-
               final vm = Provider.of<DeleteStopViewModel>(context, listen: false);
-
               final success = await vm.deleteRouteApi(
                 s.transportRouteStopId,
                 context,
               );
-
               if (success) {
-
                 if (_selectedFilterRoute?.transportRouteId != null) {
                   Provider.of<GetStopViewModel>(context, listen: false)
                       .getStopApi(_selectedFilterRoute!.transportRouteId.toString());
                 }
-
               }
-
             },
-            child: const Text('Delete',
-                style: TextStyle(
+            child: Text('stop.delete'.tr(),
+                style: const TextStyle(
                     color: Color(0xFFFF4D6D),
                     fontWeight: FontWeight.bold)),
           ),
@@ -173,7 +162,6 @@ class _StopScreenState extends State<StopScreen> {
     );
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,7 +173,6 @@ class _StopScreenState extends State<StopScreen> {
           final List<FeeHeads> feeHeads =
               feeHeadVm.feesHeadManagementModel?.data?.feeHeads ?? [];
 
-          // Filter stops by search query
           final List<StopData> allStops = stopVm.stopModel.data ?? [];
           final List<StopData> stops = _searchQuery.isEmpty
               ? allStops
@@ -201,20 +188,17 @@ class _StopScreenState extends State<StopScreen> {
             children: [
               _buildHeader(),
 
-              // ── Route filter bar ──
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: _buildRouteFilter(routes),
               ),
 
-              // ── Search bar (only when route selected) ──
               if (_selectedFilterRoute != null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
                   child: _buildSearchBar(),
                 ),
 
-              // ── Count row ──
               if (_selectedFilterRoute != null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -222,8 +206,10 @@ class _StopScreenState extends State<StopScreen> {
                     children: [
                       AppText.customText(
                         stopVm.loading
-                            ? 'Loading...'
-                            : '${stops.length} stop${stops.length != 1 ? 's' : ''} found',
+                            ? 'stop.loading'.tr()
+                            : 'stop.stops_found'.tr()
+                            .replaceAll('{count}', '${stops.length}')
+                            .replaceAll('{plural}', stops.length != 1 ? '' : ''),
                         size: 13,
                         color: Colors.grey.shade500,
                         weight: FontWeight.w600,
@@ -239,7 +225,6 @@ class _StopScreenState extends State<StopScreen> {
                   ),
                 ),
 
-              // ── List / Loader / Empty / Prompt ──
               Expanded(
                 child: _selectedFilterRoute == null
                     ? _buildSelectRoutePrompt()
@@ -260,18 +245,11 @@ class _StopScreenState extends State<StopScreen> {
                     freqLabel: _freqLabel(
                         stops[i].feeFrequency),
                     onEdit: () {
-
                       if (!PermissionExtensions.canAccess(
                           PermissionKeys.manageTransport)) {
-
-                        Utils.show(
-                          "You don't have permission to edit stops.",
-                          context,
-                        );
-
+                        Utils.show('stop.no_permission_edit'.tr(), context);
                         return;
                       }
-
                       _openSheet(
                         existing: stops[i],
                         routes: routes,
@@ -279,18 +257,11 @@ class _StopScreenState extends State<StopScreen> {
                       );
                     },
                     onDelete: () {
-
                       if (!PermissionExtensions.canAccess(
                           PermissionKeys.manageTransport)) {
-
-                        Utils.show(
-                          "You don't have permission to delete stops.",
-                          context,
-                        );
-
+                        Utils.show('stop.no_permission_delete'.tr(), context);
                         return;
                       }
-
                       _confirmDelete(stops[i]);
                     },
                   ),
@@ -301,7 +272,6 @@ class _StopScreenState extends State<StopScreen> {
         },
       ),
 
-      // ── FAB ──
       floatingActionButton:
       Consumer2<GetRouteViewModel, FeesHeadManagementViewModel>(
         builder: (context, routeVm, feeHeadVm, _) {
@@ -317,18 +287,14 @@ class _StopScreenState extends State<StopScreen> {
           return SizedBox(
             width: 150,
             child: AppButton(
-              title: "Add Stop",
+              title: 'stop.add_stop'.tr(),
               icon: Icons.add_rounded,
               height: 50,
               radius: 14,
               onTap: () {
                 if (!PermissionExtensions.canAccess(
                     PermissionKeys.manageTransport)) {
-                  Utils.show(
-                    "You don't have permission to add stops.",
-                    context,
-                  );
-
+                  Utils.show('stop.no_permission_add'.tr(), context);
                   return;
                 }
                 _openSheet(
@@ -339,10 +305,10 @@ class _StopScreenState extends State<StopScreen> {
             ),
           );
         },
-      ),    );
+      ),
+    );
   }
 
-  // ── Route filter dropdown ─────────────────────────────────────────────────
   Widget _buildRouteFilter(List<Data> routes) {
     return Container(
       decoration: BoxDecoration(
@@ -366,7 +332,7 @@ class _StopScreenState extends State<StopScreen> {
                 Icon(Icons.route_rounded,
                     size: 18, color: Colors.grey.shade400),
                 const SizedBox(width: 10),
-                Text('Select Route to view stops',
+                Text('stop.select_route'.tr(),
                     style: TextStyle(
                         color: Colors.grey.shade400,
                         fontWeight: FontWeight.w500,
@@ -488,7 +454,7 @@ class _StopScreenState extends State<StopScreen> {
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: AppText.customText('Stop Management',
+            child: AppText.customText('stop.title'.tr(),
                 size: 19, weight: FontWeight.bold, color: Colors.white),
           ),
           Container(
@@ -524,7 +490,7 @@ class _StopScreenState extends State<StopScreen> {
             fontSize: 14,
             color: Color(0xFF1a2340)),
         decoration: InputDecoration(
-          hintText: 'Search stops...',
+          hintText: 'stop.search_hint'.tr(),
           hintStyle: TextStyle(
               color: Colors.grey.shade400, fontWeight: FontWeight.w500),
           prefixIcon: Icon(Icons.search_rounded,
@@ -554,12 +520,12 @@ class _StopScreenState extends State<StopScreen> {
         children: [
           Icon(Icons.route_rounded, size: 72, color: Colors.grey.shade300),
           const SizedBox(height: 16),
-          AppText.customText('Select a Route',
+          AppText.customText('stop.select_route_prompt'.tr(),
               size: 16,
               weight: FontWeight.bold,
               color: Colors.grey.shade400),
           const SizedBox(height: 6),
-          AppText.customText('Choose a route above to view its stops',
+          AppText.customText('stop.select_route_desc'.tr(),
               size: 13, color: Colors.grey.shade400),
         ],
       ),
@@ -574,12 +540,12 @@ class _StopScreenState extends State<StopScreen> {
           Icon(Icons.location_off_rounded,
               size: 72, color: Colors.grey.shade300),
           const SizedBox(height: 16),
-          AppText.customText('No stops found',
+          AppText.customText('stop.no_stops_found'.tr(),
               size: 16,
               weight: FontWeight.bold,
               color: Colors.grey.shade400),
           const SizedBox(height: 6),
-          AppText.customText('Tap + Add Stop to get started',
+          AppText.customText('stop.tap_to_add'.tr(),
               size: 13, color: Colors.grey.shade400),
         ],
       ),
@@ -587,7 +553,7 @@ class _StopScreenState extends State<StopScreen> {
   }
 }
 
-// ─── Stop Card — uses StopData from API ──────────────────────────────────────
+// ─── Stop Card ──────────────────────────────────────────────────────────────
 
 class _StopCard extends StatelessWidget {
   final StopData     stop;
@@ -621,7 +587,6 @@ class _StopCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Icon ──
             Container(
               width: 46,
               height: 46,
@@ -638,12 +603,10 @@ class _StopCard extends StatelessWidget {
             ),
             const SizedBox(width: 14),
 
-            // ── Content ──
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name + students badge
                   Row(
                     children: [
                       Expanded(
@@ -663,7 +626,7 @@ class _StopCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            '${stop.totalStudents} students',
+                            '${stop.totalStudents} ${'stop.students'.tr()}',
                             style: const TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -674,7 +637,6 @@ class _StopCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Amount + Distance
                   Row(
                     children: [
                       _InfoChip(
@@ -685,14 +647,13 @@ class _StopCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       _InfoChip(
                           icon: Icons.social_distance_rounded,
-                          label: '${double.tryParse(stop.distanceKm ?? '0')?.toStringAsFixed(1) ?? '0'} km',
+                          label: '${double.tryParse(stop.distanceKm ?? '0')?.toStringAsFixed(1) ?? '0'} ${'stop.km'.tr()}',
                           color: const Color(0xFFFF8C42),
                           bg: const Color(0xFFFFF3EC)),
                     ],
                   ),
                   const SizedBox(height: 6),
 
-                  // Frequency
                   _InfoChip(
                       icon: Icons.repeat_rounded,
                       label: freqLabel,
@@ -703,7 +664,6 @@ class _StopCard extends StatelessWidget {
               ),
             ),
 
-            // ── Actions ──
             Column(
               children: [
                 _ActionBtn(
@@ -803,7 +763,7 @@ class _StopFormSheet extends StatefulWidget {
   final StopData?        existing;
   final List<Data>       routes;
   final List<FeeHeads>   feeHeads;
-  final Data?            preselectedRoute; // auto-select filter route
+  final Data?            preselectedRoute;
   final VoidCallback     onSaved;
 
   const _StopFormSheet({
@@ -849,21 +809,13 @@ class _StopFormSheetState extends State<_StopFormSheet> {
             ?.toStringAsFixed(0) ??
             '')
             : '');
-    // if (e != null) {
-    //   _selectedFeeHead = widget.feeHeads.firstWhere(
-    //         (f) => f.feeHeadId == e.feeHeadId,
-    //     orElse: () => widget.feeHeads.first,
-    //   );
-    // }
     if (e != null) {
-      // Pre-fill route from existing stop
       _selectedRoute = widget.routes.cast<Data?>().firstWhere(
             (r) => r?.transportRouteId == e.transportRouteId,
         orElse: () => null,
       );
       _selectedFreq = e.feeFrequency ?? 'monthly';
     } else {
-      // Auto-select the currently filtered route
       _selectedRoute = widget.preselectedRoute;
     }
   }
@@ -879,52 +831,42 @@ class _StopFormSheetState extends State<_StopFormSheet> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedRoute == null) {
-      Utils.show("Please select a route", context);
-      // _showError('Please select a route');
+      Utils.show('stop.route_name_required'.tr(), context);
       return;
     }
     if (_selectedFeeHead == null) {
-      Utils.show("Please select a fee head", context);
-      // _showError('Please select a fee head');
+      Utils.show('stop.fee_head_required'.tr(), context);
       return;
     }
 
     if (_isEdit) {
-
       final vm = Provider.of<UpdateStopViewModel>(context, listen: false);
-
       final success = await vm.updateStopApi(
         widget.existing!.transportRouteStopId,
         _stopNameCtrl.text.trim(),
         double.tryParse(_distanceCtrl.text.trim()),
         double.tryParse(_amountCtrl.text.trim()),
         _selectedFreq,
-        // _selectedRoute!.transportRouteId,
         context,
       );
-
       if (success) {
         Navigator.pop(context);
         widget.onSaved();
       }
-
       return;
     }
 
-    // ── CREATE API ────────────────────────────────────────────────────────
     final vm = Provider.of<CreateStopViewModel>(context, listen: false);
-
     final success = await vm.createStopApi(
-      _selectedRoute!.transportRouteId,            // transport_route_id
-      _stopNameCtrl.text.trim(),                   // stop_name
-      double.tryParse(_distanceCtrl.text.trim()),  // distance_km
-      double.tryParse(_amountCtrl.text.trim()),    // base_amount
-      _selectedFreq,                               // fee_frequency
-      _selectedFeeHead!.feeHeadId,                 // fee_head_id
+      _selectedRoute!.transportRouteId,
+      _stopNameCtrl.text.trim(),
+      double.tryParse(_distanceCtrl.text.trim()),
+      double.tryParse(_amountCtrl.text.trim()),
+      _selectedFreq,
+      _selectedFeeHead!.feeHeadId,
       context,
     );
 
-    // ViewModel already pops on success
     if (success) widget.onSaved();
   }
 
@@ -965,7 +907,6 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Drag handle
                   Center(
                     child: Container(
                       width: 40,
@@ -977,7 +918,6 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Title
                   Row(
                     children: [
                       Container(
@@ -994,7 +934,7 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                       ),
                       const SizedBox(width: 12),
                       AppText.customText(
-                        _isEdit ? 'Edit Stop' : 'Add New Stop',
+                        _isEdit ? 'stop.edit_stop'.tr() : 'stop.add_new_stop'.tr(),
                         size: 18,
                         weight: FontWeight.w900,
                         color: const Color(0xFF1a2340),
@@ -1003,15 +943,14 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                   ),
                   const SizedBox(height: 20),
 
-                  // ── Route Dropdown ──────────────────────────────────
-                  _buildLabel('Route', Icons.route_rounded,
+                  _buildLabel('stop.select_route_hint'.tr(), Icons.route_rounded,
                       required: true),
                   const SizedBox(height: 6),
                   widget.routes.isEmpty
-                      ? _buildLoadingDropdown('Loading routes...')
+                      ? _buildLoadingDropdown('stop.loading_routes'.tr())
                       : _buildStyledDropdown<Data>(
                     value: _selectedRoute,
-                    hint: 'Select Route',
+                    hint: 'stop.select_route_hint'.tr(),
                     icon: Icons.route_rounded,
                     iconBg: const Color(0xFFEEF2FF),
                     iconColor: const Color(0xFF3F72FF),
@@ -1023,29 +962,27 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                   ),
                   const SizedBox(height: 14),
 
-                  // ── Stop Name ───────────────────────────────────────
                   _FormField(
                     controller: _stopNameCtrl,
-                    label: 'Stop Name',
-                    hint: 'e.g. Bus Stand Kua',
+                    label: 'stop.stop_name'.tr(),
+                    hint: 'stop.stop_name_hint'.tr(),
                     icon: Icons.location_on_rounded,
                     required: true,
                     validator: (v) =>
                     (v == null || v.trim().isEmpty)
-                        ? 'Stop name is required'
+                        ? 'stop.stop_name_required'.tr()
                         : null,
                     textCapitalization: TextCapitalization.words,
                   ),
                   const SizedBox(height: 14),
 
-                  // ── Distance + Amount ───────────────────────────────
                   Row(
                     children: [
                       Expanded(
                         child: _FormField(
                           controller: _distanceCtrl,
-                          label: 'Distance (km)',
-                          hint: 'e.g. 5.5',
+                          label: 'stop.distance'.tr(),
+                          hint: 'stop.distance_hint'.tr(),
                           icon: Icons.social_distance_rounded,
                           required: true,
                           keyboardType:
@@ -1057,9 +994,9 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                           ],
                           validator: (v) {
                             if (v == null || v.trim().isEmpty)
-                              return 'Required';
+                              return 'stop.distance_required'.tr();
                             if (double.tryParse(v) == null)
-                              return 'Invalid';
+                              return 'stop.distance_invalid'.tr();
                             return null;
                           },
                         ),
@@ -1068,8 +1005,8 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                       Expanded(
                         child: _FormField(
                           controller: _amountCtrl,
-                          label: 'Base Amount (₹)',
-                          hint: 'e.g. 1000',
+                          label: 'stop.base_amount'.tr(),
+                          hint: 'stop.base_amount_hint'.tr(),
                           icon: Icons.currency_rupee_rounded,
                           required: true,
                           keyboardType: TextInputType.number,
@@ -1078,9 +1015,9 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                           ],
                           validator: (v) {
                             if (v == null || v.trim().isEmpty)
-                              return 'Required';
+                              return 'stop.amount_required'.tr();
                             if (double.tryParse(v) == null)
-                              return 'Invalid';
+                              return 'stop.amount_invalid'.tr();
                             return null;
                           },
                         ),
@@ -1089,27 +1026,25 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                   ),
                   const SizedBox(height: 14),
 
-                  // ── Fee Frequency ───────────────────────────────────
-                  _buildLabel('Fee Frequency', Icons.repeat_rounded,
+                  _buildLabel('stop.fee_frequency'.tr(), Icons.repeat_rounded,
                       required: true),
                   const SizedBox(height: 6),
                   _buildFrequencyDropdown(),
                   const SizedBox(height: 14),
 
-                  // ── Fee Head ────────────────────────────────────────
-                  _buildLabel('Fee Head',
+                  _buildLabel('stop.fee_head'.tr(),
                       Icons.account_balance_wallet_rounded,
                       required: true),
                   const SizedBox(height: 6),
                   widget.feeHeads.isEmpty
-                      ? _buildLoadingDropdown('Loading fee heads...')
+                      ? _buildLoadingDropdown('stop.loading_fee_heads'.tr())
                       : IgnorePointer(
                     ignoring: _isEdit,
                     child: Opacity(
                       opacity: _isEdit ? 0.6 : 1,
                       child: _buildStyledDropdown<FeeHeads>(
                         value: _selectedFeeHead,
-                        hint: 'Select Fee Head',
+                        hint: 'stop.select_fee_head'.tr(),
                         icon: Icons.account_balance_wallet_rounded,
                         iconBg: const Color(0xFFF3EEFF),
                         iconColor: const Color(0xFF8B5CF6),
@@ -1120,23 +1055,8 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                       ),
                     ),
                   ),
-                  // widget.feeHeads.isEmpty
-                  //     ? _buildLoadingDropdown('Loading fee heads...')
-                  //     : _buildStyledDropdown<FeeHeads>(
-                  //   value: _selectedFeeHead,
-                  //   hint: 'Select Fee Head',
-                  //   icon: Icons.account_balance_wallet_rounded,
-                  //   iconBg: const Color(0xFFF3EEFF),
-                  //   iconColor: const Color(0xFF8B5CF6),
-                  //   checkColor: const Color(0xFF8B5CF6),
-                  //   items: widget.feeHeads,
-                  //   itemLabel: (f) => f.headName ?? '-',
-                  //   onChanged: (f) =>
-                  //       setState(() => _selectedFeeHead = f),
-                  // ),
                   const SizedBox(height: 24),
 
-                  // ── Buttons ─────────────────────────────────────────
                   Row(
                     children: [
                       Expanded(
@@ -1153,7 +1073,7 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                                 borderRadius:
                                 BorderRadius.circular(14)),
                           ),
-                          child: AppText.customText('Cancel',
+                          child: AppText.customText('stop.cancel'.tr(),
                               size: 14,
                               weight: FontWeight.w700,
                               color: Colors.grey.shade600),
@@ -1164,8 +1084,8 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                         flex: 1,
                         child: AppButton(
                           title: _isEdit
-                              ? "Update Stop"
-                              : "Add Stop",
+                              ? 'stop.update_stop'.tr()
+                              : 'stop.add_stop'.tr(),
                           icon: _isEdit
                               ? Icons.edit_location_alt_rounded
                               : Icons.add_location_alt_rounded,
@@ -1187,85 +1107,16 @@ class _StopFormSheetState extends State<_StopFormSheet> {
     );
   }
 
-  // Widget _buildFrequencyDropdown() {
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       color: const Color(0xFFF7F9FF),
-  //       borderRadius: BorderRadius.circular(12),
-  //       border: Border.all(color: const Color(0xFFE2E8F5), width: 1.5),
-  //     ),
-  //     child: DropdownButtonHideUnderline(
-  //       child: DropdownButton<String>(
-  //         value: _selectedFreq,
-  //         isExpanded: true,
-  //         padding: const EdgeInsets.symmetric(horizontal: 14),
-  //         borderRadius: BorderRadius.circular(14),
-  //         dropdownColor: Colors.white,
-  //         icon: const Icon(Icons.keyboard_arrow_down_rounded,
-  //             color: Color(0xFF8898c0)),
-  //         selectedItemBuilder: (_) => _freqOptions
-  //             .map((f) => Align(
-  //           alignment: Alignment.centerLeft,
-  //           child: Row(
-  //             children: [
-  //               Icon(f.icon,
-  //                   size: 16,
-  //                   color: const Color(0xFF8B5CF6)),
-  //               const SizedBox(width: 8),
-  //               Text(f.label,
-  //                   style: const TextStyle(
-  //                       fontSize: 14,
-  //                       fontWeight: FontWeight.w700,
-  //                       color: Color(0xFF1a2340))),
-  //             ],
-  //           ),
-  //         ))
-  //             .toList(),
-  //         items: _freqOptions
-  //             .map((f) => DropdownMenuItem(
-  //           value: f.value,
-  //           child: Padding(
-  //             padding:
-  //             const EdgeInsets.symmetric(vertical: 6),
-  //             child: Row(
-  //               children: [
-  //                 Container(
-  //                   padding: const EdgeInsets.all(7),
-  //                   decoration: BoxDecoration(
-  //                       color: const Color(0xFFF3EEFF),
-  //                       borderRadius:
-  //                       BorderRadius.circular(8)),
-  //                   child: Icon(f.icon,
-  //                       size: 16,
-  //                       color: const Color(0xFF8B5CF6)),
-  //                 ),
-  //                 const SizedBox(width: 12),
-  //                 Text(f.label,
-  //                     style: const TextStyle(
-  //                         fontSize: 14,
-  //                         fontWeight: FontWeight.w700,
-  //                         color: Color(0xFF1a2340))),
-  //                 const Spacer(),
-  //                 if (_selectedFreq == f.value)
-  //                   const Icon(Icons.check_circle_rounded,
-  //                       size: 18,
-  //                       color: Color(0xFF8B5CF6)),
-  //               ],
-  //             ),
-  //           ),
-  //         ))
-  //             .toList(),
-  //         onChanged: (v) => setState(() => _selectedFreq = v!),
-  //       ),
-  //     ),
-  //   );
-  // }
   Widget _buildFrequencyDropdown() {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: _freqOptions.map((f) {
         final isSelected = _selectedFreq == f.value;
+        final label = f.value == 'monthly' ? 'stop.monthly'.tr() :
+        f.value == 'quarterly' ? 'stop.quarterly'.tr() :
+        f.value == 'half_yearly' ? 'stop.half_yearly'.tr() :
+        'stop.yearly'.tr();
         return GestureDetector(
           onTap: () => setState(() => _selectedFreq = f.value),
           child: AnimatedContainer(
@@ -1305,7 +1156,7 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  f.label,
+                  label,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -1319,6 +1170,7 @@ class _StopFormSheetState extends State<_StopFormSheet> {
       }).toList(),
     );
   }
+
   Widget _buildStyledDropdown<T>({
     required T?      value,
     required String  hint,
@@ -1439,8 +1291,8 @@ class _StopFormSheetState extends State<_StopFormSheet> {
                 fontWeight: FontWeight.w700,
                 color: Color(0xFF3a4a6b))),
         if (required)
-          const Text(' *',
-              style: TextStyle(
+          Text(' *',
+              style: const TextStyle(
                   color: Color(0xFFFF4D6D), fontSize: 13)),
       ],
     );
@@ -1487,8 +1339,8 @@ class _FormField extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF3a4a6b))),
             if (required)
-              const Text(' *',
-                  style: TextStyle(
+              Text(' *',
+                  style: const TextStyle(
                       color: Color(0xFFFF4D6D), fontSize: 13)),
           ],
         ),

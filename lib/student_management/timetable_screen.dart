@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../model/school_model/classes/all_classes_model.dart';
 import '../model/school_model/section/all_sections_model.dart';
 import '../../model/student_model/timetable_model.dart';
@@ -58,16 +60,8 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      if (!PermissionExtensions.canAccess(
-        PermissionKeys.viewTimetable,
-      )) {
-
-        Utils.show(
-          "You don't have permission to view timetable",
-          context,
-        );
-
+      if (!PermissionExtensions.canAccess(PermissionKeys.viewTimetable)) {
+        Utils.show('school_timetable.permission_denied'.tr(), context);
         Navigator.pop(context);
         return;
       }
@@ -78,12 +72,12 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
 
   Future<void> _loadTimetable() async {
     if (_selectedClass == null) {
-      _showSnack("Please select class");
+      _showSnack('school_timetable.please_select_class'.tr());
       return;
     }
 
     if (_selectedSection == null) {
-      _showSnack("Please select section");
+      _showSnack('school_timetable.please_select_section'.tr());
       return;
     }
 
@@ -101,27 +95,20 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
       type: 'error',
     );
   }
+
   List<TimetableData> _filteredData(List<TimetableData> data) {
     if (_selectedDay == "All Days") return data;
     return data
         .where(
           (e) =>
-              (e.dayOfWeek ?? "").toLowerCase() == _selectedDay.toLowerCase(),
-        )
+      (e.dayOfWeek ?? "").toLowerCase() == _selectedDay.toLowerCase(),
+    )
         .toList();
   }
 
-
-  Future<void> _downloadPdf(
-      List<TimetableData> displayData,
-      ) async {
-
+  Future<void> _downloadPdf(List<TimetableData> displayData) async {
     if (displayData.isEmpty) {
-      Utils.show(
-        "No timetable available",
-        context,
-        type: "warning",
-      );
+      Utils.show('school_timetable.no_timetable_available'.tr(), context, type: "warning");
       return;
     }
 
@@ -130,9 +117,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
     });
 
     try {
-
-      final bytes =
-      await TimetablePdfGenerator.generate(
+      final bytes = await TimetablePdfGenerator.generate(
         data: displayData,
         className:
         displayData.first.className ??
@@ -152,7 +137,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
         if (androidInfo.version.sdkInt < 29) {
           final status = await Permission.storage.request();
           if (!status.isGranted) {
-            Utils.show("Storage permission denied", context, type: "error");
+            Utils.show('school_timetable.storage_permission_denied'.tr(), context, type: "error");
             setState(() => _isGeneratingPdf = false);
             return;
           }
@@ -165,34 +150,18 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
       final fileName =
           "School_Timetable_${DateTime.now().millisecondsSinceEpoch}.pdf";
 
-      final file =
-      File("${directory.path}/$fileName");
+      final file = File("${directory.path}/$fileName");
 
       await file.writeAsBytes(bytes);
 
-      Utils.show(
-        "PDF Downloaded Successfully",
-        context,
-        type: "success",
-      );
+      Utils.show('school_timetable.pdf_downloaded_success'.tr(), context, type: "success");
 
-      await Future.delayed(
-        const Duration(milliseconds: 500),
-      );
+      await Future.delayed(const Duration(milliseconds: 500));
 
       OpenFile.open(file.path);
-
     } catch (e) {
-
-      debugPrint(
-        "PDF DOWNLOAD ERROR => $e",
-      );
-
-      Utils.show(
-        "Failed to download PDF",
-        context,
-        type: "error",
-      );
+      debugPrint("PDF DOWNLOAD ERROR => $e");
+      Utils.show('school_timetable.failed_to_download_pdf'.tr(), context, type: "error");
     }
 
     if (mounted) {
@@ -246,27 +215,23 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "School Timetable",
-                          style: TextStyle(
+                        Text(
+                          'school_timetable.title'.tr(),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-
                         const SizedBox(height: 3),
-
                         Text(
-                          "View class schedule by day and period",
+                          'school_timetable.subtitle'.tr(),
                           style: TextStyle(
                             color: Colors.white.withOpacity(.9),
                             fontSize: 12,
@@ -281,66 +246,27 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
           ),
         ),
       ),
-      body: Consumer3<
-          AllClassesViewModel,
-          AllSectionsViewModel,
-          SchoolTimetableViewModel>(
-        builder: (
-            context,
-            classVm,
-            sectionVm,
-            timetableVm,
-            child,
-            ) {
-          final allData =
-              timetableVm.timetableModel?.data ?? [];
-
-          final displayData =
-          _filteredData(allData);
-
-          final totalPeriods =
-              displayData.length;
-
-          final totalDays =
-              displayData
-                  .map((e) => e.dayOfWeek)
-                  .toSet()
-                  .length;
-
-          final totalSubjects =
-              displayData
-                  .map((e) => e.subjectName)
-                  .toSet()
-                  .length;
-
-          final totalTeachers =
-              displayData
-                  .map((e) => e.teacherName)
-                  .toSet()
-                  .length;
+      body: Consumer3<AllClassesViewModel, AllSectionsViewModel, SchoolTimetableViewModel>(
+        builder: (context, classVm, sectionVm, timetableVm, child) {
+          final allData = timetableVm.timetableModel?.data ?? [];
+          final displayData = _filteredData(allData);
+          final totalPeriods = displayData.length;
+          final totalDays = displayData.map((e) => e.dayOfWeek).toSet().length;
+          final totalSubjects = displayData.map((e) => e.subjectName).toSet().length;
+          final totalTeachers = displayData.map((e) => e.teacherName).toSet().length;
 
           return RefreshIndicator(
             color: const Color(0xFF1E88E5),
-
             onRefresh: () async {
-              if (_selectedClass != null &&
-                  _selectedSection != null) {
+              if (_selectedClass != null && _selectedSection != null) {
                 await _loadTimetable();
               }
             },
-
             child: SingleChildScrollView(
-              physics:
-              const AlwaysScrollableScrollPhysics(),
-
-              padding: EdgeInsets.all(
-                width * 0.025,
-              ),
-
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.all(width * 0.025),
               child: Column(
                 children: [
-
-                  /// FILTER CARD
                   _buildFilterCard(
                     width: width,
                     height: height,
@@ -350,12 +276,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                     hasData: allData.isNotEmpty,
                     displayData: displayData,
                   ),
-
-                  SizedBox(
-                    height: height * 0.015,
-                  ),
-
-                  /// SUMMARY GRID
+                  SizedBox(height: height * 0.015),
                   if (displayData.isNotEmpty)
                     _buildSummaryGrid(
                       width: width,
@@ -364,15 +285,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                       totalSubjects: totalSubjects,
                       totalTeachers: totalTeachers,
                     ),
-
-                  SizedBox(
-                    height:
-                    displayData.isNotEmpty
-                        ? height * 0.015
-                        : 0,
-                  ),
-
-                  /// TIMETABLE BODY
+                  SizedBox(height: displayData.isNotEmpty ? height * 0.015 : 0),
                   _buildTimetableBody(
                     width: width,
                     height: height,
@@ -380,10 +293,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                     timetableVm: timetableVm,
                     displayData: displayData,
                   ),
-
-                  SizedBox(
-                    height: height * 0.05,
-                  ),
+                  SizedBox(height: height * 0.05),
                 ],
               ),
             ),
@@ -392,7 +302,6 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
       ),
     );
   }
-
 
   Widget _buildFilterCard({
     required double width,
@@ -423,29 +332,26 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: _labeledField(
-                    "CLASS",
-                    _classDropdown(classVm, sectionVm),
-                  ),
+                  child: _labeledField('school_timetable.class_label'.tr(), _classDropdown(classVm, sectionVm)),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: _labeledField("SECTION", _sectionDropdown(sectionVm)),
+                  child: _labeledField('school_timetable.section_label'.tr(), _sectionDropdown(sectionVm)),
                 ),
                 const SizedBox(width: 16),
-                Expanded(child: _labeledField("FILTER BY DAY", _dayDropdown())),
+                Expanded(child: _labeledField('school_timetable.filter_by_day'.tr(), _dayDropdown())),
               ],
             )
           else ...[
-            _labeledField("CLASS", _classDropdown(classVm, sectionVm)),
+            _labeledField('school_timetable.class_label'.tr(), _classDropdown(classVm, sectionVm)),
             SizedBox(height: height * 0.018),
             Row(
               children: [
                 Expanded(
-                  child: _labeledField("SECTION", _sectionDropdown(sectionVm)),
+                  child: _labeledField('school_timetable.section_label'.tr(), _sectionDropdown(sectionVm)),
                 ),
                 const SizedBox(width: 12),
-                Expanded(child: _labeledField("FILTER BY DAY", _dayDropdown())),
+                Expanded(child: _labeledField('school_timetable.filter_by_day'.tr(), _dayDropdown())),
               ],
             ),
           ],
@@ -454,7 +360,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
             children: [
               Expanded(
                 child: AppButton(
-                  title: "Load Timetable",
+                  title: 'school_timetable.load_timetable'.tr(),
                   icon: Icons.refresh_rounded,
                   height: 50,
                   radius: 14,
@@ -479,24 +385,24 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                     ),
                     child: _isGeneratingPdf
                         ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                         : Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.picture_as_pdf, size: 20),
-                              SizedBox(width: 8),
-                              Text(
-                                "Download PDF",
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.picture_as_pdf, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          'school_timetable.download_pdf'.tr(),
+                          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -526,25 +432,22 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
     );
   }
 
-  Widget _classDropdown(
-    AllClassesViewModel classVm,
-    AllSectionsViewModel sectionVm,
-  ) {
+  Widget _classDropdown(AllClassesViewModel classVm, AllSectionsViewModel sectionVm) {
     return DropdownButtonFormField<Data>(
       dropdownColor: Colors.white,
       value: _selectedClass,
       isExpanded: true,
-      decoration: _ddDecoration(hint: "Select Class"),
+      decoration: _ddDecoration(hint: 'school_timetable.select_class'.tr()),
       items: classVm.allClassesModel?.data
           ?.map(
             (item) => DropdownMenuItem<Data>(
-              value: item,
-              child: Text(
-                item.className ?? "",
-                style: GoogleFonts.poppins(fontSize: 14),
-              ),
-            ),
-          )
+          value: item,
+          child: Text(
+            item.className ?? "",
+            style: GoogleFonts.poppins(fontSize: 14),
+          ),
+        ),
+      )
           .toList(),
       onChanged: (value) async {
         setState(() {
@@ -564,17 +467,17 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
       dropdownColor: Colors.white,
       value: _selectedSection,
       isExpanded: true,
-      decoration: _ddDecoration(hint: "Select Section"),
+      decoration: _ddDecoration(hint: 'school_timetable.select_section'.tr()),
       items: sectionVm.allSectionsModel?.data
           ?.map(
             (item) => DropdownMenuItem<SectionData>(
-              value: item,
-              child: Text(
-                item.sectionName ?? "",
-                style: GoogleFonts.poppins(fontSize: 14),
-              ),
-            ),
-          )
+          value: item,
+          child: Text(
+            item.sectionName ?? "",
+            style: GoogleFonts.poppins(fontSize: 14),
+          ),
+        ),
+      )
           .toList(),
       onChanged: (value) {
         setState(() => _selectedSection = value);
@@ -587,12 +490,19 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
       dropdownColor: Colors.white,
       value: _selectedDay,
       isExpanded: true,
-      decoration: _ddDecoration(hint: "All Days"),
-      items: _days
-          .map((day) => DropdownMenuItem(value: day, child: Text(day, style: GoogleFonts.poppins(),)))
-          .toList(),
+      decoration: _ddDecoration(hint: 'school_timetable.all_days'.tr()),
+      items: [
+        'school_timetable.all_days'.tr(),
+        'school_timetable.monday'.tr(),
+        'school_timetable.tuesday'.tr(),
+        'school_timetable.wednesday'.tr(),
+        'school_timetable.thursday'.tr(),
+        'school_timetable.friday'.tr(),
+        'school_timetable.saturday'.tr(),
+        'school_timetable.sunday'.tr(),
+      ].map((day) => DropdownMenuItem(value: day, child: Text(day, style: GoogleFonts.poppins()))).toList(),
       onChanged: (value) {
-        setState(() => _selectedDay = value ?? "All Days");
+        setState(() => _selectedDay = value ?? 'school_timetable.all_days'.tr());
       },
     );
   }
@@ -635,30 +545,10 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
       crossAxisSpacing: 11,
       mainAxisSpacing: 12,
       children: [
-        _summaryCard(
-          "Total Periods",
-          "$totalPeriods",
-          const Color(0xFF1E88E5),
-          Icons.schedule_rounded,
-        ),
-        _summaryCard(
-          "Days",
-          "$totalDays",
-          const Color(0xFF4CAF50),
-          Icons.calendar_today_rounded,
-        ),
-        _summaryCard(
-          "Subjects",
-          "$totalSubjects",
-          const Color(0xFF9C27B0),
-          Icons.menu_book_rounded,
-        ),
-        _summaryCard(
-          "Teachers",
-          "$totalTeachers",
-          const Color(0xFFFF6B35),
-          Icons.person_rounded,
-        ),
+        _summaryCard('school_timetable.total_periods'.tr(), "$totalPeriods", const Color(0xFF1E88E5), Icons.schedule_rounded),
+        _summaryCard('school_timetable.days'.tr(), "$totalDays", const Color(0xFF4CAF50), Icons.calendar_today_rounded),
+        _summaryCard('school_timetable.subjects'.tr(), "$totalSubjects", const Color(0xFF9C27B0), Icons.menu_book_rounded),
+        _summaryCard('school_timetable.teachers'.tr(), "$totalTeachers", const Color(0xFFFF6B35), Icons.person_rounded),
       ],
     );
   }
@@ -725,14 +615,14 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
         ),
-        child:  Center(
+        child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(color: Color(0xFF1E88E5)),
               SizedBox(height: 16),
               Text(
-                "Loading timetable...",
+                'school_timetable.loading_timetable'.tr(),
                 style: GoogleFonts.poppins(color: Colors.grey),
               ),
             ],
@@ -783,7 +673,12 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${displayData.first.className ?? ""} * Section ${displayData.first.sectionName ?? ""}",
+                        'school_timetable.class_section_label'.tr(
+                            namedArgs: {
+                              'className': displayData.first.className ?? "",
+                              'sectionName': displayData.first.sectionName ?? "",
+                            }
+                        ),
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -791,7 +686,14 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "${displayData.length} periods · ${_selectedDay == "All Days" ? "All Days" : _selectedDay}",
+                        'school_timetable.periods_info'.tr(
+                            namedArgs: {
+                              'count': displayData.length.toString(),
+                              'day': _selectedDay == "All Days"
+                                  ? 'school_timetable.all_days'.tr()
+                                  : _selectedDay,
+                            }
+                        ),
                         style: GoogleFonts.poppins(
                           color: Colors.grey.shade600,
                           fontSize: 10,
@@ -808,7 +710,7 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
           if (isTablet)
             ...List.generate(
               displayData.length,
-              (i) => _buildPeriodRow(width, displayData[i], i),
+                  (i) => _buildPeriodRow(width, displayData[i], i),
             )
           else
             Padding(
@@ -864,14 +766,18 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
           ),
           const SizedBox(height: 20),
           Text(
-            dayFilterActive ? "No Periods Found" : "No Timetable Found",
+            dayFilterActive
+                ? 'school_timetable.no_periods_found'.tr()
+                : 'school_timetable.no_timetable_found'.tr(),
             style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 10),
           Text(
             dayFilterActive
-                ? "No periods are scheduled for $_selectedDay.\nTry selecting a different day."
-                : "Select a class and section, then tap\n\"Load Timetable\" to view the schedule.",
+                ? 'school_timetable.no_periods_scheduled'.tr(
+                namedArgs: {'day': _selectedDay}
+            )
+                : 'school_timetable.no_timetable_message'.tr(),
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               color: Colors.grey.shade600,
@@ -884,17 +790,16 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
     );
   }
 
-
   Widget _buildTableHeader(double width) {
     return Container(
       color: const Color(0xffF8FAFC),
       padding: EdgeInsets.symmetric(horizontal: width * 0.04, vertical: 14),
       child: Row(
         children: [
-          Expanded(flex: 3, child: _headerText("SUBJECT")),
-          Expanded(flex: 3, child: _headerText("TEACHER")),
-          Expanded(flex: 2, child: _headerText("DAY")),
-          Expanded(flex: 3, child: _headerText("TIME")),
+          Expanded(flex: 3, child: _headerText('school_timetable.subject'.tr())),
+          Expanded(flex: 3, child: _headerText('school_timetable.teacher'.tr())),
+          Expanded(flex: 2, child: _headerText('school_timetable.day'.tr())),
+          Expanded(flex: 3, child: _headerText('school_timetable.time'.tr())),
         ],
       ),
     );
@@ -997,11 +902,11 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
             ],
           ),
           const SizedBox(height: 16),
-          _infoTile(Icons.person_rounded, "Teacher", item.teacherName ?? "-"),
+          _infoTile(Icons.person_rounded, 'school_timetable.teacher_label'.tr(), item.teacherName ?? "-"),
           const SizedBox(height: 12),
           _infoTile(
             Icons.access_time_rounded,
-            "Time",
+            'school_timetable.time_label'.tr(),
             "${item.startTime ?? ""} - ${item.endTime ?? ""}",
           ),
         ],
@@ -1084,7 +989,6 @@ class _SchoolTimetableViewState extends State<SchoolTimetableView> {
   }
 }
 
-
 class TimetablePdfGenerator {
   TimetablePdfGenerator._();
 
@@ -1105,7 +1009,6 @@ class TimetablePdfGenerator {
     final printedAt = DateFormat('dd/MM/yyyy, HH:mm').format(now);
     final officialDate = DateFormat('MMMM d, yyyy').format(now);
 
-    // Group data by day for better organization
     final grouped = _groupByDay(data);
     final dayOrder = [
       "Monday",
@@ -1123,12 +1026,10 @@ class TimetablePdfGenerator {
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.fromLTRB(32, 24, 32, 24),
         header: (context) => _buildHeader(printedAt),
-
         build: (context) => [
           pw.SizedBox(height: 16),
           _buildTitle(className, sectionName, dayLabel),
           pw.SizedBox(height: 20),
-          // Build sections for each day
           for (final day in sortedDays) _buildDaySection(day, grouped[day]!),
           pw.SizedBox(height: 48),
           _buildSignatureRow(officialDate),
@@ -1139,9 +1040,7 @@ class TimetablePdfGenerator {
     return pdf.save();
   }
 
-  static Map<String, List<TimetableData>> _groupByDay(
-    List<TimetableData> data,
-  ) {
+  static Map<String, List<TimetableData>> _groupByDay(List<TimetableData> data) {
     final Map<String, List<TimetableData>> grouped = {};
     for (final item in data) {
       final day = item.dayOfWeek?.toString() ?? 'Unknown';
@@ -1161,7 +1060,7 @@ class TimetablePdfGenerator {
             style: const pw.TextStyle(fontSize: 8, color: _greySubtitle),
           ),
           pw.Text(
-            "School Dashboard - Student Portal",
+            'school_timetable.school_dashboard'.tr(),
             style: const pw.TextStyle(fontSize: 8, color: _greySubtitle),
           ),
         ],
@@ -1169,88 +1068,7 @@ class TimetablePdfGenerator {
     );
   }
 
-  static pw.Widget _buildFooter(
-    String schoolName,
-    String schoolPhone,
-    String schoolEmail,
-    String schoolShortCode,
-  ) {
-    return pw.Column(
-      mainAxisSize: pw.MainAxisSize.min,
-      children: [
-        pw.Divider(color: _greyBorder, thickness: 0.5),
-        pw.SizedBox(height: 4),
-        pw.Center(
-          child: pw.Text(
-            "$schoolName | $schoolPhone | $schoolEmail | $schoolShortCode",
-            style: const pw.TextStyle(fontSize: 8, color: _greySubtitle),
-          ),
-        ),
-      ],
-    );
-  }
-
-  static pw.Widget _buildSchoolBanner({
-    required String schoolName,
-    required String schoolPhone,
-    required String schoolEmail,
-    required String schoolShortCode,
-    required String officialDate,
-  }) {
-    return pw.Row(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-      children: [
-        pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              schoolName,
-              style: pw.TextStyle(
-                fontSize: 22,
-                fontWeight: pw.FontWeight.bold,
-                color: _primaryBlue,
-              ),
-            ),
-            pw.SizedBox(height: 4),
-            pw.Text(
-              "$schoolPhone | $schoolEmail | $schoolShortCode",
-              style: const pw.TextStyle(fontSize: 9, color: _greySubtitle),
-            ),
-          ],
-        ),
-        pw.Container(
-          padding: const pw.EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-          decoration: pw.BoxDecoration(
-            border: pw.Border.all(color: _primaryBlue, width: 0.8),
-            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(4)),
-          ),
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            children: [
-              pw.Text(
-                "OFFICIAL DOCUMENT",
-                style: pw.TextStyle(
-                  fontSize: 8,
-                  fontWeight: pw.FontWeight.bold,
-                  color: _primaryBlue,
-                  letterSpacing: 0.6,
-                ),
-              ),
-              pw.SizedBox(height: 3),
-              pw.Text(officialDate, style: const pw.TextStyle(fontSize: 9)),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  static pw.Widget _buildTitle(
-    String className,
-    String sectionName,
-    String dayLabel,
-  ) {
+  static pw.Widget _buildTitle(String className, String sectionName, String dayLabel) {
     final classLine = StringBuffer("Class: ");
     classLine.write(className.isEmpty ? "-" : className);
     if (sectionName.isNotEmpty) {
@@ -1262,7 +1080,7 @@ class TimetablePdfGenerator {
       child: pw.Column(
         children: [
           pw.Text(
-            "CLASS TIMETABLE",
+            'school_timetable.class_timetable'.tr(),
             style: pw.TextStyle(
               fontSize: 18,
               fontWeight: pw.FontWeight.bold,
@@ -1281,11 +1099,14 @@ class TimetablePdfGenerator {
   }
 
   static pw.Widget _buildDaySection(String day, List<TimetableData> periods) {
+    final pluralKey = periods.length == 1
+        ? 'school_timetable.period_singular'.tr()
+        : 'school_timetable.period_plural'.tr();
+
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.SizedBox(height: 16),
-        // Day Header
         pw.Container(
           width: double.infinity,
           padding: const pw.EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -1305,58 +1126,57 @@ class TimetablePdfGenerator {
                 ),
               ),
               pw.Text(
-                '${periods.length} ${periods.length == 1 ? 'Period' : 'Periods'}',
+                'school_timetable.periods_count'.tr(
+                    namedArgs: {
+                      'count': periods.length.toString(),
+                      'plural': pluralKey,
+                    }
+                ),
                 style: const pw.TextStyle(fontSize: 11, color: _primaryBlue),
               ),
             ],
           ),
         ),
         pw.SizedBox(height: 8),
-        // Periods Table
         pw.Table(
           border: pw.TableBorder.all(color: _greyBorder, width: 0.5),
           columnWidths: const {
-            0: pw.FlexColumnWidth(1.2), // S.No
-            1: pw.FlexColumnWidth(2.5), // Subject
-            2: pw.FlexColumnWidth(2.5), // Teacher
-            3: pw.FlexColumnWidth(1.5), // Day
-            4: pw.FlexColumnWidth(1.8), // Start Time
-            5: pw.FlexColumnWidth(1.8), // End Time
+            0: pw.FlexColumnWidth(1.2),
+            1: pw.FlexColumnWidth(2.5),
+            2: pw.FlexColumnWidth(2.5),
+            3: pw.FlexColumnWidth(1.5),
+            4: pw.FlexColumnWidth(1.8),
+            5: pw.FlexColumnWidth(1.8),
           },
           children: [
-            // Table Header
             pw.TableRow(
               decoration: const pw.BoxDecoration(
                 color: PdfColor.fromInt(0xFFE3EAFD),
               ),
-              children:
-                  const [
-                        "S.No",
-                        "Subject",
-                        "Teacher",
-                        "Day",
-                        "Start Time",
-                        "End Time",
-                      ]
-                      .map(
-                        (h) => pw.Padding(
-                          padding: pw.EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 6,
-                          ),
-                          child: pw.Text(
-                            h,
-                            style: pw.TextStyle(
-                              fontSize: 9,
-                              fontWeight: pw.FontWeight.bold,
-                              color: PdfColors.grey700,
-                            ),
-                          ),
-                        ),
-                      )
-                      .toList(),
+              children: [
+                'school_timetable.sno'.tr(),
+                'school_timetable.subject_pdf'.tr(),
+                'school_timetable.teacher_pdf'.tr(),
+                'school_timetable.day_pdf'.tr(),
+                'school_timetable.start_time'.tr(),
+                'school_timetable.end_time'.tr(),
+              ].map(
+                    (h) => pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 6,
+                  ),
+                  child: pw.Text(
+                    h,
+                    style: pw.TextStyle(
+                      fontSize: 9,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.grey700,
+                    ),
+                  ),
+                ),
+              ).toList(),
             ),
-            // Data Rows
             for (var i = 0; i < periods.length; i++)
               _buildRow(i + 1, periods[i]),
           ],
@@ -1378,8 +1198,7 @@ class TimetablePdfGenerator {
     );
   }
 
-  static pw.Widget _cell(
-    String text, {
+  static pw.Widget _cell(String text, {
     bool bold = false,
     PdfColor? color,
     pw.TextAlign align = pw.TextAlign.left,
@@ -1401,19 +1220,19 @@ class TimetablePdfGenerator {
   static PdfColor _getDayColor(String? day) {
     switch ((day ?? "").toLowerCase()) {
       case "monday":
-        return const PdfColor.fromInt(0xFF4338CA); // Indigo
+        return const PdfColor.fromInt(0xFF4338CA);
       case "tuesday":
-        return const PdfColor.fromInt(0xFF15803D); // Green
+        return const PdfColor.fromInt(0xFF15803D);
       case "wednesday":
-        return const PdfColor.fromInt(0xFFB45309); // Orange
+        return const PdfColor.fromInt(0xFFB45309);
       case "thursday":
-        return const PdfColor.fromInt(0xFFB91C1C); // Red
+        return const PdfColor.fromInt(0xFFB91C1C);
       case "friday":
-        return const PdfColor.fromInt(0xFF0E7490); // Cyan
+        return const PdfColor.fromInt(0xFF0E7490);
       case "saturday":
-        return const PdfColor.fromInt(0xFF7E22CE); // Purple
+        return const PdfColor.fromInt(0xFF7E22CE);
       case "sunday":
-        return const PdfColor.fromInt(0xFF9D174D); // Pink
+        return const PdfColor.fromInt(0xFF9D174D);
       default:
         return PdfColors.black;
     }
@@ -1430,7 +1249,7 @@ class TimetablePdfGenerator {
             _buildStampWidget(),
             pw.SizedBox(height: 12),
             pw.Text(
-              "Date: $officialDate",
+              'school_timetable.date_label'.tr(namedArgs: {'date': officialDate}),
               style: const pw.TextStyle(fontSize: 9),
             ),
           ],
@@ -1438,9 +1257,9 @@ class TimetablePdfGenerator {
         pw.Row(
           crossAxisAlignment: pw.CrossAxisAlignment.end,
           children: [
-            _buildSignatureBlock("Class Teacher"),
+            _buildSignatureBlock('school_timetable.class_teacher'.tr()),
             pw.SizedBox(width: 32),
-            _buildSignatureBlock("Principal"),
+            _buildSignatureBlock('school_timetable.principal'.tr()),
           ],
         ),
       ],
@@ -1463,7 +1282,7 @@ class TimetablePdfGenerator {
         ),
       ),
       child: pw.Text(
-        "SCHOOL\nSTAMP",
+        'school_timetable.school_stamp'.tr(),
         textAlign: pw.TextAlign.center,
         style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey500),
       ),
@@ -1485,7 +1304,7 @@ class TimetablePdfGenerator {
           ),
         ),
         pw.Text(
-          "SIGNATURE",
+          'school_timetable.signature'.tr(),
           style: const pw.TextStyle(
             fontSize: 7,
             color: PdfColors.grey500,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 
 import '../../res/app_color.dart';
 import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_view_model.dart';
@@ -130,18 +131,18 @@ class _CoScholasticTableState extends State<CoScholasticTable> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text(
-                  "No data loaded",
-                  style: TextStyle(
+                Text(
+                  'co_scholastic_table.no_data_loaded'.tr(),
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                     color: Color(0xFF374151),
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  "Select filters and press Load",
-                  style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
+                Text(
+                  'co_scholastic_table.no_data_subtitle'.tr(),
+                  style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13),
                 ),
               ],
             ),
@@ -174,20 +175,20 @@ class _CoScholasticTableState extends State<CoScholasticTable> {
                         controller: _searchController,
                         onChanged: (v) => setState(() => _searchQuery = v),
                         style: const TextStyle(fontSize: 13),
-                        decoration: const InputDecoration(
-                          hintText: "Search by name or roll no...",
-                          hintStyle: TextStyle(
+                        decoration: InputDecoration(
+                          hintText: 'co_scholastic_table.search_hint'.tr(),
+                          hintStyle: const TextStyle(
                             color: Color(0xFFADB5BD),
                             fontSize: 13,
                           ),
-                          prefixIcon: Icon(
+                          prefixIcon: const Icon(
                             Icons.search,
                             size: 18,
                             color: Color(0xFFADB5BD),
                           ),
                           border: InputBorder.none,
                           isDense: true,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
                         ),
                       ),
                     ),
@@ -204,7 +205,9 @@ class _CoScholasticTableState extends State<CoScholasticTable> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        "${filteredStudents.length} students",
+                        'co_scholastic_table.students_count'.tr(
+                          namedArgs: {'count': filteredStudents.length.toString()},
+                        ),
                         style: const TextStyle(
                           color: Color(0xFF4F46E5),
                           fontSize: 12,
@@ -236,8 +239,8 @@ class _CoScholasticTableState extends State<CoScholasticTable> {
                           color: AppColor.primary,
                           child: Row(
                             children: [
-                              _headerCell("ROLL NO", width: 70),
-                              _headerCell("STUDENT NAME", width: 180),
+                              _headerCell('co_scholastic_table.roll_no'.tr(), width: 70),
+                              _headerCell('co_scholastic_table.student_name'.tr(), width: 180),
                               ...vm.subjects.map(
                                     (s) => _headerCell(
                                   (s.subjectName ?? "").toUpperCase(),
@@ -342,7 +345,12 @@ class _CoScholasticTableState extends State<CoScholasticTable> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
-                  "Showing 1–${filteredStudents.length} of ${vm.students.length}",
+                  'co_scholastic_table.showing_records'.tr(
+                    namedArgs: {
+                      'showing': filteredStudents.length.toString(),
+                      'total': vm.students.length.toString(),
+                    },
+                  ),
                   style: const TextStyle(
                     color: Color(0xFF9CA3AF),
                     fontSize: 12,

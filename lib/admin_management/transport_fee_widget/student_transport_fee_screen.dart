@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../res/app_color.dart';
@@ -29,7 +30,6 @@ class _StudentTransportFeeScreenState
       final academicVm = Provider.of<AcademicViewModel>(context, listen: false);
       await academicVm.academicApi(context);
 
-      // ✅ Current year auto-select karo
       if (mounted && academicVm.currentYear != null) {
         setState(() {
           selectedYear = academicVm.currentYear!.yearName;
@@ -41,6 +41,7 @@ class _StudentTransportFeeScreenState
       }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,14 +83,14 @@ class _StudentTransportFeeScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppText.customText(
-                        "Student Transport Fee",
+                        'student_transport.title'.tr(),
                         size: 20,
                         weight: FontWeight.bold,
                         color: Colors.white,
                       ),
                       const SizedBox(height: 2),
                       AppText.customText(
-                        "View transport details & fee status",
+                        'student_transport.subtitle'.tr(),
                         size: 12,
                         weight: FontWeight.w400,
                         color: Colors.white70,
@@ -116,7 +117,6 @@ class _StudentTransportFeeScreenState
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               children: [
-                /// Student Dropdown
                 Consumer<AllStudentListVieModel>(
                   builder: (context, vm, child) {
                     if (vm.loading) {
@@ -127,7 +127,7 @@ class _StudentTransportFeeScreenState
                       icon: Icons.person_search_rounded,
                       iconColor: const Color(0xFF4A6CF7),
                       iconBg: const Color(0xFFEEF2FF),
-                      hint: "Select Student",
+                      hint: 'student_transport.select_student'.tr(),
                       value: selectedStudent,
                       items: students
                           .map(
@@ -149,7 +149,6 @@ class _StudentTransportFeeScreenState
 
                 const SizedBox(height: 12),
 
-                /// Year Dropdown
                 Consumer<AcademicViewModel>(
                   builder: (context, academicVm, _) {
                     if (academicVm.loading) return _buildShimmerDropdown();
@@ -158,7 +157,7 @@ class _StudentTransportFeeScreenState
                       icon: Icons.calendar_today_rounded,
                       iconColor: const Color(0xFF00B894),
                       iconBg: const Color(0xFFECFDF5),
-                      hint: "Select Academic Year",
+                      hint: 'student_transport.select_academic_year'.tr(),
                       value: selectedYear,
                       items: years
                           .map((e) => DropdownMenuItem(
@@ -182,7 +181,6 @@ class _StudentTransportFeeScreenState
 
           const SizedBox(height: 20),
 
-          /// ── DATA SECTION ─────────────────────────────────────────
           Expanded(
             child: Consumer<GetStudentTransportViewModel>(
               builder: (context, vm, child) {
@@ -203,7 +201,6 @@ class _StudentTransportFeeScreenState
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 4),
                   children: [
-                    /// Route & Vehicle Card
                     _sectionCard(
                       child: Column(
                         children: [
@@ -211,7 +208,7 @@ class _StudentTransportFeeScreenState
                             icon: Icons.route_rounded,
                             iconBg: const Color(0xFFEEF2FF),
                             iconColor: const Color(0xFF4A6CF7),
-                            label: "Route",
+                            label: 'student_transport.route'.tr(),
                             value: data.routeName ?? "—",
                             bold: true,
                           ),
@@ -220,7 +217,7 @@ class _StudentTransportFeeScreenState
                             icon: Icons.location_on_rounded,
                             iconBg: const Color(0xFFFFF3E0),
                             iconColor: const Color(0xFFF57C00),
-                            label: "Stop",
+                            label: 'student_transport.stop'.tr(),
                             value: data.stopName ?? "—",
                           ),
                           _divider(),
@@ -228,7 +225,7 @@ class _StudentTransportFeeScreenState
                             icon: Icons.directions_bus_rounded,
                             iconBg: const Color(0xFFE8F5E9),
                             iconColor: const Color(0xFF43A047),
-                            label: "Vehicle No.",
+                            label: 'student_transport.vehicle_no'.tr(),
                             value: data.vehicleNo ?? "—",
                           ),
                         ],
@@ -237,11 +234,10 @@ class _StudentTransportFeeScreenState
 
                     const SizedBox(height: 14),
 
-                    /// Driver Card
                     _sectionCard(
                       header: _cardHeader(
                         icon: Icons.person_pin_circle_rounded,
-                        label: "Driver Info",
+                        label: 'student_transport.driver_info'.tr(),
                         color: const Color(0xFF7C3AED),
                       ),
                       child: Column(
@@ -250,7 +246,7 @@ class _StudentTransportFeeScreenState
                             icon: Icons.badge_rounded,
                             iconBg: const Color(0xFFF3E8FF),
                             iconColor: const Color(0xFF7C3AED),
-                            label: "Name",
+                            label: 'student_transport.driver_name'.tr(),
                             value: data.driverName ?? "—",
                           ),
                           _divider(),
@@ -258,7 +254,7 @@ class _StudentTransportFeeScreenState
                             icon: Icons.phone_rounded,
                             iconBg: const Color(0xFFE0F7FA),
                             iconColor: const Color(0xFF00838F),
-                            label: "Phone",
+                            label: 'student_transport.driver_phone'.tr(),
                             value: data.driverPhone ?? "—",
                           ),
                         ],
@@ -267,11 +263,10 @@ class _StudentTransportFeeScreenState
 
                     const SizedBox(height: 14),
 
-                    /// Route Details Card
                     _sectionCard(
                       header: _cardHeader(
                         icon: Icons.info_outline_rounded,
-                        label: "Route Details",
+                        label: 'student_transport.route_details'.tr(),
                         color: const Color(0xFF0284C7),
                       ),
                       child: Column(
@@ -280,15 +275,15 @@ class _StudentTransportFeeScreenState
                             icon: Icons.straighten_rounded,
                             iconBg: const Color(0xFFE0F2FE),
                             iconColor: const Color(0xFF0284C7),
-                            label: "Distance",
-                            value: "${data.distanceKm ?? 0} KM",
+                            label: 'student_transport.distance'.tr(),
+                            value: "${data.distanceKm ?? 0} ${'student_transport.km'.tr()}",
                           ),
                           _divider(),
                           _infoTile(
                             icon: Icons.repeat_rounded,
                             iconBg: const Color(0xFFFFF1F2),
                             iconColor: const Color(0xFFE11D48),
-                            label: "Fee Frequency",
+                            label: 'student_transport.fee_frequency'.tr(),
                             value: data.feeFrequency ?? "—",
                           ),
                         ],
@@ -297,25 +292,24 @@ class _StudentTransportFeeScreenState
 
                     const SizedBox(height: 14),
 
-                    /// Fee Summary Card
                     _sectionCard(
                       header: _cardHeader(
                         icon: Icons.account_balance_wallet_rounded,
-                        label: "Fee Summary",
+                        label: 'student_transport.fee_summary'.tr(),
                         color: const Color(0xFF059669),
                       ),
                       child: Column(
                         children: [
-                          _feeRow("Base Amount", data.baseAmount,
+                          _feeRow('student_transport.base_amount'.tr(), data.baseAmount,
                               const Color(0xFF374151)),
                           _divider(),
-                          _feeRow("Assigned Amount", data.assignedAmount,
+                          _feeRow('student_transport.assigned_amount'.tr(), data.assignedAmount,
                               const Color(0xFF374151)),
                           _divider(),
-                          _feeRow("Paid Amount", data.paidAmount,
+                          _feeRow('student_transport.paid_amount'.tr(), data.paidAmount,
                               const Color(0xFF059669)),
                           _divider(),
-                          _feeRow("Pending Amount", data.pendingAmount,
+                          _feeRow('student_transport.pending_amount'.tr(), data.pendingAmount,
                               const Color(0xFFDC2626),
                               bold: true),
                         ],
@@ -324,7 +318,6 @@ class _StudentTransportFeeScreenState
 
                     const SizedBox(height: 14),
 
-                    /// Status Footer Card
                     _sectionCard(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -333,7 +326,7 @@ class _StudentTransportFeeScreenState
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Assigned On",
+                                'student_transport.assigned_on'.tr(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey.shade500,
@@ -578,13 +571,28 @@ class _StudentTransportFeeScreenState
   );
 
   Widget _statusBadge(String status) {
-    final isPending = status.toLowerCase() == "pending";
-    final color = isPending
-        ? const Color(0xFFDC2626)
-        : const Color(0xFF059669);
-    final bgColor = isPending
-        ? const Color(0xFFFEE2E2)
-        : const Color(0xFFD1FAE5);
+    final statusLower = status.toLowerCase();
+    final isPending = statusLower == "pending";
+    final isPaid = statusLower == "paid";
+    final isPartial = statusLower == "partial";
+
+    Color color;
+    Color bgColor;
+    String label;
+
+    if (isPaid) {
+      color = const Color(0xFF059669);
+      bgColor = const Color(0xFFD1FAE5);
+      label = 'student_transport.status_paid'.tr();
+    } else if (isPartial) {
+      color = const Color(0xFFF59E0B);
+      bgColor = const Color(0xFFFEF3C7);
+      label = 'student_transport.status_partial'.tr();
+    } else {
+      color = const Color(0xFFDC2626);
+      bgColor = const Color(0xFFFEE2E2);
+      label = 'student_transport.status_pending'.tr();
+    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -605,7 +613,7 @@ class _StudentTransportFeeScreenState
           ),
           const SizedBox(width: 6),
           Text(
-            status,
+            label,
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.w700,
@@ -635,9 +643,9 @@ class _StudentTransportFeeScreenState
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            "No Transport Assigned",
-            style: TextStyle(
+          Text(
+            'student_transport.no_transport_assigned'.tr(),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: Color(0xFF374151),
@@ -645,7 +653,7 @@ class _StudentTransportFeeScreenState
           ),
           const SizedBox(height: 8),
           Text(
-            "Please select a student and academic\nyear to view transport details.",
+            'student_transport.no_transport_desc'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,

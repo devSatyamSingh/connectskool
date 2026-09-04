@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../view_model/school_view_model/marksheet/generate_marksheet_view_model.dart';
 import '../../view_model/auth_view_model/school_admin_profile_view_model.dart';
 
 class MarksheetPreviewWidget extends StatelessWidget {
   const MarksheetPreviewWidget({super.key});
 
-  // Common Color Schemes from Design
   static const Color primaryBlue = Color(0xFF153D91);
   static const Color darkBlueText = Color(0xFF0F2C67);
   static const Color borderGrey = Color(0xFFD6D6D6);
@@ -20,12 +21,12 @@ class MarksheetPreviewWidget extends StatelessWidget {
     final school = profileVm.schoolAdminProfileModel?.data;
 
     if (data == null) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Text(
-            "No Marksheet Found",
-            style: TextStyle(
+            'marksheets_preview.no_marksheet_found'.tr(),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
               color: Colors.grey,
@@ -41,8 +42,7 @@ class MarksheetPreviewWidget extends StatelessWidget {
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Container(
-          width:
-              850, // Standard width for maintaining crisp desktop/tablet/web preview aspect ratio
+          width: 850,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
@@ -59,39 +59,24 @@ class MarksheetPreviewWidget extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              /// SCHOOL HEADER WITH LOGO ICON BADGE
               _buildSchoolHeader(school),
               const SizedBox(height: 12),
-
-              /// REPORT TITLE & CLASS SESSION
               _buildReportTitle(
                 year: data.academicYear?.toString() ?? "-",
                 className: student?.className?.toString() ?? "-",
                 sectionName: student?.sectionName?.toString() ?? "-",
               ),
               const SizedBox(height: 16),
-
-              /// STUDENT PROFILE SECTION
               _buildStudentProfile(student),
               const SizedBox(height: 16),
-
-              /// ATTENDANCE BAR
               _buildAttendance(data),
               const SizedBox(height: 16),
-
-              /// SCHOLASTIC AREA (8 POINT SCALE)
               _buildScholasticSection(data.scholastic),
               const SizedBox(height: 16),
-
-              /// PERFORMANCE SUMMARY CARDS (CGPA, OVERALL %, RESULT)
               _buildSummaryCards(data),
               const SizedBox(height: 16),
-
-              /// CO-SCHOLASTIC GRADES AND GRADING SCALE SIDE-BY-SIDE
               _buildCoScholasticAndScaleSection(data.coScholastic),
               const SizedBox(height: 40),
-
-              /// SIGNATURE AUTHORITIES
               _buildSignatureSection(),
             ],
           ),
@@ -104,7 +89,6 @@ class MarksheetPreviewWidget extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        /// School Logo
         Container(
           width: 54,
           height: 54,
@@ -118,16 +102,13 @@ class MarksheetPreviewWidget extends StatelessWidget {
             size: 28,
           ),
         ),
-
         const SizedBox(width: 16),
-
-        /// School Details
         Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                school?.schoolName?.toString() ?? "School Name",
+                school?.schoolName?.toString() ?? 'marksheets_preview.school_name_default'.tr(),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 25,
@@ -136,25 +117,25 @@ class MarksheetPreviewWidget extends StatelessWidget {
                   letterSpacing: 1.5,
                 ),
               ),
-
               const SizedBox(height: 4),
-
               Text(
-                school?.schoolAdrees?.toString() ?? "School Address",
+                school?.schoolAdrees?.toString() ?? 'marksheets_preview.school_address_default'.tr(),
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(fontSize: 10, color: Colors.black54),
               ),
-
               Text(
-                "Email : ${school?.schoolEmail ?? "-"}",
+                'marksheets_preview.email_label'.tr(
+                  namedArgs: {'email': school?.schoolEmail ?? "-"},
+                ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 9, color: Colors.black54),
               ),
-
               Text(
-                "Phone : ${school?.schoolPhoneNumber ?? "-"}",
+                'marksheets_preview.phone_label'.tr(
+                  namedArgs: {'phone': school?.schoolPhoneNumber ?? "-"},
+                ),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 9,
@@ -165,8 +146,6 @@ class MarksheetPreviewWidget extends StatelessWidget {
             ],
           ),
         ),
-
-        /// Right Spacer
         const SizedBox(width: 54),
       ],
     );
@@ -180,11 +159,9 @@ class MarksheetPreviewWidget extends StatelessWidget {
     return Column(
       children: [
         const Divider(color: primaryBlue, thickness: 2, height: 1),
-
         const SizedBox(height: 8),
-
         Text(
-          "REPORT CARD  SESSION $year",
+          'marksheets_preview.report_card'.tr(namedArgs: {'year': year}),
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 15,
@@ -193,9 +170,7 @@ class MarksheetPreviewWidget extends StatelessWidget {
             letterSpacing: 1.2,
           ),
         ),
-
         const SizedBox(height: 6),
-
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           decoration: BoxDecoration(
@@ -212,9 +187,7 @@ class MarksheetPreviewWidget extends StatelessWidget {
             ),
           ),
         ),
-
         const SizedBox(height: 8),
-
         const Divider(color: primaryBlue, thickness: 2, height: 1),
       ],
     );
@@ -236,9 +209,9 @@ class MarksheetPreviewWidget extends StatelessWidget {
               color: primaryBlue.withOpacity(0.04),
               border: const Border(bottom: BorderSide(color: borderGrey)),
             ),
-            child: const Text(
-              "STUDENT PROFILE",
-              style: TextStyle(
+            child: Text(
+              'marksheets_preview.student_profile'.tr(),
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: primaryBlue,
                 fontSize: 13,
@@ -256,30 +229,35 @@ class MarksheetPreviewWidget extends StatelessWidget {
               },
               children: [
                 _buildProfileTableRow(
-                  "Name of Student",
+                  'marksheets_preview.name_of_student'.tr(),
                   student?.name,
-                  "Roll No",
+                  'marksheets_preview.roll_no'.tr(),
                   student?.rollNo,
                 ),
                 _buildProfileTableRow(
-                  "Admission No.",
+                  'marksheets_preview.admission_no'.tr(),
                   student?.admissionNo,
-                  "Section",
+                  'marksheets_preview.section'.tr(),
                   student?.sectionName,
                 ),
                 _buildProfileTableRow(
-                  "Date of Birth",
+                  'marksheets_preview.date_of_birth'.tr(),
                   student?.dob,
-                  "Class",
+                  'marksheets_preview.class'.tr(),
                   student?.className,
                 ),
                 _buildProfileTableRow(
-                  "Mother's Name",
+                  'marksheets_preview.mother_name'.tr(),
                   student?.motherName,
-                  "Father's Name",
+                  'marksheets_preview.father_name'.tr(),
                   student?.fatherName,
                 ),
-                _buildProfileTableRow("Address", student?.address, "", ""),
+                _buildProfileTableRow(
+                  'marksheets_preview.address'.tr(),
+                  student?.address,
+                  "",
+                  "",
+                ),
               ],
             ),
           ),
@@ -289,11 +267,11 @@ class MarksheetPreviewWidget extends StatelessWidget {
   }
 
   TableRow _buildProfileTableRow(
-    String label1,
-    String? val1,
-    String label2,
-    String? val2,
-  ) {
+      String label1,
+      String? val1,
+      String label2,
+      String? val2,
+      ) {
     const labelStyle = TextStyle(
       fontWeight: FontWeight.w600,
       fontSize: 11,
@@ -339,16 +317,19 @@ class MarksheetPreviewWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Text(
-            "Attendance",
-            style: TextStyle(
+          Text(
+            'marksheets_preview.attendance'.tr(),
+            style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 12,
               color: primaryBlue,
             ),
           ),
           const SizedBox(width: 24),
-          Text("Total Working Days : ", style: const TextStyle(fontSize: 11)),
+          Text(
+            'marksheets_preview.total_working_days'.tr(),
+            style: const TextStyle(fontSize: 11),
+          ),
           Text(
             "${data.attendance?.totalWorkingDays ?? 0}",
             style: const TextStyle(
@@ -358,7 +339,10 @@ class MarksheetPreviewWidget extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 24),
-          Text("Total Attendance : ", style: const TextStyle(fontSize: 11)),
+          Text(
+            'marksheets_preview.total_attendance'.tr(),
+            style: const TextStyle(fontSize: 11),
+          ),
           Text(
             "${data.attendance?.presentDays ?? 0}",
             style: TextStyle(
@@ -369,7 +353,9 @@ class MarksheetPreviewWidget extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            "Roll No : $rollNo",
+            'marksheets_preview.roll_no_label'.tr(
+              namedArgs: {'rollNo': rollNo},
+            ),
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 12,
@@ -390,9 +376,9 @@ class MarksheetPreviewWidget extends StatelessWidget {
           width: double.infinity,
           color: primaryBlue,
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-          child: const Text(
-            "SCHOLASTIC AREA  (8 POINT SCALE)",
-            style: TextStyle(
+          child: Text(
+            'marksheets_preview.scholastic_area'.tr(),
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 12,
@@ -405,87 +391,79 @@ class MarksheetPreviewWidget extends StatelessWidget {
           decoration: BoxDecoration(border: Border.all(color: borderGrey)),
           child: hasRecords
               ? Table(
-                  border: TableBorder.all(color: borderGrey),
-                  children: [
-                    const TableRow(
-                      decoration: BoxDecoration(color: Color(0xFFEFEFEF)),
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Text(
-                            "Subject",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-
-                        Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Text(
-                            "Max",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-
-                        Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Text(
-                            "Obtained",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-
-                        Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Text(
-                            "Grade",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    ...scholasticData!.entries.map((entry) {
-                      final item = entry.value;
-
-                      return TableRow(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Text(entry.key),
-                          ),
-
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Text("${item['max_marks'] ?? '-'}"),
-                          ),
-
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Text("${item['obtained_marks'] ?? '-'}"),
-                          ),
-
-                          Padding(
-                            padding: const EdgeInsets.all(8),
-                            child: Text("${item['grade'] ?? '-'}"),
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ],
-                )
-              : const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Center(
+            border: TableBorder.all(color: borderGrey),
+            children: [
+              TableRow(
+                decoration: const BoxDecoration(color: Color(0xFFEFEFEF)),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8),
                     child: Text(
-                      "No scholastic records for this session.",
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                        fontStyle: FontStyle.italic,
-                      ),
+                      'marksheets_preview.subject'.tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      'marksheets_preview.max'.tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      'marksheets_preview.obtained'.tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Text(
+                      'marksheets_preview.grade'.tr(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              ...scholasticData!.entries.map((entry) {
+                final item = entry.value;
+                return TableRow(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text(entry.key),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text("${item['max_marks'] ?? '-'}"),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text("${item['obtained_marks'] ?? '-'}"),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: Text("${item['grade'] ?? '-'}"),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ],
+          )
+              : Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Center(
+              child: Text(
+                'marksheets_preview.no_scholastic_records'.tr(),
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
                 ),
+              ),
+            ),
+          ),
         ),
       ],
     );
@@ -494,13 +472,13 @@ class MarksheetPreviewWidget extends StatelessWidget {
   Widget _buildSummaryCards(data) {
     final double percentage =
         double.tryParse(data.overallPercentage.toString()) ?? 0.0;
-    final isPass = percentage >= 33.0; // Standard evaluation pass mark
+    final isPass = percentage >= 33.0;
 
     return Row(
       children: [
         Expanded(
           child: _buildSummaryCard(
-            "CGPA",
+            'marksheets_preview.cgpa'.tr(),
             data.cgpa ?? "—",
             const Color(0xFF153D91),
           ),
@@ -508,7 +486,7 @@ class MarksheetPreviewWidget extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: _buildSummaryCard(
-            "OVERALL %",
+            'marksheets_preview.overall_percent'.tr(),
             "$percentage%",
             const Color(0xFF2E7D32),
           ),
@@ -516,8 +494,8 @@ class MarksheetPreviewWidget extends StatelessWidget {
         const SizedBox(width: 16),
         Expanded(
           child: _buildSummaryCard(
-            "RESULT",
-            isPass ? "PASS ✓" : "FAIL ✗",
+            'marksheets_preview.result'.tr(),
+            isPass ? 'marksheets_preview.pass'.tr() : 'marksheets_preview.fail'.tr(),
             isPass ? const Color(0xFF2E7D32) : const Color(0xFFD32F2F),
           ),
         ),
@@ -558,15 +536,13 @@ class MarksheetPreviewWidget extends StatelessWidget {
   }
 
   Widget _buildCoScholasticAndScaleSection(
-    Map<String, dynamic>? coScholasticData,
-  ) {
+      Map<String, dynamic>? coScholasticData,
+      ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Table 1 (Co-Scholastic Metrics left block split layout)
         Expanded(flex: 3, child: _buildCoScholasticTable(coScholasticData)),
         const SizedBox(width: 16),
-        // Grading Scale Reference Card (Right block layout matching image scale metrics)
         Expanded(flex: 2, child: _buildGradingScaleTable()),
       ],
     );
@@ -574,13 +550,9 @@ class MarksheetPreviewWidget extends StatelessWidget {
 
   Widget _buildCoScholasticTable(Map<String, dynamic>? data) {
     final term1 = Map<String, dynamic>.from(data?['term1'] ?? {});
-
     final term2 = Map<String, dynamic>.from(data?['term2'] ?? {});
-
     final Set<String> subjectIds = {};
-
     subjectIds.addAll(term1.keys);
-
     subjectIds.addAll(term2.keys);
 
     return Column(
@@ -595,9 +567,9 @@ class MarksheetPreviewWidget extends StatelessWidget {
           decoration: const BoxDecoration(
             color: primaryBlue,
           ),
-          child: const Text(
-            "CO-SCHOLASTIC AREA",
-            style: TextStyle(
+          child: Text(
+            'marksheets_preview.co_scholastic_area'.tr(),
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 11,
@@ -605,7 +577,6 @@ class MarksheetPreviewWidget extends StatelessWidget {
             ),
           ),
         ),
-
         Table(
           border: TableBorder.all(
             color: borderGrey,
@@ -617,29 +588,27 @@ class MarksheetPreviewWidget extends StatelessWidget {
             2: FlexColumnWidth(1),
           },
           children: [
-
-            /// Header
-            const TableRow(
-              decoration: BoxDecoration(
+            TableRow(
+              decoration: const BoxDecoration(
                 color: Color(0xFFF3F4F6),
               ),
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Text(
-                    "Activity",
-                    style: TextStyle(
+                    'marksheets_preview.activity'.tr(),
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 11,
                     ),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Center(
                     child: Text(
-                      "Term-1",
-                      style: TextStyle(
+                      'marksheets_preview.term1'.tr(),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 11,
                       ),
@@ -647,11 +616,11 @@ class MarksheetPreviewWidget extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Center(
                     child: Text(
-                      "Term-2",
-                      style: TextStyle(
+                      'marksheets_preview.term2'.tr(),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 11,
                       ),
@@ -660,45 +629,37 @@ class MarksheetPreviewWidget extends StatelessWidget {
                 ),
               ],
             ),
-
-            /// Dynamic Rows
             if (subjectIds.isEmpty)
-              const TableRow(
+              TableRow(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(12),
                     child: Text(
-                      "No Co-Scholastic Records",
-                      style: TextStyle(
+                      'marksheets_preview.no_co_scholastic_records'.tr(),
+                      style: const TextStyle(
                         fontSize: 11,
                         color: Colors.grey,
                       ),
                     ),
                   ),
-                  SizedBox(),
-                  SizedBox(),
+                  const SizedBox(),
+                  const SizedBox(),
                 ],
               )
             else
               ...subjectIds.map((subjectId) {
-
                 final t1 = term1[subjectId];
-
                 final t2 = term2[subjectId];
-
                 final activity =
                     t1?['subject_name'] ??
                         t2?['subject_name'] ??
                         '-';
-
                 final term1Grade =
                     t1?['grade'] ??
                         '-';
-
                 final term2Grade =
                     t2?['grade'] ??
                         '-';
-
                 return _buildCoScholasticRow(
                   activity.toString(),
                   term1Grade.toString(),
@@ -710,6 +671,7 @@ class MarksheetPreviewWidget extends StatelessWidget {
       ],
     );
   }
+
   TableRow _buildCoScholasticRow(String activity, String t1, String t2) {
     return TableRow(
       children: [
@@ -747,9 +709,9 @@ class MarksheetPreviewWidget extends StatelessWidget {
           width: double.infinity,
           color: primaryBlue,
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-          child: const Text(
-            "SCALE INDICATORS",
-            style: TextStyle(
+          child: Text(
+            'marksheets_preview.scale_indicators'.tr(),
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 11,
@@ -760,14 +722,14 @@ class MarksheetPreviewWidget extends StatelessWidget {
           border: TableBorder.all(color: borderGrey),
           columnWidths: const {0: FlexColumnWidth(1), 1: FlexColumnWidth(2.5)},
           children: [
-            _buildScaleRow("A1", "Outstanding", const Color(0xFF2E7D32)),
-            _buildScaleRow("A2", "Excellent", Colors.blue),
-            _buildScaleRow("B1", "Very Good", Colors.purple.shade400),
-            _buildScaleRow("B2", "Good", Colors.cyan.shade700),
-            _buildScaleRow("C1", "Above Average", Colors.orange),
-            _buildScaleRow("C2", "Average", Colors.orange.shade300),
-            _buildScaleRow("D", "Below Average", Colors.redAccent),
-            _buildScaleRow("E", "Needs Effort", Colors.red.shade900),
+            _buildScaleRow("A1", 'marksheets_preview.outstanding'.tr(), const Color(0xFF2E7D32)),
+            _buildScaleRow("A2", 'marksheets_preview.excellent'.tr(), Colors.blue),
+            _buildScaleRow("B1", 'marksheets_preview.very_good'.tr(), Colors.purple.shade400),
+            _buildScaleRow("B2", 'marksheets_preview.good'.tr(), Colors.cyan.shade700),
+            _buildScaleRow("C1", 'marksheets_preview.above_average'.tr(), Colors.orange),
+            _buildScaleRow("C2", 'marksheets_preview.average'.tr(), Colors.orange.shade300),
+            _buildScaleRow("D", 'marksheets_preview.below_average'.tr(), Colors.redAccent),
+            _buildScaleRow("E", 'marksheets_preview.needs_effort'.tr(), Colors.red.shade900),
           ],
         ),
       ],
@@ -775,10 +737,10 @@ class MarksheetPreviewWidget extends StatelessWidget {
   }
 
   TableRow _buildScaleRow(
-    String grade,
-    String description,
-    Color indicatorColor,
-  ) {
+      String grade,
+      String description,
+      Color indicatorColor,
+      ) {
     return TableRow(
       children: [
         Container(
@@ -812,14 +774,14 @@ class MarksheetPreviewWidget extends StatelessWidget {
         const Divider(
           color: Colors.grey,
           thickness: 0.8,
-        ), // Styled dotted baseline structure setup
+        ),
         const SizedBox(height: 16),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: const [
-            _SignatureLabel(title: "DIRECTOR"),
-            _SignatureLabel(title: "CLASS TEACHER"),
-            _SignatureLabel(title: "PRINCIPAL"),
+          children: [
+            _SignatureLabel(title: 'marksheets_preview.director'.tr()),
+            _SignatureLabel(title: 'marksheets_preview.class_teacher'.tr()),
+            _SignatureLabel(title: 'marksheets_preview.principal'.tr()),
           ],
         ),
       ],
@@ -839,7 +801,7 @@ class _SignatureLabel extends StatelessWidget {
           width: 120,
           height: 1,
           color: Colors.black26,
-        ), // Solid accent signature line
+        ),
         const SizedBox(height: 6),
         Text(
           title,

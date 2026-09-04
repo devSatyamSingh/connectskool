@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import '../../res/app_color.dart';
@@ -65,7 +66,7 @@ class _TransportFeeManagementScreenState
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppText.customText(
-                    "Transport Fee Management",
+                    'transport_management.title'.tr(),
                     size: 19,
                     weight: FontWeight.bold,
                     color: Colors.white,
@@ -92,14 +93,12 @@ class _TransportFeeManagementScreenState
                   onTap: () {
                     if (!PermissionExtensions.canAccess(
                         PermissionKeys.manageTransport)) {
-
                       Utils.show(
-                        "You don't have permission to access this module.",
+                        'transport_management.permission_denied'.tr(),
                         context,
                       );
                       return;
                     }
-
                     Navigator.pushNamed(
                       context,
                       RoutesName.routeScreen,
@@ -107,7 +106,7 @@ class _TransportFeeManagementScreenState
                   },
                   child: _gridCard(
                       icon: Icons.route,
-                      title: "Route Management",
+                      title: 'transport_management.route_management'.tr(),
                       color: Colors.blue),
                 ),
 
@@ -116,9 +115,8 @@ class _TransportFeeManagementScreenState
                   onTap: () {
                     if (!PermissionExtensions.canAccess(
                         PermissionKeys.manageTransport)) {
-
                       Utils.show(
-                        "You don't have permission to access this module.",
+                        'transport_management.permission_denied'.tr(),
                         context,
                       );
                       return;
@@ -127,17 +125,17 @@ class _TransportFeeManagementScreenState
                   },
                   child: _gridCard(
                       icon: Icons.location_on,
-                      title: "Stop Management",
+                      title: 'transport_management.stop_management'.tr(),
                       color: Colors.orange),
                 ),
 
+                /// ASSIGN TRANSPORT
                 GestureDetector(
                   onTap: () {
                     if (!PermissionExtensions.canAccess(
                         PermissionKeys.manageTransport)) {
-
                       Utils.show(
-                        "You don't have permission to access this module.",
+                        'transport_management.permission_denied'.tr(),
                         context,
                       );
                       return;
@@ -147,20 +145,28 @@ class _TransportFeeManagementScreenState
                   },
                   child: _gridCard(
                       icon: Icons.directions_bus,
-                      title: "Assign Transport",
+                      title: 'transport_management.assign_transport'.tr(),
                       color: Colors.green),
                 ),
 
-                /// STUDENT TRANSPORT FEE
+                /// STUDENT TRANSPORT FEE (Commented out but ready)
                 // GestureDetector(
                 //   onTap: () {
+                //     if (!PermissionExtensions.canAccess(
+                //         PermissionKeys.manageTransport)) {
+                //       Utils.show(
+                //         'transport_management.permission_denied'.tr(),
+                //         context,
+                //       );
+                //       return;
+                //     }
                 //     Navigator.pushNamed(
                 //         context,
                 //         RoutesName.studentTransportFeeScreen);
                 //   },
                 //   child: _gridCard(
                 //       icon: Icons.person,
-                //       title: "Student Transport Fee",
+                //       title: 'transport_management.student_transport_fee'.tr(),
                 //       color: Colors.purple),
                 // ),
 

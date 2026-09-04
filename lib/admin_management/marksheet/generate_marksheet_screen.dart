@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../view_model/school_view_model/marksheet/generate_marksheet_view_model.dart';
@@ -12,7 +14,6 @@ import '../../view_model/auth_view_model/school_admin_profile_view_model.dart';
 import 'chart_marksheet_preview_widget.dart';
 import 'generate_chart_marksheet_pdf.dart';
 import 'marksheet_preview_widget.dart';
-// apne actual paths ke according adjust karein:
 import 'marksheet_preview_pdf_service.dart';
 import 'marksheet_screen.dart';
 
@@ -33,7 +34,6 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
-    // Tab change hone par index track karo
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         setState(() => _currentTabIndex = _tabController.index);
@@ -114,9 +114,9 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
       await ChartMarksheetPdfService.showOptions(
         context:       context,
         grades:        grades,
-        schoolName:    profileVm.schoolAdminProfileModel?.data?.schoolName    ?? 'School Name',
-        schoolAddress: profileVm.schoolAdminProfileModel?.data?.schoolAdrees  ?? 'School Address',
-        affiliationNo: 'N/A',
+        schoolName:    profileVm.schoolAdminProfileModel?.data?.schoolName    ?? 'generate_marksheet.school_name_default'.tr(),
+        schoolAddress: profileVm.schoolAdminProfileModel?.data?.schoolAdrees  ?? 'generate_marksheet.school_address_default'.tr(),
+        affiliationNo: 'generate_marksheet.affiliation_no'.tr(),
         academicYear:  data?.academicYear?.toString() ?? '2026-27',
       );
     }
@@ -163,23 +163,23 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
                   ),
                 ),
                 const SizedBox(width: 16),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Generate Marksheet",
-                        style: TextStyle(
+                        'generate_marksheet.title'.tr(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.3,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        "Manage and generate student academic reports",
-                        style: TextStyle(
+                        'generate_marksheet.subtitle'.tr(),
+                        style: const TextStyle(
                           color: Color(0xffE2ECFF),
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
@@ -250,7 +250,7 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
 
   Widget _buildModernActionRow() {
     final isChartTab = _currentTabIndex == 1;
-    final label = isChartTab ? "Chart Marksheet" : "Marksheet";
+    final type = isChartTab ? 'generate_marksheet.chart_marksheet'.tr() : 'generate_marksheet.marksheet'.tr();
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -273,7 +273,7 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
               onPressed: _handleDownload,
               icon: const Icon(Icons.download_rounded, size: 18),
               label: Text(
-                "Download $label",
+                'generate_marksheet.download_marksheet'.tr(namedArgs: {'type': type}),
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
@@ -330,15 +330,15 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
           fontWeight: FontWeight.w600,
           fontSize: 13,
         ),
-        tabs: const [
+        tabs: [
           Tab(
             height: 40,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.article_rounded, size: 16),
-                SizedBox(width: 8),
-                Text("Marksheet"),
+                const Icon(Icons.article_rounded, size: 16),
+                const SizedBox(width: 8),
+                Text('generate_marksheet.tab_marksheet'.tr()),
               ],
             ),
           ),
@@ -347,9 +347,9 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.insert_chart_rounded, size: 16),
-                SizedBox(width: 8),
-                Text("Chart Marksheet"),
+                const Icon(Icons.insert_chart_rounded, size: 16),
+                const SizedBox(width: 8),
+                Text('generate_marksheet.tab_chart_marksheet'.tr()),
               ],
             ),
           ),
@@ -358,6 +358,7 @@ class _GenerateMarksheetScreenState extends State<GenerateMarksheetScreen>
     );
   }
 }
+
 class _CoScholasticGradeProxy {
   final String subjectName;
   final String grade;
@@ -436,13 +437,13 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
       ),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.filter_alt_rounded, color: AppColor.primary, size: 22),
-              SizedBox(width: 10),
+              const Icon(Icons.filter_alt_rounded, color: AppColor.primary, size: 22),
+              const SizedBox(width: 10),
               Text(
-                "Filter Marksheet",
-                style: TextStyle(
+                'generate_marksheet.filter_title'.tr(),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
                   color: Colors.black87,
@@ -456,7 +457,7 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
           DropdownButtonFormField<String>(
             dropdownColor: Colors.white,
             value: selectedAcademicYear,
-            decoration: _inputDecoration("Academic Year", Icons.calendar_month_rounded),
+            decoration: _inputDecoration('generate_marksheet.academic_year'.tr(), Icons.calendar_month_rounded),
             items: academicVm.years
                 .map((e) => DropdownMenuItem(value: e.yearName, child: Text(e.yearName ?? "")))
                 .toList(),
@@ -471,7 +472,7 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
                 child: DropdownButtonFormField<String>(
                   dropdownColor: Colors.white,
                   value: selectedClassId,
-                  decoration: _inputDecoration("Class", Icons.school_rounded),
+                  decoration: _inputDecoration('generate_marksheet.class'.tr(), Icons.school_rounded),
                   items: (classVm.allClassesModel?.data ?? [])
                       .map((e) => DropdownMenuItem<String>(
                     value: e.classId.toString(),
@@ -496,7 +497,7 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
                 child: DropdownButtonFormField<String>(
                   dropdownColor: Colors.white,
                   value: selectedSectionId,
-                  decoration: _inputDecoration("Section", Icons.groups_rounded),
+                  decoration: _inputDecoration('generate_marksheet.section'.tr(), Icons.groups_rounded),
                   items: (sectionVm.allSectionsModel?.data ?? [])
                       .map((e) => DropdownMenuItem<String>(
                     value: e.sectionId.toString(),
@@ -527,8 +528,8 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
           DropdownButtonFormField<int>(
             dropdownColor: Colors.white,
             value: selectedStudentId,
-            decoration: _inputDecoration("Student", Icons.person_rounded),
-            disabledHint: const Text("Select Section First"),
+            decoration: _inputDecoration('generate_marksheet.student'.tr(), Icons.person_rounded),
+            disabledHint: Text('generate_marksheet.select_section_first'.tr()),
             items: (studentVm.allStudentListModel?.data ?? [])
                 .map((s) => DropdownMenuItem<int>(
               value: s.studentId,
@@ -542,14 +543,14 @@ class _MarksheetFilterCardState extends State<MarksheetFilterCard> {
           const SizedBox(height: 24),
 
           AppButton(
-            title: "Search Marksheet",
+            title: 'generate_marksheet.search_marksheet'.tr(),
             icon: Icons.search_rounded,
             loading: marksheetVm.loading,
             onTap: () async {
-              if (selectedAcademicYear == null) return _showError("Please select academic year");
-              if (selectedClassId == null)      return _showError("Please select class");
-              if (selectedSectionId == null)    return _showError("Please select section");
-              if (selectedStudentId == null)    return _showError("Please select student");
+              if (selectedAcademicYear == null) return _showError('generate_marksheet.please_select_academic_year'.tr());
+              if (selectedClassId == null)      return _showError('generate_marksheet.please_select_class'.tr());
+              if (selectedSectionId == null)    return _showError('generate_marksheet.please_select_section'.tr());
+              if (selectedStudentId == null)    return _showError('generate_marksheet.please_select_student'.tr());
 
               await marksheetVm.generateMarksheetApi(
                 studentId:    selectedStudentId.toString(),

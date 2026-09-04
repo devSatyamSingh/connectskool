@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 
 class StudentExamScreen extends StatefulWidget {
   const StudentExamScreen({super.key});
@@ -24,7 +25,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "totalMarks": 100,
       "type": "Final Exam",
       "syllabus": "Chapters 1-10",
-      "color": Color(0xFF6C5CE7),
+      "color": const Color(0xFF6C5CE7),
       "icon": Icons.calculate_rounded,
       "daysLeft": 11,
     },
@@ -36,7 +37,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "totalMarks": 100,
       "type": "Final Exam",
       "syllabus": "All Units",
-      "color": Color(0xFF00B894),
+      "color": const Color(0xFF00B894),
       "icon": Icons.science_rounded,
       "daysLeft": 14,
     },
@@ -48,7 +49,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "totalMarks": 100,
       "type": "Final Exam",
       "syllabus": "Chapters 1-8",
-      "color": Color(0xFFFF6B6B),
+      "color": const Color(0xFFFF6B6B),
       "icon": Icons.biotech_rounded,
       "daysLeft": 16,
     },
@@ -60,13 +61,12 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "totalMarks": 80,
       "type": "Final Exam",
       "syllabus": "Full Syllabus",
-      "color": Color(0xFFFFA502),
+      "color": const Color(0xFFFFA502),
       "icon": Icons.menu_book_rounded,
       "daysLeft": 18,
     },
   ];
 
-  // Past Results Data
   final List<Map<String, dynamic>> pastResults = [
     {
       "subject": "Mathematics",
@@ -75,7 +75,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "marksObtained": 92,
       "totalMarks": 100,
       "grade": "A+",
-      "color": Color(0xFF6C5CE7),
+      "color": const Color(0xFF6C5CE7),
       "icon": Icons.calculate_rounded,
     },
     {
@@ -85,7 +85,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "marksObtained": 88,
       "totalMarks": 100,
       "grade": "A",
-      "color": Color(0xFF00B894),
+      "color": const Color(0xFF00B894),
       "icon": Icons.science_rounded,
     },
     {
@@ -95,7 +95,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "marksObtained": 85,
       "totalMarks": 100,
       "grade": "A",
-      "color": Color(0xFFFF6B6B),
+      "color": const Color(0xFFFF6B6B),
       "icon": Icons.biotech_rounded,
     },
     {
@@ -105,7 +105,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "marksObtained": 90,
       "totalMarks": 100,
       "grade": "A+",
-      "color": Color(0xFFFFA502),
+      "color": const Color(0xFFFFA502),
       "icon": Icons.menu_book_rounded,
     },
     {
@@ -115,7 +115,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
       "marksObtained": 95,
       "totalMarks": 100,
       "grade": "A+",
-      "color": Color(0xFF0984E3),
+      "color": const Color(0xFF0984E3),
       "icon": Icons.computer_rounded,
     },
   ];
@@ -171,14 +171,14 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             AppText.customText(
-                              "Examinations",
+                              'student_exam.title'.tr(),
                               size: 26,
                               weight: FontWeight.bold,
                               color: Colors.black87,
                             ),
                             const SizedBox(height: 4),
                             AppText.customText(
-                              "Track your exam schedule & results",
+                              'student_exam.subtitle'.tr(),
                               size: 13,
                               color: Colors.grey[600]!,
                             ),
@@ -246,7 +246,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           AppText.customText(
-                            "Overall Performance",
+                            'student_exam.overall_performance'.tr(),
                             size: 16,
                             color: Colors.white.withOpacity(0.9),
                             weight: FontWeight.w600,
@@ -273,7 +273,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                                 ),
                                 const SizedBox(height: 4),
                                 AppText.customText(
-                                  "Average Score",
+                                  'student_exam.average_score'.tr(),
                                   size: 13,
                                   color: Colors.white.withOpacity(0.85),
                                 ),
@@ -298,7 +298,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                                   color: Colors.white,
                                 ),
                                 AppText.customText(
-                                  "Exams",
+                                  'student_exam.exams_count'.tr(),
                                   size: 11,
                                   color: Colors.white.withOpacity(0.9),
                                 ),
@@ -321,7 +321,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                   children: [
                     Expanded(
                       child: _buildQuickStatCard(
-                        title: "Upcoming",
+                        title: 'student_exam.upcoming'.tr(),
                         value: "${upcomingExams.length}",
                         icon: Icons.calendar_month_rounded,
                         color: const Color(0xFFFFA502),
@@ -330,7 +330,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                     const SizedBox(width: 14),
                     Expanded(
                       child: _buildQuickStatCard(
-                        title: "Completed",
+                        title: 'student_exam.completed'.tr(),
                         value: "$totalExams",
                         icon: Icons.check_circle_rounded,
                         color: const Color(0xFF00B894),
@@ -339,7 +339,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                     const SizedBox(width: 14),
                     Expanded(
                       child: _buildQuickStatCard(
-                        title: "Next Exam",
+                        title: 'student_exam.next_exam'.tr(),
                         value: "${upcomingExams.first['daysLeft']}d",
                         icon: Icons.access_time_rounded,
                         color: const Color(0xFFFF6B6B),
@@ -376,10 +376,10 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
-                    tabs: const [
-                      Tab(text: 'Upcoming'),
-                      Tab(text: 'Results'),
-                      Tab(text: 'Schedule'),
+                    tabs: [
+                      Tab(text: 'student_exam.tab_upcoming'.tr()),
+                      Tab(text: 'student_exam.tab_results'.tr()),
+                      Tab(text: 'student_exam.tab_schedule'.tr()),
                     ],
                   ),
                 ),
@@ -399,7 +399,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                 ),
               ),
 
-              SizedBox(height: screenHeight*0.07),
+              SizedBox(height: screenHeight * 0.07),
             ],
           ),
         ),
@@ -452,17 +452,15 @@ class _StudentExamScreenState extends State<StudentExamScreen>
     );
   }
 
-  // Upcoming Exams Tab
   Widget _buildUpcomingTab() {
     return ListView(
-      // physics: NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             AppText.customText(
-              "Upcoming Exams",
+              'student_exam.upcoming_exams'.tr(),
               size: 18,
               weight: FontWeight.bold,
               color: Colors.black87,
@@ -477,7 +475,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                 borderRadius: BorderRadius.circular(10),
               ),
               child: AppText.customText(
-                "${upcomingExams.length} Exams",
+                'student_exam.exams_label'.tr(namedArgs: {'count': upcomingExams.length.toString()}),
                 size: 12,
                 color: Colors.grey[700]!,
                 weight: FontWeight.w600,
@@ -623,7 +621,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                           ),
                           const SizedBox(width: 4),
                           AppText.customText(
-                            "$daysLeft days",
+                            'student_exam.days'.tr(namedArgs: {'count': daysLeft.toString()}),
                             size: 12,
                             weight: FontWeight.bold,
                             color: Colors.white,
@@ -644,25 +642,25 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                     children: [
                       _buildExamInfoRow(
                         Icons.calendar_today_rounded,
-                        "Date",
+                        'student_exam.date'.tr(),
                         exam['date'],
                       ),
                       const SizedBox(height: 8),
                       _buildExamInfoRow(
                         Icons.schedule_rounded,
-                        "Time",
+                        'student_exam.time'.tr(),
                         exam['time'],
                       ),
                       const SizedBox(height: 8),
                       _buildExamInfoRow(
                         Icons.timer_rounded,
-                        "Duration",
+                        'student_exam.duration'.tr(),
                         exam['duration'],
                       ),
                       const SizedBox(height: 8),
                       _buildExamInfoRow(
                         Icons.assignment_rounded,
-                        "Total Marks",
+                        'student_exam.total_marks'.tr(),
                         "${exam['totalMarks']}",
                       ),
                     ],
@@ -699,17 +697,15 @@ class _StudentExamScreenState extends State<StudentExamScreen>
     );
   }
 
-  // Results Tab
   Widget _buildResultsTab() {
     return ListView(
-      // physics: NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             AppText.customText(
-              "Past Results",
+              'student_exam.past_results'.tr(),
               size: 18,
               weight: FontWeight.bold,
               color: Colors.black87,
@@ -724,7 +720,9 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                 borderRadius: BorderRadius.circular(10),
               ),
               child: AppText.customText(
-                "Avg: ${averagePercentage.toStringAsFixed(1)}%",
+                'student_exam.avg_label'.tr(
+                    namedArgs: {'avg': averagePercentage.toStringAsFixed(1)}
+                ),
                 size: 12,
                 color: Colors.grey[700]!,
                 weight: FontWeight.w600,
@@ -854,7 +852,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppText.customText(
-                        "Score",
+                        'student_exam.score'.tr(),
                         size: 12,
                         color: Colors.grey[600]!,
                       ),
@@ -873,7 +871,7 @@ class _StudentExamScreenState extends State<StudentExamScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppText.customText(
-                        "Percentage",
+                        'student_exam.percentage'.tr(),
                         size: 12,
                         color: Colors.grey[600]!,
                       ),
@@ -905,14 +903,12 @@ class _StudentExamScreenState extends State<StudentExamScreen>
     );
   }
 
-  // Schedule Tab
   Widget _buildScheduleTab() {
     return ListView(
-      // physics: NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
         AppText.customText(
-          "Complete Exam Schedule",
+          'student_exam.complete_schedule'.tr(),
           size: 18,
           weight: FontWeight.bold,
           color: Colors.black87,
@@ -1096,20 +1092,20 @@ class _StudentExamScreenState extends State<StudentExamScreen>
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Exam Type", exam['type']),
-            _buildDetailRow("Date", exam['date']),
-            _buildDetailRow("Time", exam['time']),
-            _buildDetailRow("Duration", exam['duration']),
-            _buildDetailRow("Total Marks", "${exam['totalMarks']}"),
-            _buildDetailRow("Syllabus", exam['syllabus']),
-            _buildDetailRow("Days Left", "${exam['daysLeft']} days"),
+            _buildDetailRow('student_exam.exam_type'.tr(), exam['type']),
+            _buildDetailRow('student_exam.date'.tr(), exam['date']),
+            _buildDetailRow('student_exam.time'.tr(), exam['time']),
+            _buildDetailRow('student_exam.duration'.tr(), exam['duration']),
+            _buildDetailRow('student_exam.total_marks'.tr(), "${exam['totalMarks']}"),
+            _buildDetailRow('student_exam.syllabus'.tr(), exam['syllabus']),
+            _buildDetailRow('student_exam.days_left'.tr(), "${exam['daysLeft']} days"),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: AppText.customText(
-              "Close",
+              'student_exam.close'.tr(),
               size: 14,
               color: AppColor.lightBlueColor,
               weight: FontWeight.bold,

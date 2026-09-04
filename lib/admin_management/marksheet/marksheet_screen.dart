@@ -5,12 +5,9 @@ import 'package:open_file/open_file.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-
-// Apne model ke according import adjust karein
-// import '../models/co_scholastic_grade.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 
 class MarksheetPdfService {
-  // ── Brand Colors ─────────────────────────────────────────────────────────────
   static const _brandRed    = PdfColor.fromInt(0xFFBA1A1A);
   static const _darkSlate   = PdfColor.fromInt(0xFF2F3B52);
   static const _borderGrey  = PdfColor.fromInt(0xFFCCCCCC);
@@ -18,18 +15,14 @@ class MarksheetPdfService {
   static const _black54     = PdfColor.fromInt(0x8A000000);
   static const _white       = PdfColors.white;
 
-  // ────────────────────────────────────────────────────────────────────────────
-  /// Main entry — PDF generate karo aur Share / Open dialog dikhao
-  // ────────────────────────────────────────────────────────────────────────────
   static Future<void> showOptions({
     required BuildContext context,
-    required List<dynamic> grades,   // List<CoScholasticGrade>
+    required List<dynamic> grades,
     required String schoolName,
     required String schoolAddress,
     required String affiliationNo,
     required String academicYear,
   }) async {
-    // PDF bytes banao
     final bytes = await _buildPdf(
       grades: grades,
       schoolName: schoolName,
@@ -38,14 +31,12 @@ class MarksheetPdfService {
       academicYear: academicYear,
     );
 
-    // File save karo
     final dir  = await getTemporaryDirectory();
     final file = File('${dir.path}/marksheet_${DateTime.now().millisecondsSinceEpoch}.pdf');
     await file.writeAsBytes(bytes);
 
     if (!context.mounted) return;
 
-    // Bottom-sheet — Share ya Download
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -65,29 +56,31 @@ class MarksheetPdfService {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Marksheet PDF Ready',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Text(
+                'marksheet_pdf.marksheet_pdf_ready'.tr(),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
 
-              // Share
               _sheetButton(
                 icon: Icons.share_rounded,
-                label: 'Share PDF',
+                label: 'marksheet_pdf.share_pdf'.tr(),
                 color: const Color(0xFF0D2B55),
                 onTap: () {
                   Navigator.pop(context);
-                  Share.shareXFiles([XFile(file.path)],
-                      text: 'Progress Report Card — $academicYear');
+                  Share.shareXFiles(
+                    [XFile(file.path)],
+                    text: 'marksheet_pdf.share_text'.tr(
+                        namedArgs: {'year': academicYear}
+                    ),
+                  );
                 },
               ),
               const SizedBox(height: 12),
 
-              // Open / Download
               _sheetButton(
                 icon: Icons.download_rounded,
-                label: 'Open / Download',
+                label: 'marksheet_pdf.open_download'.tr(),
                 color: const Color(0xFFC8922A),
                 onTap: () {
                   Navigator.pop(context);
@@ -101,7 +94,6 @@ class MarksheetPdfService {
     );
   }
 
-  // ─── Sheet Button Helper ─────────────────────────────────────────────────────
   static Widget _sheetButton({
     required IconData icon,
     required String label,
@@ -122,20 +114,20 @@ class MarksheetPdfService {
           children: [
             Icon(icon, color: Colors.white, size: 20),
             const SizedBox(width: 10),
-            Text(label,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold)),
+            Text(
+              label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // ────────────────────────────────────────────────────────────────────────────
-  /// PDF Build — same layout as ChartMarksheetPreviewWidget
-  // ────────────────────────────────────────────────────────────────────────────
   static Future<List<int>> _buildPdf({
     required List<dynamic> grades,
     required String schoolName,
@@ -145,11 +137,9 @@ class MarksheetPdfService {
   }) async {
     final pdf = pw.Document();
 
-    // Term-wise split
     final term1 = grades.where((g) => g.term == 'term1').toList();
     final term2 = grades.where((g) => g.term == 'term2').toList();
 
-    // Student info — pehli entry se lo
     final first     = grades.isNotEmpty ? grades.first : null;
     final stuName   = first?.studentName ?? '—';
     final className = first?.className   ?? '—';
@@ -184,15 +174,16 @@ class MarksheetPdfService {
     return pdf.save();
   }
 
-  // ─── Header ──────────────────────────────────────────────────────────────────
   static pw.Widget _pdfHeader(String name, String address, String year) {
+    final schoolName = name.isNotEmpty ? name : 'marksheet_pdf.school_name_default'.tr();
+    final schoolAddress = address.isNotEmpty ? address : 'marksheet_pdf.school_address_default'.tr();
+
     return pw.Column(
       children: [
         pw.Row(
           mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
           crossAxisAlignment: pw.CrossAxisAlignment.center,
           children: [
-            // Left red circle icon placeholder
             pw.Container(
               width: 48, height: 48,
               decoration: pw.BoxDecoration(
@@ -207,14 +198,12 @@ class MarksheetPdfService {
                         fontWeight: pw.FontWeight.bold)),
               ),
             ),
-
-            // Center school info
             pw.Expanded(
               child: pw.Column(
                 mainAxisAlignment: pw.MainAxisAlignment.center,
                 children: [
                   pw.Text(
-                    name.toUpperCase(),
+                    schoolName.toUpperCase(),
                     textAlign: pw.TextAlign.center,
                     style: pw.TextStyle(
                       color: _brandRed,
@@ -224,22 +213,24 @@ class MarksheetPdfService {
                     ),
                   ),
                   pw.SizedBox(height: 2),
-                  pw.Text('TRUST ON EDUCATION',
+                  pw.Text(
+                      'marksheet_pdf.trust_line'.tr(),
                       textAlign: pw.TextAlign.center,
                       style: pw.TextStyle(
                           color: _brandRed,
                           fontSize: 8,
                           fontWeight: pw.FontWeight.bold,
-                          letterSpacing: 1.0)),
+                          letterSpacing: 1.0)
+                  ),
                   pw.SizedBox(height: 2),
-                  pw.Text(address,
+                  pw.Text(
+                      schoolAddress,
                       textAlign: pw.TextAlign.center,
-                      style: const pw.TextStyle(fontSize: 8, color: _black54)),
+                      style: const pw.TextStyle(fontSize: 8, color: _black54)
+                  ),
                 ],
               ),
             ),
-
-            // Right book icon placeholder
             pw.Container(
               width: 40, height: 40,
               decoration: pw.BoxDecoration(
@@ -255,7 +246,6 @@ class MarksheetPdfService {
         ),
         pw.SizedBox(height: 8),
 
-        // Progress Report banner
         pw.Container(
           padding: const pw.EdgeInsets.symmetric(vertical: 4),
           decoration: const pw.BoxDecoration(
@@ -266,7 +256,9 @@ class MarksheetPdfService {
           ),
           child: pw.Center(
             child: pw.Text(
-              'PROGRESS REPORT * $year',
+              'marksheet_pdf.progress_report'.tr(
+                  namedArgs: {'year': year}
+              ),
               style: pw.TextStyle(
                   fontSize: 11,
                   fontWeight: pw.FontWeight.bold,
@@ -278,7 +270,6 @@ class MarksheetPdfService {
     );
   }
 
-  // ─── Student Profile ──────────────────────────────────────────────────────────
   static pw.Widget _pdfStudentProfile(
       String name, String cls, String sec,
       String roll, String dob, String father,
@@ -300,24 +291,23 @@ class MarksheetPdfService {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Student Profile',
+        pw.Text('marksheet_pdf.student_profile'.tr(),
             style: pw.TextStyle(
                 fontSize: 10,
                 fontWeight: pw.FontWeight.bold,
                 decoration: pw.TextDecoration.underline)),
         pw.SizedBox(height: 6),
-        row('Name of Student', name, 'Class & Section', '$cls - $sec'),
+        row('marksheet_pdf.name_of_student'.tr(), name, 'marksheet_pdf.class_section'.tr(), '$cls - $sec'),
         pw.SizedBox(height: 4),
-        row("Mother's Name", mother, 'Roll No', roll),
+        row('marksheet_pdf.mother_name'.tr(), mother, 'marksheet_pdf.roll_no'.tr(), roll),
         pw.SizedBox(height: 4),
-        row("Father's Name", father, 'D.O.B.', dob),
+        row('marksheet_pdf.father_name'.tr(), father, 'marksheet_pdf.dob'.tr(), dob),
         pw.SizedBox(height: 4),
-        row('Admission No.', admNo, '', ''),
+        row('marksheet_pdf.admission_no'.tr(), admNo, '', ''),
       ],
     );
   }
 
-  // ─── Co-Scholastic Table ──────────────────────────────────────────────────────
   static pw.Widget _pdfCoScholasticTable(List term1, List term2) {
     final allKeys = <String>{};
     for (final g in [...term1, ...term2]) {
@@ -339,7 +329,6 @@ class MarksheetPdfService {
       );
     }
 
-    // Build rows
     final rows = allKeys.map((key) {
       final g1 = term1.firstWhere(
               (g) => g.subjectName == key, orElse: () => null);
@@ -348,12 +337,10 @@ class MarksheetPdfService {
       return [key, g1?.grade ?? '—', g2?.grade ?? '—'];
     }).toList();
 
-    // Split half-half for 2 columns
     final half   = (rows.length / 2).ceil();
     final left   = rows.sublist(0, half);
     final right  = rows.sublist(half);
 
-    // Pad right side if shorter
     while (right.length < left.length) right.add(['', '', '']);
 
     return pw.Row(
@@ -372,19 +359,17 @@ class MarksheetPdfService {
               5: const pw.FlexColumnWidth(1),
             },
             children: [
-              // Header
               pw.TableRow(
                 decoration: const pw.BoxDecoration(color: _darkSlate),
                 children: [
-                  cell('Co Scholastic Area', header: true),
-                  cell('Term-1', header: true),
-                  cell('Term-2', header: true),
-                  cell('Co Scholastic Area', header: true),
-                  cell('Term-1', header: true),
-                  cell('Term-2', header: true),
+                  cell('marksheet_pdf.co_scholastic_area'.tr(), header: true),
+                  cell('marksheet_pdf.term1'.tr(), header: true),
+                  cell('marksheet_pdf.term2'.tr(), header: true),
+                  cell('marksheet_pdf.co_scholastic_area'.tr(), header: true),
+                  cell('marksheet_pdf.term1'.tr(), header: true),
+                  cell('marksheet_pdf.term2'.tr(), header: true),
                 ],
               ),
-              // Data rows
               ...List.generate(left.length, (i) {
                 final l = left[i];
                 final r = right[i];
@@ -402,7 +387,6 @@ class MarksheetPdfService {
         ),
         pw.SizedBox(width: 12),
 
-        // Right Grade Scale
         pw.Expanded(
           flex: 2,
           child: pw.Table(
@@ -412,13 +396,13 @@ class MarksheetPdfService {
               1: const pw.FlexColumnWidth(2),
             },
             children: [
-              ['A1','Outstanding'],
-              ['A2','Excellent'],
-              ['B1','Very Good'],
-              ['B2','Good'],
-              ['C1','Above Average'],
-              ['C2','Average'],
-              ['D','Below Average'],
+              ['A1','marksheet_pdf.outstanding'.tr()],
+              ['A2','marksheet_pdf.excellent'.tr()],
+              ['B1','marksheet_pdf.very_good'.tr()],
+              ['B2','marksheet_pdf.good'.tr()],
+              ['C1','marksheet_pdf.above_average'.tr()],
+              ['C2','marksheet_pdf.average'.tr()],
+              ['D','marksheet_pdf.below_average'.tr()],
             ].map((e) => pw.TableRow(children: [
               pw.Container(
                 padding: const pw.EdgeInsets.symmetric(vertical: 4),
@@ -442,7 +426,6 @@ class MarksheetPdfService {
     );
   }
 
-  // ─── Grading Scale Table ──────────────────────────────────────────────────────
   static pw.Widget _pdfGradingScale() {
     pw.Widget hCell(String t) => pw.Container(
       padding: const pw.EdgeInsets.symmetric(vertical: 4),
@@ -468,7 +451,7 @@ class MarksheetPdfService {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text(
-          'Instructions:- Grading scale:- Grades are awarded on a 8-point grading scale as follows',
+          'marksheet_pdf.grading_scale_instruction'.tr(),
           style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
         ),
         pw.SizedBox(height: 4),
@@ -478,20 +461,25 @@ class MarksheetPdfService {
             pw.TableRow(
               decoration: const pw.BoxDecoration(color: _brandRed),
               children: [
-                hCell('91-100'), hCell('81-90'), hCell('71-80'),
-                hCell('61-70'), hCell('51-60'), hCell('41-50'),
-                hCell('33-40'), hCell('32 & Below'),
+                hCell('marksheet_pdf.range_91_100'.tr()),
+                hCell('marksheet_pdf.range_81_90'.tr()),
+                hCell('marksheet_pdf.range_71_80'.tr()),
+                hCell('marksheet_pdf.range_61_70'.tr()),
+                hCell('marksheet_pdf.range_51_60'.tr()),
+                hCell('marksheet_pdf.range_41_50'.tr()),
+                hCell('marksheet_pdf.range_33_40'.tr()),
+                hCell('marksheet_pdf.range_below_32'.tr()),
               ],
             ),
             pw.TableRow(children: [
-              vCell('A1', PdfColors.green800),
-              vCell('A2', PdfColors.blue800),
-              vCell('B1', PdfColors.purple),
-              vCell('B2', PdfColors.cyan800),
-              vCell('C1', PdfColors.orange),
-              vCell('C2', PdfColors.orangeAccent),
-              vCell('D',  PdfColors.redAccent),
-              vCell('E\n(Need Improvement)', PdfColors.red),
+              vCell('marksheet_pdf.grade_a1'.tr(), PdfColors.green800),
+              vCell('marksheet_pdf.grade_a2'.tr(), PdfColors.blue800),
+              vCell('marksheet_pdf.grade_b1'.tr(), PdfColors.purple),
+              vCell('marksheet_pdf.grade_b2'.tr(), PdfColors.cyan800),
+              vCell('marksheet_pdf.grade_c1'.tr(), PdfColors.orange),
+              vCell('marksheet_pdf.grade_c2'.tr(), PdfColors.orangeAccent),
+              vCell('marksheet_pdf.grade_d'.tr(), PdfColors.redAccent),
+              vCell('marksheet_pdf.grade_e'.tr(), PdfColors.red),
             ]),
           ],
         ),
@@ -499,7 +487,6 @@ class MarksheetPdfService {
     );
   }
 
-  // ─── Footer ───────────────────────────────────────────────────────────────────
   static pw.Widget _pdfFooter() {
     pw.Widget sig(String label) => pw.Column(
       children: [
@@ -515,15 +502,16 @@ class MarksheetPdfService {
     return pw.Row(
       children: [
         pw.Text(
-          'Date : ${DateTime.now().day.toString().padLeft(2,'0')}-'
-              '${DateTime.now().month.toString().padLeft(2,'0')}-'
-              '${DateTime.now().year}',
+          'marksheet_pdf.date_label'.tr() +
+              ' : ${DateTime.now().day.toString().padLeft(2,'0')}-'
+                  '${DateTime.now().month.toString().padLeft(2,'0')}-'
+                  '${DateTime.now().year}',
           style: pw.TextStyle(fontSize: 9, fontWeight: pw.FontWeight.bold),
         ),
         pw.Spacer(),
-        sig('CLASS TEACHER'),
+        sig('marksheet_pdf.class_teacher'.tr()),
         pw.SizedBox(width: 40),
-        sig('PRINCIPAL'),
+        sig('marksheet_pdf.principal'.tr()),
       ],
     );
   }

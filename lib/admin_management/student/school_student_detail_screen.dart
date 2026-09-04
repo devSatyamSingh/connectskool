@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:school_pro/res/app_color.dart';
@@ -6,12 +7,12 @@ import 'package:school_pro/view_model/school_view_model/student/school_student_d
 
 class SchoolStudentDetailScreen extends StatefulWidget {
   final int studentId;
-  final String? className; // ADD
+  final String? className;
   final String? sectionName;
   const SchoolStudentDetailScreen({
     super.key,
     required this.studentId,
-    this.className, // ADD
+    this.className,
     this.sectionName,
   });
 
@@ -34,27 +35,31 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
 
   // ─── Helpers ────────────────────────────────────────────
   String _formatDate(String? dateString) {
-    if (dateString == null || dateString.trim().isEmpty) return 'N/A';
+    if (dateString == null || dateString.trim().isEmpty) {
+      return 'student_detail.not_available'.tr();
+    }
     try {
       final date = DateTime.parse(dateString);
       return '${date.day.toString().padLeft(2, '0')}/'
           '${date.month.toString().padLeft(2, '0')}/'
           '${date.year}';
     } catch (_) {
-      return 'N/A';
+      return 'student_detail.not_available'.tr();
     }
   }
 
   String _capitalize(String? value) {
-    if (value == null || value.trim().isEmpty) return 'N/A';
+    if (value == null || value.trim().isEmpty) {
+      return 'student_detail.not_available'.tr();
+    }
     final v = value.trim();
     return v[0].toUpperCase() + v.substring(1);
   }
 
   String _safe(dynamic value) {
-    if (value == null) return 'N/A';
+    if (value == null) return 'student_detail.not_available'.tr();
     final s = value.toString().trim();
-    return s.isEmpty || s == 'null' ? 'N/A' : s;
+    return s.isEmpty || s == 'null' ? 'student_detail.not_available'.tr() : s;
   }
 
   void _showErrorSnack(String msg) {
@@ -75,7 +80,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
         uri,
         mode: LaunchMode.externalApplication,
       );
-      if (!launched) _showErrorSnack("Could not open document");
+      if (!launched) _showErrorSnack('student_detail.could_not_open'.tr());
     } catch (e) {
       _showErrorSnack("Error: $e");
     }
@@ -107,7 +112,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Student Details'),
+        title: Text('student_detail.title'.tr()),
         backgroundColor: AppColor.lightBlueColor,
         foregroundColor: Colors.white,
         elevation: 0,
@@ -121,7 +126,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
           final s = viewModel.schoolTeachersDetailModel?.data;
 
           if (s == null) {
-            return const Center(child: Text('No data found'));
+            return Center(child: Text('student_detail.no_data'.tr()));
           }
 
           return SingleChildScrollView(
@@ -148,34 +153,34 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                           child: ClipOval(
                             child: s.studentPhotoUrl != null
                                 ? Image.network(
-                                    s.studentPhotoUrl!,
-                                    width: 124,
-                                    height: 124,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder: (_, child, progress) =>
-                                        progress == null
-                                        ? child
-                                        : const CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                          ),
-                                    errorBuilder: (_, __, ___) => Icon(
-                                      Icons.person,
-                                      size: 70,
-                                      color: AppColor.lightBlueColor,
-                                    ),
-                                  )
+                              s.studentPhotoUrl!,
+                              width: 124,
+                              height: 124,
+                              fit: BoxFit.cover,
+                              loadingBuilder: (_, child, progress) =>
+                              progress == null
+                                  ? child
+                                  : const CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.person,
+                                size: 70,
+                                color: AppColor.lightBlueColor,
+                              ),
+                            )
                                 : Icon(
-                                    Icons.person,
-                                    size: 70,
-                                    color: AppColor.lightBlueColor,
-                                  ),
+                              Icons.person,
+                              size: 70,
+                              color: AppColor.lightBlueColor,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 14),
 
                         // Name
                         Text(
-                          s.name ?? 'N/A',
+                          s.name ?? 'student_detail.not_available'.tr(),
                           style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -185,7 +190,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                         const SizedBox(height: 4),
 
                         // Admission No chip
-                        if (_safe(s.admissionNo) != 'N/A')
+                        if (_safe(s.admissionNo) != 'student_detail.not_available'.tr())
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -205,7 +210,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  'Adm No: ${s.admissionNo}',
+                                  '${'student_detail.adm_no'.tr()}: ${s.admissionNo}',
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.white,
@@ -216,24 +221,6 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                             ),
                           ),
                         const SizedBox(height: 10),
-
-                        // Status chip
-                        // Container(
-                        //   padding: const EdgeInsets.symmetric(
-                        //       horizontal: 14, vertical: 6),
-                        //   decoration: BoxDecoration(
-                        //     color: s.status == 1 ? Colors.green : Colors.red,
-                        //     borderRadius: BorderRadius.circular(20),
-                        //   ),
-                        //   child: Text(
-                        //     s.status == 1 ? 'Active' : 'Inactive',
-                        //     style: const TextStyle(
-                        //       color: Colors.white,
-                        //       fontWeight: FontWeight.bold,
-                        //       fontSize: 13,
-                        //     ),
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -242,155 +229,149 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                 const SizedBox(height: 20),
 
                 // ── Personal Information ────────────────────
-                _buildSection('Personal Information', [
+                _buildSection('student_detail.personal_information'.tr(), [
                   _buildInfoRow(
                     Icons.person_outline,
-                    'Full Name',
+                    'student_detail.full_name'.tr(),
                     _safe(s.name),
                   ),
                   _buildInfoRow(
                     Icons.email_outlined,
-                    'Email',
+                    'student_detail.email'.tr(),
                     _safe(s.userEmail),
                   ),
                   _buildInfoRow(
                     Icons.phone_outlined,
-                    'Mobile',
+                    'student_detail.mobile'.tr(),
                     _safe(s.mobileNumber),
                   ),
                   _buildInfoRow(
                     Icons.wc_rounded,
-                    'Gender',
+                    'student_detail.gender'.tr(),
                     _capitalize(s.gender?.toString()),
                   ),
                   _buildInfoRow(
                     Icons.cake_outlined,
-                    'Date of Birth',
+                    'student_detail.date_of_birth'.tr(),
                     _formatDate(s.dob?.toString()),
                   ),
                   _buildInfoRow(
                     Icons.bloodtype_outlined,
-                    'Blood Group',
+                    'student_detail.blood_group'.tr(),
                     _safe(s.bloodGroup),
                   ),
                   _buildInfoRow(
                     Icons.category_outlined,
-                    'Category',
+                    'student_detail.category'.tr(),
                     _capitalize(s.category?.toString()),
                   ),
                   _buildInfoRow(
                     Icons.church_outlined,
-                    'Religion',
+                    'student_detail.religion'.tr(),
                     _capitalize(s.religion?.toString()),
                   ),
                   _buildInfoRow(
                     Icons.location_city_outlined,
-                    'City',
+                    'student_detail.city'.tr(),
                     _safe(s.city),
                   ),
-                  _buildInfoRow(Icons.map_outlined, 'State', _safe(s.state)),
+                  _buildInfoRow(Icons.map_outlined, 'student_detail.state'.tr(), _safe(s.state)),
                   _buildInfoRow(
                     Icons.pin_outlined,
-                    'Pincode',
+                    'student_detail.pincode'.tr(),
                     _safe(s.pincode),
                   ),
                   _buildInfoRow(
                     Icons.location_on_outlined,
-                    'Address',
+                    'student_detail.address'.tr(),
                     _safe(s.address),
                   ),
                 ]),
 
                 // ── Academic Information ────────────────────
-                _buildSection('Academic Information', [
+                _buildSection('student_detail.academic_information'.tr(), [
                   _buildInfoRow(
                     Icons.confirmation_number_outlined,
-                    'Admission No',
+                    'student_detail.admission_no'.tr(),
                     _safe(s.admissionNo),
                   ),
                   _buildInfoRow(
                     Icons.format_list_numbered_rounded,
-                    'Roll No',
+                    'student_detail.roll_no'.tr(),
                     _safe(s.rollNo),
                   ),
                   _buildInfoRow(
                     Icons.school_outlined,
-                    'Academic Year',
+                    'student_detail.academic_year'.tr(),
                     _safe(s.academicYear),
                   ),
                   _buildInfoRow(
                     Icons.class_outlined,
-                    'Class Name',
+                    'student_detail.class_name'.tr(),
                     _safe(
                       s.className?.isNotEmpty == true
                           ? s.className
                           : widget.className,
                     ),
                   ),
-
-                  // ✅ BAAD MEIN — widget value ko priority do
                   _buildInfoRow(
                     Icons.grid_view_outlined,
-                    'Section Name',
+                    'student_detail.section_name'.tr(),
                     _safe(
                       widget.sectionName?.isNotEmpty == true
-                          ? widget.sectionName   // pehle list se aaya value use karo
-                          : s.sectionName,       // fallback API se
+                          ? widget.sectionName
+                          : s.sectionName,
                     ),
                   ),
-                  // _buildInfoRow(Icons.class_outlined, 'Class Name',
-                  //     _safe(s.className)),
-                  // _buildInfoRow(Icons.grid_view_outlined, 'Section Name',
-                  //     _safe(s.sectionName)),
                   _buildInfoRow(
                     Icons.calendar_today_outlined,
-                    'Admission Date',
+                    'student_detail.admission_date'.tr(),
                     _formatDate(s.createdAt?.toString()),
                   ),
                 ]),
 
                 // ── Family Information ──────────────────────
-                _buildSection('Family Information', [
+                _buildSection('student_detail.family_information'.tr(), [
                   _buildInfoRow(
                     Icons.person,
-                    "Father's Name",
+                    "student_detail.father_name".tr(),
                     _safe(s.fatherName),
                   ),
                   _buildInfoRow(
                     Icons.work_outline,
-                    "Father's Occupation",
+                    "student_detail.father_occupation".tr(),
                     _safe(s.fatherOccupation),
                   ),
                   _buildInfoRow(
                     Icons.phone_outlined,
-                    "Father's Mobile",
+                    "student_detail.father_mobile".tr(),
                     _safe(s.fatherMobile),
                   ),
                   const Divider(height: 20),
                   _buildInfoRow(
                     Icons.person,
-                    "Mother's Name",
+                    "student_detail.mother_name".tr(),
                     _safe(s.motherName),
                   ),
                   _buildInfoRow(
                     Icons.work_outline,
-                    "Mother's Occupation",
+                    "student_detail.mother_occupation".tr(),
                     _safe(s.motherOccupation),
                   ),
                   _buildInfoRow(
                     Icons.phone_outlined,
-                    "Mother's Mobile",
+                    "student_detail.mother_mobile".tr(),
                     _safe(s.motherMobile),
                   ),
                   const Divider(height: 20),
                   _buildInfoRow(
                     Icons.supervised_user_circle_outlined,
-                    "Guardian's Name",
+                    "student_detail.guardian_name".tr(),
                     _safe(s.guardianName),
                   ),
                   _buildInfoRow(
                     Icons.emergency_outlined,
-                    'Emergency Contact',
+                    'student_detail.emergency_contact'.tr(),
                     _safe(s.emergencyContactNumber),
                   ),
                 ]),
@@ -398,7 +379,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                 // ── Fee Heads ──────────────────────────────
                 if ((s.feeHeads ?? []).isNotEmpty)
                   _buildSection(
-                    'Assigned Fee Heads',
+                    'student_detail.assigned_fee_heads'.tr(),
                     [
                       Wrap(
                         spacing: 10,
@@ -447,33 +428,31 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                   ),
 
                 // ── Documents ──────────────────────────────
-                _buildSection('Documents', [
+                _buildSection('student_detail.documents'.tr(), [
                   _buildDocumentCard(
-                    title: 'Aadhar Card',
+                    title: 'student_detail.aadhar_card'.tr(),
                     url: s.aadharCardUrl?.toString(),
                     icon: Icons.credit_card_rounded,
                   ),
-                  if (_safe(s.aadharNumber) != 'N/A') ...[
+                  if (_safe(s.aadharNumber) != 'student_detail.not_available'.tr()) ...[
                     const SizedBox(height: 10),
                     _buildInfoRow(
                       Icons.numbers_rounded,
-                      'Aadhar Number',
+                      'student_detail.aadhar_number'.tr(),
                       _safe(s.aadharNumber),
                     ),
                   ],
                   const SizedBox(height: 4),
 
-                  // Father photo
                   _buildDocumentCard(
-                    title: "Father's Photo",
+                    title: "student_detail.father_photo".tr(),
                     url: s.fatherPhotoUrl?.toString(),
                     icon: Icons.person_rounded,
                   ),
                   const SizedBox(height: 10),
 
-                  // Mother photo
                   _buildDocumentCard(
-                    title: "Mother's Photo",
+                    title: "student_detail.mother_photo".tr(),
                     url: s.motherPhotoUrl?.toString(),
                     icon: Icons.person_rounded,
                   ),
@@ -583,8 +562,8 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
         InkWell(
           onTap: hasDoc
               ? () => isImg
-                    ? _openImageViewer(context, url!, title)
-                    : _openUrl(url!)
+              ? _openImageViewer(context, url!, title)
+              : _openUrl(url!)
               : null,
           borderRadius: BorderRadius.circular(12),
           child: Container(
@@ -644,9 +623,9 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                           Text(
                             hasDoc
                                 ? (isImg
-                                      ? 'Uploaded • Tap to view'
-                                      : 'Uploaded • Tap to open')
-                                : 'Not Uploaded',
+                                ? 'student_detail.uploaded_view'.tr()
+                                : 'student_detail.uploaded_open'.tr())
+                                : 'student_detail.not_uploaded'.tr(),
                             style: TextStyle(
                               fontSize: 12,
                               color: hasDoc ? Colors.green[700] : Colors.grey,
@@ -703,7 +682,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                           child: CircularProgressIndicator(
                             value: progress.expectedTotalBytes != null
                                 ? progress.cumulativeBytesLoaded /
-                                      progress.expectedTotalBytes!
+                                progress.expectedTotalBytes!
                                 : null,
                             color: AppColor.lightBlueColor,
                             strokeWidth: 2,
@@ -718,7 +697,7 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Column(
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
@@ -726,9 +705,9 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                             size: 40,
                             color: Colors.grey,
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           Text(
-                            'Image could not be loaded',
+                            'student_detail.image_error'.tr(),
                             style: TextStyle(color: Colors.grey, fontSize: 12),
                           ),
                         ],
@@ -747,18 +726,18 @@ class _SchoolStudentDetailScreenState extends State<SchoolStudentDetailScreen> {
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.zoom_out_map_rounded,
                             color: Colors.white,
                             size: 13,
                           ),
-                          SizedBox(width: 4),
+                          const SizedBox(width: 4),
                           Text(
-                            'Tap to expand',
-                            style: TextStyle(color: Colors.white, fontSize: 11),
+                            'student_detail.tap_to_expand'.tr(),
+                            style: const TextStyle(color: Colors.white, fontSize: 11),
                           ),
                         ],
                       ),
@@ -789,7 +768,7 @@ class _ImageViewerScreen extends StatefulWidget {
 
 class _ImageViewerScreenState extends State<_ImageViewerScreen> {
   final TransformationController _transformController =
-      TransformationController();
+  TransformationController();
 
   @override
   void dispose() {
@@ -814,7 +793,7 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
           IconButton(
             onPressed: _resetZoom,
             icon: const Icon(Icons.fit_screen_rounded, color: Colors.white),
-            tooltip: 'Reset Zoom',
+            tooltip: 'student_detail.reset_zoom'.tr(),
           ),
           IconButton(
             onPressed: () async {
@@ -822,7 +801,7 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
               await launchUrl(uri, mode: LaunchMode.externalApplication);
             },
             icon: const Icon(Icons.open_in_new_rounded, color: Colors.white),
-            tooltip: 'Open in browser',
+            tooltip: 'student_detail.open_browser'.tr(),
           ),
         ],
       ),
@@ -844,19 +823,19 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
                   CircularProgressIndicator(
                     value: progress.expectedTotalBytes != null
                         ? progress.cumulativeBytesLoaded /
-                              progress.expectedTotalBytes!
+                        progress.expectedTotalBytes!
                         : null,
                     color: Colors.white,
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Loading image...',
-                    style: TextStyle(color: Colors.white60, fontSize: 13),
+                  Text(
+                    'student_detail.loading_image'.tr(),
+                    style: const TextStyle(color: Colors.white60, fontSize: 13),
                   ),
                 ],
               );
             },
-            errorBuilder: (_, __, ___) => const Column(
+            errorBuilder: (_, __, ___) => Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
@@ -864,10 +843,10 @@ class _ImageViewerScreenState extends State<_ImageViewerScreen> {
                   size: 60,
                   color: Colors.white54,
                 ),
-                SizedBox(height: 12),
+                const SizedBox(height: 12),
                 Text(
-                  'Could not load image',
-                  style: TextStyle(color: Colors.white54),
+                  'student_detail.image_error'.tr(),
+                  style: const TextStyle(color: Colors.white54),
                 ),
               ],
             ),

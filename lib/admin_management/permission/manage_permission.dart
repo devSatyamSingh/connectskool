@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 
@@ -54,7 +55,7 @@ class _ManagePermissionState extends State<ManagePermission> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: AppText.customText(
-                    "Manage Permissions",
+                    'permission.title'.tr(),
                     size: 19,
                     weight: FontWeight.bold,
                     color: Colors.white,
@@ -63,8 +64,6 @@ class _ManagePermissionState extends State<ManagePermission> {
               ],
             ),
           ),
-
-          // const SizedBox(height: 20),
 
           // Grid Section
           Expanded(
@@ -76,15 +75,14 @@ class _ManagePermissionState extends State<ManagePermission> {
                 mainAxisSpacing: 16,
                 children: [
                   _permissionCard(
-                    title: "Role Permission",
+                    title: 'permission.role_permission'.tr(),
                     icon: Icons.admin_panel_settings_rounded,
                     onTap: () {
                       Navigator.pushNamed(context, RoutesName.rolePermissionScreen);
-                      // Navigate to Role Permission Screen
                     },
                   ),
                   _permissionCard(
-                    title: "User Permission",
+                    title: 'permission.user_permission'.tr(),
                     icon: Icons.person_rounded,
                     onTap: () {
                       Navigator.pushNamed(context, RoutesName.userPermissionScreen);
@@ -109,11 +107,11 @@ class _ManagePermissionState extends State<ManagePermission> {
       borderRadius: BorderRadius.circular(18),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white, // 👈 Light background
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08), // 👈 Soft shadow
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 15,
               offset: const Offset(0, 8),
             ),
@@ -131,7 +129,7 @@ class _ManagePermissionState extends State<ManagePermission> {
               child: Icon(
                 icon,
                 size: 32,
-                color: AppColor.primary, // 👈 Theme color icon
+                color: AppColor.primary,
               ),
             ),
             const SizedBox(height: 14),

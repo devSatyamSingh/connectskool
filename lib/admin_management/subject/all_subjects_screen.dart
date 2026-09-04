@@ -3,14 +3,13 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/main.dart';
 import 'package:school_pro/view_model/school_view_model/subject/delete_subject_view_model.dart';
 import 'package:shimmer/shimmer.dart';
-
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 import 'package:school_pro/res/app_color.dart';
 import 'package:school_pro/res/const_text.dart';
 import 'package:school_pro/res/app_button.dart';
 import 'package:school_pro/view_model/school_view_model/subject/all_subjects_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/subject/add_subject_view_model.dart';
 import 'package:school_pro/view_model/school_view_model/subject/edit_subject_view_model.dart';
-
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
 import '../../utils/utils.dart';
@@ -46,12 +45,10 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
     super.dispose();
   }
 
-  // ── Pull to Refresh ──────────────────────────
   Future<void> _onRefresh() async {
     await Provider.of<AllSubjectsVieModel>(context, listen: false)
         .allSubjectsApi(context);
 
-    // Animation reset karo taaki cards dobara animate hon
     _animationController.reset();
     _animationController.forward();
   }
@@ -71,7 +68,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
         floatingActionButton: SizedBox(
           width: 180,
           child: AppButton(
-            title: "Add Subject",
+            title: 'all_subjects.add_subject'.tr(),
             icon: Icons.add_rounded,
             height: 56,
             radius: 18,
@@ -80,7 +77,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                 PermissionKeys.addSubject,
               )) {
                 Utils.show(
-                  "You don't have permission to add subject",
+                  'all_subjects.permission_add'.tr(),
                   context,
                 );
                 return;
@@ -92,7 +89,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
         ),
         body: Column(
           children: [
-            /// ===== HEADER =====
             Container(
               padding: const EdgeInsets.fromLTRB(12, 50, 20, 22),
               decoration: BoxDecoration(
@@ -128,7 +124,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppText.customText(
-                      "All Subjects",
+                      'all_subjects.title'.tr(),
                       size: 19,
                       weight: FontWeight.bold,
                       color: Colors.white,
@@ -146,7 +142,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
 
             const SizedBox(height: 12),
 
-            /// ===== LIST =====
             Expanded(
               child: viewModel.loading
                   ? _subjectShimmer()
@@ -169,7 +164,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      "No Subjects Found",
+                      'all_subjects.no_subjects_found'.tr(),
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w600,
@@ -178,7 +173,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      "Subjects will appear here once added",
+                      'all_subjects.no_subjects_subtitle'.tr(),
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade500,
@@ -187,7 +182,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                   ],
                 ),
               )
-              // ✅ Pull to Refresh wrapped ListView
                   : RefreshIndicator(
                 onRefresh: _onRefresh,
                 color: AppColor.primary,
@@ -195,25 +189,18 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                 strokeWidth: 2.5,
                 displacement: 60,
                 child: ListView.builder(
-                  // ✅ Zaruri: list choti ho tab bhi pull kaam kare
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding:
                   const EdgeInsets.fromLTRB(18, 8, 18, 20),
                   itemCount: subjects.length,
                   itemBuilder: (context, index) {
                     final s = subjects[index];
-                    return // ✅ FIX - type add karo
-                      _subjectCard(index, {
-                        "id": s.subjectId,
-                        "name": s.subjectName ?? "",
-                        "status": s.status,
-                        "type": s.assessmentModel ?? "scholastic", // 👈 YEH ADD KARO
-                      });
-                    //   _subjectCard(index, {
-                    //   "id": s.subjectId,
-                    //   "name": s.subjectName ?? "",
-                    //   "status": s.status,
-                    // });
+                    return _subjectCard(index, {
+                      "id": s.subjectId,
+                      "name": s.subjectName ?? "",
+                      "status": s.status,
+                      "type": s.assessmentModel ?? "scholastic",
+                    });
                   },
                 ),
               ),
@@ -292,27 +279,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                   ),
                 ),
                 const SizedBox(height: 6),
-                // Row(
-                //   children: [
-                //     Container(
-                //       height: 8,
-                //       width: 8,
-                //       decoration: BoxDecoration(
-                //         color:
-                //         s["status"] == 1 ? Colors.green : Colors.red,
-                //         shape: BoxShape.circle,
-                //       ),
-                //     ),
-                //     const SizedBox(width: 6),
-                //     Text(
-                //       s["status"] == 1 ? "Active Subject" : "Inactive",
-                //       style: TextStyle(
-                //         fontSize: 12,
-                //         color: Colors.grey.shade600,
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 Row(
                   children: [
                     Icon(
@@ -326,7 +292,9 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      s["type"] == "scholastic" ? "Scholastic" : "Co-Scholastic",
+                      s["type"] == "scholastic"
+                          ? 'all_subjects.scholastic'.tr()
+                          : 'all_subjects.co_scholastic'.tr(),
                       style: TextStyle(
                         fontSize: 12,
                         color: s["type"] == "scholastic"
@@ -344,18 +312,14 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
             children: [
               IconButton(
                 onPressed: () {
-
                   if (!PermissionExtensions.canAccess(
                       PermissionKeys.editSubject)) {
-
                     Utils.show(
-                      "You don't have permission to edit subject",
+                      'all_subjects.permission_edit'.tr(),
                       context,
                     );
-
                     return;
                   }
-
                   _openSubjectSheet(subject: s);
                 },
                 icon:
@@ -365,12 +329,10 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                 onPressed: () async {
                   if (!PermissionExtensions.canAccess(
                       PermissionKeys.deleteSubject)) {
-
                     Utils.show(
-                      "You don't have permission to delete subject",
+                      'all_subjects.permission_delete'.tr(),
                       context,
                     );
-
                     return;
                   }
                   bool confirmed = await _showDeleteDialog();
@@ -389,7 +351,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
     );
   }
 
-  // ── Delete Dialog ────────────────────────────
   Future<bool> _showDeleteDialog() async {
     return await showDialog<bool>(
       context: context,
@@ -404,7 +365,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Top Icon
               Container(
                 height: 70,
                 width: 70,
@@ -418,34 +378,25 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                   size: 36,
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // Title
-              const Text(
-                "Delete Subject",
-                style: TextStyle(
+              Text(
+                'all_subjects.delete_subject'.tr(),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-
               const SizedBox(height: 10),
-
-              // Description
-              const Text(
-                "Are you sure you want to delete this subject?\nThis action cannot be undone.",
+              Text(
+                'all_subjects.delete_confirmation'.tr(),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.grey,
                   fontSize: 14,
                   height: 1.5,
                 ),
               ),
-
               const SizedBox(height: 24),
-
-              // Buttons
               Row(
                 children: [
                   Expanded(
@@ -461,7 +412,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                         ),
                       ),
                       child: Text(
-                        "Cancel",
+                        'all_subjects.cancel'.tr(),
                         style: TextStyle(
                           color: Colors.grey.shade600,
                           fontWeight: FontWeight.w600,
@@ -469,9 +420,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () =>
@@ -485,9 +434,9 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                         ),
                         elevation: 2,
                       ),
-                      child: const Text(
-                        "Delete",
-                        style: TextStyle(
+                      child: Text(
+                        'all_subjects.delete'.tr(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
@@ -503,6 +452,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
     ) ??
         false;
   }
+
   void _openSubjectSheet({Map<String, dynamic>? subject}) {
     final isEdit = subject != null;
     final nameCtrl =
@@ -532,20 +482,20 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        isEdit ? "Edit Subject" : "Add Subject",
+                        isEdit
+                            ? 'all_subjects.edit_subject'.tr()
+                            : 'all_subjects.add_subject_title'.tr(),
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-
                       const SizedBox(height: 16),
 
-                      /// Subject Name
                       TextField(
                         controller: nameCtrl,
                         decoration: InputDecoration(
-                          hintText: "Subject Name",
+                          hintText: 'all_subjects.subject_name'.tr(),
                           filled: true,
                           fillColor: Colors.white,
                           contentPadding: const EdgeInsets.symmetric(
@@ -556,54 +506,16 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 14),
 
-                      /// Dropdown
-                      // ValueListenableBuilder<String>(
-                      //   valueListenable: type,
-                      //   builder: (context, value, child) {
-                      //     return Container(
-                      //       padding: const EdgeInsets.symmetric(
-                      //           horizontal: 12),
-                      //       decoration: BoxDecoration(
-                      //         color: Colors.white,
-                      //         borderRadius: BorderRadius.circular(14),
-                      //       ),
-                      //       child: DropdownButtonFormField<String>(
-                      //         value: value,
-                      //         isExpanded: true,
-                      //         menuMaxHeight: 200,
-                      //         decoration: const InputDecoration(
-                      //             border: InputBorder.none),
-                      //         items: const [
-                      //           DropdownMenuItem(
-                      //             value: "scholastic",
-                      //             child: Text("Scholastic"),
-                      //           ),
-                      //           DropdownMenuItem(
-                      //             value: "co_scholastic",
-                      //             child: Text("Co Scholastic"),
-                      //           ),
-                      //         ],
-                      //         onChanged: (v) {
-                      //           type.value = v!;
-                      //         },
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
-                      /// Dropdown
                       ValueListenableBuilder<String>(
                         valueListenable: type,
                         builder: (context, value, child) {
                           return GestureDetector(
                             onTap: () async {
-                              // Pehle keyboard band karo
                               FocusScope.of(context).unfocus();
                               await Future.delayed(const Duration(milliseconds: 200));
 
-                              // Phir type selection bottom sheet kholo
                               showModalBottomSheet(
                                 context: context,
                                 backgroundColor: Colors.white,
@@ -617,7 +529,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          // Handle bar
                                           Container(
                                             height: 4,
                                             width: 40,
@@ -627,18 +538,14 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                                               borderRadius: BorderRadius.circular(10),
                                             ),
                                           ),
-
-                                          const Text(
-                                            "Select Subject Type",
-                                            style: TextStyle(
+                                          Text(
+                                            'all_subjects.select_type'.tr(),
+                                            style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w700,
                                             ),
                                           ),
-
                                           const SizedBox(height: 12),
-
-                                          // Option 1
                                           ListTile(
                                             onTap: () {
                                               type.value = "scholastic";
@@ -648,14 +555,12 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                                               Icons.school_rounded,
                                               color: Colors.blue.shade400,
                                             ),
-                                            title: const Text("Scholastic"),
+                                            title: Text('all_subjects.scholastic'.tr()),
                                             trailing: value == "scholastic"
                                                 ? Icon(Icons.check_circle,
                                                 color: Colors.blue.shade400)
                                                 : null,
                                           ),
-
-                                          // Option 2
                                           ListTile(
                                             onTap: () {
                                               type.value = "co_scholastic";
@@ -665,13 +570,12 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                                               Icons.palette_rounded,
                                               color: Colors.orange.shade400,
                                             ),
-                                            title: const Text("Co Scholastic"),
+                                            title: Text('all_subjects.co_scholastic'.tr()),
                                             trailing: value == "co_scholastic"
                                                 ? Icon(Icons.check_circle,
                                                 color: Colors.orange.shade400)
                                                 : null,
                                           ),
-
                                           const SizedBox(height: 8),
                                         ],
                                       ),
@@ -700,7 +604,9 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
-                                      value == "scholastic" ? "Scholastic" : "Co Scholastic",
+                                      value == "scholastic"
+                                          ? 'all_subjects.scholastic'.tr()
+                                          : 'all_subjects.co_scholastic'.tr(),
                                       style: const TextStyle(fontSize: 15),
                                     ),
                                   ),
@@ -714,60 +620,27 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                       ),
                       const SizedBox(height: 20),
 
-                      /// Button
                       AppButton(
-                        title:
-                        isEdit ? "Update Subject" : "Add Subject",
-                        // onTap: () {
-                        //   final vm = Provider.of<AddSubjectViewModel>(
-                        //       context,
-                        //       listen: false);
-                        //   final editVm =
-                        //   Provider.of<EditSubjectsViewModel>(
-                        //       context,
-                        //       listen: false);
-                        //
-                        //   if (isEdit) {
-                        //     editVm.editSubjectsApi(
-                        //       subject!["id"].toString(),
-                        //       nameCtrl.text,
-                        //       type.value,
-                        //       context,
-                        //     );
-                        //   } else {
-                        //     vm.addSubjectsApi(
-                        //       nameCtrl.text,
-                        //       type.value,
-                        //       context,
-                        //     );
-                        //   }
-                        //
-                        //   Navigator.pop(context);
-                        // },
+                        title: isEdit
+                            ? 'all_subjects.update_subject'.tr()
+                            : 'all_subjects.add_subject'.tr(),
                         onTap: () async {
                           if (isEdit) {
-
                             if (!PermissionExtensions.canAccess(
                                 PermissionKeys.editSubject)) {
-
                               Utils.show(
-                                "You don't have permission to edit subject",
+                                'all_subjects.permission_edit'.tr(),
                                 context,
                               );
-
                               return;
                             }
-
                           } else {
-
                             if (!PermissionExtensions.canAccess(
                                 PermissionKeys.addSubject)) {
-
                               Utils.show(
-                                "You don't have permission to add subject",
+                                'all_subjects.permission_add'.tr(),
                                 context,
                               );
-
                               return;
                             }
                           }
@@ -793,7 +666,7 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                           }
 
                           if (success) {
-                            await listVm.allSubjectsApi(context); // ✅ AUTO REFRESH
+                            await listVm.allSubjectsApi(context);
                             if (mounted) Navigator.pop(context);
                           }
                         },
@@ -803,7 +676,6 @@ class _AllSubjectsScreenState extends State<AllSubjectsScreen>
                         textColor: Colors.white,
                         icon: isEdit ? Icons.edit : Icons.add_rounded,
                       ),
-
                       const SizedBox(height: 20),
                     ],
                   ),

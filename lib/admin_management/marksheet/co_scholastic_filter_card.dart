@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
 import '../../res/app_button.dart';
 import '../../res/app_color.dart';
 import '../../view_model/auth_view_model/academic_view_model.dart';
@@ -11,12 +12,11 @@ import '../../view_model/school_view_model/co_scholastic/co_scholastic_grade_vie
 
 class CoScholasticFilterCard extends StatefulWidget {
   final Function({
-    required String classId,
-    required String sectionId,
-    required String academicYear,
-    required String term,
-  })
-  onLoad;
+  required String classId,
+  required String sectionId,
+  required String academicYear,
+  required String term,
+  }) onLoad;
 
   const CoScholasticFilterCard({super.key, required this.onLoad});
 
@@ -35,7 +35,6 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-
       await context
           .read<AcademicViewModel>()
           .academicApi(context);
@@ -44,16 +43,11 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
           .read<AllClassesViewModel>()
           .allClassesApi(context);
 
-      final academicVm =
-      context.read<AcademicViewModel>();
+      final academicVm = context.read<AcademicViewModel>();
 
       if (academicVm.currentYear != null) {
-
         setState(() {
-
-          selectedAcademicYear =
-              academicVm.currentYear!
-                  .yearName;
+          selectedAcademicYear = academicVm.currentYear!.yearName;
         });
       }
     });
@@ -62,9 +56,7 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
   @override
   Widget build(BuildContext context) {
     final classVm = Provider.of<AllClassesViewModel>(context);
-
     final sectionVm = Provider.of<AllSectionsViewModel>(context);
-
     final academicVm = Provider.of<AcademicViewModel>(context);
 
     return Container(
@@ -83,29 +75,26 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
       child: Column(
         children: [
           Row(
-            children: const [
-              Icon(Icons.filter_alt_rounded, color: AppColor.primary),
-              SizedBox(width: 8),
+            children: [
+              const Icon(Icons.filter_alt_rounded, color: AppColor.primary),
+              const SizedBox(width: 8),
               Text(
-                "Filter Records",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                'co_scholastic.filter_records'.tr(),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
             ],
           ),
-
           const SizedBox(height: 16),
 
           /// Academic Year
           DropdownButtonFormField<String>(
             dropdownColor: Colors.white,
             value: selectedAcademicYear,
-            decoration: _inputDecoration("Academic Year"),
+            decoration: _inputDecoration('co_scholastic.academic_year'.tr()),
             items: academicVm.years.map(
                   (e) => DropdownMenuItem<String>(
                 value: e.yearName,
-                child: Text(
-                  e.yearName?? "",
-                ),
+                child: Text(e.yearName ?? ""),
               ),
             ).toList(),
             onChanged: (value) {
@@ -114,21 +103,20 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
               });
             },
           ),
-
           const SizedBox(height: 12),
 
           /// Class
           DropdownButtonFormField<String>(
             dropdownColor: Colors.white,
             value: selectedClassId,
-            decoration: _inputDecoration("Class"),
+            decoration: _inputDecoration('co_scholastic.class'.tr()),
             items: (classVm.allClassesModel?.data ?? [])
                 .map<DropdownMenuItem<String>>(
                   (e) => DropdownMenuItem<String>(
-                    value: e.classId.toString(),
-                    child: Text(e.className ?? ""),
-                  ),
-                )
+                value: e.classId.toString(),
+                child: Text(e.className ?? ""),
+              ),
+            )
                 .toList(),
             onChanged: (value) async {
               setState(() {
@@ -144,21 +132,20 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
               }
             },
           ),
-
           const SizedBox(height: 12),
 
           /// Section
           DropdownButtonFormField<String>(
             dropdownColor: Colors.white,
             value: selectedSectionId,
-            decoration: _inputDecoration("Section"),
+            decoration: _inputDecoration('co_scholastic.section'.tr()),
             items: (sectionVm.allSectionsModel?.data ?? [])
                 .map<DropdownMenuItem<String>>(
                   (e) => DropdownMenuItem<String>(
-                    value: e.sectionId.toString(),
-                    child: Text(e.sectionName ?? ""),
-                  ),
-                )
+                value: e.sectionId.toString(),
+                child: Text(e.sectionName ?? ""),
+              ),
+            )
                 .toList(),
             onChanged: (value) {
               setState(() {
@@ -166,17 +153,15 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
               });
             },
           ),
-
           const SizedBox(height: 12),
 
           /// Term
           DropdownButtonFormField<String>(
             dropdownColor: Colors.white,
             value: selectedTerm,
-            decoration: _inputDecoration("Term"),
+            decoration: _inputDecoration('co_scholastic.term'.tr()),
             items: const [
-              DropdownMenuItem(value: "term1", child: Text("Term 1")),
-
+              DropdownMenuItem(value: "term1", child: Text("Term 1")),  // ← Will fix below
               DropdownMenuItem(value: "term2", child: Text("Term 2")),
             ],
             onChanged: (value) {
@@ -185,11 +170,10 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
               });
             },
           ),
-
           const SizedBox(height: 18),
 
           AppButton(
-            title: "Load Students",
+            title: 'co_scholastic.load_students'.tr(),
             icon: Icons.search,
             loading: false,
             onTap: () async {
@@ -211,11 +195,8 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
 
               final gradeVm = context.read<CoScholasticGradeViewModel>();
               gradeVm.clearGradeMaps();
-
               gradeVm.currentAcademicYear = selectedAcademicYear!;
-
               gradeVm.currentTerm = selectedTerm;
-
               gradeVm.setStudents(
                 context
                     .read<AllStudentListVieModel>()
@@ -223,7 +204,6 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
                     ?.data ??
                     [],
               );
-
               gradeVm.setSubjects(
                 context.read<AllSubjectsVieModel>().allSubjectsModel?.data ??
                     [],
@@ -236,7 +216,6 @@ class _CoScholasticFilterCardState extends State<CoScholasticFilterCard> {
                   [];
 
               for (final student in students) {
-
                 await gradeVm.getGradesApi(
                   studentId: student.studentId.toString(),
                   academicYear: selectedAcademicYear!,

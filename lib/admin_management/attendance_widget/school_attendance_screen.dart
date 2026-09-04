@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:school_pro/utils/routes/routes_name.dart';
 import 'package:school_pro/view_model/school_view_model/attendance/all_attendance_view_model.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../res/app_color.dart';
 import '../../res/const_text.dart';
 import '../../view_model/school_view_model/classes/all_classes_view_model.dart';
@@ -30,13 +32,9 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
     });
   }
 
-  // ── Format date for API ──
   String get _apiDate => DateFormat('yyyy/MM/dd').format(_selectedDate);
-
-  // ── Format date for display ──
   String get _displayDate => DateFormat('dd MMM yyyy').format(_selectedDate);
 
-  // ── Call attendance API ──
   void _fetchAttendance() {
     if (selectedClass != null && selectedSection != null) {
       print("📌 Fetching attendance → class=$selectedClass section=$selectedSection date=$_apiDate");
@@ -50,7 +48,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
     }
   }
 
-  // ── Date picker ──
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -66,7 +63,7 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
     );
     if (picked != null && picked != _selectedDate) {
       setState(() => _selectedDate = picked);
-      _fetchAttendance(); // auto reload on date change
+      _fetchAttendance();
     }
   }
 
@@ -79,19 +76,12 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
       backgroundColor: AppColor.screenBg,
       body: Column(
         children: [
-          // ── HEADER ──
           _buildHeader(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, RoutesName.staffAttendanceScreen);
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (_) => const StaffAttendanceGridScreen(),
-                //   ),
-                // );
               },
               child: Container(
                 padding: const EdgeInsets.all(16),
@@ -118,7 +108,7 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: AppText.customText(
-                        "Staff Attendance",
+                        'school_attendance.staff_attendance'.tr(),
                         size: 15,
                         weight: FontWeight.w600,
                         color: Colors.white,
@@ -131,25 +121,20 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
               ),
             ),
           ),
-          // ── BODY ──
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  // ── Filters card ──
                   _buildFilterCard(classVm, sectionVm),
-
                   const SizedBox(height: 16),
-
-                  // ── Stats + List ──
                   Consumer<AllAttendanceViewModel>(
                     builder: (context, vm, _) {
                       if (selectedClass == null || selectedSection == null) {
                         return _emptyPrompt(
                           icon: Icons.filter_list_rounded,
-                          title: 'Select Class & Section',
-                          subtitle: 'Choose filters above to load attendance',
+                          title: 'school_attendance.select_class_section'.tr(),
+                          subtitle: 'school_attendance.choose_filters'.tr(),
                         );
                       }
                       if (vm.loading) return _shimmerList();
@@ -157,17 +142,15 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
                       if (vm.students.isEmpty) {
                         return _emptyPrompt(
                           icon: Icons.people_outline_rounded,
-                          title: 'No Students Found',
-                          subtitle: 'No attendance data for this selection',
+                          title: 'school_attendance.no_students_found'.tr(),
+                          subtitle: 'school_attendance.no_attendance_data'.tr(),
                         );
                       }
 
                       return Column(
                         children: [
-                          // Stats row
                           _buildStatsRow(vm),
                           const SizedBox(height: 16),
-                          // Student cards
                           ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
@@ -187,8 +170,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
       ),
     );
   }
-
-  // ─── HEADER ──────────────────────────────────
 
   Widget _buildHeader() {
     return Container(
@@ -224,10 +205,9 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
           ),
           const SizedBox(width: 14),
           Expanded(
-            child: AppText.customText("Attendance",
+            child: AppText.customText('school_attendance.title'.tr(),
                 size: 20, weight: FontWeight.bold, color: Colors.white),
           ),
-          // Date button
           GestureDetector(
             onTap: _pickDate,
             child: Container(
@@ -252,8 +232,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
     );
   }
 
-  // ─── FILTER CARD ─────────────────────────────
-
   Widget _buildFilterCard(AllClassesViewModel classVm, AllSectionsViewModel sectionVm) {
     return Container(
       decoration: BoxDecoration(
@@ -268,7 +246,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
       ),
       child: Column(
         children: [
-          // Card header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
@@ -284,16 +261,16 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
                 Icon(Icons.filter_alt_rounded,
                     color: AppColor.lightBlueColor, size: 18),
                 const SizedBox(width: 8),
-                AppText.customText('Select Filters',
+                AppText.customText('school_attendance.select_filters'.tr(),
                     size: 13,
                     weight: FontWeight.w600,
                     color: AppColor.lightBlueColor),
                 const Spacer(),
                 if (selectedClass != null)
-                  _badge(Icons.check_circle_rounded, 'Class', true),
+                  _badge(Icons.check_circle_rounded, 'school_attendance.class'.tr(), true),
                 const SizedBox(width: 6),
                 if (selectedSection != null)
-                  _badge(Icons.check_circle_rounded, 'Section', true),
+                  _badge(Icons.check_circle_rounded, 'school_attendance.section'.tr(), true),
               ],
             ),
           ),
@@ -302,9 +279,8 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
             padding: const EdgeInsets.all(14),
             child: Column(
               children: [
-                // ── CLASS DROPDOWN ──
                 _styledDropdown(
-                  hint: 'Select Class',
+                  hint: 'school_attendance.select_class'.tr(),
                   value: selectedClass,
                   icon: Icons.class_rounded,
                   items: classVm.allClassesModel?.data
@@ -322,18 +298,16 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
                     if (value != null) {
                       Provider.of<AllSectionsViewModel>(context, listen: false)
                           .allSectionsApi(context, value);
-                      // clear old data
                       Provider.of<AllAttendanceViewModel>(context, listen: false)
                           .clear();
                     }
                   },
                 ),
-
                 const SizedBox(height: 12),
-
-                // ── SECTION DROPDOWN ──
                 _styledDropdown(
-                  hint: selectedClass == null ? 'Select class first' : 'Select Section',
+                  hint: selectedClass == null
+                      ? 'school_attendance.select_class_first'.tr()
+                      : 'school_attendance.select_section'.tr(),
                   value: selectedSection,
                   icon: Icons.group_rounded,
                   enabled: selectedClass != null,
@@ -346,7 +320,7 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
                       .toList() ?? [],
                   onChanged: (value) {
                     setState(() => selectedSection = value);
-                    _fetchAttendance(); // ✅ API call on section select
+                    _fetchAttendance();
                   },
                 ),
               ],
@@ -410,21 +384,19 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
     );
   }
 
-  // ─── STATS ROW ───────────────────────────────
-
   Widget _buildStatsRow(AllAttendanceViewModel vm) {
     return Row(
       children: [
-        _statCard('Total', vm.totalStudents.toString(),
+        _statCard('school_attendance.total'.tr(), vm.totalStudents.toString(),
             Icons.people_rounded, AppColor.lightBlueColor),
         const SizedBox(width: 10),
-        _statCard('Present', vm.presentStudents.length.toString(),
+        _statCard('school_attendance.present'.tr(), vm.presentStudents.length.toString(),
             Icons.check_circle_rounded, Colors.green),
         const SizedBox(width: 10),
-        _statCard('Absent', vm.absentStudents.length.toString(),
+        _statCard('school_attendance.absent'.tr(), vm.absentStudents.length.toString(),
             Icons.cancel_rounded, Colors.red),
         const SizedBox(width: 10),
-        _statCard('Late', vm.lateStudents.length.toString(),
+        _statCard('school_attendance.late'.tr(), vm.lateStudents.length.toString(),
             Icons.watch_later_rounded, Colors.orange),
       ],
     );
@@ -454,8 +426,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
     );
   }
 
-  // ─── STUDENT CARD ─────────────────────────────
-
   Widget _studentCard(student, int index) {
     final status = student.status?.toLowerCase() ?? '';
     final Color statusColor = status == 'present'
@@ -481,7 +451,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
       ),
       child: Row(
         children: [
-          // Avatar
           Container(
             width: 44,
             height: 44,
@@ -499,8 +468,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
             ),
           ),
           const SizedBox(width: 12),
-
-          // Name
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -519,8 +486,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
               ],
             ),
           ),
-
-          // Status badge
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
             decoration: BoxDecoration(
@@ -528,7 +493,7 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
               borderRadius: BorderRadius.circular(20),
             ),
             child: AppText.customText(
-              (student.status ?? 'N/A').toUpperCase(),
+              (student.status?.toUpperCase() ?? 'school_attendance.unknown_status'.tr()),
               size: 10,
               weight: FontWeight.bold,
               color: statusColor,
@@ -538,8 +503,6 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
       ),
     );
   }
-
-  // ─── HELPERS ─────────────────────────────────
 
   Widget _badge(IconData icon, String label, bool active) {
     return Container(
@@ -569,10 +532,11 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
     );
   }
 
-  Widget _emptyPrompt(
-      {required IconData icon,
-        required String title,
-        required String subtitle}) {
+  Widget _emptyPrompt({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(top: 60),
       child: Column(
@@ -596,7 +560,7 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
           const Icon(Icons.error_outline_rounded,
               size: 72, color: Colors.red),
           const SizedBox(height: 12),
-          AppText.customText('Something went wrong',
+          AppText.customText('school_attendance.something_went_wrong'.tr(),
               size: 16, weight: FontWeight.bold),
           const SizedBox(height: 6),
           AppText.customText(msg, size: 12, color: AppColor.softGreyText),
@@ -604,7 +568,7 @@ class _SchoolAttendanceScreenState extends State<SchoolAttendanceScreen> {
           ElevatedButton.icon(
             onPressed: _fetchAttendance,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Retry'),
+            label: Text('school_attendance.retry'.tr()),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColor.lightBlueColor,
               shape: RoundedRectangleBorder(

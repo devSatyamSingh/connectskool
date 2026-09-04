@@ -1,6 +1,7 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import 'package:school_pro/res/app_color.dart';
 import '../../utils/permission_extensions.dart';
 import '../../utils/permission_keys.dart';
@@ -34,7 +35,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
   String? _selectedSubjectId;
   String? _selectedTimetableId;
 
-
   final List<Map<String, dynamic>> _studentRows = [];
 
   bool _loadingStudents   = false;
@@ -51,21 +51,14 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     _headerAnim = AnimationController(vsync: this, duration: const Duration(milliseconds: 600))..forward();
     _cardAnim   = AnimationController(vsync: this, duration: const Duration(milliseconds: 400));
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      if (!PermissionExtensions.canAccess(
-          PermissionKeys.assignMarks)) {
-
-        Utils.show(
-          "You don't have permission to perform this action",
-          context,
-        );
-
+      if (!PermissionExtensions.canAccess(PermissionKeys.assignMarks)) {
+        Utils.show('exam_marks_entry.permission_denied'.tr(), context);
         Navigator.pop(context);
         return;
       }
-
       _initDropdowns();
-    });  }
+    });
+  }
 
   Future<void> _initDropdowns() async {
     final classVm = Provider.of<AllClassesViewModel>(context, listen: false);
@@ -102,7 +95,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     }
   }
 
-
   Future<void> _loadTimetable() async {
     if (_selectedExamId == null ||
         _selectedClassId == null ||
@@ -116,10 +108,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
       _studentRows.clear();
     });
 
-    // ✅ Correct ViewModel: SchoolExamTimeTableViewModel
-    // ✅ Correct params:   examId, classId, sectionId
-    final vm =
-    Provider.of<SchoolExamTimeTableViewModel>(context, listen: false);
+    final vm = Provider.of<SchoolExamTimeTableViewModel>(context, listen: false);
     await vm.getExamTimetable(
       examId:    int.parse(_selectedExamId!),
       classId:   int.parse(_selectedClassId!),
@@ -127,12 +116,10 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
       context:   context,
     );
 
-    // ✅ Model: ExamTimeTableModel → data: List<ExamTimetableData>
     final slots = vm.examTimeTableModel?.data ?? [];
 
     setState(() {
       _loadingTimetable = false;
-      // Unique subjects — one timetable_id per subject
       final seen = <String>{};
       for (final slot in slots) {
         final sid = slot.subjectId.toString();
@@ -147,19 +134,17 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     });
 
     if (_timetableSlots.isEmpty) {
-      _snack('No timetable found for this exam / class / section',
-          Colors.orange.shade600);
+      _snack('exam_marks_entry.no_timetable_found'.tr(), Colors.orange.shade600);
     }
   }
 
-  // ── Load students for the section ──
   Future<void> _loadStudents() async {
     if (_selectedExamId == null ||
         _selectedClassId == null ||
         _selectedSectionId == null ||
         _selectedSubjectId == null ||
         _selectedTimetableId == null) {
-      _snack('Please select Exam, Class, Section & Subject', Colors.orange.shade600);
+      _snack('exam_marks_entry.select_all_filters'.tr(), Colors.orange.shade600);
       return;
     }
 
@@ -173,8 +158,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     await vm.allStudentListApi(context);
 
     final filtered = (vm.allStudentListModel?.data ?? [])
-        .where((e) =>
-    e.classId.toString() == _selectedClassId &&
+        .where((e) => e.classId.toString() == _selectedClassId &&
         e.sectionId.toString() == _selectedSectionId)
         .toList();
 
@@ -192,11 +176,10 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
 
     if (_studentRows.isNotEmpty) _cardAnim.forward(from: 0);
     if (_studentRows.isEmpty) {
-      _snack('No students found for this section', Colors.orange.shade600);
+      _snack('exam_marks_entry.no_students_section'.tr(), Colors.orange.shade600);
     }
   }
 
-  // ── Save all marks ──
   Future<void> _saveAll() async {
     if (_studentRows.isEmpty) return;
 
@@ -211,13 +194,11 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
       final double marks = absent ? 0.0 : (double.tryParse(txt) ?? 0.0);
       final String remarks = (row['remarksCtrl'] as TextEditingController).text.trim();
 
-      // ✅ timetable_id comes from the slot selected by user
-      // ✅ student_id comes from the loaded student object
       final ok = await Provider.of<CreateExamMarksViewModel>(
           context, listen: false)
           .createExamMarksApi(
-        int.parse(_selectedTimetableId!), // timetable_id ✅
-        s.studentId ?? 0,                 // student_id   ✅
+        int.parse(_selectedTimetableId!),
+        s.studentId ?? 0,
         marks,
         absent ? 1 : 0,
         remarks,
@@ -229,10 +210,18 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
 
     setState(() {
       _saving = false;
-      if (success > 0) _successMsg = '$success/${_studentRows.length} marks saved!';
+      if (success > 0) {
+        _successMsg = 'exam_marks_entry.marks_saved'.tr(
+            namedArgs: {'saved': success.toString(), 'total': _studentRows.length.toString()}
+        );
+      }
     });
 
-    if (fail > 0) _snack('$fail records failed to save', Colors.red.shade400);
+    if (fail > 0) {
+      _snack('exam_marks_entry.records_failed'.tr(
+          namedArgs: {'failed': fail.toString()}
+      ), Colors.red.shade400);
+    }
   }
 
   void _snack(String msg, Color color) {
@@ -244,7 +233,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     ));
   }
 
-  // ── Stats ──
   int get _total   => _studentRows.length;
   int get _present => _studentRows.where((r) => !(r['isAbsent'] as bool)).length;
   int get _absent  => _studentRows.where((r) =>  (r['isAbsent'] as bool)).length;
@@ -282,7 +270,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     super.dispose();
   }
 
-  // ════════════════════════════════════════════════════════
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -309,8 +296,10 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Text('Students (${_studentRows.length})',
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36))),
+                  Text(
+                      '${'exam_marks_entry.students'.tr()} (${_studentRows.length})',
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36))
+                  ),
                 ]),
                 const SizedBox(height: 10),
                 ...List.generate(_studentRows.length, (i) {
@@ -335,7 +324,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     );
   }
 
-  // ── HEADER ──
   Widget _buildHeader() {
     return AnimatedBuilder(
       animation: _headerAnim,
@@ -362,9 +350,9 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
           ),
           const SizedBox(width: 14),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Exam Marks Entry',
-                style: TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
-            Text('Manage student performance',
+            Text('exam_marks_entry.title'.tr(),
+                style: const TextStyle(color: Colors.white, fontSize: 19, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
+            Text('exam_marks_entry.subtitle'.tr(),
                 style: TextStyle(color: Colors.white.withOpacity(0.75), fontSize: 12)),
           ])),
           if (_studentRows.isNotEmpty)
@@ -375,15 +363,18 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: Colors.white.withOpacity(0.3)),
               ),
-              child: Text('$_total Students',
-                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+              child: Text(
+                  'exam_marks_entry.students_count'.tr(
+                      namedArgs: {'count': _total.toString()}
+                  ),
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)
+              ),
             ),
         ]),
       ),
     );
   }
 
-  // ── SUCCESS BANNER ──
   Widget _buildSuccessBanner() {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -410,7 +401,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     );
   }
 
-  // ── FILTER CARD ──
   Widget _buildFilterCard() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -427,17 +417,18 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
             child: Icon(Icons.filter_list_rounded, color: AppColor.lightBlueColor, size: 16),
           ),
           const SizedBox(width: 9),
-          const Text('Select Filters',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36))),
+          Text('exam_marks_entry.select_filters'.tr(),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF1A1F36))),
         ]),
         const SizedBox(height: 14),
         const Divider(height: 1, color: Color(0xFFF0F0F0)),
         const SizedBox(height: 14),
 
-        // Row 1: Exam + Class
         Row(children: [
           Expanded(child: _filterDrop(
-            label: 'EXAM', hint: 'Select Exam', icon: Icons.assignment_rounded,
+            label: 'exam_marks_entry.exam'.tr(),
+            hint: 'exam_marks_entry.exam_hint'.tr(),
+            icon: Icons.assignment_rounded,
             value: _selectedExamId,
             items: _exams.map((e) => DropdownMenuItem<String>(
               value: e['id'] as String,
@@ -451,17 +442,16 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                 _timetableSlots.clear();
                 _studentRows.clear();
               });
-              // Re-fetch timetable if class+section already selected
-              if (v != null &&
-                  _selectedClassId != null &&
-                  _selectedSectionId != null) {
+              if (v != null && _selectedClassId != null && _selectedSectionId != null) {
                 await _loadTimetable();
               }
             },
           )),
           const SizedBox(width: 12),
           Expanded(child: _filterDrop(
-            label: 'CLASS', hint: 'Select Class', icon: Icons.class_rounded,
+            label: 'exam_marks_entry.class'.tr(),
+            hint: 'exam_marks_entry.class_hint'.tr(),
+            icon: Icons.class_rounded,
             value: _selectedClassId,
             items: _classes.map((e) => DropdownMenuItem<String>(
               value: e['id'] as String,
@@ -484,10 +474,11 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
 
         const SizedBox(height: 12),
 
-        // Row 2: Section + Subject (from timetable)
         Row(children: [
           Expanded(child: _filterDrop(
-            label: 'SECTION', hint: 'Select Section', icon: Icons.dashboard_rounded,
+            label: 'exam_marks_entry.section'.tr(),
+            hint: 'exam_marks_entry.section_hint'.tr(),
+            icon: Icons.dashboard_rounded,
             value: _selectedSectionId,
             items: _sections.map((e) => DropdownMenuItem(
               value: e['section_id'].toString(),
@@ -501,7 +492,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                 _timetableSlots.clear();
                 _studentRows.clear();
               });
-              // ✅ Fetch timetable only if exam also selected
               if (v != null && _selectedClassId != null && _selectedExamId != null) {
                 await _loadTimetable();
               }
@@ -511,7 +501,8 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
           Expanded(
             child: _loadingTimetable
                 ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('SUBJECT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.grey.shade500, letterSpacing: 0.5)),
+              Text('exam_marks_entry.subject'.tr(),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.grey.shade500, letterSpacing: 0.5)),
               const SizedBox(height: 5),
               Container(
                 height: 38,
@@ -524,19 +515,21 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                   SizedBox(width: 14, height: 14,
                       child: CircularProgressIndicator(color: AppColor.lightBlueColor, strokeWidth: 2)),
                   const SizedBox(width: 8),
-                  Text('Loading...', style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
+                  Text('exam_marks_entry.loading'.tr(),
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
                 ]),
               ),
             ])
                 : _filterDrop(
-              label: 'SUBJECT', hint: 'Select Subject', icon: Icons.menu_book_rounded,
+              label: 'exam_marks_entry.subject'.tr(),
+              hint: 'exam_marks_entry.subject_hint'.tr(),
+              icon: Icons.menu_book_rounded,
               value: _selectedSubjectId,
               items: _timetableSlots.map((e) => DropdownMenuItem<String>(
                 value: e['subject_id'] as String,
                 child: Text(e['subject_name'] as String, style: const TextStyle(fontSize: 13)),
               )).toList(),
               onChanged: (v) {
-                // ✅ Auto-set timetable_id from the selected subject slot
                 final slot = _timetableSlots.firstWhere(
                       (s) => s['subject_id'] == v,
                   orElse: () => {},
@@ -550,7 +543,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
           ),
         ]),
 
-        // timetable_id debug hint (dev only — remove in prod)
         if (_selectedTimetableId != null) ...[
           const SizedBox(height: 8),
           Container(
@@ -563,15 +555,18 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
             child: Row(children: [
               Icon(Icons.check_circle_rounded, size: 14, color: Colors.green.shade600),
               const SizedBox(width: 6),
-              Text('Timetable ID: $_selectedTimetableId',
-                  style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w600)),
+              Text(
+                  'exam_marks_entry.timetable_id'.tr(
+                      namedArgs: {'id': _selectedTimetableId!}
+                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w600)
+              ),
             ]),
           ),
         ],
 
         const SizedBox(height: 16),
 
-        // Load Students Button
         SizedBox(
           width: double.infinity,
           height: 46,
@@ -588,12 +583,14 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
               const SizedBox(width: 16, height: 16,
                   child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
               const SizedBox(width: 10),
-              Text('Loading students...', style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 14)),
+              Text('exam_marks_entry.loading_students'.tr(),
+                  style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w600, fontSize: 14)),
             ])
-                : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.group_rounded, color: Colors.white, size: 18),
-              SizedBox(width: 8),
-              Text('Load Students', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+                : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const Icon(Icons.group_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text('exam_marks_entry.load_students'.tr(),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
             ]),
           ),
         ),
@@ -601,17 +598,16 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     );
   }
 
-  // ── STATS ROW ──
   Widget _buildStatsRow() {
     return Wrap(
       spacing: 10, runSpacing: 10,
       children: [
-        _statChip('Total',   '$_total',   const Color(0xFF5C6BC0), Icons.people_rounded),
-        _statChip('Present', '$_present', const Color(0xFF26A69A), Icons.check_circle_rounded),
-        _statChip('Absent',  '$_absent',  const Color(0xFFEF5350), Icons.cancel_rounded),
-        _statChip('Pass',    '$_pass',    const Color(0xFF66BB6A), Icons.thumb_up_rounded),
-        _statChip('Fail',    '$_fail',    const Color(0xFFFF7043), Icons.thumb_down_rounded),
-        _statChip('Avg',     '${_avg.toStringAsFixed(1)}%', AppColor.lightBlueColor, Icons.bar_chart_rounded),
+        _statChip('exam_marks_entry.total'.tr(), _total.toString(), const Color(0xFF5C6BC0), Icons.people_rounded),
+        _statChip('exam_marks_entry.present'.tr(), _present.toString(), const Color(0xFF26A69A), Icons.check_circle_rounded),
+        _statChip('exam_marks_entry.absent'.tr(), _absent.toString(), const Color(0xFFEF5350), Icons.cancel_rounded),
+        _statChip('exam_marks_entry.pass'.tr(), _pass.toString(), const Color(0xFF66BB6A), Icons.thumb_up_rounded),
+        _statChip('exam_marks_entry.fail'.tr(), _fail.toString(), const Color(0xFFFF7043), Icons.thumb_down_rounded),
+        _statChip('exam_marks_entry.avg'.tr(), '${_avg.toStringAsFixed(1)}%', AppColor.lightBlueColor, Icons.bar_chart_rounded),
       ],
     );
   }
@@ -635,7 +631,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     );
   }
 
-  // ── STUDENT CARD ──
   Widget _buildStudentCard(int i) {
     final row        = _studentRows[i];
     final s          = row['student'];
@@ -686,7 +681,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                   overflow: TextOverflow.ellipsis),
               const SizedBox(height: 2),
               Text(
-                'Roll No: ${s.rollNo ?? '—'}',
+                'exam_marks_entry.roll_no'.tr(namedArgs: {'rollNo': s.rollNo ?? '—'}),
                 style: TextStyle(
                   fontSize: 11,
                   color: Colors.grey.shade500,
@@ -706,7 +701,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                   Icon(isPassed ? Icons.check_circle_rounded : Icons.cancel_rounded,
                       size: 12, color: isPassed ? Colors.green.shade600 : Colors.red.shade600),
                   const SizedBox(width: 4),
-                  Text(isPassed ? 'PASS' : 'FAIL',
+                  Text(isPassed ? 'exam_marks_entry.pass_status'.tr() : 'exam_marks_entry.fail_status'.tr(),
                       style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800,
                           color: isPassed ? Colors.green.shade700 : Colors.red.shade700)),
                 ]),
@@ -714,7 +709,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
               const SizedBox(width: 6),
             ],
             Column(children: [
-              Text('Absent',
+              Text('exam_marks_entry.absent'.tr(),
                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600,
                       color: absent ? Colors.orange.shade700 : Colors.grey.shade400)),
               Transform.scale(
@@ -753,7 +748,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
           padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
           child: Row(children: [
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('MARKS (out of 100)',
+              Text('exam_marks_entry.marks_label'.tr(),
                   style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey.shade500)),
               const SizedBox(height: 4),
               SizedBox(
@@ -767,7 +762,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                       color: absent ? Colors.grey.shade400 : AppColor.lightBlueColor),
                   onChanged: (_) => setState(() {}),
                   decoration: InputDecoration(
-                    hintText: absent ? 'Absent' : '0–100',
+                    hintText: absent ? 'exam_marks_entry.marks_absent'.tr() : 'exam_marks_entry.marks_hint'.tr(),
                     hintStyle: TextStyle(fontSize: 12, color: Colors.grey.shade400),
                     filled: true,
                     fillColor: absent ? const Color(0xFFF9F9F9) : const Color(0xFFF0F4FF),
@@ -789,7 +784,8 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
             ]),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('REMARKS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey.shade500)),
+              Text('exam_marks_entry.remarks_label'.tr(),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.grey.shade500)),
               const SizedBox(height: 4),
               SizedBox(
                 height: 40,
@@ -797,7 +793,7 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
                   controller: remarksCtrl,
                   style: const TextStyle(fontSize: 13),
                   decoration: InputDecoration(
-                    hintText: 'Add remark (optional)...',
+                    hintText: 'exam_marks_entry.remarks_hint'.tr(),
                     hintStyle: TextStyle(fontSize: 11, color: Colors.grey.shade400),
                     filled: true, fillColor: const Color(0xFFFAFAFF),
                     isDense: true,
@@ -815,7 +811,6 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
     );
   }
 
-  // ── SAVE BUTTON ──
   Widget _buildSaveButton() {
     return Container(
       width: double.infinity, height: 52,
@@ -828,17 +823,10 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
         onPressed: _saving
             ? null
             : () {
-
-          if (!PermissionExtensions.canAccess(
-              PermissionKeys.assignMarks)) {
-
-            Utils.show(
-              "You don't have permission to perform this action",
-              context,
-            );
+          if (!PermissionExtensions.canAccess(PermissionKeys.assignMarks)) {
+            Utils.show('exam_marks_entry.permission_denied'.tr(), context);
             return;
           }
-
           _saveAll();
         },
         style: ElevatedButton.styleFrom(
@@ -847,22 +835,26 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         child: _saving
-            ? const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
-          SizedBox(width: 10),
-          Text('Saving marks...', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+            ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)),
+          const SizedBox(width: 10),
+          Text('exam_marks_entry.saving'.tr(),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
         ])
             : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Icon(Icons.save_rounded, color: Colors.white, size: 20),
           const SizedBox(width: 8),
-          Text('Save All Marks  ($_total students)',
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)),
+          Text(
+              'exam_marks_entry.save_all'.tr(
+                  namedArgs: {'count': _total.toString()}
+              ),
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15)
+          ),
         ]),
       ),
     );
   }
 
-  // ── EMPTY STATE ──
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
@@ -878,17 +870,16 @@ class _CreateExamMarksPageState extends State<CreateExamMarksPage>
             child: Icon(Icons.assignment_outlined, size: 50, color: Colors.grey.shade300),
           ),
           const SizedBox(height: 16),
-          Text('No Students Loaded',
+          Text('exam_marks_entry.no_students_loaded'.tr(),
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.grey.shade400)),
           const SizedBox(height: 6),
-          Text('Select filters above & tap Load Students',
+          Text('exam_marks_entry.no_students_subtitle'.tr(),
               style: TextStyle(fontSize: 13, color: Colors.grey.shade400)),
         ]),
       ),
     );
   }
 
-  // ── FILTER DROPDOWN ──
   Widget _filterDrop({
     required String label,
     required String hint,

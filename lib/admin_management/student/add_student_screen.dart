@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,19 +16,11 @@ import '../../model/school_model/student/student_form_model.dart';
 import '../../view_model/school_view_model/student/add_student_view_model.dart';
 import '../../view_model/school_view_model/student/edit_student_view_model.dart';
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  StudentFormPage
-//
-//  Pass [existingStudent] to open in Edit mode, null for Add mode.
-//  [existingStudent] keys mirror the map built in AllStudentList._studentCard.
-// ─────────────────────────────────────────────────────────────────────────────
 class StudentFormPage extends StatefulWidget {
   final Map<String, dynamic>? existingStudent;
 
   const StudentFormPage({super.key, this.existingStudent});
 
-  /// Convenience named constructors
   const StudentFormPage.add({super.key}) : existingStudent = null;
 
   const StudentFormPage.edit({super.key, required Map<String, dynamic> student})
@@ -82,7 +75,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
   late final ValueNotifier<String> _category;
   late final ValueNotifier<String> _academicYear;
   final _passwordVisible = ValueNotifier<bool>(false);
-  final _showChangePassword = ValueNotifier<bool>(false); // edit mode only
+  final _showChangePassword = ValueNotifier<bool>(false);
 
   // ── Image files ───────────────────────────────────────────
   final _studentPhoto = ValueNotifier<File?>(null);
@@ -97,10 +90,9 @@ class _StudentFormPageState extends State<StudentFormPage> {
   void initState() {
     super.initState();
 
-    // Pre-fill controllers
     nameCtrl = TextEditingController(text: _prefill("name"));
     emailCtrl = TextEditingController(text: _prefill("email"));
-    passwordCtrl = TextEditingController(); // never pre-filled
+    passwordCtrl = TextEditingController();
     admissionCtrl = TextEditingController(text: _prefill("admission"));
     rollNoCtrl = TextEditingController(text: _prefill("roll_no"));
     dobCtrl = TextEditingController(text: _prefill("dob"));
@@ -122,7 +114,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
     stateCtrl = TextEditingController(text: _prefill("state"));
     pincodeCtrl = TextEditingController(text: _prefill("pincode"));
 
-    // Pre-fill ValueNotifiers
     _classId = ValueNotifier<String>(_prefill("class_id"));
     _sectionId = ValueNotifier<String>(_prefill("section_id"));
     _gender = ValueNotifier<String>(_prefill("gender", fallback: "Male"));
@@ -130,26 +121,22 @@ class _StudentFormPageState extends State<StudentFormPage> {
     _category = ValueNotifier<String>(_prefill("category"));
     _academicYear = ValueNotifier<String>(_prefill("academic_year"));
 
-    // In edit mode, load sections for pre-filled class
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initDropdowns();
     });
   }
 
   Future<void> _initDropdowns() async {
-    // Load academic years & fee heads
     Provider.of<AcademicViewModel>(context, listen: false)
         .academicApi(context);
     Provider.of<FeesHeadManagementViewModel>(context, listen: false)
         .feesHeadManagementApi(context);
 
-    // Load classes
     final classesVm =
     Provider.of<AllClassesViewModel>(context, listen: false);
     classesVm.allClassesApi(context);
     classesVm.addListener(_onClassesLoaded);
 
-    // If edit and a class is already selected, load its sections
     if (_isEdit && _classId.value.isNotEmpty) {
       final repo = AllSectionsRepository();
       final resp = await repo.allSectionsApi(_classId.value);
@@ -222,19 +209,19 @@ class _StudentFormPageState extends State<StudentFormPage> {
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Select Image Source'),
+        title: Text('student_form.select_image_source'.tr()),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt, color: Colors.blue),
-              title: const Text('Camera'),
+              title: Text('student_form.camera'.tr()),
               onTap: () => Navigator.pop(context, ImageSource.camera),
             ),
             ListTile(
               leading:
               const Icon(Icons.photo_library, color: Colors.green),
-              title: const Text('Gallery'),
+              title: Text('student_form.gallery'.tr()),
               onTap: () => Navigator.pop(context, ImageSource.gallery),
             ),
           ],
@@ -254,39 +241,39 @@ class _StudentFormPageState extends State<StudentFormPage> {
   // ── Validation ────────────────────────────────────────────
   bool _validate() {
     if (nameCtrl.text.trim().isEmpty) {
-      Utils.show("Enter student name", context);
+      Utils.show('student_form.errors.enter_name'.tr(), context);
       return false;
     }
     if (emailCtrl.text.trim().isEmpty) {
-      Utils.show("Enter email", context);
+      Utils.show('student_form.errors.enter_email'.tr(), context);
       return false;
     }
     if (!_isEdit && passwordCtrl.text.trim().isEmpty) {
-      Utils.show("Enter password", context);
+      Utils.show('student_form.errors.enter_password'.tr(), context);
       return false;
     }
     if (_classId.value.isEmpty) {
-      Utils.show("Select class", context);
+      Utils.show('student_form.errors.select_class'.tr(), context);
       return false;
     }
     if (dobCtrl.text.trim().isEmpty) {
-      Utils.show("Select Date of Birth", context);
+      Utils.show('student_form.errors.select_dob'.tr(), context);
       return false;
     }
     if (mobileCtrl.text.trim().isEmpty) {
-      Utils.show("Enter mobile number", context);
+      Utils.show('student_form.errors.enter_mobile'.tr(), context);
       return false;
     }
     if (mobileCtrl.text.trim().length < 10) {
-      Utils.show("Enter valid 10-digit mobile number", context);
+      Utils.show('student_form.errors.valid_mobile'.tr(), context);
       return false;
     }
     if (fatherNameCtrl.text.trim().isEmpty) {
-      Utils.show("Enter father's name", context);
+      Utils.show('student_form.errors.enter_father_name'.tr(), context);
       return false;
     }
     if (motherNameCtrl.text.trim().isEmpty) {
-      Utils.show("Enter mother's name", context);
+      Utils.show('student_form.errors.enter_mother_name'.tr(), context);
       return false;
     }
     return true;
@@ -296,7 +283,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
   StudentFormModel _buildFormModel() => StudentFormModel(
     name: nameCtrl.text.trim(),
     email: emailCtrl.text.trim(),
-    password: passwordCtrl.text.trim(), // empty = keep existing (edit)
+    password: passwordCtrl.text.trim(),
     classId: _classId.value,
     sectionId: _sectionId.value,
     admissionNo: admissionCtrl.text.trim(),
@@ -368,10 +355,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
       backgroundColor: AppColor.pageBgColor,
       body: Column(
         children: [
-          // ── Header ──────────────────────────────────────
           _buildHeader(),
-
-          // ── Scrollable form body ─────────────────────────
           Expanded(
             child: SingleChildScrollView(
               padding:
@@ -379,147 +363,128 @@ class _StudentFormPageState extends State<StudentFormPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Basic info
-                  _sectionHeader("Basic Information"),
+                  _sectionHeader('student_form.basic_information'.tr()),
                   const SizedBox(height: 12),
-                  _field(nameCtrl, "Full Name", Icons.person),
+                  _field(nameCtrl, 'student_form.full_name'.tr(), Icons.person),
                   const SizedBox(height: 12),
-                  _field(emailCtrl, "Email", Icons.email,
+                  _field(emailCtrl, 'student_form.email'.tr(), Icons.email,
                       keyboardType: TextInputType.emailAddress),
                   const SizedBox(height: 12),
                   _buildPasswordSection(),
                   const SizedBox(height: 16),
                   _buildGenderPicker(),
-
                   const SizedBox(height: 24),
 
-                  // Academic info
-                  _sectionHeader("Academic Information"),
+                  _sectionHeader('student_form.academic_information'.tr()),
                   const SizedBox(height: 12),
                   _buildAcademicYearDropdown(),
                   const SizedBox(height: 12),
-                  _field(admissionCtrl, "Admission No.",
+                  _field(admissionCtrl, 'student_form.admission_no'.tr(),
                       Icons.confirmation_number),
                   const SizedBox(height: 12),
-                  _field(rollNoCtrl, "Roll No.",
+                  _field(rollNoCtrl, 'student_form.roll_no'.tr(),
                       Icons.format_list_numbered),
                   const SizedBox(height: 12),
                   _buildClassDropdown(),
                   const SizedBox(height: 12),
                   _buildSectionDropdown(),
-
                   const SizedBox(height: 24),
 
-                  // Personal info
-                  _sectionHeader("Personal Information"),
+                  _sectionHeader('student_form.personal_information'.tr()),
                   const SizedBox(height: 12),
                   _buildDobPicker(),
                   const SizedBox(height: 12),
-                  _field(mobileCtrl, "Mobile Number", Icons.phone,
+                  _field(mobileCtrl, 'student_form.mobile_number'.tr(), Icons.phone,
                       keyboardType: TextInputType.phone, maxLength: 10),
                   const SizedBox(height: 12),
-                  _field(religionCtrl, "Religion", Icons.temple_hindu),
-
+                  _field(religionCtrl, 'student_form.religion'.tr(), Icons.temple_hindu),
                   const SizedBox(height: 24),
 
-                  // Parent info
-                  _sectionHeader("Parent Information"),
+                  _sectionHeader('student_form.parent_information'.tr()),
                   const SizedBox(height: 12),
-                  _field(fatherNameCtrl, "Father's Name", Icons.person),
+                  _field(fatherNameCtrl, 'student_form.father_name'.tr(), Icons.person),
                   const SizedBox(height: 12),
-                  _field(motherNameCtrl, "Mother's Name", Icons.person),
-
+                  _field(motherNameCtrl, 'student_form.mother_name'.tr(), Icons.person),
                   const SizedBox(height: 24),
 
-                  // Additional info
-                  _sectionHeader("Additional Information"),
+                  _sectionHeader('student_form.additional_information'.tr()),
                   const SizedBox(height: 12),
                   _buildBloodGroupDropdown(),
                   const SizedBox(height: 12),
                   _buildCategoryDropdown(),
                   const SizedBox(height: 12),
-                  _field(aadharNumberCtrl, "Aadhar Number",
+                  _field(aadharNumberCtrl, 'student_form.aadhar_number'.tr(),
                       Icons.credit_card,
                       keyboardType: TextInputType.number),
-
                   const SizedBox(height: 24),
 
-                  // Parent extra
-                  _sectionHeader("Parent Extra Details"),
+                  _sectionHeader('student_form.parent_extra_details'.tr()),
                   const SizedBox(height: 12),
-                  _field(fatherOccupationCtrl, "Father's Occupation",
+                  _field(fatherOccupationCtrl, 'student_form.father_occupation'.tr(),
                       Icons.work),
                   const SizedBox(height: 12),
-                  _field(fatherMobileCtrl, "Father's Mobile", Icons.phone,
+                  _field(fatherMobileCtrl, 'student_form.father_mobile'.tr(), Icons.phone,
                       keyboardType: TextInputType.phone, maxLength: 10),
                   const SizedBox(height: 12),
-                  _field(motherOccupationCtrl, "Mother's Occupation",
+                  _field(motherOccupationCtrl, 'student_form.mother_occupation'.tr(),
                       Icons.work),
                   const SizedBox(height: 12),
-                  _field(motherMobileCtrl, "Mother's Mobile", Icons.phone,
+                  _field(motherMobileCtrl, 'student_form.mother_mobile'.tr(), Icons.phone,
                       keyboardType: TextInputType.phone, maxLength: 10),
                   const SizedBox(height: 12),
-                  _field(guardianNameCtrl, "Guardian Name", Icons.person),
+                  _field(guardianNameCtrl, 'student_form.guardian_name'.tr(), Icons.person),
                   const SizedBox(height: 12),
-                  _field(emergencyContactCtrl, "Emergency Contact",
+                  _field(emergencyContactCtrl, 'student_form.emergency_contact'.tr(),
                       Icons.emergency,
                       keyboardType: TextInputType.phone, maxLength: 10),
-
                   const SizedBox(height: 24),
 
-                  // Address
-                  _sectionHeader("Address Details"),
+                  _sectionHeader('student_form.address_details'.tr()),
                   const SizedBox(height: 12),
-                  _field(addressCtrl, "Address", Icons.home, maxLines: 3),
+                  _field(addressCtrl, 'student_form.address'.tr(), Icons.home, maxLines: 3),
                   const SizedBox(height: 12),
-                  _field(cityCtrl, "City", Icons.location_city),
+                  _field(cityCtrl, 'student_form.city'.tr(), Icons.location_city),
                   const SizedBox(height: 12),
-                  _field(stateCtrl, "State", Icons.map),
+                  _field(stateCtrl, 'student_form.state'.tr(), Icons.map),
                   const SizedBox(height: 12),
-                  _field(pincodeCtrl, "Pincode", Icons.pin_drop,
+                  _field(pincodeCtrl, 'student_form.pincode'.tr(), Icons.pin_drop,
                       keyboardType: TextInputType.number),
-
                   const SizedBox(height: 24),
 
-                  // Documents
-                  _sectionHeader("Upload Documents"),
+                  _sectionHeader('student_form.upload_documents'.tr()),
                   const SizedBox(height: 12),
                   _buildImageTile(
-                    label: "Student Photo",
+                    label: 'student_form.student_photo'.tr(),
                     icon: Icons.portrait,
                     notifier: _studentPhoto,
                     existingUrl: _prefill("student_photo_url"),
                   ),
                   const SizedBox(height: 12),
                   _buildImageTile(
-                    label: "Aadhar Card",
+                    label: 'student_form.aadhar_card'.tr(),
                     icon: Icons.credit_card,
                     notifier: _aadharCard,
                     existingUrl: _prefill("aadhar_card_url"),
                   ),
                   const SizedBox(height: 12),
                   _buildImageTile(
-                    label: "Father's Photo",
+                    label: 'student_form.father_photo'.tr(),
                     icon: Icons.person,
                     notifier: _fatherPhoto,
                     existingUrl: _prefill("father_photo_url"),
                   ),
                   const SizedBox(height: 12),
                   _buildImageTile(
-                    label: "Mother's Photo",
+                    label: 'student_form.mother_photo'.tr(),
                     icon: Icons.person,
                     notifier: _motherPhoto,
                     existingUrl: _prefill("mother_photo_url"),
                   ),
-
                   const SizedBox(height: 24),
 
-                  // Fee Heads — Add mode: selectable | Edit mode: read-only display
                   _buildFeeHeadsSection(),
-
                   const SizedBox(height: 20),
 
-                  // Submit button
                   Selector<AddStudentViewModel, bool>(
                     selector: (_, vm) => vm.loading,
                     builder: (_, addLoading, __) =>
@@ -529,8 +494,8 @@ class _StudentFormPageState extends State<StudentFormPage> {
                             final isLoading = addLoading || editLoading;
                             return AppButton(
                               title: isLoading
-                                  ? "Please wait..."
-                                  : (_isEdit ? "Update Student" : "Add Student"),
+                                  ? 'student_form.please_wait'.tr()
+                                  : (_isEdit ? 'student_form.update_student'.tr() : 'student_form.add_student'.tr()),
                               onTap: () async {
                                 if (!isLoading) {
                                   await _submit();
@@ -548,7 +513,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
                           },
                         ),
                   ),
-
                   const SizedBox(height: 40),
                 ],
               ),
@@ -593,7 +557,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
         ),
         const SizedBox(width: 12),
         AppText.customText(
-          _isEdit ? "Edit Student" : "Add Student",
+          _isEdit ? 'student_form.title_edit'.tr() : 'student_form.title_add'.tr(),
           size: 19,
           weight: FontWeight.bold,
           color: Colors.white,
@@ -605,19 +569,17 @@ class _StudentFormPageState extends State<StudentFormPage> {
   // ── Password section ──────────────────────────────────────
   Widget _buildPasswordSection() {
     if (!_isEdit) {
-      // Add mode: always show password field
       return ValueListenableBuilder<bool>(
         valueListenable: _passwordVisible,
         builder: (_, visible, __) => _passwordField(
           controller: passwordCtrl,
-          hint: "Password",
+          hint: 'student_form.password'.tr(),
           visible: visible,
           onToggle: () => _passwordVisible.value = !visible,
         ),
       );
     }
 
-    // Edit mode: collapsible change-password section
     return ValueListenableBuilder<bool>(
       valueListenable: _showChangePassword,
       builder: (_, show, __) => Column(
@@ -653,7 +615,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      show ? "Cancel password change" : "Change Password",
+                      show ? 'student_form.cancel_password_change'.tr() : 'student_form.change_password'.tr(),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -691,7 +653,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "Leave blank to keep the existing password.",
+                      'student_form.password_leave_blank'.tr(),
                       style: TextStyle(
                           fontSize: 12, color: Colors.amber.shade800),
                     ),
@@ -704,7 +666,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
               valueListenable: _passwordVisible,
               builder: (_, visible, __) => _passwordField(
                 controller: passwordCtrl,
-                hint: "New Password",
+                hint: 'student_form.new_password'.tr(),
                 visible: visible,
                 onToggle: () => _passwordVisible.value = !visible,
               ),
@@ -756,7 +718,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
     builder: (_, val, __) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Gender",
+        Text('student_form.gender'.tr(),
             style:
             TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
         const SizedBox(height: 12),
@@ -764,7 +726,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
           children: [
             Expanded(
                 child: _genderCard(
-                    title: "Male",
+                    title: 'student_form.male'.tr(),
                     icon: Icons.male_rounded,
                     color: AppColor.maleColor,
                     selected: val == "Male",
@@ -772,7 +734,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
             const SizedBox(width: 12),
             Expanded(
                 child: _genderCard(
-                    title: "Female",
+                    title: 'student_form.female'.tr(),
                     icon: Icons.female_rounded,
                     color: AppColor.femaleColor,
                     selected: val == "Female",
@@ -781,7 +743,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
             const SizedBox(width: 12),
             Expanded(
                 child: _genderCard(
-                    title: "Other",
+                    title: 'student_form.other'.tr(),
                     icon: Icons.transgender_rounded,
                     color: Colors.purple,
                     selected: val == "Other",
@@ -800,7 +762,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
           return const Center(
               child: CircularProgressIndicator(strokeWidth: 2));
         }
-        // Auto-select current year when no pre-fill
         if (_academicYear.value.isEmpty && vm.currentYear != null) {
           Future.microtask(
                   () => _academicYear.value = vm.currentYear!.yearName ?? "");
@@ -810,7 +771,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
           builder: (_, val, __) => _dropdownBox(
             child: DropdownButton<String>(
               isExpanded: true,
-              hint: _dropdownHint(Icons.calendar_today, "Academic Year"),
+              hint: _dropdownHint(Icons.calendar_today, 'student_form.academic_year'.tr()),
               value: val.isEmpty ? null : val,
               items: vm.years
                   .map((y) => DropdownMenuItem<String>(
@@ -825,7 +786,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                       decoration: BoxDecoration(
                           color: Colors.green.shade100,
                           borderRadius: BorderRadius.circular(6)),
-                      child: Text("Current",
+                      child: Text('student_form.current'.tr(),
                           style: TextStyle(
                               fontSize: 11,
                               color: Colors.green.shade700,
@@ -851,7 +812,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
           builder: (_, cVal, __) => _dropdownBox(
             child: DropdownButton<String>(
               isExpanded: true,
-              hint: _dropdownHint(Icons.class_, "Class"),
+              hint: _dropdownHint(Icons.class_, 'student_form.class'.tr()),
               value: cVal.isEmpty ? null : cVal,
               items: list
                   .map((e) => DropdownMenuItem<String>(
@@ -897,7 +858,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
             builder: (_, sVal, __) => _dropdownBox(
               child: DropdownButton<String>(
                 isExpanded: true,
-                hint: _dropdownHint(Icons.grid_view_rounded, "Section"),
+                hint: _dropdownHint(Icons.grid_view_rounded, 'student_form.section'.tr()),
                 value: sVal.isEmpty ? null : sVal,
                 items: list
                     .map((e) => DropdownMenuItem<String>(
@@ -925,7 +886,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
       Icon(Icons.info_outline_rounded,
           size: 20, color: Colors.orange.shade400),
       const SizedBox(width: 10),
-      Text("No section available for this class",
+      Text('student_form.no_section_available'.tr(),
           style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
@@ -949,7 +910,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
     },
     child: AbsorbPointer(
       child: _field(
-          dobCtrl, "Date of Birth (DD/MM/YYYY)", Icons.cake),
+          dobCtrl, 'student_form.date_of_birth'.tr(), Icons.cake),
     ),
   );
 
@@ -959,7 +920,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
     builder: (_, val, __) => _dropdownBox(
       child: DropdownButton<String>(
         isExpanded: true,
-        hint: _dropdownHint(Icons.bloodtype, "Blood Group"),
+        hint: _dropdownHint(Icons.bloodtype, 'student_form.blood_group'.tr()),
         value: val.isEmpty ? null : val,
         items: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
             .map((g) => DropdownMenuItem(value: g, child: Text(g)))
@@ -975,7 +936,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
     builder: (_, val, __) => _dropdownBox(
       child: DropdownButton<String>(
         isExpanded: true,
-        hint: _dropdownHint(Icons.category, "Category"),
+        hint: _dropdownHint(Icons.category, 'student_form.category'.tr()),
         value: val.isEmpty ? null : val,
         items: ["General", "OBC", "SC", "ST", "EWS", "Other"]
             .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -992,7 +953,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
 
       if (vm.loading) {
         return Column(children: [
-          _sectionHeader("Fee Heads"),
+          _sectionHeader('student_form.fee_heads'.tr()),
           const SizedBox(height: 12),
           const Center(child: CircularProgressIndicator()),
         ]);
@@ -1000,7 +961,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
 
       if (allFeeHeads.isEmpty) return const SizedBox.shrink();
 
-      // ── Edit mode: sirf assigned fee heads dikhao ──
       final visibleFeeHeads = _isEdit
           ? allFeeHeads.where((fee) {
         final assignedIds = _prefill("selected_fee_heads")
@@ -1012,18 +972,17 @@ class _StudentFormPageState extends State<StudentFormPage> {
       }).toList()
           : allFeeHeads;
 
-      // Edit mode mein agar koi assigned fee head nahi to section hide karo
       if (_isEdit && visibleFeeHeads.isEmpty) return const SizedBox.shrink();
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _sectionHeader("Fee Heads"),
+          _sectionHeader('student_form.fee_heads'.tr()),
           if (_isEdit)
             Padding(
               padding: const EdgeInsets.only(top: 6, bottom: 12),
               child: Text(
-                "Fee heads assigned at admission. Cannot be changed.",
+                'student_form.fee_heads_assigned'.tr(),
                 style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
               ),
             )
@@ -1093,7 +1052,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            _isEdit ? "Assigned fee head" : "Fee Head",
+                            _isEdit ? 'student_form.assigned_fee_head'.tr() : 'student_form.fee_head'.tr(),
                             style: TextStyle(
                                 fontSize: 11, color: Colors.grey.shade600),
                           ),
@@ -1169,10 +1128,10 @@ class _StudentFormPageState extends State<StudentFormPage> {
                     Expanded(
                       child: Text(
                         file != null
-                            ? "$label Selected ✓"
+                            ? "$label ${'student_form.student_photo_selected'.tr()} ✓"
                             : showExisting
-                            ? "$label (uploaded) • Tap to change"
-                            : "Upload $label",
+                            ? "$label ${'student_form.student_photo_uploaded'.tr()} • ${'student_form.tap_to_change'.tr()}"
+                            : 'student_form.upload_student_photo'.tr().replaceAll('Student Photo', label),
                         style: TextStyle(
                           color: (file != null || showExisting)
                               ? Colors.green
@@ -1256,7 +1215,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
                     decoration: BoxDecoration(
                         color: Colors.black54,
                         borderRadius: BorderRadius.circular(8)),
-                    child: const Text("Current",
+                    child: Text('student_form.current_image'.tr(),
                         style:
                         TextStyle(color: Colors.white, fontSize: 11)),
                   ),
@@ -1268,7 +1227,6 @@ class _StudentFormPageState extends State<StudentFormPage> {
       },
     );
   }
-
 
   Widget _sectionHeader(String title) => Text(
     title,
@@ -1375,7 +1333,7 @@ class _StudentFormPageState extends State<StudentFormPage> {
           hintText: hint,
           prefixIcon: Icon(icon, color: AppColor.lightBlueColor),
           filled: true,
-             fillColor: Colors.white,
+          fillColor: Colors.white,
           border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none),

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +40,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
   String? selectedAcademicYear;
   String? selectedClassId;
   String? selectedSectionId;
+
   @override
   void initState() {
     super.initState();
@@ -71,7 +73,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
   }
 
   void _fetchStudents() {
-    if (selectedRouteId == null || selectedAcademicYear == null) return; // ✅
+    if (selectedRouteId == null || selectedAcademicYear == null) return;
     Provider.of<GetRouteStudentsViewModel>(
       context,
       listen: false,
@@ -85,7 +87,6 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => _TransportFeeFormSheet(
         onSuccess: () async {
-
           await Provider.of<GetAllTransportStudentsViewModel>(
             context,
             listen: false,
@@ -93,7 +94,6 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
             selectedAcademicYear ?? "",
             context,
           );
-
         },
       ),
     );
@@ -111,7 +111,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
         studentId: studentId,
         studentName: studentName,
         academicYear: academicYear,
-        onSuccess: _fetchStudents, // refresh list after discontinue
+        onSuccess: _fetchStudents,
       ),
     );
   }
@@ -161,14 +161,14 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       AppText.customText(
-                        'Transport Fee',
+                        'transport_fee.title'.tr(),
                         size: 19,
                         weight: FontWeight.bold,
                         color: Colors.white,
                       ),
                       const SizedBox(height: 2),
                       AppText.customText(
-                        'Route-wise student fee overview',
+                        'transport_fee.subtitle'.tr(),
                         size: 12,
                         weight: FontWeight.w400,
                         color: Colors.white70,
@@ -205,16 +205,15 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                         icon: Icons.school,
                         iconBg: const Color(0xFFEEF2FF),
                         iconColor: const Color(0xFF4A6CF7),
-                        hint: "All Classes",
+                        hint: 'transport_fee.all_classes'.tr(),
                         value: selectedClassId,
                         items: [
-                          const DropdownMenuItem(
+                          DropdownMenuItem(
                             value: "all",
-                            child: Text("All Classes"),
+                            child: Text('transport_fee.all_classes'.tr()),
                           ),
-
                           ...classes.map(
-                            (e) => DropdownMenuItem(
+                                (e) => DropdownMenuItem(
                               value: e.classId.toString(),
                               child: Text(e.className ?? ""),
                             ),
@@ -223,7 +222,6 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                         onChanged: (v) {
                           setState(() {
                             selectedClassId = v.toString();
-
                             selectedSectionId = null;
                           });
 
@@ -248,16 +246,15 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                         icon: Icons.groups,
                         iconBg: const Color(0xFFF3E8FF),
                         iconColor: const Color(0xFF7C3AED),
-                        hint: "All Sections",
+                        hint: 'transport_fee.all_sections'.tr(),
                         value: selectedSectionId,
                         items: [
-                          const DropdownMenuItem(
+                          DropdownMenuItem(
                             value: "all",
-                            child: Text("All Sections"),
+                            child: Text('transport_fee.all_sections'.tr()),
                           ),
-
                           ...sections.map(
-                            (e) => DropdownMenuItem(
+                                (e) => DropdownMenuItem(
                               value: e.sectionId.toString(),
                               child: Text(e.sectionName ?? ""),
                             ),
@@ -282,7 +279,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                         icon: Icons.calendar_today_rounded,
                         iconBg: const Color(0xFFECFDF5),
                         iconColor: const Color(0xFF059669),
-                        hint: "Year",
+                        hint: 'transport_fee.year'.tr(),
                         value: selectedAcademicYear,
                         items: years.map((y) {
                           return DropdownMenuItem(
@@ -325,7 +322,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                   final className = classVm.allClassesModel?.data
                       ?.firstWhere(
                         (e) => e.classId.toString() == selectedClassId,
-                      )
+                  )
                       .className;
 
                   filteredStudents = filteredStudents.where((e) {
@@ -342,7 +339,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                   final sectionName = sectionVm.allSectionsModel?.data
                       ?.firstWhere(
                         (e) => e.sectionId.toString() == selectedSectionId,
-                      )
+                  )
                       .sectionName;
 
                   filteredStudents = filteredStudents.where((e) {
@@ -378,7 +375,6 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                       ),
                       child: Column(
                         children: [
-                          // top info
                           Padding(
                             padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
                             child: Row(
@@ -413,7 +409,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         data.studentName ?? "",
@@ -429,25 +425,21 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                                         spacing: 5,
                                         runSpacing: 8,
                                         children: [
-
                                           _pill(
-                                            "Roll: ${data.rollNo ?? '-'}",
+                                            '${'transport_fee.roll'.tr()}: ${data.rollNo ?? '-'}',
                                             const Color(0xFFE0F2FE),
                                             const Color(0xFF0284C7),
                                           ),
-
                                           _pill(
                                             "${data.className ?? '-'}",
                                             const Color(0xFFF3E8FF),
                                             const Color(0xFF7C3AED),
                                           ),
-
                                           _pill(
-                                            "Sec: ${data.sectionName ?? '-'}",
+                                            '${'transport_fee.sec'.tr()}: ${data.sectionName ?? '-'}',
                                             const Color(0xFFECFDF5),
                                             const Color(0xFF059669),
                                           ),
-
                                           _pill(
                                             data.academicYear ?? "-",
                                             const Color(0xFFFFF7ED),
@@ -464,7 +456,6 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                             ),
                           ),
 
-                          // stop row
                           Container(
                             margin: const EdgeInsets.symmetric(horizontal: 14),
                             padding: const EdgeInsets.all(12),
@@ -474,34 +465,27 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                             ),
                             child: Column(
                               children: [
-
                                 _detailRow(
                                   Icons.route_rounded,
-                                  "Route",
+                                  'transport_fee.route'.tr(),
                                   data.routeName ?? "-",
                                 ),
-
                                 const SizedBox(height: 8),
-
                                 _detailRow(
                                   Icons.location_on_rounded,
-                                  "Stop",
+                                  'transport_fee.stop'.tr(),
                                   data.stopName ?? "-",
                                 ),
-
                                 const SizedBox(height: 8),
-
                                 _detailRow(
                                   Icons.directions_bus_rounded,
-                                  "Vehicle",
+                                  'transport_fee.vehicle'.tr(),
                                   data.vehicleNo ?? "-",
                                 ),
-
                                 const SizedBox(height: 8),
-
                                 _detailRow(
                                   Icons.calendar_month_rounded,
-                                  "Assigned",
+                                  'transport_fee.assigned'.tr(),
                                   data.assignedOn ?? "-",
                                 ),
                               ],
@@ -510,7 +494,6 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
 
                           const SizedBox(height: 10),
 
-                          // fee summary
                           Container(
                             margin: const EdgeInsets.fromLTRB(14, 0, 14, 0),
                             padding: const EdgeInsets.symmetric(
@@ -528,19 +511,19 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                             child: Row(
                               children: [
                                 _feeChip(
-                                  label: "Assigned",
+                                  label: 'transport_fee.assigned_amount'.tr(),
                                   amount: "₹${data.assignedAmount ?? 0}",
                                   color: const Color(0xFF374151),
                                 ),
                                 _verticalDivider(),
                                 _feeChip(
-                                  label: "Paid",
+                                  label: 'transport_fee.paid_amount'.tr(),
                                   amount: "₹${data.paidAmount ?? 0}",
                                   color: const Color(0xFF059669),
                                 ),
                                 _verticalDivider(),
                                 _feeChip(
-                                  label: "Pending",
+                                  label: 'transport_fee.pending_amount'.tr(),
                                   amount: "₹${data.pendingAmount ?? 0}",
                                   color: const Color(0xFFDC2626),
                                 ),
@@ -548,19 +531,17 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                             ),
                           ),
 
-                          // ── ACTION BUTTONS ROW ──────────────────────
                           Padding(
                             padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
                             child: Row(
                               children: [
-                                // Details button
                                 Expanded(
                                   child: OutlinedButton.icon(
                                     onPressed: () async {
                                       final vm =
-                                          Provider.of<
-                                            GetStudentTransportViewModel
-                                          >(context, listen: false);
+                                      Provider.of<
+                                          GetStudentTransportViewModel
+                                      >(context, listen: false);
 
                                       await vm.getStudentTransportApi(
                                         data.studentId.toString(),
@@ -585,7 +566,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                                       Icons.info_outline_rounded,
                                       size: 15,
                                     ),
-                                    label: const Text("Details"),
+                                    label: Text('transport_fee.details'.tr()),
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor: const Color(0xFF4A6CF7),
                                       side: const BorderSide(
@@ -607,37 +588,35 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
                                 ),
                                 const SizedBox(width: 10),
 
-                                // ── DISCONTINUE / STOP BUTTON ───────
                                 Expanded(
                                   child: ElevatedButton.icon(
                                     onPressed: stopped
                                         ? null
                                         : () {
-                                            if (!PermissionExtensions.canAccess(
-                                              PermissionKeys.manageTransport,
-                                            )) {
-                                              Utils.show(
-                                                "You don't have permission to perform this action.",
-                                                context,
-                                              );
+                                      if (!PermissionExtensions.canAccess(
+                                        PermissionKeys.manageTransport,
+                                      )) {
+                                        Utils.show(
+                                          'transport_fee.permission_denied'.tr(),
+                                          context,
+                                        );
+                                        return;
+                                      }
 
-                                              return;
-                                            }
-
-                                            _openDiscontinueDialog(
-                                              studentId: data.studentId,
-                                              studentName:
-                                                  data.studentName ?? "Student",
-                                              academicYear:
-                                                  selectedAcademicYear!,
-                                            );
-                                          },
+                                      _openDiscontinueDialog(
+                                        studentId: data.studentId,
+                                        studentName:
+                                        data.studentName ?? "Student",
+                                        academicYear:
+                                        selectedAcademicYear!,
+                                      );
+                                    },
                                     icon: const Icon(
                                       Icons.stop_circle_outlined,
                                       size: 15,
                                     ),
                                     label: Text(
-                                      stopped ? "Stopped" : "Discontinue",
+                                      stopped ? 'transport_fee.stopped'.tr() : 'transport_fee.discontinue'.tr(),
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: stopped
@@ -675,7 +654,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
       floatingActionButton: SizedBox(
         width: 200,
         child: AppButton(
-          title: "Assign Transport",
+          title: 'transport_fee.assign_transport'.tr(),
           icon: Icons.add_rounded,
           height: 50,
           radius: 14,
@@ -683,17 +662,17 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
             if (!PermissionExtensions.canAccess(
                 PermissionKeys.manageTransport)) {
               Utils.show(
-                "You don't have permission to perform this action.",
+                'transport_fee.permission_denied'.tr(),
                 context,
               );
-
               return;
             }
 
             _openAssignSheet();
           },
         ),
-      ),    );
+      ),
+    );
   }
 
   String _initials(String name) {
@@ -713,15 +692,12 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
       ) {
     return Row(
       children: [
-
         Icon(
           icon,
           size: 16,
           color: const Color(0xFF4A6CF7),
         ),
-
         const SizedBox(width: 8),
-
         Text(
           "$title : ",
           style: GoogleFonts.poppins(
@@ -730,7 +706,6 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
             color: Color(0xFF6B7280),
           ),
         ),
-
         Expanded(
           child: Text(
             value,
@@ -915,9 +890,9 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
-            "No Students Found",
-            style: TextStyle(
+          Text(
+            'transport_fee.no_students_found'.tr(),
+            style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
               color: Color(0xFF374151),
@@ -925,7 +900,7 @@ class _TransportFeeScreenState extends State<TransportFeeScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Select a route and academic year\nto view transport fee details.",
+            'transport_fee.no_students_desc'.tr(),
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
@@ -964,10 +939,9 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
   @override
   void initState() {
     super.initState();
-    // pre-fill today's date
     final now = DateTime.now();
     _discontinuedOnCtrl.text =
-        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -981,7 +955,7 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
     final picked = await showDatePicker(
       context: context,
       initialDate:
-          DateTime.tryParse(_discontinuedOnCtrl.text) ?? DateTime.now(),
+      DateTime.tryParse(_discontinuedOnCtrl.text) ?? DateTime.now(),
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
       builder: (ctx, child) => Theme(
@@ -996,7 +970,7 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
     );
     if (picked != null) {
       _discontinuedOnCtrl.text =
-          '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+      '${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
     }
   }
 
@@ -1026,7 +1000,6 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ── HEADER ─────────────────────────────────────────────
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
@@ -1055,9 +1028,9 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Discontinue Transport",
-                        style: TextStyle(
+                      Text(
+                        'transport_fee.discontinue_transport'.tr(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w800,
                           fontSize: 15,
@@ -1085,7 +1058,6 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
             ),
           ),
 
-          // ── FORM BODY ───────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.all(18),
             child: Form(
@@ -1093,7 +1065,6 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Warning banner
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(
@@ -1117,23 +1088,11 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
                         ),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: RichText(
-                            text: const TextSpan(
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF7B4F00),
-                              ),
-                              children: [
-                                TextSpan(text: "Transport will be "),
-                                TextSpan(
-                                  text: "discontinued",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    color: Color(0xFFF57C00),
-                                  ),
-                                ),
-                                TextSpan(text: ", history will be preserved."),
-                              ],
+                          child: Text(
+                            'transport_fee.discontinue_warning'.tr(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF7B4F00),
                             ),
                           ),
                         ),
@@ -1143,8 +1102,7 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
 
                   const SizedBox(height: 16),
 
-                  // Academic Year (read-only)
-                  _fieldLabel("ACADEMIC YEAR"),
+                  _fieldLabel('transport_fee.academic_year'.tr()),
                   const SizedBox(height: 6),
                   Container(
                     width: double.infinity,
@@ -1182,8 +1140,7 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
 
                   const SizedBox(height: 14),
 
-                  // Discontinued On
-                  _fieldLabel("DISCONTINUED ON", required: true),
+                  _fieldLabel('transport_fee.discontinued_on_label'.tr(), required: true),
                   const SizedBox(height: 6),
                   GestureDetector(
                     onTap: _pickDate,
@@ -1191,7 +1148,7 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
                       child: TextFormField(
                         controller: _discontinuedOnCtrl,
                         validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'Date is required'
+                            ? 'transport_fee.date_required'.tr()
                             : null,
                         style: const TextStyle(
                           fontSize: 14,
@@ -1209,14 +1166,13 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
 
                   const SizedBox(height: 14),
 
-                  // Reason
-                  _fieldLabel("REASON", required: true),
+                  _fieldLabel('transport_fee.reason_label'.tr(), required: true),
                   const SizedBox(height: 6),
                   TextFormField(
                     controller: _reasonCtrl,
                     maxLines: 3,
                     validator: (v) => (v == null || v.trim().isEmpty)
-                        ? 'Reason is required'
+                        ? 'transport_fee.reason_required'.tr()
                         : null,
                     style: const TextStyle(
                       fontSize: 13,
@@ -1224,13 +1180,12 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: _inputDecoration(
-                      hint: 'e.g. Student left school, Route changed...',
+                      hint: 'transport_fee.reason_hint'.tr(),
                     ),
                   ),
 
                   const SizedBox(height: 22),
 
-                  // Buttons
                   Consumer<DiscontinueStudentViewModel>(
                     builder: (context, vm, _) {
                       return Row(
@@ -1250,7 +1205,7 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
                                 ),
                               ),
                               child: Text(
-                                "Cancel",
+                                'transport_fee.cancel'.tr(),
                                 style: TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w700,
@@ -1285,20 +1240,20 @@ class _DiscontinueDialogState extends State<_DiscontinueDialog> {
                                 onPressed: vm.loading ? null : _confirm,
                                 icon: vm.loading
                                     ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
-                                        ),
-                                      )
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
                                     : const Icon(
-                                        Icons.check_circle_outline_rounded,
-                                        size: 16,
-                                        color: Colors.white,
-                                      ),
+                                  Icons.check_circle_outline_rounded,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
                                 label: Text(
-                                  vm.loading ? "Please wait..." : "Confirm",
+                                  vm.loading ? 'transport_fee.please_wait'.tr() : 'transport_fee.confirm'.tr(),
                                   style: const TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,
@@ -1418,6 +1373,7 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
   List<StopData> _filteredStops = [];
   String? _selectedAcademicYear;
   String? _selectedYearEnd;
+
   @override
   void initState() {
     super.initState();
@@ -1510,23 +1466,20 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
 
   Future<void> _save() async {
     if (!PermissionExtensions.canAccess(PermissionKeys.manageTransport)) {
-      Utils.show("You don't have permission to perform this action.", context);
-
+      Utils.show('transport_fee.permission_denied'.tr(), context);
       return;
     }
     if (!_formKey.currentState!.validate()) return;
     if (_selectedStudent == null) {
-      Utils.show('Please select a student', context);
-      // _showError('Please select a student');
+      Utils.show('transport_fee.select_student_error'.tr(), context);
       return;
     }
     if (_selectedRoute == null) {
-      Utils.show("Please select a route", context);
-      // _showError('Please select a route');
+      Utils.show('transport_fee.select_route_error'.tr(), context);
       return;
     }
     if (_selectedStop == null) {
-      Utils.show("Please select a stop", context);
+      Utils.show('transport_fee.select_stop_error'.tr(), context);
       return;
     }
 
@@ -1545,22 +1498,13 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
     );
 
     if(success){
-
       if(mounted){
-
         Navigator.pop(context);
-
-        Utils.show(
-          "Transport assigned successfully",
-          context,
-        );
-
+        Utils.show('transport_fee.assigned_success'.tr(), context);
         widget.onSuccess();
-
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -1616,7 +1560,7 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                       ),
                       const SizedBox(width: 12),
                       AppText.customText(
-                        'Assign Transport',
+                        'transport_fee.assign_transport_title'.tr(),
                         size: 17,
                         weight: FontWeight.w900,
                         color: const Color(0xFF1a2340),
@@ -1632,14 +1576,14 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                         children: [
                           Expanded(
                             child: _label(
-                              'Class *',
+                              '${'transport_fee.class'.tr()} *',
                               classVm.loading
                                   ? _buildPlaceholder(
-                                'Loading...',
+                                'transport_fee.loading'.tr(),
                                 showSpinner: true,
                               )
                                   : _sheetDrop(
-                                hint: 'Select',
+                                hint: 'transport_fee.select'.tr(),
                                 value: _classId,
                                 items:
                                 (classVm.allClassesModel?.data ?? [])
@@ -1653,7 +1597,6 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                                 )
                                     .toList(),
                                 onChanged: (v) async {
-
                                   setState(() {
                                     _classId = v;
                                     _sectionId = null;
@@ -1662,7 +1605,6 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                                   });
 
                                   if (v != null) {
-
                                     await Provider.of<AllSectionsViewModel>(
                                       context,
                                       listen: false,
@@ -1683,15 +1625,15 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _label(
-                              'Section *',
+                              '${'transport_fee.section'.tr()} *',
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   _sheetDrop(
                                     hint:
                                     _classId != null && allSections.isEmpty
-                                        ? '⚠ No sections'
-                                        : 'Select',
+                                        ? '⚠ ${'transport_fee.no_sections'.tr()}'
+                                        : 'transport_fee.select'.tr(),
                                     value:
                                     allSections.any(
                                           (s) =>
@@ -1711,7 +1653,6 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                                     onChanged: allSections.isEmpty
                                         ? null
                                         : (v) async {
-
                                       setState(() {
                                         _sectionId = v;
                                         _selectedStudent = null;
@@ -1720,7 +1661,6 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
 
                                       if (_classId != null &&
                                           _sectionId != null) {
-
                                         await Provider.of<
                                             AllStudentListVieModel>(
                                           context,
@@ -1758,7 +1698,7 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                       );
                     },
                   ),
-                  _buildLabel('Student', Icons.person_rounded, required: true),
+                  _buildLabel('transport_fee.student'.tr(), Icons.person_rounded, required: true),
                   const SizedBox(height: 6),
                   Consumer<AllStudentListVieModel>(
                     builder: (context, studentVm, _) {
@@ -1766,30 +1706,30 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                           studentVm.allStudentListModel?.data ?? [];
                       if (studentVm.loading) {
                         return _buildPlaceholder(
-                          'Loading students...',
+                          'transport_fee.loading_students'.tr(),
                           showSpinner: true,
                         );
                       }
                       if (_classId == null) {
                         return _buildPlaceholder(
-                          'Select class first',
+                          'transport_fee.select_class_first'.tr(),
                         );
                       }
 
                       if (_sectionId == null) {
                         return _buildPlaceholder(
-                          'Select section first',
+                          'transport_fee.select_section_first'.tr(),
                         );
                       }
 
                       if (students.isEmpty) {
                         return _buildPlaceholder(
-                          'No students found in this section',
+                          'transport_fee.no_students_section'.tr(),
                         );
                       }
                       return _buildSheetDropdown<StudentData>(
                         value: _selectedStudent,
-                        hint: 'Select Student',
+                        hint: 'transport_fee.select_student'.tr(),
                         icon: Icons.person_rounded,
                         iconBg: const Color(0xFFEEF2FF),
                         iconColor: const Color(0xFF3F72FF),
@@ -1800,26 +1740,24 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                             ? 'Adm: ${s.admissionNo}'
                             : '',
                         onChanged: (StudentData? v) {
-
                           setState(() {
                             _selectedStudent = v;
                           });
-
                         },
                       );
                     },
                   ),
                   const SizedBox(height: 14),
-                  _buildLabel('Route', Icons.route_rounded, required: true),
+                  _buildLabel('transport_fee.route'.tr(), Icons.route_rounded, required: true),
                   const SizedBox(height: 6),
                   routes.isEmpty
                       ? _buildPlaceholder(
-                    'Loading routes...',
+                    'transport_fee.loading_routes'.tr(),
                     showSpinner: true,
                   )
                       : _buildSheetDropdown<Data>(
                     value: _selectedRoute,
-                    hint: 'Select Route',
+                    hint: 'transport_fee.select_route'.tr(),
                     icon: Icons.route_rounded,
                     iconBg: const Color(0xFFEEF2FF),
                     iconColor: const Color(0xFF3F72FF),
@@ -1831,20 +1769,20 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                   ),
                   const SizedBox(height: 14),
                   _buildLabel(
-                    'Stop',
+                    'transport_fee.stop'.tr(),
                     Icons.location_on_rounded,
                     required: true,
                   ),
                   const SizedBox(height: 6),
                   _selectedRoute == null
-                      ? _buildPlaceholder('Select a route first')
+                      ? _buildPlaceholder('transport_fee.select_route_first'.tr())
                       : stopVm.loading
-                      ? _buildPlaceholder('Loading stops...', showSpinner: true)
+                      ? _buildPlaceholder('transport_fee.loading_stops'.tr(), showSpinner: true)
                       : _filteredStops.isEmpty
-                      ? _buildPlaceholder('No stops available')
+                      ? _buildPlaceholder('transport_fee.no_stops_available'.tr())
                       : _buildSheetDropdown<StopData>(
                     value: _selectedStop,
-                    hint: 'Select Stop',
+                    hint: 'transport_fee.select_stop'.tr(),
                     icon: Icons.location_on_rounded,
                     iconBg: const Color(0xFFE6FAF7),
                     iconColor: const Color(0xFF00C9A7),
@@ -1862,11 +1800,11 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                       Expanded(
                         child: _DateField(
                           controller: _assignedOnCtrl,
-                          label: 'Assigned On',
+                          label: 'transport_fee.assigned_on'.tr(),
                           required: true,
                           onTap: () => _pickDate(_assignedOnCtrl),
                           validator: (v) => (v == null || v.trim().isEmpty)
-                              ? 'Required'
+                              ? 'transport_fee.date_required'.tr()
                               : null,
                         ),
                       ),
@@ -1888,7 +1826,7 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                             ),
                           ),
                           child: AppText.customText(
-                            'Cancel',
+                            'transport_fee.cancel'.tr(),
                             size: 14,
                             weight: FontWeight.w700,
                             color: Colors.grey.shade600,
@@ -1899,14 +1837,15 @@ class _TransportFeeFormSheetState extends State<_TransportFeeFormSheet> {
                       Expanded(
                         flex: 1,
                         child: AppButton(
-                          title: "Assign",
+                          title: 'transport_fee.assign_transport'.tr(),
                           icon: Icons.assignment_turned_in_rounded,
                           loading: loading,
                           height: 50,
                           radius: 14,
                           onTap: _save,
                         ),
-                      ),                    ],
+                      ),
+                    ],
                   ),
                   SizedBox(height: screenHeight * 0.05),
                 ],
@@ -2293,7 +2232,6 @@ class TransportDetailsBottomSheet extends StatelessWidget {
       ),
       child: Column(
         children: [
-          /// Handle
           Container(
             margin: const EdgeInsets.only(top: 12),
             width: 60,
@@ -2306,7 +2244,6 @@ class TransportDetailsBottomSheet extends StatelessWidget {
 
           const SizedBox(height: 14),
 
-          /// Header
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 18),
             padding: const EdgeInsets.all(18),
@@ -2331,24 +2268,20 @@ class TransportDetailsBottomSheet extends StatelessWidget {
                     size: 30,
                   ),
                 ),
-
                 const SizedBox(width: 14),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Transport Details",
-                        style: TextStyle(
+                      Text(
+                        'transport_fee.transport_details'.tr(),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                         ),
                       ),
-
                       const SizedBox(height: 4),
-
                       Text(
                         data?.routeName ?? "-",
                         style: const TextStyle(
@@ -2359,7 +2292,6 @@ class TransportDetailsBottomSheet extends StatelessWidget {
                     ],
                   ),
                 ),
-
                 InkWell(
                   onTap: () => Navigator.pop(context),
                   child: const Icon(Icons.close_rounded, color: Colors.white),
@@ -2375,43 +2307,35 @@ class TransportDetailsBottomSheet extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Column(
                 children: [
-                  /// Route Information
                   _sectionCard(
-                    title: "Route Information",
+                    title: 'transport_fee.route_information'.tr(),
                     icon: Icons.route_rounded,
                     child: Column(
                       children: [
-                        _infoTile("Route Name", data?.routeName),
-
-                        _infoTile("Vehicle Number", data?.vehicleNo),
-
-                        _infoTile("Stop Name", data?.stopName),
-
-                        _infoTile("Distance", "${data?.distanceKm ?? "0"} KM"),
-
-                        _infoTile("Frequency", data?.feeFrequency),
+                        _infoTile('transport_fee.route_name'.tr(), data?.routeName),
+                        _infoTile('transport_fee.vehicle_number'.tr(), data?.vehicleNo),
+                        _infoTile('transport_fee.stop_name'.tr(), data?.stopName),
+                        _infoTile('transport_fee.distance'.tr(), "${data?.distanceKm ?? "0"} ${'transport_fee.km'.tr()}"),
+                        _infoTile('transport_fee.frequency'.tr(), data?.feeFrequency),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  /// Driver Information
                   _sectionCard(
-                    title: "Driver Information",
+                    title: 'transport_fee.driver_information'.tr(),
                     icon: Icons.person_rounded,
                     child: Column(
                       children: [
-                        _infoTile("Driver Name", data?.driverName),
-
-                        _infoTile("Driver Phone", data?.driverPhone),
+                        _infoTile('transport_fee.driver_name'.tr(), data?.driverName),
+                        _infoTile('transport_fee.driver_phone'.tr(), data?.driverPhone),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: 16),
 
-                  /// Fee Summary
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -2443,34 +2367,29 @@ class TransportDetailsBottomSheet extends StatelessWidget {
                             ),
                           ],
                         ),
-
                         const SizedBox(height: 18),
 
                         Row(
                           children: [
                             Expanded(
                               child: _amountCard(
-                                "Assigned",
+                                'transport_fee.assigned_amount'.tr(),
                                 "₹${data?.assignedAmount ?? "0"}",
                                 const Color(0xFF374151),
                               ),
                             ),
-
                             const SizedBox(width: 10),
-
                             Expanded(
                               child: _amountCard(
-                                "Paid",
+                                'transport_fee.paid_amount'.tr(),
                                 "₹${data?.paidAmount ?? "0"}",
                                 const Color(0xFF10B981),
                               ),
                             ),
-
                             const SizedBox(width: 10),
-
                             Expanded(
                               child: _amountCard(
-                                "Pending",
+                                'transport_fee.pending_amount'.tr(),
                                 "₹${data?.pendingAmount ?? "0"}",
                                 const Color(0xFFEF4444),
                               ),
@@ -2498,11 +2417,9 @@ class TransportDetailsBottomSheet extends StatelessWidget {
                                 Icons.info_outline,
                                 color: _statusColor(data?.feeStatus),
                               ),
-
                               const SizedBox(width: 8),
-
                               Text(
-                                "Status : ${data?.feeStatus ?? "-"}",
+                                '${'transport_fee.status'.tr()} : ${data?.feeStatus ?? "-"}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   color: _statusColor(data?.feeStatus),
@@ -2517,7 +2434,6 @@ class TransportDetailsBottomSheet extends StatelessWidget {
 
                   const SizedBox(height: 16),
 
-                  /// Transport Status
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -2536,13 +2452,11 @@ class TransportDetailsBottomSheet extends StatelessWidget {
                                   ? Colors.green
                                   : Colors.red,
                             ),
-
                             const SizedBox(width: 8),
-
                             Text(
                               data?.isActive == 1
-                                  ? "Active Transport"
-                                  : "Discontinued",
+                                  ? 'transport_fee.active_transport'.tr()
+                                  : 'transport_fee.discontinued'.tr(),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 15,
@@ -2555,13 +2469,11 @@ class TransportDetailsBottomSheet extends StatelessWidget {
                           Column(
                             children: [
                               const SizedBox(height: 16),
-
                               _infoTile(
-                                "Discontinued On",
+                                'transport_fee.discontinued_on'.tr(),
                                 data?.discontinuedOn,
                               ),
-
-                              _infoTile("Reason", data?.discontinueReason),
+                              _infoTile('transport_fee.reason'.tr(), data?.discontinueReason),
                             ],
                           ),
                       ],
@@ -2582,13 +2494,10 @@ class TransportDetailsBottomSheet extends StatelessWidget {
     switch (status?.toLowerCase()) {
       case "paid":
         return Colors.green;
-
       case "partial":
         return Colors.orange;
-
       case "pending":
         return Colors.red;
-
       default:
         return Colors.blueGrey;
     }
@@ -2613,9 +2522,7 @@ class TransportDetailsBottomSheet extends StatelessWidget {
           Row(
             children: [
               Icon(icon, color: const Color(0xFF4A6CF7)),
-
               const SizedBox(width: 8),
-
               Text(
                 title,
                 style: const TextStyle(
@@ -2625,9 +2532,7 @@ class TransportDetailsBottomSheet extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 16),
-
           child,
         ],
       ),
@@ -2648,7 +2553,6 @@ class TransportDetailsBottomSheet extends StatelessWidget {
               ),
             ),
           ),
-
           Expanded(
             child: Text(
               value?.toString() ?? "-",
@@ -2678,9 +2582,7 @@ class TransportDetailsBottomSheet extends StatelessWidget {
               fontSize: 15,
             ),
           ),
-
           const SizedBox(height: 4),
-
           Text(
             title,
             style: TextStyle(

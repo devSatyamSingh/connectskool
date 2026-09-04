@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -42,7 +43,6 @@ class UserPermissionsScreen extends StatefulWidget {
 class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
   String _selectedRole = 'student';
 
-  // ── Role options matching the screenshot ─────────────────────────────
   final List<Map<String, dynamic>> _roles = [
     {'key': 'teacher', 'label': 'Teacher', 'icon': Icons.person_rounded},
     {'key': 'student', 'label': 'Student', 'icon': Icons.school_rounded},
@@ -52,7 +52,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
       'icon': Icons.account_balance_rounded,
     },
   ];
-
 
   @override
   void initState() {
@@ -68,13 +67,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
   }
 
   void _fetchUsersByRole(String role) async {
-    // if (!PermissionGuard.check(
-    //   context,
-    //   PermissionKeys.managePermissions,
-    //   "Manage Permissions",
-    // )) {
-    //   return;
-    // }
     setState(() => _selectedRole = role);
 
     final usersVm = Provider.of<GetUsersByRoleViewModel>(
@@ -87,8 +79,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
       _fetchPermissions(usersVm);
     }
   }
-
-  // ─── Step 2: Fetch permissions for selected user ──────────────────────
 
   void _fetchPermissions(GetUsersByRoleViewModel usersVm) {
     final userId =
@@ -105,13 +95,11 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
     );
   }
 
-  // ─── User dropdown changed ────────────────────────────────────────────
-
   void _onUserChanged(UserByRole user) {
     if (!PermissionGuard.check(
       context,
       PermissionKeys.managePermissions,
-      "Manage Permissions",
+      'user_permission.manage_permissions'.tr(),
     )) {
       return;
     }
@@ -123,20 +111,16 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
     _fetchPermissions(usersVm);
   }
 
-  // ─── Reset ────────────────────────────────────────────────────────────
-
   void _resetAll() => Provider.of<GetUserPermissionViewModel>(
     context,
     listen: false,
   ).resetAll();
 
-
   void _saveChanges() async {
-    // ✅ Pattern A - Button click guard
     if (!PermissionGuard.check(
       context,
       PermissionKeys.managePermissions,
-      "Manage Permissions",
+      'user_permission.manage_permissions'.tr(),
     )) {
       return;
     }
@@ -166,7 +150,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
     );
 
     if (success) {
-      // fresh reload after save
       await permVm.getUserPermissionApi(
         context: context,
         userId: userId,
@@ -175,14 +158,14 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Permissions saved successfully")),
+        SnackBar(content: Text('user_permission.permissions_saved'.tr())),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Failed to save permissions")),
+        SnackBar(content: Text('user_permission.permissions_save_failed'.tr())),
       );
     }
-  } // ─── Build ────────────────────────────────────────────────────────────
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,26 +184,22 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // ── Page subtitle ─────────────────────────────
-                        const Text(
-                          'Manage individual user permission overrides on top of their role',
-                          style: TextStyle(fontSize: 12.5, color: _textMid),
+                        Text(
+                          'user_permission.subtitle_desc'.tr(),
+                          style: const TextStyle(fontSize: 12.5, color: _textMid),
                         ),
                         const SizedBox(height: 16),
 
-                        // ── Role Dropdown ─────────────────────────────
-                        _buildLabel('SELECT ROLE'),
+                        _buildLabel('user_permission.select_role'.tr()),
                         const SizedBox(height: 6),
                         _buildRoleDropdown(),
                         const SizedBox(height: 14),
 
-                        // ── User Dropdown ─────────────────────────────
-                        _buildLabel('SELECT USER'),
+                        _buildLabel('user_permission.select_user'.tr()),
                         const SizedBox(height: 6),
                         _buildUserDropdown(usersVm),
                         const SizedBox(height: 18),
 
-                        // ── Permissions + Summary ─────────────────────
                         _buildBody(usersVm, permVm),
                       ],
                     ),
@@ -265,27 +244,26 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'User Permissions',
-                  style: TextStyle(
+                  'user_permission.title'.tr(),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: _white,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  'Settings  ›  User Permissions',
-                  style: TextStyle(fontSize: 11, color: Colors.white70),
+                  'user_permission.subtitle'.tr(),
+                  style: const TextStyle(fontSize: 11, color: Colors.white70),
                 ),
               ],
             ),
           ),
-          // Save button in header
           GestureDetector(
             onTap: _saveChanges,
             child: Container(
@@ -294,9 +272,9 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                 color: _white,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
-                'Save Changes',
-                style: TextStyle(
+              child: Text(
+                'user_permission.save_changes'.tr(),
+                style: const TextStyle(
                   color: _accent,
                   fontWeight: FontWeight.w700,
                   fontSize: 12,
@@ -327,7 +305,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
 
   Widget _buildRoleDropdown() {
     final current = _roles.firstWhere(
-      (r) => r['key'] == _selectedRole,
+          (r) => r['key'] == _selectedRole,
       orElse: () => _roles.first,
     );
 
@@ -344,6 +322,10 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
             fontWeight: FontWeight.w500,
           ),
           selectedItemBuilder: (_) => _roles.map((r) {
+            final labelKey = r['key'] as String;
+            final label = labelKey == 'teacher' ? 'user_permission.teacher'.tr() :
+            labelKey == 'student' ? 'user_permission.student'.tr() :
+            'user_permission.accountant'.tr();
             return Row(
               children: [
                 Container(
@@ -357,7 +339,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  r['label'] as String,
+                  label,
                   style: const TextStyle(
                     color: _textDark,
                     fontWeight: FontWeight.w600,
@@ -372,6 +354,10 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
           },
           items: _roles.map((r) {
             final isSelected = r['key'] == _selectedRole;
+            final labelKey = r['key'] as String;
+            final label = labelKey == 'teacher' ? 'user_permission.teacher'.tr() :
+            labelKey == 'student' ? 'user_permission.student'.tr() :
+            'user_permission.accountant'.tr();
             return DropdownMenuItem<String>(
               value: r['key'] as String,
               child: Container(
@@ -394,7 +380,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        r['label'] as String,
+                        label,
                         style: TextStyle(
                           color: isSelected ? _white : _textDark,
                           fontWeight: isSelected
@@ -439,7 +425,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
             const Icon(Icons.person_off_rounded, color: _textLight, size: 16),
             const SizedBox(width: 8),
             Text(
-              'No users found for this role',
+              'user_permission.no_users_found'.tr(),
               style: const TextStyle(color: _textMid, fontSize: 13),
             ),
           ],
@@ -582,9 +568,9 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
   // ─── Body ─────────────────────────────────────────────────────────────
 
   Widget _buildBody(
-    GetUsersByRoleViewModel usersVm,
-    GetUserPermissionViewModel permVm,
-  ) {
+      GetUsersByRoleViewModel usersVm,
+      GetUserPermissionViewModel permVm,
+      ) {
     if (usersVm.loading || permVm.loading) {
       return const Center(
         child: Padding(
@@ -604,7 +590,7 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
               Icon(Icons.lock_open_rounded, size: 48, color: _textLight),
               const SizedBox(height: 12),
               Text(
-                'No permissions found',
+                'user_permission.no_permissions_found'.tr(),
                 style: const TextStyle(color: _textMid, fontSize: 14),
               ),
             ],
@@ -613,7 +599,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
       );
     }
 
-    // Count stats
     int totalCount = 0;
     int allowedCount = 0;
     int deniedCount = 0;
@@ -629,19 +614,16 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
 
     return Column(
       children: [
-        // ── Permissions Summary Card ──────────────────────────────────
         _buildSummaryCard(totalCount, allowedCount, deniedCount, defaultCount),
         const SizedBox(height: 16),
 
-        // ── Permission sections ───────────────────────────────────────
         ...permVm.sections.map(
-          (s) => Padding(
+              (s) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: _buildSectionCard(permVm, s),
           ),
         ),
 
-        // ── Footer buttons ────────────────────────────────────────────
         _buildFooter(),
       ],
     );
@@ -654,22 +636,22 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Permissions Summary',
-            style: TextStyle(
+          Text(
+            'user_permission.permissions_summary'.tr(),
+            style: const TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.bold,
               color: _textDark,
             ),
           ),
           const SizedBox(height: 14),
-          _summaryRow('Total', total, const Color(0xFF2563EB), total, total),
+          _summaryRow('user_permission.total'.tr(), total, const Color(0xFF2563EB), total, total),
           const SizedBox(height: 8),
-          _summaryRow('Allowed', allowed, _greenAllow, allowed, total),
+          _summaryRow('user_permission.allowed'.tr(), allowed, _greenAllow, allowed, total),
           const SizedBox(height: 8),
-          _summaryRow('Denied', denied, _redDeny, denied, total),
+          _summaryRow('user_permission.denied'.tr(), denied, _redDeny, denied, total),
           const SizedBox(height: 8),
-          _summaryRow('Default (Role)', def, _textLight, def, total),
+          _summaryRow('user_permission.default_role'.tr(), def, _textLight, def, total),
         ],
       ),
     );
@@ -725,7 +707,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
       padding: EdgeInsets.zero,
       child: Column(
         children: [
-          // Section header
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             child: Row(
@@ -773,7 +754,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                     ],
                   ),
                 ),
-                // Select All
                 GestureDetector(
                   onTap: () => vm.selectAllInSection(section, 'allowed'),
                   child: Row(
@@ -787,9 +767,9 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                         ),
                       ),
                       const SizedBox(width: 5),
-                      const Text(
-                        'Select All',
-                        style: TextStyle(
+                      Text(
+                        'user_permission.select_all'.tr(),
+                        style: const TextStyle(
                           fontSize: 11.5,
                           color: _textMid,
                           fontWeight: FontWeight.w500,
@@ -814,7 +794,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
     final permId = item.permissionId ?? 0;
     final currentState = vm.getState(permId);
 
-    // dot color
     Color dotColor;
     if (currentState == 'allowed')
       dotColor = _greenAllow;
@@ -829,7 +808,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
             children: [
-              // Status dot
               Container(
                 width: 8,
                 height: 8,
@@ -840,7 +818,6 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
               ),
               const SizedBox(width: 12),
 
-              // Key + description
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -867,37 +844,36 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
 
               const SizedBox(width: 8),
 
-              // Allowed / Denied / Default buttons
               Row(
                 children: [
                   _permBtn(
-                    'Allowed',
+                    'user_permission.allowed_btn'.tr(),
                     currentState == 'allowed',
                     _greenAllow,
                     _greenBg,
-                    () => vm.updatePermissionState(
+                        () => vm.updatePermissionState(
                       permId,
                       currentState == 'allowed' ? 'default' : 'allowed',
                     ),
                   ),
                   const SizedBox(width: 5),
                   _permBtn(
-                    'Denied',
+                    'user_permission.denied_btn'.tr(),
                     currentState == 'denied',
                     _redDeny,
                     _redBg,
-                    () => vm.updatePermissionState(
+                        () => vm.updatePermissionState(
                       permId,
                       currentState == 'denied' ? 'default' : 'denied',
                     ),
                   ),
                   const SizedBox(width: 5),
                   _permBtn(
-                    'Default',
+                    'user_permission.default_btn'.tr(),
                     currentState == 'default',
                     _accent,
                     _accentLight,
-                    () => vm.updatePermissionState(permId, 'default'),
+                        () => vm.updatePermissionState(permId, 'default'),
                   ),
                 ],
               ),
@@ -910,12 +886,12 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
   }
 
   Widget _permBtn(
-    String label,
-    bool active,
-    Color activeColor,
-    Color activeBg,
-    VoidCallback onTap,
-  ) {
+      String label,
+      bool active,
+      Color activeColor,
+      Color activeBg,
+      VoidCallback onTap,
+      ) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -984,9 +960,9 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                 size: 15,
                 color: _textMid,
               ),
-              label: const Text(
-                'Reset to Default',
-                style: TextStyle(
+              label: Text(
+                'user_permission.reset_to_default'.tr(),
+                style: const TextStyle(
                   color: _textMid,
                   fontWeight: FontWeight.w600,
                   fontSize: 12.5,
@@ -1020,9 +996,9 @@ class _UserPermissionsScreenState extends State<UserPermissionsScreen> {
                   ),
                 ),
                 icon: const Icon(Icons.save_rounded, size: 15, color: _white),
-                label: const Text(
-                  'Save Changes',
-                  style: TextStyle(
+                label: Text(
+                  'user_permission.save_changes'.tr(),
+                  style: const TextStyle(
                     color: _white,
                     fontWeight: FontWeight.w700,
                     fontSize: 12.5,

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -32,7 +33,6 @@ class _AllStudentListState extends State<AllStudentList>
   final _selectedSectionId = ValueNotifier<String>("");
   bool _sectionsLoading = false;
 
-  // ✅ dispose() ke crash ko fix karne ke liye reference yahan save karo
   AllClassesViewModel? _classesVm;
 
   @override
@@ -51,7 +51,6 @@ class _AllStudentListState extends State<AllStudentList>
         listen: false,
       ).allStudentListApi(context);
 
-      // ✅ reference save kar liya, ab dispose() mein Provider.of call nahi karna padega
       _classesVm = Provider.of<AllClassesViewModel>(context, listen: false);
       _classesVm!.allClassesApi(context);
       _classesVm!.addListener(_onClassesLoaded);
@@ -65,10 +64,10 @@ class _AllStudentListState extends State<AllStudentList>
       _classes.value = data
           .map(
             (e) => {
-              "class_id": e.classId.toString(),
-              "class_name": e.className ?? "",
-            },
-          )
+          "class_id": e.classId.toString(),
+          "class_name": e.className ?? "",
+        },
+      )
           .toList();
     }
   }
@@ -76,7 +75,6 @@ class _AllStudentListState extends State<AllStudentList>
   @override
   void dispose() {
     _animCtrl.dispose();
-    // ✅ ab yahan Provider.of(context) call nahi kar rahe — saved reference use kar rahe hain
     _classesVm?.removeListener(_onClassesLoaded);
     _classes.dispose();
     _sections.dispose();
@@ -98,7 +96,7 @@ class _AllStudentListState extends State<AllStudentList>
     if (!PermissionGuard.check(
       context,
       PermissionKeys.addStudent,
-      "Add Student",
+      "all_students.add_student".tr(),
     )) {
       return;
     }
@@ -112,7 +110,7 @@ class _AllStudentListState extends State<AllStudentList>
     if (!PermissionGuard.check(
       context,
       PermissionKeys.editStudent,
-      "Edit Student",
+      "all_students.edit_student".tr(),
     )) {
       return;
     }
@@ -125,32 +123,29 @@ class _AllStudentListState extends State<AllStudentList>
   @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<AllStudentListVieModel>(context);
-
-    // ✅✅ SABSE IMPORTANT FIX: yahan `viewModel.students` use karo,
-    // `viewModel.allStudentListModel?.data` NAHI — warna sirf page 1 ke 20 hi dikhenge
     final students = viewModel.students;
 
     final filtered = students.where((s) {
       final selectedClassName =
           _classes.value.firstWhere(
-            (c) =>
-                c["class_id"].toString() == _selectedClassId.value.toString(),
+                (c) =>
+            c["class_id"].toString() == _selectedClassId.value.toString(),
             orElse: () => <String, String>{},
           )["class_name"] ??
-          "";
+              "";
       final classMatch =
           _selectedClassId.value.isEmpty ||
-          (s.className ?? "") == selectedClassName;
+              (s.className ?? "") == selectedClassName;
 
       final selectedSectionName =
           _sections.value.firstWhere(
-            (sec) => sec["section_id"].toString() == _selectedSectionId.value,
+                (sec) => sec["section_id"].toString() == _selectedSectionId.value,
             orElse: () => <String, dynamic>{},
           )["section_name"] ??
-          "";
+              "";
       final sectionMatch =
           _selectedSectionId.value.isEmpty ||
-          (s.sectionName ?? "") == selectedSectionName;
+              (s.sectionName ?? "") == selectedSectionName;
 
       return classMatch && sectionMatch;
     }).toList();
@@ -162,7 +157,7 @@ class _AllStudentListState extends State<AllStudentList>
         floatingActionButton: SizedBox(
           width: 170,
           child: AppButton(
-            title: "Add Student",
+            title: 'all_students.add_student'.tr(),
             icon: Icons.add_rounded,
             height: 50,
             radius: 18,
@@ -206,13 +201,12 @@ class _AllStudentListState extends State<AllStudentList>
                   const SizedBox(width: 12),
                   Expanded(
                     child: AppText.customText(
-                      "All Students",
+                      'all_students.title'.tr(),
                       size: 19,
                       weight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
-                  // ✅ ab yeh count bhi loaded students (jo accumulate ho rahe hain) ka sahi count dikhayega
                   AppText.customText(
                     "${students.length}",
                     size: 16,
@@ -244,25 +238,25 @@ class _AllStudentListState extends State<AllStudentList>
                   : filtered.isEmpty
                   ? _empty()
                   : RefreshIndicator(
-                      color: AppColor.lightBlueColor,
-                      onRefresh: _onRefresh,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(18, 8, 18, 100),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        itemCount: filtered.length + 1, // +1 footer
-                        itemBuilder: (_, i) {
-                          if (i >= filtered.length) {
-                            return _footer(viewModel);
-                          }
-                          final s = filtered[i];
-                          final isMale = s.gender?.toLowerCase() == "male";
-                          return _animatedCard(
-                            i,
-                            _studentMap(s, isMale: isMale),
-                          );
-                        },
-                      ),
-                    ),
+                color: AppColor.lightBlueColor,
+                onRefresh: _onRefresh,
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(18, 8, 18, 100),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: filtered.length + 1,
+                  itemBuilder: (_, i) {
+                    if (i >= filtered.length) {
+                      return _footer(viewModel);
+                    }
+                    final s = filtered[i];
+                    final isMale = s.gender?.toLowerCase() == "male";
+                    return _animatedCard(
+                      i,
+                      _studentMap(s, isMale: isMale),
+                    );
+                  },
+                ),
+              ),
             ),
           ],
         ),
@@ -277,12 +271,11 @@ class _AllStudentListState extends State<AllStudentList>
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 16),
       child: AppButton(
-        title: "View More",
+        title: 'all_students.view_more'.tr(),
         icon: Icons.expand_more_rounded,
         height: 48,
         radius: 14,
-        loading:
-            viewModel.loadingMore, // ✅ AppButton khud hi spinner dikha dega
+        loading: viewModel.loadingMore,
         onTap: () {
           viewModel.loadMoreStudents(
             context,
@@ -313,8 +306,8 @@ class _AllStudentListState extends State<AllStudentList>
     "roll_no": s.rollNo?.toString() ?? "",
     "dob": s.dob != null
         ? s.dob!.contains("T")
-              ? s.dob!.split("T")[0]
-              : s.dob!
+        ? s.dob!.split("T")[0]
+        : s.dob!
         : "",
     "mobile_number": s.mobileNumber ?? "",
     "father_name": s.fatherName ?? "",
@@ -369,7 +362,7 @@ class _AllStudentListState extends State<AllStudentList>
         if (!PermissionExtensions.canAccess(
           PermissionKeys.viewOneStudentProfile,
         )) {
-          Utils.show("You don't have permission", context);
+          Utils.show('all_students.no_permission_view'.tr(), context);
           return;
         }
         Navigator.push(
@@ -432,7 +425,7 @@ class _AllStudentListState extends State<AllStudentList>
                     Row(
                       children: [
                         AppText.customText(
-                          "Adm: ${s["admission"]}",
+                          '${'all_students.adm'.tr()}: ${s["admission"]}',
                           size: 11,
                           color: AppColor.softGreyText,
                         ),
@@ -477,7 +470,7 @@ class _AllStudentListState extends State<AllStudentList>
                       if (!PermissionGuard.check(
                         context,
                         PermissionKeys.deleteStudent,
-                        "Delete Student",
+                        "all_students.delete".tr(),
                       )) {
                         return;
                       }
@@ -517,15 +510,15 @@ class _AllStudentListState extends State<AllStudentList>
         builder: (_, list, __) => ValueListenableBuilder<String>(
           valueListenable: _selectedClassId,
           builder: (_, val, __) => _filterDropdown(
-            label: "Class",
+            label: 'all_students.class'.tr(),
             value: val.isEmpty ? null : val,
             items: list
                 .map(
                   (e) => DropdownMenuItem<String>(
-                    value: e["class_id"],
-                    child: Text(e["class_name"]),
-                  ),
-                )
+                value: e["class_id"],
+                child: Text(e["class_name"]),
+              ),
+            )
                 .toList(),
             onChanged: (v) async {
               _selectedClassId.value = v ?? "";
@@ -546,11 +539,8 @@ class _AllStudentListState extends State<AllStudentList>
                     resp["data"],
                   );
                 }
-
-                // ✅ server se class ke hisaab se students refetch karo
                 await vm.allStudentListApi(context, classId: v);
               } else {
-                // ✅ class clear ki to poori list wapas load karo
                 await vm.allStudentListApi(context);
               }
 
@@ -574,15 +564,15 @@ class _AllStudentListState extends State<AllStudentList>
               return _noSectionFilterPlaceholder();
             }
             return _filterDropdown(
-              label: "Section",
+              label: 'all_students.section'.tr(),
               value: val.isEmpty ? null : val,
               items: list
                   .map(
                     (e) => DropdownMenuItem<String>(
-                      value: e["section_id"].toString(),
-                      child: Text(e["section_name"]),
-                    ),
-                  )
+                  value: e["section_id"].toString(),
+                  child: Text(e["section_name"]),
+                ),
+              )
                   .toList(),
               onChanged: (v) async {
                 setState(() => _selectedSectionId.value = v ?? "");
@@ -592,7 +582,6 @@ class _AllStudentListState extends State<AllStudentList>
                   listen: false,
                 );
 
-                // ✅ server se class + section dono ke hisaab se refetch karo
                 await vm.allStudentListApi(
                   context,
                   classId: _selectedClassId.value.isEmpty
@@ -656,7 +645,7 @@ class _AllStudentListState extends State<AllStudentList>
         ),
         const SizedBox(width: 10),
         Text(
-          "Loading...",
+          'all_students.loading'.tr(),
           style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
         ),
       ],
@@ -679,7 +668,7 @@ class _AllStudentListState extends State<AllStudentList>
         ),
         const SizedBox(width: 8),
         Text(
-          "No Section",
+          'all_students.no_section'.tr(),
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
@@ -707,7 +696,7 @@ class _AllStudentListState extends State<AllStudentList>
               ),
               const SizedBox(height: 16),
               Text(
-                "No Students Found",
+                'all_students.no_students_found'.tr(),
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -716,7 +705,7 @@ class _AllStudentListState extends State<AllStudentList>
               ),
               const SizedBox(height: 8),
               Text(
-                "Pull down to refresh",
+                'all_students.pull_to_refresh'.tr(),
                 style: TextStyle(fontSize: 13, color: Colors.grey.shade400),
               ),
             ],
@@ -770,15 +759,15 @@ class _AllStudentListState extends State<AllStudentList>
                   ),
                 ),
                 const SizedBox(height: 15),
-                const Text(
-                  "Delete Student",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Text(
+                  'all_students.delete_student'.tr(),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "Are you sure you want to delete this student?",
+                Text(
+                  'all_students.delete_confirmation'.tr(),
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -791,7 +780,7 @@ class _AllStudentListState extends State<AllStudentList>
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text("Cancel"),
+                        child: Text('all_students.cancel'.tr()),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -804,9 +793,9 @@ class _AllStudentListState extends State<AllStudentList>
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          "Delete",
-                          style: TextStyle(color: Colors.white),
+                        child: Text(
+                          'all_students.delete'.tr(),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     ),
@@ -817,5 +806,5 @@ class _AllStudentListState extends State<AllStudentList>
           ),
         ),
       ) ??
-      false;
+          false;
 }

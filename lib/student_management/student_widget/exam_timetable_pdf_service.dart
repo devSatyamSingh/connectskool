@@ -8,6 +8,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:easy_localization/easy_localization.dart';  // ← ADD THIS
+
 import '../../model/school_model/timetable/get_school_exam_time_table_model.dart';
 import '../../model/school_model/auth/school_admin_profile_model.dart';
 
@@ -23,13 +25,13 @@ class ExamTimetablePdfService {
   static const _blueBorder = PdfColor.fromInt(0xFF90caf9);
   static const _stripeBg   = PdfColor.fromInt(0xFFfafafa);
 
-  static const List<String> _instructions = [
-    'Report 15 minutes before commencement of the exam',
-    'Valid School ID Card & Admit Card must be carried',
-    'Write Roll Number and Name clearly on the answer sheet',
-    'Possession of electronic gadgets is strictly prohibited',
-    'No student will be allowed to leave before duration ends',
-    'Use of unfair means leads to immediate cancellation',
+  static const List<String> _instructionsKeys = [
+    'exam_timetable_pdf.instruction_1',
+    'exam_timetable_pdf.instruction_2',
+    'exam_timetable_pdf.instruction_3',
+    'exam_timetable_pdf.instruction_4',
+    'exam_timetable_pdf.instruction_5',
+    'exam_timetable_pdf.instruction_6',
   ];
 
   static Future<File> generatePdf({
@@ -96,7 +98,7 @@ class ExamTimetablePdfService {
       children: [
         pw.Text(printedAt,
             style: pw.TextStyle(fontSize: 7, color: _textGrey)),
-        pw.Text('School Dashboard - Student Portal',
+        pw.Text('exam_timetable_pdf.school_dashboard'.tr(),
             style: pw.TextStyle(fontSize: 7, color: _textGrey)),
         pw.SizedBox(width: 40),
       ],
@@ -109,7 +111,7 @@ class ExamTimetablePdfService {
       children: [
         pw.Expanded(
           child: pw.Text(
-            (school?.schoolName ?? 'SCHOOL NAME').toUpperCase(),
+            (school?.schoolName ?? 'exam_timetable_pdf.school_name_default'.tr()).toUpperCase(),
             style: pw.TextStyle(
               fontSize: 18,
               fontWeight: pw.FontWeight.bold,
@@ -126,7 +128,7 @@ class ExamTimetablePdfService {
           child: pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.center,
             children: [
-              pw.Text('OFFICIAL DOCUMENT',
+              pw.Text('exam_timetable_pdf.official_document'.tr(),
                   style: pw.TextStyle(fontSize: 7, color: _darkBlue, fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 2),
               pw.Text(generatedDate,
@@ -143,7 +145,7 @@ class ExamTimetablePdfService {
       children: [
         pw.Center(
           child: pw.Text(
-            'EXAMINATION TIMETABLE',
+            'exam_timetable_pdf.examination_timetable'.tr(),
             style: pw.TextStyle(
               fontSize: 14,
               fontWeight: pw.FontWeight.bold,
@@ -155,7 +157,12 @@ class ExamTimetablePdfService {
         pw.SizedBox(height: 3),
         pw.Center(
           child: pw.Text(
-            'Class: $className – Section $sectionName',
+            'exam_timetable_pdf.class_section_label'.tr(
+                namedArgs: {
+                  'className': className,
+                  'sectionName': sectionName,
+                }
+            ),
             style: pw.TextStyle(fontSize: 9, color: _textDark),
           ),
         ),
@@ -183,9 +190,10 @@ class ExamTimetablePdfService {
         pw.TableRow(
           decoration: const pw.BoxDecoration(color: _headerBg),
           children: [
-            _infoCell('EXAM', examName),
-            _infoCell('CLASS & SECTION', '$className – $sectionName', hasBorder: true),
-            _infoCell('TOTAL SUBJECTS', '$total Subjects', hasBorder: false),
+            _infoCell('exam_timetable_pdf.exam_label'.tr(), examName),
+            _infoCell('exam_timetable_pdf.class_section_header'.tr(), '$className – $sectionName', hasBorder: true),
+            _infoCell('exam_timetable_pdf.total_subjects_header'.tr(),
+                'exam_timetable_pdf.subjects_count'.tr(namedArgs: {'count': total.toString()}), hasBorder: false),
           ],
         ),
       ],
@@ -214,7 +222,18 @@ class ExamTimetablePdfService {
   }
 
   static pw.Widget _buildTimetableTable(List<ExamTimetableData> items) {
-    const headers = ['S.No', 'Subject', 'Date', 'Day', 'Start Time', 'End Time', 'Room', 'Max Marks', 'Pass Marks'];
+    final headers = [
+      'exam_timetable_pdf.sno'.tr(),
+      'exam_timetable_pdf.subject'.tr(),
+      'exam_timetable_pdf.date'.tr(),
+      'exam_timetable_pdf.day'.tr(),
+      'exam_timetable_pdf.start_time'.tr(),
+      'exam_timetable_pdf.end_time'.tr(),
+      'exam_timetable_pdf.room'.tr(),
+      'exam_timetable_pdf.max_marks'.tr(),
+      'exam_timetable_pdf.pass_marks'.tr(),
+    ];
+
     const colWidths = {
       0: pw.FlexColumnWidth(0.5),
       1: pw.FlexColumnWidth(1.2),
@@ -227,13 +246,11 @@ class ExamTimetablePdfService {
       8: pw.FlexColumnWidth(1.1),
     };
 
-    // Header row
     final headerRow = pw.TableRow(
       decoration: const pw.BoxDecoration(color: _headerBg),
       children: headers.map((h) => _thCell(h)).toList(),
     );
 
-    // Data rows
     final dataRows = items.asMap().entries.map((entry) {
       final i    = entry.key;
       final item = entry.value;
@@ -279,7 +296,8 @@ class ExamTimetablePdfService {
         pw.TextAlign align = pw.TextAlign.left,
         PdfColor color     = _textDark,
         bool bold          = false,
-      }) {return pw.Container(
+      }) {
+    return pw.Container(
       padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 5),
       child: pw.Text(
         text,
@@ -294,8 +312,8 @@ class ExamTimetablePdfService {
   }
 
   static pw.Widget _buildInstructionsBox() {
-    final left  = _instructions.sublist(0, 3);
-    final right = _instructions.sublist(3);
+    final left  = _instructionsKeys.sublist(0, 3);
+    final right = _instructionsKeys.sublist(3);
 
     return pw.Container(
       decoration: pw.BoxDecoration(
@@ -308,7 +326,7 @@ class ExamTimetablePdfService {
             color: _lightBlue,
             padding: const pw.EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             child: pw.Text(
-              '  IMPORTANT INSTRUCTIONS FOR STUDENTS',
+              '  exam_timetable_pdf.important_instructions'.tr(),
               style: pw.TextStyle(
                 fontSize: 9,
                 fontWeight: pw.FontWeight.bold,
@@ -326,9 +344,9 @@ class ExamTimetablePdfService {
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: left
-                        .map((t) => pw.Padding(
+                        .map((key) => pw.Padding(
                       padding: const pw.EdgeInsets.only(bottom: 4),
-                      child: pw.Text('✓  $t',
+                      child: pw.Text('✓  ${key.tr()}',
                           style: pw.TextStyle(fontSize: 8, color: _textDark)),
                     ))
                         .toList(),
@@ -339,9 +357,9 @@ class ExamTimetablePdfService {
                   child: pw.Column(
                     crossAxisAlignment: pw.CrossAxisAlignment.start,
                     children: right
-                        .map((t) => pw.Padding(
+                        .map((key) => pw.Padding(
                       padding: const pw.EdgeInsets.only(bottom: 4),
-                      child: pw.Text('✓  $t',
+                      child: pw.Text('✓  ${key.tr()}',
                           style: pw.TextStyle(fontSize: 8, color: _textDark)),
                     ))
                         .toList(),
@@ -359,7 +377,6 @@ class ExamTimetablePdfService {
     return pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.end,
       children: [
-        // Stamp
         pw.Container(
           width: 60,
           height: 55,
@@ -369,30 +386,28 @@ class ExamTimetablePdfService {
           ),
           child: pw.Center(
             child: pw.Text(
-              'SCHOOL\nSTAMP',
+              'exam_timetable_pdf.school_stamp'.tr(),
               textAlign: pw.TextAlign.center,
               style: pw.TextStyle(fontSize: 7, color: _border),
             ),
           ),
         ),
         pw.Expanded(child: pw.SizedBox()),
-        // Class Teacher
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.center,
           children: [
             pw.Divider(color: _textDark, thickness: 0.8, indent: 0, endIndent: 0),
-            pw.Text('Class Teacher', style: pw.TextStyle(fontSize: 8, color: _textDark)),
-            pw.Text('SIGNATURE', style: pw.TextStyle(fontSize: 7, color: _textGrey)),
+            pw.Text('exam_timetable_pdf.class_teacher'.tr(), style: pw.TextStyle(fontSize: 8, color: _textDark)),
+            pw.Text('exam_timetable_pdf.signature'.tr(), style: pw.TextStyle(fontSize: 7, color: _textGrey)),
           ],
         ),
         pw.SizedBox(width: 30),
-        // Principal
         pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.center,
           children: [
             pw.Divider(color: _textDark, thickness: 0.8),
-            pw.Text('Principal', style: pw.TextStyle(fontSize: 8, color: _textDark)),
-            pw.Text('SIGNATURE', style: pw.TextStyle(fontSize: 7, color: _textGrey)),
+            pw.Text('exam_timetable_pdf.principal'.tr(), style: pw.TextStyle(fontSize: 8, color: _textDark)),
+            pw.Text('exam_timetable_pdf.signature'.tr(), style: pw.TextStyle(fontSize: 7, color: _textGrey)),
           ],
         ),
       ],
@@ -471,13 +486,13 @@ class ExamTimetablePdfService {
         if (sdk < 33) {
           final status = await Permission.storage.request();
           if (!status.isGranted) {
-            _showSnack(context, 'Storage permission denied');
+            _showSnack(context, 'exam_timetable_pdf.storage_permission_denied'.tr());
             return;
           }
         }
       }
 
-      _showSnack(context, 'Generating PDF...');
+      _showSnack(context, 'exam_timetable_pdf.generating_pdf'.tr());
 
       final file = await generatePdf(
         examTimeTableModel:      examTimeTableModel,
@@ -489,10 +504,14 @@ class ExamTimetablePdfService {
 
       final result = await OpenFile.open(file.path);
       if (result.type != ResultType.done) {
-        _showSnack(context, 'Could not open PDF: ${result.message}');
+        _showSnack(context, 'exam_timetable_pdf.could_not_open_pdf'.tr(
+            namedArgs: {'message': result.message ?? ''}
+        ));
       }
     } catch (e) {
-      _showSnack(context, 'Error: $e');
+      _showSnack(context, 'exam_timetable_pdf.error'.tr(
+          namedArgs: {'error': e.toString()}
+      ));
     }
   }
 
@@ -505,7 +524,7 @@ class ExamTimetablePdfService {
     required String sectionName,
   }) async {
     try {
-      _showSnack(context, 'Preparing PDF...');
+      _showSnack(context, 'exam_timetable_pdf.preparing_pdf'.tr());
       final file = await generatePdf(
         examTimeTableModel:      examTimeTableModel,
         schoolAdminProfileModel: schoolAdminProfileModel,
@@ -518,7 +537,9 @@ class ExamTimetablePdfService {
         subject: 'Exam Timetable - $examName',
       );
     } catch (e) {
-      _showSnack(context, 'Error: $e');
+      _showSnack(context, 'exam_timetable_pdf.error'.tr(
+          namedArgs: {'error': e.toString()}
+      ));
     }
   }
 
@@ -527,7 +548,7 @@ class ExamTimetablePdfService {
       final info = await DeviceInfoPlugin().androidInfo;
       return info.version.sdkInt;
     } catch (_) {
-      return 30; // safe fallback — Android 11
+      return 30;
     }
   }
 

@@ -62,13 +62,13 @@ class _AccountantManagementDashBoardScreenState
     _tileAnimations = List.generate(
         DashboardModules.modules.length,
             (i) {
-      final start = (i * 0.05).clamp(0.0, 0.65);
-      final end = (start + 0.42).clamp(0.0, 1.0);
-      return CurvedAnimation(
-        parent: _animController,
-        curve: Interval(start, end, curve: Curves.easeOutBack),
-      );
-    });
+          final start = (i * 0.05).clamp(0.0, 0.65);
+          final end = (start + 0.42).clamp(0.0, 1.0);
+          return CurvedAnimation(
+            parent: _animController,
+            curve: Interval(start, end, curve: Curves.easeOutBack),
+          );
+        });
 
     _animController.forward();
   }
@@ -86,41 +86,40 @@ class _AccountantManagementDashBoardScreenState
 
   Future<bool> _showExitPopup() async {
     return await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            title: const Text(
-              'Exit App',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: const Text('Are you sure you want to exit?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1B5E20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () => SystemNavigator.pop(),
-                child: const Text(
-                  'Exit',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          'accountant_dashboard.exit_app'.tr(),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Text('accountant_dashboard.exit_confirm'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('accountant_dashboard.cancel'.tr()),
           ),
-        ) ??
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF1B5E20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () => SystemNavigator.pop(),
+            child: Text(
+              'accountant_dashboard.exit'.tr(),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    ) ??
         false;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -133,17 +132,17 @@ class _AccountantManagementDashBoardScreenState
         Provider.of<AllStudentListVieModel>(
           context,
         ).allStudentListModel?.pagination?.total?.toString() ??
-        '...';
+            '...';
     final accountantTotal =
         Provider.of<AllAccountantListVieModel>(
           context,
         ).allAccountantListModel?.pagination?.total?.toString() ??
-        '0';
+            '0';
     final teacherTotal =
         Provider.of<AllTeachersListVieModel>(
           context,
         ).allTeachersListModel?.pagination?.total?.toString() ??
-        '...';
+            '...';
     return WillPopScope(
       onWillPop: () async => await _showExitPopup(),
       child: SafeArea(
@@ -168,14 +167,13 @@ class _AccountantManagementDashBoardScreenState
     );
   }
 
-
   Widget _buildHeader(
-    BuildContext context,
-    String name,
-    String studentTotal,
-    String teacherTotal,
-    String accountantTotal,
-  ) {
+      BuildContext context,
+      String name,
+      String studentTotal,
+      String teacherTotal,
+      String accountantTotal,
+      ) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -194,7 +192,6 @@ class _AccountantManagementDashBoardScreenState
       ),
       child: Column(
         children: [
-          // ── Top Row ──
           Row(
             children: [
               Builder(
@@ -225,7 +222,7 @@ class _AccountantManagementDashBoardScreenState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'ACCOUNTANT PORTAL',
+                      'accountant_dashboard.title'.tr(),
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
@@ -235,7 +232,7 @@ class _AccountantManagementDashBoardScreenState
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Hi, $name 👋',
+                      '${'accountant_dashboard.hi'.tr()}, $name 👋',
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -245,7 +242,6 @@ class _AccountantManagementDashBoardScreenState
                   ],
                 ),
               ),
-              // Notification bell
               Stack(
                 children: [
                   Container(
@@ -281,30 +277,27 @@ class _AccountantManagementDashBoardScreenState
               ),
             ],
           ),
-
           const SizedBox(height: 20),
-
-          // ── Finance Stat Cards ──
           Row(
             children: [
               _statCard(
                 icon: Icons.receipt_long_rounded,
                 value: studentTotal,
-                label: 'Students',
+                label: 'accountant_dashboard.students'.tr(),
                 accent: const Color(0xFFEF5350),
               ),
               const SizedBox(width: 10),
               _statCard(
                 icon: Icons.check_circle_rounded,
                 value: teacherTotal,
-                label: 'Teachers',
+                label: 'accountant_dashboard.teachers'.tr(),
                 accent: const Color(0xFF66BB6A),
               ),
               const SizedBox(width: 10),
               _statCard(
                 icon: Icons.account_balance_rounded,
                 value: accountantTotal,
-                label: 'Accountant',
+                label: 'accountant_dashboard.accountant'.tr(),
                 accent: const Color(0xFF42A5F5),
               ),
             ],
@@ -365,7 +358,6 @@ class _AccountantManagementDashBoardScreenState
     );
   }
 
-
   Widget _buildGrid() {
     final visibleModules = DashboardModules.modules
         .where(
@@ -405,7 +397,6 @@ class _AccountantManagementDashBoardScreenState
       },
     );
   }
-
 
   Widget _buildModuleTile(
       DashboardModule module,
@@ -472,7 +463,7 @@ class _AccountantManagementDashBoardScreenState
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    module.title,
+                    module.localizedTitle,
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -567,9 +558,9 @@ class _AccountantManagementDashBoardScreenState
                       color: Colors.white.withValues(alpha: 0.3),
                     ),
                   ),
-                  child: const Text(
-                    '💰  Finance & Accounts',
-                    style: TextStyle(
+                  child: Text(
+                    '💰  ${'accountant_dashboard.finance_accounts'.tr()}',
+                    style: const TextStyle(
                       fontSize: 11,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
@@ -583,7 +574,6 @@ class _AccountantManagementDashBoardScreenState
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 10),
               children: [
-                // In drawer items:
                 _drawerItem(
                   icon: Icons.shield_outlined,
                   title: 'cms.privacy_policy'.tr(),
@@ -631,27 +621,19 @@ class _AccountantManagementDashBoardScreenState
                 ),
                 _drawerItem(
                   icon: Icons.help_outline_rounded,
-                  title: 'Help & Support',
+                  title: 'accountant_dashboard.help_support'.tr(),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushNamed(context, RoutesName.helpSupportScreen);
                   },
                 ),
-                // _drawerItem(
-                //   icon: Icons.settings_outlined,
-                //   title: 'Settings',
-                //   onTap: () => Navigator.push(
-                //     context,
-                //     MaterialPageRoute(builder: (context) => ManagePermission()),
-                //   ),
-                // ),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                   child: Divider(),
                 ),
                 _drawerItem(
                   icon: Icons.logout_rounded,
-                  title: 'Logout',
+                  title: 'accountant_dashboard.logout'.tr(),
                   iconColor: Colors.red.shade700,
                   titleColor: Colors.red.shade700,
                   iconBg: Colors.red.shade50,
@@ -721,31 +703,31 @@ class _AccountantManagementDashBoardScreenState
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: const Row(
+              title: Row(
                 children: [
-                  Icon(Icons.logout_rounded, color: Colors.red),
-                  SizedBox(width: 10),
+                  const Icon(Icons.logout_rounded, color: Colors.red),
+                  const SizedBox(width: 10),
                   Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    'accountant_dashboard.logout'.tr(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
-              content: const Text(
-                'Are you sure you want to logout?',
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+              content: Text(
+                'accountant_dashboard.logout_confirm'.tr(),
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
               actions: [
-                // CANCEL — loading mein disable
                 TextButton(
                   onPressed: isLoggingOut ? null : () => Navigator.pop(ctx),
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.grey),
+                  child: Text(
+                    'accountant_dashboard.cancel'.tr(),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
-
-                // LOGOUT
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -762,7 +744,6 @@ class _AccountantManagementDashBoardScreenState
                     final userVM = UserViewModel();
 
                     try {
-                      // STEP 1: Subscribed session pehle padho
                       final session =
                       await userVM.getSubscribedSession();
                       final schoolId = session['schoolId'];
@@ -775,7 +756,6 @@ class _AccountantManagementDashBoardScreenState
                         "🔍 Accountant Logout => school=$schoolId | role=$role",
                       );
 
-                      // STEP 2: FCM Topics unsubscribe
                       if (schoolId != null &&
                           schoolId.isNotEmpty &&
                           role != null &&
@@ -817,11 +797,9 @@ class _AccountantManagementDashBoardScreenState
                         );
                       }
 
-                      // STEP 3: FCM Token delete
                       await FirebaseMessaging.instance.deleteToken();
                       debugPrint("✅ FCM Token deleted");
 
-                      // STEP 4: Backend logout (best-effort)
                       try {
                         final repo = AuthRepository();
                         await repo.logoutApi({
@@ -845,10 +823,8 @@ class _AccountantManagementDashBoardScreenState
                       PermissionManager.clear();
                     }
 
-                    // Dialog close
                     if (ctx.mounted) Navigator.pop(ctx);
 
-                    // Splash pe jao — pura stack clear
                     if (context.mounted) {
                       Navigator.pushNamedAndRemoveUntil(
                         context,
@@ -866,9 +842,9 @@ class _AccountantManagementDashBoardScreenState
                       strokeWidth: 2.5,
                     ),
                   )
-                      : const Text(
-                    "Logout",
-                    style: TextStyle(color: Colors.white),
+                      : Text(
+                    'accountant_dashboard.logout_btn'.tr(),
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
               ],
@@ -879,4 +855,3 @@ class _AccountantManagementDashBoardScreenState
     );
   }
 }
-
